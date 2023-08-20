@@ -17,7 +17,7 @@ import jakarta.transaction.Transactional;
 
 @Service
 public class RefreshTokenService {
-    @Value("${bezkoder.app.jwtRefreshExpirationMs}")
+    @Value("${f4education.app.jwtRefreshExpirationMs}")
     private Long refreshTokenDurationMs;
 
     @Autowired

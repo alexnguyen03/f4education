@@ -23,11 +23,11 @@ import io.jsonwebtoken.security.Keys;
 public class JwtUtils {
   private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
 
-  @Value("${bezkoder.app.jwtSecret}")
+  @Value("${f4education.app.jwtSecret}")
   private String jwtSecret;
 
-  @Value("${bezkoder.app.jwtExpirationMs}")
-  private int jwtExpirationMs;
+  @Value("${f4education.app.jwtExpirationMs}")
+  private int jwtExpirationMs ;
 
   public String generateJwtToken(Authentication authentication) {
 
