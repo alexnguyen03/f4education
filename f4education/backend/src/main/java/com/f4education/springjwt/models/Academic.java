@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,32 +27,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Account", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
-		@UniqueConstraint(columnNames = "email") })
-public class User {
+@Table(name = "Academic")
+public class Academic {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Integer id;
+	private Integer academicId;
 
-	private String username;
+	private String academicName;
 
-	private String email;
+	private Date startDate;
 
-	private String password;
-
-	private String token;
+	private Date endDate;
 	
-	@OneToMany(mappedBy = "user")
-	List<Account_role> account_role;
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles = new HashSet<>();
-
-	public User(String username, String email, String password) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
-	}
-
+	@OneToMany(mappedBy = "academic")
+	List<Attendance> attendance;
+	
+	@OneToMany(mappedBy = "academic")
+	List<Schedule> schedules;
 }
