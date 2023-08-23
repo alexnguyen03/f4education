@@ -1,0 +1,14 @@
+{
+	"configurations": [
+		{
+			"type": "java",
+			"name": "Spring Boot-SpringBootSecurityJwtApplication<spring-boot-security-jwt>",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"mainClass": "com.f4education.springjwt.SpringBootSecurityJwtApplication",
+			"projectName": "spring-boot-security-jwt",
+			"args": "",
+			"envFile": "${workspaceFolder}/.env"
+		}
+	]
+}

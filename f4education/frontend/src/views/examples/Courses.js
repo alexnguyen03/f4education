@@ -2,8 +2,12 @@ import {Button, Card, CardHeader, CardBody, FormGroup, Form, Input, Container, R
 import UserHeader from 'components/Headers/UserHeader.js';
 import CoursesHeader from 'components/Headers/CoursesHeader';
 import {useState, useMemo} from 'react';
-import {Delete, Edit} from '@mui/icons-material';
+import Delete from '@material-ui/icons/Delete';
+import Refresh from '@material-ui/icons/Refresh';
+import Save from '@material-ui/icons/Save';
+
 import {MaterialReactTable} from 'material-react-table';
+import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
 import {Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
 const data = [
 	{
@@ -11,50 +15,70 @@ const data = [
 		courseName: 'Java cơ bản',
 		duration: 150,
 		price: 120000,
+		description: 'Khóa học Java cho người mới bắt đầu',
+	},
+	{
+		subjectName: 'C#',
+		courseName: 'C# cơ bản',
+		duration: 120,
+		price: 130000,
+		description: 'Khóa học C# cho người mới bắt đầu',
 	},
 	{
 		subjectName: 'Java',
 		courseName: 'Java cơ bản',
 		duration: 150,
 		price: 120000,
+		description: 'Khóa học Java cho người mới bắt đầu',
 	},
 	{
 		subjectName: 'Java',
 		courseName: 'Java cơ bản',
 		duration: 150,
 		price: 120000,
+		description: 'Khóa học Java cho người mới bắt đầu',
 	},
 	{
 		subjectName: 'Java',
 		courseName: 'Java cơ bản',
 		duration: 150,
 		price: 120000,
+		description: 'Khóa học Java cho người mới bắt đầu',
 	},
 	{
 		subjectName: 'Java',
 		courseName: 'Java cơ bản',
 		duration: 150,
 		price: 120000,
+		description: 'Khóa học Java cho người mới bắt đầu',
 	},
 	{
 		subjectName: 'Java',
 		courseName: 'Java cơ bản',
 		duration: 150,
 		price: 120000,
-	},
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
+		description: 'Khóa học Java cho người mới bắt đầu',
 	},
 ];
+
 const Courses = () => {
 	const [subjectList, setSubjectList] = useState([{key: 'java', value: 'Java'}, {key: 'c#', value: 'C#'}, , {key: 'python', value: 'Python'}, {key: 'PHP', value: 'PHP'}]);
 	const [image, setImage] = useState(null);
 	const [imgData, setImgData] = useState(null);
-	// ['https://image8.cdn.seaart.ai/2023-07-13/44636826861637/9a63261b1c0f75815a7a3cf8da39724adf3629cf.png', 'https://image7.cdn.seaart.ai/2023-06-15/34756618563653/95386e96704af92a42448bebb7e302603ec46e4d.png'];
 	const [showForm, setShowForm] = useState(false);
+	const [course, setCourse] = useState({
+		subjectName: '',
+		courseName: '',
+		duration: 0,
+		price: 0,
+		description: '',
+		image: '',
+	});
+
+	const handelOnChangeInput = (e) => {
+		setCourse({[e.target.name]: e.target.value});
+	};
+	// ['https://image8.cdn.seaart.ai/2023-07-13/44636826861637/9a63261b1c0f75815a7a3cf8da39724adf3629cf.png', 'https://image7.cdn.seaart.ai/2023-06-15/34756618563653/95386e96704af92a42448bebb7e302603ec46e4d.png'];
 	const onChangePicture = (e) => {
 		if (e.target.files[0]) {
 			setImage(e.target.files[0]);
@@ -90,6 +114,7 @@ const Courses = () => {
 		],
 		[],
 	);
+
 	return (
 		<>
 			<CoursesHeader />
@@ -111,26 +136,25 @@ const Courses = () => {
 							Create New Account
 						</Button>
 					)}
+					enableRowActions
 					renderRowActions={({row, table}) => (
-						<Box sx={{display: 'flex', gap: '1rem'}}>
-							<Tooltip
-								arrow
-								placement='left'
-								title='Edit'>
-								<IconButton onClick={() => {}}>
-									<Edit />
-								</IconButton>
-							</Tooltip>
-							<Tooltip
-								arrow
-								placement='right'
-								title='Delete'>
-								<IconButton
-									color='error'
-									onClick={() => {}}>
-									<Delete />
-								</IconButton>
-							</Tooltip>
+						<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
+							<IconButton
+								color='secondary'
+								onClick={() => {
+									setShowForm(true);
+									setCourse({...row.original});
+									console.log(course);
+								}}>
+								<EditIcon />
+							</IconButton>
+							<IconButton
+								color='error'
+								onClick={() => {
+									data.splice(row.index, 1); //assuming simple data table
+								}}>
+								<DeleteIcon />
+							</IconButton>
 						</Box>
 					)}
 				/>
@@ -163,10 +187,18 @@ const Courses = () => {
 									</label>
 									<Input
 										id='exampleSelect'
-										name='select'
-										type='select'>
+										name='subjectName'
+										type='select'
+										onChange={handelOnChangeInput}
+										value={course.subjectName}>
 										{subjectList.map((item) => {
-											return <option key={item.key}>{item.value}</option>;
+											return (
+												<option
+													key={item.key}
+													value={item.value}>
+													{item.value}
+												</option>
+											);
 										})}
 									</Input>
 								</FormGroup>
@@ -178,10 +210,13 @@ const Courses = () => {
 									</label>
 									<Input
 										className='form-control-alternative'
-										defaultValue='Java cơ bản cho người mới'
-										id='input-first-name'
-										placeholder='First name'
+										// defaultValue='Java cơ bản cho người mới'
+										id='input-course-name'
+										placeholder='Tên khóa học'
 										type='text'
+										onChange={handelOnChangeInput}
+										name='course.courseName'
+										value={course.courseName}
 									/>
 								</FormGroup>
 
@@ -195,12 +230,14 @@ const Courses = () => {
 											</label>
 											<Input
 												className='form-control-alternative'
-												id='input-first-name'
-												placeholder='First name'
+												id='input-duration'
+												placeholder='Thời lượng'
 												type='number'
 												min={120}
 												step={30}
-												value={120}
+												value={course.duration}
+												name='duration'
+												onChange={handelOnChangeInput}
 											/>
 										</FormGroup>
 									</Col>
@@ -213,9 +250,11 @@ const Courses = () => {
 											</label>
 											<Input
 												className='form-control-alternative'
-												value={120000}
-												id='input-last-name'
+												value={course.price}
+												id='input-price'
 												type='number'
+												name='price'
+												onChange={handelOnChangeInput}
 											/>
 										</FormGroup>
 									</Col>
@@ -231,30 +270,32 @@ const Courses = () => {
 
 											<Input
 												className='form-control-alternative'
-												id='exampleText'
-												name='text'
+												id='input-description'
+												name='description'
+												value={course.description}
 												type='textarea'
+												onChange={handelOnChangeInput}
 											/>
 										</FormGroup>
 									</Col>
 									<Col md={12}>
 										<FormGroup>
 											<Label
-												for='exampleFile'
+												htmlFor='exampleFile'
 												className='form-control-label'>
 												Hình ảnh khóa học
 											</Label>
-											<div class='custom-file'>
+											<div className='custom-file'>
 												<input
 													type='file'
-													class='custom-file-input form-control-alternative'
+													className='custom-file-input form-control-alternative'
 													id='customFile'
 													onChange={onChangePicture}
 													multiple={true}
 												/>
 												<label
-													class='custom-file-label'
-													for='customFile'>
+													className='custom-file-label'
+													htmlFor='customFile'>
 													Chọn hình ảnh
 												</label>
 											</div>
