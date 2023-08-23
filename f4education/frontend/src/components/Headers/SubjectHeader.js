@@ -17,13 +17,13 @@
 */
 
 // reactstrap components
-import { Button, Container, Row, Col } from "reactstrap";
+import { Container, Row, Col } from "reactstrap";
 
 const SubjectHeader = () => {
   return (
     <>
       <div
-        className="header pt-5 pt-lg-8 d-flex align-items-center"
+        className="header pb-8 pt-5 pt-lg-8 d-flex align-items-center"
         style={{
           minHeight: "200px",
           backgroundImage:

@@ -41,24 +41,57 @@ const data = [
 ];
 
 const Subjects = (props) => {
+  // Main variable
+  const [subjects, setSubjects] = useState(data);
+
   // Action variable
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
   // Material React Table
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [tableData, setTableData] = useState(data);
   const [validationErrors, setValidationErrors] = useState({});
 
+  // Form avariable
+  const [subject, setSubject] = useState({
+    id: "",
+    adminId: "",
+    name: "",
+  });
+
+  const handleChangeInput = (e) => {
+    setSubject((prevSubject) => ({
+      ...prevSubject,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  // Material Area
   const handleCreateNewRow = (values) => {
-    tableData.push(values);
-    setTableData([...tableData]);
+    subjects.push(values);
+    setSubjects([...subjects]);
+  };
+
+  const handleUpdateRow = () => {
+    console.log(subject);
+    const newSubjects = [...subjects];
+
+    const subjectIndex = newSubjects.findIndex((sb) => sb.id === subject.id);
+
+    console.log(subjectIndex);
+
+    if (subjectIndex !== -1) {
+      newSubjects[subjectIndex] = subject;
+
+      setSubjects(newSubjects);
+    }
   };
 
   const handleSaveRowEdits = async ({ exitEditingMode, row, values }) => {
     if (!Object.keys(validationErrors).length) {
-      tableData[row.index] = values;
+      subject[row.index] = values;
       //send/receive api updates here, then refetch or update local table data for re-render
-      setTableData([...tableData]);
+      setSubject([...subject]);
       exitEditingMode(); //required to exit editing mode and close modal
     }
   };
@@ -71,25 +104,26 @@ const Subjects = (props) => {
     () => [
       {
         accessorKey: "id",
-        header: "ID môn học",
+        header: "ID",
         enableColumnOrdering: false,
         enableEditing: false, //disable editing on this column
         enableSorting: false,
-        size: 30,
+        size: 10,
       },
       {
         accessorKey: "adminId",
-        header: "Tên admin",
-        size: 30,
+        header: "Admin ID",
+        size: 10,
       },
       {
         accessorKey: "name",
-        header: "Tên môn học",
-        size: 150,
+        header: "Tên Môn Học",
       },
     ],
     []
   );
+
+  // Form Area
 
   return (
     <>
@@ -98,7 +132,7 @@ const Subjects = (props) => {
       {/* HeaderSubject End */}
 
       {/* Page content */}
-      <Container className="mt-7" fluid>
+      <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
           <CardHeader className="bg-white border-0">
             <h3 className="mb-0">Bảng Môn học</h3>
@@ -108,24 +142,28 @@ const Subjects = (props) => {
             <MaterialReactTable
               displayColumnDefOptions={{
                 "mrt-row-actions": {
-                  muiTableHeadCellProps: {
-                    align: "center",
-                  },
+                  header: "Thao tác",
+                  size: 20,
+                  // Something else here
                 },
               }}
               columns={columns}
-              data={tableData}
+              data={subjects}
               editingMode="modal" //default
               enableColumnOrdering
               enableEditing
               onEditingRowSave={handleSaveRowEdits}
               onEditingRowCancel={handleCancelRowEdits}
-              renderRowActions={({ row, table }) => (
-                <div className="d-flex justify-content-center align-content-center">
+              positionActionsColumn="last"
+              renderRowActions={({ row }) => (
+                <div className="d-flex justify-content-start">
                   <Button
                     color="warning"
                     outline
-                    onClick={() => table.setEditingRow(row)}
+                    onClick={() => {
+                      setShowModal(true);
+                      setSubject({ ...row.original });
+                    }}
                   >
                     <i className="bx bx-edit"></i>
                   </Button>
@@ -161,10 +199,10 @@ const Subjects = (props) => {
         <ToastContainer />
 
         {/* Modal */}
-        {/* <Modal
+        <Modal
           className="modal-dialog-centered"
-          isOpen={isUpdateModalOpen}
-          toggle={isUpdateModalOpen}
+          isOpen={showModal}
+          toggle={showModal}
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">
@@ -175,12 +213,51 @@ const Subjects = (props) => {
               className="close"
               data-dismiss="modal"
               type="button"
-              onClick={() => setIsUpdateModalOpen(false)}
+              onClick={() => setShowModal(false)}
             >
               <span aria-hidden={true}>×</span>
             </button>
           </div>
           <div className="modal-body">
+            <form method="post">
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="id">
+                  Mã môn học
+                </label>
+                <Input
+                  className="form-control-alternative"
+                  id="id"
+                  onChange={handleChangeInput}
+                  name="id"
+                  value={subject.id}
+                />
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="adminId">
+                  Mã Admin
+                </label>
+                <Input
+                  className="form-control-alternative"
+                  disabled
+                  id="adminId"
+                  onChange={handleChangeInput}
+                  name="adminId"
+                  value={subject.adminId}
+                />
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="name">
+                  Tên môn học
+                </label>
+                <Input
+                  className="form-control-alternative"
+                  id="name"
+                  onChange={handleChangeInput}
+                  name="name"
+                  value={subject.name}
+                />
+              </FormGroup>
+            </form>
           </div>
           <div className="modal-footer">
             <Button
@@ -188,15 +265,23 @@ const Subjects = (props) => {
               outline
               data-dismiss="modal"
               type="button"
-              onClick={() => setIsUpdateModalOpen(false)}
+              onClick={() => setShowModal(false)}
             >
-              Close
+              Trở lại
             </Button>
-            <Button color="primary" type="button">
+            <Button
+              color="primary"
+              type="button"
+              onClick={() => {
+                handleUpdateRow();
+                toast("Cập nhật môn học thành công");
+                setShowModal(false);
+              }}
+            >
               Cập nhật
             </Button>
           </div>
-        </Modal> */}
+        </Modal>
       </Container>
     </>
   );
