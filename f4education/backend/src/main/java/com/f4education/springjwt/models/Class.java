@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,32 +27,32 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Account", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
-		@UniqueConstraint(columnNames = "email") })
-public class User {
+@Table(name = "Class")
+public class Class {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private Integer classId;
 
-	private String username;
+	private String className;
 
-	private String email;
+	private Date startDate;
 
-	private String password;
-
-	private String token;
-
-	@OneToMany(mappedBy = "user")
-	List<Account_role> account_role;
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles = new HashSet<>();
-
-	public User(String username, String email, String password) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
-	}
-
+	private Date endDate;
+	
+	private Integer maximumQuantity;
+	
+	@OneToMany(mappedBy = "class1")
+	List<Attendance> attendances;
+	
+	@OneToMany(mappedBy = "class1")
+	List<ClassHistory> classHistories;
+	
+	@OneToMany(mappedBy = "class1")
+	List<Comment> comments;
+	
+	@OneToMany(mappedBy = "class1")
+	List<Schedule> schedules;
+	
+	@OneToMany(mappedBy = "class1")
+	List<Task> tasks;
 }

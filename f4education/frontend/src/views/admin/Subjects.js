@@ -1,43 +1,20 @@
-import {
-  Box,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogTitle,
-  FormGroup,
-  IconButton,
-  MenuItem,
-  Stack,
-  TextField,
-  Tooltip,
-} from "@mui/material";
-import SubjectHeader from "components/Headers/SubjectHeader";
-import { MaterialReactTable } from "material-react-table";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {Box, Dialog, DialogActions, DialogContent, DialogTitle, FormGroup, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
+import SubjectHeader from 'components/Headers/SubjectHeader';
+import {MaterialReactTable} from 'material-react-table';
+import {useCallback, useEffect, useMemo, useState} from 'react';
 
 // reactstrap components
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Container,
-  Input,
-  Label,
-  Modal,
-  Row,
-  UncontrolledTooltip,
-} from "reactstrap";
+import {Button, Card, CardBody, CardHeader, Container, Input, Label, Modal, Row, UncontrolledTooltip} from 'reactstrap';
 
 // Stoatify component
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { ToastContainer, toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 
 const data = [
-  { id: "JAVABS", name: "Java cơ bản", adminId: "nam257" },
-  { id: "JAVAAV", name: "Java nâng cap", adminId: "duong038" },
-  { id: "WEB201", name: "Kiểm thử", adminId: "hien082" },
-  { id: "WEB104", name: "AngularJS ang Bootstrap ", adminId: "loi018" },
+	{id: 'JAVABS', name: 'Java cơ bản', adminId: 'nam257'},
+	{id: 'JAVAAV', name: 'Java nâng cap', adminId: 'duong038'},
+	{id: 'WEB201', name: 'Kiểm thử', adminId: 'hien082'},
+	{id: 'WEB104', name: 'AngularJS ang Bootstrap ', adminId: 'loi018'},
 ];
 
 const Subjects = (props) => {
@@ -47,10 +24,10 @@ const Subjects = (props) => {
   // Action variable
   const [showModal, setShowModal] = useState(false);
 
-  // Material React Table
-  const [createModalOpen, setCreateModalOpen] = useState(false);
-  const [tableData, setTableData] = useState(data);
-  const [validationErrors, setValidationErrors] = useState({});
+	// Material React Table
+	const [createModalOpen, setCreateModalOpen] = useState(false);
+	const [tableData, setTableData] = useState(data);
+	const [validationErrors, setValidationErrors] = useState({});
 
   // Form avariable
   const [subject, setSubject] = useState({
@@ -96,9 +73,9 @@ const Subjects = (props) => {
     }
   };
 
-  const handleCancelRowEdits = () => {
-    setValidationErrors({});
-  };
+	const handleCancelRowEdits = () => {
+		setValidationErrors({});
+	};
 
   const columns = useMemo(
     () => [
@@ -125,11 +102,11 @@ const Subjects = (props) => {
 
   // Form Area
 
-  return (
-    <>
-      {/* HeaderSubject start */}
-      <SubjectHeader />
-      {/* HeaderSubject End */}
+	return (
+		<>
+			{/* HeaderSubject start */}
+			<SubjectHeader />
+			{/* HeaderSubject End */}
 
       {/* Page content */}
       <Container className="mt--7" fluid>
@@ -185,18 +162,18 @@ const Subjects = (props) => {
               Thêm môn học
             </UncontrolledTooltip>
 
-            {/* Add new Subject */}
-            <CreateNewAccountModal
-              columns={columns}
-              open={createModalOpen}
-              onClose={() => setCreateModalOpen(false)}
-              onSubmit={handleCreateNewRow}
-            />
-          </CardBody>
-        </Card>
+						{/* Add new Subject */}
+						<CreateNewAccountModal
+							columns={columns}
+							open={createModalOpen}
+							onClose={() => setCreateModalOpen(false)}
+							onSubmit={handleCreateNewRow}
+						/>
+					</CardBody>
+				</Card>
 
-        {/* Toast */}
-        <ToastContainer />
+				{/* Toast */}
+				{/* <ToastContainer /> */}
 
         {/* Modal */}
         <Modal
@@ -287,73 +264,71 @@ const Subjects = (props) => {
   );
 };
 
-export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
-  const [values, setValues] = useState(() =>
-    columns.reduce((acc, column) => {
-      acc[column.accessorKey ?? ""] = "";
-      return acc;
-    }, {})
-  );
+export const CreateNewAccountModal = ({open, columns, onClose, onSubmit}) => {
+	const [values, setValues] = useState(() =>
+		columns.reduce((acc, column) => {
+			acc[column.accessorKey ?? ''] = '';
+			return acc;
+		}, {}),
+	);
 
-  const handleSubmit = () => {
-    //put your validation logic here
-    onSubmit(values);
-    onClose();
-  };
+	const handleSubmit = () => {
+		//put your validation logic here
+		onSubmit(values);
+		onClose();
+	};
 
-  return (
-    <Dialog open={open}>
-      <DialogTitle textAlign="left">Tạo môn học mới</DialogTitle>
-      <DialogContent>
-        <hr className="p-0 m-0 mb-5" />
-        <form onSubmit={(e) => e.preventDefault()}>
-          <Stack
-            sx={{
-              width: "100%",
-              minWidth: { xs: "300px", sm: "360px", md: "400px" },
-              gap: "1.5rem",
-            }}
-          >
-            {columns.map((column) => (
-              <FormGroup>
-                <label
-                  className="form-control-label"
-                  htmlFor={column.accessorKey}
-                >
-                  {column.header}
-                </label>
-                <Input
-                  className="form-control-alternative"
-                  disabled={column.accessorKey === "adminId"}
-                  key={column.id}
-                  id={column.accessorKey}
-                  name={column.accessorKey}
-                  onChange={(e) =>
-                    setValues({ ...values, [e.target.name]: e.target.value })
-                  }
-                />
-              </FormGroup>
-            ))}
-          </Stack>
-        </form>
-      </DialogContent>
-      <DialogActions sx={{ p: "1.25rem" }}>
-        <Button color="default" outline onClick={onClose}>
-          Thoát
-        </Button>
-        <Button
-          color="primary"
-          onClick={() => {
-            handleSubmit();
-            toast("Thêm môn học thành công");
-          }}
-          variant="contained"
-        >
-          Tạo môn học mới
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
+	return (
+		<Dialog open={open}>
+			<DialogTitle textAlign='left'>Tạo môn học mới</DialogTitle>
+			<DialogContent>
+				<hr className='p-0 m-0 mb-5' />
+				<form onSubmit={(e) => e.preventDefault()}>
+					<Stack
+						sx={{
+							width: '100%',
+							minWidth: {xs: '300px', sm: '360px', md: '400px'},
+							gap: '1.5rem',
+						}}>
+						{columns.map((column) => (
+							<FormGroup>
+								<label
+									className='form-control-label'
+									htmlFor={column.accessorKey}>
+									{column.header}
+								</label>
+								<Input
+									className='form-control-alternative'
+									disabled={column.accessorKey === 'adminId'}
+									key={column.id}
+									id={column.accessorKey}
+									name={column.accessorKey}
+									onChange={(e) => setValues({...values, [e.target.name]: e.target.value})}
+								/>
+							</FormGroup>
+						))}
+					</Stack>
+				</form>
+			</DialogContent>
+			<DialogActions sx={{p: '1.25rem'}}>
+				<Button
+					color='default'
+					outline
+					onClick={onClose}>
+					Thoát
+				</Button>
+				<Button
+					color='primary'
+					onClick={() => {
+						handleSubmit();
+						// toast("Thêm môn học thành công");
+					}}
+					variant='contained'>
+					Tạo môn học mới
+				</Button>
+			</DialogActions>
+		</Dialog>
+	);
 };
 
 export default Subjects;

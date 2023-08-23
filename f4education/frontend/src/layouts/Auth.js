@@ -41,7 +41,7 @@ const Auth = (props) => {
 		const fetchData = async () => {
 			try {
 				const body = {
-					username: 'johnle',
+					username: 'johnnguyen',
 					password: '123456789',
 				};
 				const resp = await userApi.signin(body);

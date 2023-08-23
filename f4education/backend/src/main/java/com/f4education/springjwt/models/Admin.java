@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,32 +27,44 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Account", uniqueConstraints = { @UniqueConstraint(columnNames = "username"),
-		@UniqueConstraint(columnNames = "email") })
-public class User {
+@Table(name = "Admin")
+public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+	private String adminId;
 
-	private String username;
+	private String fullname;
 
-	private String email;
+	private Boolean gender;
 
-	private String password;
-
-	private String token;
-
-	@OneToMany(mappedBy = "user")
-	List<Account_role> account_role;
-
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles = new HashSet<>();
-
-	public User(String username, String email, String password) {
-		this.username = username;
-		this.email = email;
-		this.password = password;
-	}
-
+	private Date dateOfBirth;
+	
+	private String citizenIdentification;
+	
+	private String address;
+	
+	private String phone;
+	
+	private String image;
+	
+	@OneToMany(mappedBy = "admin")
+	List<Bill> bill;
+	
+	@OneToMany(mappedBy = "admin")
+	List<ClassHistory> classHistories;
+	
+	@OneToMany(mappedBy = "admin")
+	List<CourseHistory> courseHistories;
+	
+	@OneToMany(mappedBy = "admin")
+	List<QuestionHistory> questionHistories;
+	
+	@OneToMany(mappedBy = "admin")
+	List<ResourcesHistory> resourcesHistories;
+	
+	@OneToMany(mappedBy = "admin")
+	List<Schedule> schedules;
+	
+	@OneToMany(mappedBy = "admin")
+	List<SubjectHistory> subjectHistories;
 }
