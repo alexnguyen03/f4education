@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import SubjectHeader from "components/Headers/SubjectHeader";
 import { MaterialReactTable } from "material-react-table";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 // reactstrap components
 import {
@@ -29,15 +29,20 @@ import {
   UncontrolledTooltip,
 } from "reactstrap";
 
-const Subjects = (props) => {
-  const [isShowToast, setIsShowToast] = useState(false);
+// Stoatify component
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-  const data = [
-    { id: "JAVABS", name: "Java cơ bản", adminId: "nam257" },
-    { id: "JAVAAV", name: "Java nâng cap", adminId: "duong038" },
-    { id: "WEB201", name: "Kiểm thử", adminId: "hien082" },
-    { id: "WEB104", name: "AngularJS ang Bootstrap ", adminId: "loi018" },
-  ];
+const data = [
+  { id: "JAVABS", name: "Java cơ bản", adminId: "nam257" },
+  { id: "JAVAAV", name: "Java nâng cap", adminId: "duong038" },
+  { id: "WEB201", name: "Kiểm thử", adminId: "hien082" },
+  { id: "WEB104", name: "AngularJS ang Bootstrap ", adminId: "loi018" },
+];
+
+const Subjects = (props) => {
+  // Action variable
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
 
   // Material React Table
   const [createModalOpen, setCreateModalOpen] = useState(false);
@@ -61,8 +66,6 @@ const Subjects = (props) => {
   const handleCancelRowEdits = () => {
     setValidationErrors({});
   };
-
-  const handleDeleteRow = useCallback();
 
   const columns = useMemo(
     () => [
@@ -155,28 +158,45 @@ const Subjects = (props) => {
         </Card>
 
         {/* Toast */}
-        <div
-          className="toast auto-hide bg-white position-fixed right-0 p-3"
-          style={{ zIndex: 100, top: "100px", minWidth: "300px" }}
-          role="alert"
-          aria-live="assertive"
-          aria-atomic="true"
+        <ToastContainer />
+
+        {/* Modal */}
+        {/* <Modal
+          className="modal-dialog-centered"
+          isOpen={isUpdateModalOpen}
+          toggle={isUpdateModalOpen}
         >
-          <div className="toast-header">
-            <i className="bx bx-notification"></i>
-            <strong className="ml-1">Hệ thống!</strong>
+          <div className="modal-header">
+            <h3 className="modal-title" id="modal-title-default">
+              Cập nhật môn học
+            </h3>
             <button
-              type="button"
-              className="ml-2 mb-1 close"
-              data-dismiss="toast"
               aria-label="Close"
+              className="close"
+              data-dismiss="modal"
+              type="button"
+              onClick={() => setIsUpdateModalOpen(false)}
             >
-              <span aria-hidden="true">&times;</span>
+              <span aria-hidden={true}>×</span>
             </button>
           </div>
-          <hr className="m-0 p-0 mb-2" />
-          <div className="toast-body bg-secondary">Ngủ đi khuya gòi.</div>
-        </div>
+          <div className="modal-body">
+          </div>
+          <div className="modal-footer">
+            <Button
+              color="default"
+              outline
+              data-dismiss="modal"
+              type="button"
+              onClick={() => setIsUpdateModalOpen(false)}
+            >
+              Close
+            </Button>
+            <Button color="primary" type="button">
+              Cập nhật
+            </Button>
+          </div>
+        </Modal> */}
       </Container>
     </>
   );
@@ -236,22 +256,19 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
         <Button color="default" outline onClick={onClose}>
           Thoát
         </Button>
-        <Button color="primary" onClick={handleSubmit} variant="contained">
+        <Button
+          color="primary"
+          onClick={() => {
+            handleSubmit();
+            toast("Thêm môn học thành công");
+          }}
+          variant="contained"
+        >
           Tạo môn học mới
         </Button>
       </DialogActions>
     </Dialog>
   );
 };
-
-const validateRequired = (value) => !!value.length;
-const validateEmail = (email) =>
-  !!email.length &&
-  email
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    );
-const validateAge = (age) => age >= 18 && age <= 50;
 
 export default Subjects;
