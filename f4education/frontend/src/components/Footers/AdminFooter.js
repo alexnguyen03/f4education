@@ -33,7 +33,7 @@ const Footer = () => {
               rel="noopener noreferrer"
               target="_blank"
             >
-              Creative Tim
+              Bộ tứ siêu đẳng
             </a>
           </div>
         </Col>
