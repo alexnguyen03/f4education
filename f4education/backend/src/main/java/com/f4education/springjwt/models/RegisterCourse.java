@@ -66,4 +66,8 @@ public class RegisterCourse {
 	@ManyToOne
 	@JoinColumn(name = "courseId")
 	Course course; 
+	
+	@ManyToOne
+	@JoinColumn(name = "class_id")
+	Classes classes; 
 }

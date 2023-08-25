@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -36,12 +37,16 @@ public class ClassHistory {
 
 	private Date operationDate;
 	
+	@Column(name = "class_name")
 	private String className;
-	
+
+	@Column(name = "start_date")
 	private Date startDate;
 
+	@Column(name = "end_date")
 	private Date endDate;
 	
+	@Column(name = "maximum_quantity")
 	private Integer maximumQuantity;
 	
 	@ManyToOne
@@ -49,6 +54,6 @@ public class ClassHistory {
 	Admin admin; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 	
+	@JoinColumn(name = "class_id")
+	Classes class1; 	
 }

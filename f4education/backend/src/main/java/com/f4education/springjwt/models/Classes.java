@@ -1,10 +1,12 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -28,18 +30,25 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Class")
-public class Class {
+public class Classes implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "class_id")
 	private Integer classId;
 
+	@Column(name = "class_name")
 	private String className;
 
+	@Column(name = "start_date")
 	private Date startDate;
 
+	@Column(name = "end_date")
 	private Date endDate;
 	
+	@Column(name = "maximum_quantity")
 	private Integer maximumQuantity;
+	
+	private String status;
 	
 	@OneToMany(mappedBy = "class1")
 	List<Attendance> attendances;
@@ -55,4 +64,7 @@ public class Class {
 	
 	@OneToMany(mappedBy = "class1")
 	List<Task> tasks;
+	
+	@OneToMany(mappedBy = "class1")
+	List<RegisterCourse> registerCourses ;
 }

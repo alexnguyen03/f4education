@@ -37,6 +37,6 @@ public class Comment {
 	private Date reviewDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 
+	@JoinColumn(name = "class_id")
+	Classes class1; 
 }

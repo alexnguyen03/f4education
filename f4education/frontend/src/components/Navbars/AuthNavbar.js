@@ -114,6 +114,15 @@ const AdminNavbar = () => {
 									<span className='nav-link-inner--text'>Courses</span>
 								</NavLink>
 							</NavItem>
+							<NavItem>
+								<NavLink
+									className='nav-link-icon'
+									to='/admin/classs'
+									tag={Link}>
+									<i className='ni ni-single-02' />
+									<span className='nav-link-inner--text'>Classs</span>
+								</NavLink>
+							</NavItem>
 						</Nav>
 					</UncontrolledCollapse>
 				</Container>

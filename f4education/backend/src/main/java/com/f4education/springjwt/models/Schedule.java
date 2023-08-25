@@ -47,8 +47,8 @@ public class Schedule {
 	Academic academic; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 
+	@JoinColumn(name = "class_id")
+	Classes class1; 
 	
 	@ManyToOne
 	@JoinColumn(name = "classroomId")

@@ -24,6 +24,7 @@ import Tables from 'views/examples/Tables.js';
 import Icons from 'views/examples/Icons.js';
 import Subjects from 'views/admin/Subjects';
 import Courses from 'views/admin/Courses.js';
+import Classs from 'views/admin/Classs';
 
 var routes = [
 	{
@@ -87,6 +88,13 @@ var routes = [
 		name: 'Courses',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <Courses />,
+		layout: '/admin',
+	},
+	{
+		path: '/classs',
+		name: 'Classs',
+		icon: 'ni ni-single-02 text-yellow',
+		component: <Classs />,
 		layout: '/admin',
 	},
 ];

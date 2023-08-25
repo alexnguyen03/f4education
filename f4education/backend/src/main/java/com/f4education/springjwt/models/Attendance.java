@@ -41,8 +41,8 @@ public class Attendance {
 	Student student; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 
+	@JoinColumn(name = "class_id")
+	Classes class1; 
 	
 	@ManyToOne
 	@JoinColumn(name = "academicId")

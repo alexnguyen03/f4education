@@ -41,6 +41,6 @@ public class Task {
 	private Date endDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 
+	@JoinColumn(name = "class_id")
+	Classes class1; 
 }
