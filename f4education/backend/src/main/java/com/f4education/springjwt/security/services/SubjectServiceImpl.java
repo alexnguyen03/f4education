@@ -26,7 +26,7 @@ public class SubjectServiceImpl implements SubjectService {
 	public List<SubjectDTO> getAllSubjects() {
 		List<Subject> subjects = subjectRepository.findAll();
 		for (Subject s : subjects) {
-			System.out.println(s.getCourses());
+			System.out.println(s.getSubjectName());
 		}
 		return subjects.stream().map(this::convertToDto).collect(Collectors.toList());
 	}

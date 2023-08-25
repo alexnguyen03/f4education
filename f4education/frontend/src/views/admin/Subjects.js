@@ -143,8 +143,11 @@ const Subjects = (props) => {
       {/* Page content */}
       <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
-          <CardHeader className="bg-white border-0">
+          <CardHeader className="bg-white border-0 d-flex justify-content-between">
             <h3 className="mb-0">Bảng Môn học</h3>
+            <Button color="default" type="button">
+              Lịch sử môn học
+            </Button>
           </CardHeader>
           <CardBody>
             {/* Table view */}
@@ -229,7 +232,7 @@ const Subjects = (props) => {
           </div>
           <div className="modal-body">
             <form method="post">
-              <FormGroup className="mb-3">
+              {/* <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="id">
                   Mã môn học
                 </label>
@@ -253,7 +256,7 @@ const Subjects = (props) => {
                   name="adminId"
                   value={subject.adminId}
                 />
-              </FormGroup>
+              </FormGroup> */}
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Tên môn học
@@ -351,7 +354,10 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
                 </label>
                 <Input
                   className="form-control-alternative"
-                  disabled={column.accessorKey === "adminId"}
+                  disabled={
+                    column.accessorKey === "adminId" ||
+                    column.accessorKey === "subjectId"
+                  }
                   key={column.id}
                   id={column.accessorKey}
                   name={column.accessorKey}
