@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -31,40 +32,45 @@ import lombok.NoArgsConstructor;
 public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "adminid")
 	private String adminId;
 
+	@Column(name = "fullname")
 	private String fullname;
 
 	private Boolean gender;
 
+	@Column(name = "dateofbirth")
 	private Date dateOfBirth;
-	
+
+	@Column(name = "citizenidentification")
 	private String citizenIdentification;
-	
+
+	@Column(name = "address")
 	private String address;
-	
+
 	private String phone;
-	
+
 	private String image;
-	
+
 	@OneToMany(mappedBy = "admin")
 	List<Bill> bill;
-	
+
 	@OneToMany(mappedBy = "admin")
 	List<ClassHistory> classHistories;
-	
+
 	@OneToMany(mappedBy = "admin")
 	List<CourseHistory> courseHistories;
-	
+
 	@OneToMany(mappedBy = "admin")
 	List<QuestionHistory> questionHistories;
-	
+
 	@OneToMany(mappedBy = "admin")
 	List<ResourcesHistory> resourcesHistories;
-	
+
 	@OneToMany(mappedBy = "admin")
 	List<Schedule> schedules;
-	
+
 	@OneToMany(mappedBy = "admin")
-	List<SubjectHistory> subjectHistories;
+	List<Subject> subject;
 }
