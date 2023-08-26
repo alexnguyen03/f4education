@@ -32,7 +32,7 @@ import lombok.NoArgsConstructor;
 public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "adminid")
+	@Column(name = "admin_id")
 	private String adminId;
 
 	@Column(name = "fullname")
@@ -40,10 +40,10 @@ public class Admin {
 
 	private Boolean gender;
 
-	@Column(name = "dateofbirth")
+	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
 
-	@Column(name = "citizenidentification")
+	@Column(name = "citizen_identification")
 	private String citizenIdentification;
 
 	@Column(name = "address")
@@ -73,4 +73,7 @@ public class Admin {
 
 	@OneToMany(mappedBy = "admin")
 	List<Subject> subject;
+
+	@OneToMany(mappedBy = "admin")
+	List<Course> course;
 }
