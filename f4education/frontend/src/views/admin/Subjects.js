@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import SubjectHeader from "components/Headers/SubjectHeader";
 import { MaterialReactTable } from "material-react-table";
-import { useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 // reactstrap components
 import {
@@ -320,7 +320,7 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
     }, {})
   );
 
-  const adminId = {
+  const admin = {
     admin_id: "namnguyen",
     fullname: "Nguyễn Hoài Nam",
     gender: true,
@@ -335,7 +335,7 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
   const addNewSubject = async (values) => {
     const subject = {
       subjectId: values.subjectId,
-      adminId: adminId.admin_id,
+      adminId: admin.admin_id,
       subjectName: values.subjectName,
     };
     console.log(subject);
@@ -389,7 +389,7 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
                       name={column.accessorKey}
                       value={
                         column.accessorKey === "adminId"
-                          ? adminId.fullname // Assuming 'admin' is the object containing 'fullname'
+                          ? admin.fullname // Assuming 'admin' is the object containing 'fullname'
                           : values[column.accessorKey] // Assuming you have a 'values' object containing form input values
                       }
                       onChange={(e) => {
@@ -426,4 +426,4 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
   );
 };
 
-export default Subjects;
+export default memo(Subjects);

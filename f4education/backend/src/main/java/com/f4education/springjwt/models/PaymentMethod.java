@@ -27,6 +27,6 @@ public class PaymentMethod {
 	@Column(name = "payment_method_name")
 	private String paymentMethodName;
 
-	@OneToMany(mappedBy = "payment_method_id")
+	@OneToMany(mappedBy = "paymentMethod")
 	List<Bill> bills;
 }

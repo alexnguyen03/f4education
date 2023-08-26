@@ -42,7 +42,7 @@ public class SubjectServiceImpl implements SubjectService {
 		Subject subject = new Subject();
 		Admin admin = adminService.getAdminById(subjectDTO.getAdminId());
 		subject.setAdmin(admin);
-		System.out.println(admin);
+//		System.out.println(admin);
 
 		convertToEntity(subjectDTO, subject);
 		Subject savedSubject = subjectRepository.save(subject);
@@ -64,8 +64,8 @@ public class SubjectServiceImpl implements SubjectService {
 	}
 
 	public SubjectDTO mapSubjectToDTO(Subject subject) {
-		String adminFullname = subject.getAdmin().getFullname();
-		return new SubjectDTO(subject.getSubjectId(), subject.getSubjectName(), adminFullname);
+		String adminId = subject.getAdmin().getAdminId();
+		return new SubjectDTO(subject.getSubjectId(), subject.getSubjectName(), adminId);
 	}
 
 	private void convertToEntity(SubjectDTO subjectDTO, Subject subject) {
