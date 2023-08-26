@@ -28,7 +28,7 @@ public class SubjectServiceImpl implements SubjectService {
 		for (Subject s : subjects) {
 			System.out.println(s.getSubjectName());
 		}
-		return subjects.stream().map(this::convertToDto).collect(Collectors.toList());
+		return subjects.stream().map(this::mapSubjectToDTO).collect(Collectors.toList());
 	}
 
 	@Override
@@ -42,6 +42,7 @@ public class SubjectServiceImpl implements SubjectService {
 		Subject subject = new Subject();
 		Admin admin = adminService.getAdminById(subjectDTO.getAdminId());
 		subject.setAdmin(admin);
+//		System.out.println(admin);
 
 		convertToEntity(subjectDTO, subject);
 		Subject savedSubject = subjectRepository.save(subject);
@@ -60,6 +61,11 @@ public class SubjectServiceImpl implements SubjectService {
 		SubjectDTO subjectDTO = new SubjectDTO();
 		BeanUtils.copyProperties(subject, subjectDTO);
 		return subjectDTO;
+	}
+
+	public SubjectDTO mapSubjectToDTO(Subject subject) {
+		String adminId = subject.getAdmin().getAdminId();
+		return new SubjectDTO(subject.getSubjectId(), subject.getSubjectName(), adminId);
 	}
 
 	private void convertToEntity(SubjectDTO subjectDTO, Subject subject) {

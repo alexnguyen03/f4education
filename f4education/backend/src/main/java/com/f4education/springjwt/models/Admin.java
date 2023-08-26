@@ -38,6 +38,7 @@ public class Admin {
 	@Column(name = "fullname")
 	private String fullname;
 
+	@Column(name = "gender")
 	private Boolean gender;
 
 	@Column(name = "date_of_birth")
@@ -49,24 +50,14 @@ public class Admin {
 	@Column(name = "address")
 	private String address;
 
+	@Column(name = "phone")
 	private String phone;
 
+	@Column(name = "image")
 	private String image;
 
 	@OneToMany(mappedBy = "admin")
 	List<Bill> bill;
-
-	@OneToMany(mappedBy = "admin")
-	List<ClassHistory> classHistories;
-
-	@OneToMany(mappedBy = "admin")
-	List<CourseHistory> courseHistories;
-
-	@OneToMany(mappedBy = "admin")
-	List<QuestionHistory> questionHistories;
-
-	@OneToMany(mappedBy = "admin")
-	List<ResourcesHistory> resourcesHistories;
 
 	@OneToMany(mappedBy = "admin")
 	List<Schedule> schedules;

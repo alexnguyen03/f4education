@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 import SubjectHeader from "components/Headers/SubjectHeader";
 import { MaterialReactTable } from "material-react-table";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 
 // reactstrap components
 import {
@@ -51,9 +51,21 @@ const Subjects = (props) => {
   const [validationErrors, setValidationErrors] = useState({});
 
   // Form avariable
+  const adminId = {
+    admin_id: "namnguyen",
+    fullname: "Nguyễn Hoài Nam",
+    gender: true,
+    date_of_birth: "2003-01-01",
+    citizen_identification: "930475892189",
+    levels: "Admin",
+    address: "Can Tho",
+    phone: "1234567890",
+    image: "image1.png",
+  };
+
   const [subject, setSubject] = useState({
     subjectId: "",
-    adminId: "",
+    adminId: adminId,
     subjectName: "",
   });
 
@@ -91,6 +103,7 @@ const Subjects = (props) => {
 
       setSubjects(newSubjects);
     }
+    setShowModal(false);
   };
 
   const handleSaveRowEdits = async ({ exitEditingMode, row, values }) => {
@@ -118,7 +131,7 @@ const Subjects = (props) => {
       },
       {
         accessorKey: "adminId",
-        header: "Admin ID",
+        header: "Tên người tạo",
         size: 10,
       },
       {
@@ -232,14 +245,15 @@ const Subjects = (props) => {
           </div>
           <div className="modal-body">
             <form method="post">
-              {/* <FormGroup className="mb-3">
+              <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="id">
                   Mã môn học
                 </label>
                 <Input
                   className="form-control-alternative"
                   id="id"
-                  onChange={handleChangeInput}
+                  // onChange={handleChangeInput}
+                  disabled
                   name="id"
                   value={subject.subjectId}
                 />
@@ -252,11 +266,11 @@ const Subjects = (props) => {
                   className="form-control-alternative"
                   disabled
                   id="adminId"
-                  onChange={handleChangeInput}
+                  // onChange={handleChangeInput}
                   name="adminId"
                   value={subject.adminId}
                 />
-              </FormGroup> */}
+              </FormGroup>
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Tên môn học
@@ -287,7 +301,6 @@ const Subjects = (props) => {
               onClick={() => {
                 handleUpdateRow();
                 // toast("Cập nhật môn học thành công");
-                setShowModal(false);
               }}
             >
               Cập nhật
@@ -307,19 +320,31 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
     }, {})
   );
 
+  const admin = {
+    admin_id: "namnguyen",
+    fullname: "Nguyễn Hoài Nam",
+    gender: true,
+    date_of_birth: "2003-01-01",
+    citizen_identification: "930475892189",
+    levels: "Admin",
+    address: "Can Tho",
+    phone: "1234567890",
+    image: "image1.png",
+  };
+
   const addNewSubject = async (values) => {
     const subject = {
       subjectId: values.subjectId,
-      adminId: "namnguyen",
+      adminId: admin.admin_id,
       subjectName: values.subjectName,
     };
-    // console.log(subject);
+    console.log(subject);
 
-    axios({
-      method: "post",
-      url: ROOT_URL,
-      data: subject,
-    });
+    // axios({
+    //   method: "post",
+    //   url: ROOT_URL,
+    //   data: subject,
+    // });
   };
 
   const handleSubmit = () => {
@@ -344,29 +369,41 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
               gap: "1.5rem",
             }}
           >
-            {columns.map((column) => (
-              <FormGroup>
-                <label
-                  className="form-control-label"
-                  htmlFor={column.accessorKey}
-                >
-                  {column.header}
-                </label>
-                <Input
-                  className="form-control-alternative"
-                  disabled={
-                    column.accessorKey === "adminId" ||
-                    column.accessorKey === "subjectId"
-                  }
-                  key={column.id}
-                  id={column.accessorKey}
-                  name={column.accessorKey}
-                  onChange={(e) => {
-                    setValues({ ...values, [e.target.name]: e.target.value });
-                  }}
-                />
-              </FormGroup>
-            ))}
+            {columns.map((column) => {
+              if (
+                column.accessorKey === "adminId" ||
+                column.accessorKey === "subjectName"
+              ) {
+                return (
+                  <FormGroup key={column.id}>
+                    <label
+                      className="form-control-label"
+                      htmlFor={column.accessorKey}
+                    >
+                      {column.header}
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      disabled={column.accessorKey === "adminId"}
+                      id={column.accessorKey}
+                      name={column.accessorKey}
+                      value={
+                        column.accessorKey === "adminId"
+                          ? admin.fullname // Assuming 'admin' is the object containing 'fullname'
+                          : values[column.accessorKey] // Assuming you have a 'values' object containing form input values
+                      }
+                      onChange={(e) => {
+                        setValues({
+                          ...values,
+                          [e.target.name]: e.target.value,
+                        });
+                      }}
+                    />
+                  </FormGroup>
+                );
+              }
+              return null;
+            })}
           </Stack>
         </form>
       </DialogContent>
@@ -389,4 +426,4 @@ export const CreateNewAccountModal = ({ open, columns, onClose, onSubmit }) => {
   );
 };
 
-export default Subjects;
+export default memo(Subjects);
