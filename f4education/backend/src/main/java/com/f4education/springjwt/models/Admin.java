@@ -32,41 +32,32 @@ import lombok.NoArgsConstructor;
 public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "adminid")
+	@Column(name = "admin_id")
 	private String adminId;
 
 	@Column(name = "fullname")
 	private String fullname;
 
+	@Column(name = "gender")
 	private Boolean gender;
 
-	@Column(name = "dateofbirth")
+	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
 
-	@Column(name = "citizenidentification")
+	@Column(name = "citizen_identification")
 	private String citizenIdentification;
 
 	@Column(name = "address")
 	private String address;
 
+	@Column(name = "phone")
 	private String phone;
 
+	@Column(name = "image")
 	private String image;
 
 	@OneToMany(mappedBy = "admin")
 	List<Bill> bill;
-
-	@OneToMany(mappedBy = "admin")
-	List<ClassHistory> classHistories;
-
-	@OneToMany(mappedBy = "admin")
-	List<CourseHistory> courseHistories;
-
-	@OneToMany(mappedBy = "admin")
-	List<QuestionHistory> questionHistories;
-
-	@OneToMany(mappedBy = "admin")
-	List<ResourcesHistory> resourcesHistories;
 
 	@OneToMany(mappedBy = "admin")
 	List<Schedule> schedules;

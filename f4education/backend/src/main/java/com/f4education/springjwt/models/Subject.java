@@ -24,10 +24,10 @@ import lombok.NoArgsConstructor;
 public class Subject implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "subjectid")
+	@Column(name = "subject_id")
 	private Integer subjectId;
 
-	@Column(name = "subjectname")
+	@Column(name = "subject_name")
 	private String subjectName;
 
 	@ManyToOne
