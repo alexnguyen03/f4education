@@ -1,54 +1,63 @@
 import {Button, Card, CardHeader, CardBody, FormGroup, Form, Input, Container, Row, Col, Label, Modal} from 'reactstrap';
 import UserHeader from 'components/Headers/UserHeader.js';
 import ClasssHeader from 'components/Headers/ClasssHeader';
-import {useState, useMemo} from 'react';
-import Delete from '@material-ui/icons/Delete';
-import Refresh from '@material-ui/icons/Refresh';
-import Save from '@material-ui/icons/Save';
-
+import {useState, useMemo, useEffect} from 'react';
 import {MaterialReactTable} from 'material-react-table';
 import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
 import {Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
-const data = [
-	{
-		className: 'Lập trình Java',
-		startDate: '27/11/2023',
-		endDate: '27/12/2023',
-		maximumQuantity: 40,
-	},
-	{
-		className: 'Lập trình PHP',
-		startDate: '27/11/2023',
-		endDate: '27/12/2023',
-		maximumQuantity: 40,
-	},
-	{
-		className: 'Lập trình Python',
-		startDate: '27/11/2023',
-		endDate: '27/12/2023',
-		maximumQuantity: 40,
-	},
-	{
-		className: 'Lập trình Javascript',
-		startDate: '27/11/2023',
-		endDate: '27/12/2023',
-		maximumQuantity: 40,
-	},
-];
+
+// Axios
+import axios from "axios";
+
+// URL
+const ROOT_URL = "http://localhost:8080/api/classs";
 
 const Classs = () => {
+	const [classses, setclassses] = useState([]);
 	const [showForm, setShowForm] = useState(false);
 	const [classs, setClasss] = useState({
 		className: '',
-		startate: '',
+		starDate: '',
 		endDate: '',
 		maximumQuantity: 0,
 	});
 
+	// lấy dữ liệu từ form
 	const handelOnChangeInput = (e) => {
-		setClasss({[e.target.name]: e.target.value});
+		setClasss({
+			...classs,
+			[e.target.name]: e.target.value
+		  });
 	};
 	
+	// lấy dữ liệu từ database (gọi api)
+	const getDataClass = async () => {
+		const resp = await axios(ROOT_URL);
+		console.log(resp.data)
+		setclassses(resp.data);
+	};
+
+	const handleSubmit = (event) => {
+		event.preventDefault();
+		console.log(classs);
+		// Gửi dữ liệu đến API
+		axios.post(ROOT_URL, classs)
+		  .then((response) => {
+			// Xử lý response thành công
+			console.log(response.data);
+			// Reset form
+			setClasss({
+				className: '',
+				startate: '',
+				endDate: '',
+				maximumQuantity: 0,
+			});
+		  })
+		  .catch((error) => {
+			console.error(error);
+		  });
+	  };
+
 	const columns = useMemo(
 		() => [
 			{
@@ -71,9 +80,20 @@ const Classs = () => {
 				header: 'Số lượng tối đa',
 				size: 95,
 			},
+			{
+				accessorKey: 'admin.fullname',
+				header: 'Người tạo',
+				size: 95,
+			},
 		],
 		[],
 	);
+
+	
+  // Use effect
+  useEffect(() => {
+    getDataClass();
+  }, []);
 
 	return (
 		<>
@@ -95,7 +115,7 @@ const Classs = () => {
 					enableStickyFooter
 					enableRowNumbers
 					columns={columns}
-					data={data}
+					data={classses}
 					positionActionsColumn="last"
 					renderTopToolbarCustomActions={() => (
 						<Button
@@ -119,7 +139,7 @@ const Classs = () => {
 							<IconButton
 								color='error'
 								onClick={() => {
-									data.splice(row.index, 1); //assuming simple data table
+									classses.splice(row.index, 1); //assuming simple data table
 								}}>
 								<DeleteIcon />
 							</IconButton>
@@ -176,8 +196,8 @@ const Classs = () => {
 												className='form-control-alternative'
 												id='input-start-date'
 												type='date'
-												value={classs.startate}
-												name='startate'
+												value={classs.starDate}
+												name='starDate'
 												onChange={handelOnChangeInput}
 											/>
 										</FormGroup>
@@ -234,7 +254,8 @@ const Classs = () => {
 						</Button>
 						<Button
 							color='primary'
-							type='button'>
+							type='button'
+							onClick={handleSubmit}>
 							Lưu
 						</Button>
 					</div>

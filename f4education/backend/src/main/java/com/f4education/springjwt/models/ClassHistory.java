@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -22,20 +23,23 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "ClassHistory")
-public class ClassHistory {
+@Table(name = "Classhistory")
+public class ClassHistory implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "class_history_id")
 	private Integer classHistoryId;
 
-	private String operation;
+	private String action;
 
-	private Date operationDate;
+	@Column(name = "modify_date")
+	private Date modifyDate;
 	
 	@Column(name = "class_name")
 	private String className;
@@ -49,11 +53,19 @@ public class ClassHistory {
 	@Column(name = "maximum_quantity")
 	private Integer maximumQuantity;
 	
-	@ManyToOne
-	@JoinColumn(name = "adminId")
-	Admin admin; 
+	@Column(name = "admin_id")
+	private String adminId;
 	
 	@ManyToOne
 	@JoinColumn(name = "class_id")
-	Classes class1; 	
+	Classes classes;
+
+	@Override
+	public String toString() {
+		return "ClassHistory [classHistoryId=" + classHistoryId + ", action=" + action + ", modifyDate=" + modifyDate
+				+ ", className=" + className + ", startDate=" + startDate + ", endDate=" + endDate
+				+ ", maximumQuantity=" + maximumQuantity + ", adminId=" + adminId + ", classes=" + classes + "]";
+	} 	
+	
+	
 }

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -32,22 +34,27 @@ import lombok.NoArgsConstructor;
 public class Point {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "point_id")
 	private Integer pointId;
 
-	private Float mediumScore;
-
-	private String content;
-	
-	private Date reviewDate;
+	@Column(name = "average_point")
+	private Float averagePoint;
 	
 	@OneToMany(mappedBy = "point1")
 	List<DetailPoint> detailPoints;
 	
 	@ManyToOne
-	@JoinColumn(name = "studentId")
+	@JoinColumn(name = "student_id")
 	Student student; 
 	
 	@ManyToOne
-	@JoinColumn(name = "registerCourseId")
-	RegisterCourse registerCourse; 
+	@JoinColumn(name = "register_course_id")
+	RegisterCourse registerCourse;
+
+	@Override
+	public String toString() {
+		return "Point [pointId=" + pointId + ", averagePoint=" + averagePoint + "]";
+	} 
+	
+	
 }

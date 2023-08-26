@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -32,12 +34,13 @@ import lombok.NoArgsConstructor;
 public class Bill {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "bill_id")
 	private Integer billId;
 
+	@Column(name = "create_date")
 	private Date createDate;
-
-	private Date endDate;
 	
+	@Column(name = "total_price")
 	private Float totalPrice;
 	
 	private String status;
@@ -48,14 +51,21 @@ public class Bill {
 	List<DetailInvoice> detailInvoice;
 	
 	@ManyToOne
-	@JoinColumn(name = "adminId")
+	@JoinColumn(name = "admin_id")
 	Admin admin; 
 	
 	@ManyToOne
-	@JoinColumn(name = "studentId")
+	@JoinColumn(name = "student_id")
 	Student student; 
 	
 	@ManyToOne
-	@JoinColumn(name = "paymentMethodId")
-	PaymentMethod paymentMethod; 
+	@JoinColumn(name = "payment_method_id")
+	PaymentMethod paymentMethod;
+
+	@Override
+	public String toString() {
+		return "Bill [billId=" + billId + ", createDate=" + createDate + ", totalPrice=" + totalPrice + ", status="
+				+ status + ", note=" + note + "]";
+	} 
+	
 }

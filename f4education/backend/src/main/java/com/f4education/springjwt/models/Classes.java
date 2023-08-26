@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -24,6 +25,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -50,21 +52,25 @@ public class Classes implements Serializable{
 	
 	private String status;
 	
-	@OneToMany(mappedBy = "class1")
+	@OneToMany(mappedBy = "classes")
 	List<Attendance> attendances;
 	
-	@OneToMany(mappedBy = "class1")
+	@OneToMany(mappedBy = "classes")
 	List<ClassHistory> classHistories;
 	
-	@OneToMany(mappedBy = "class1")
+	@OneToMany(mappedBy = "classes")
 	List<Comment> comments;
 	
-	@OneToMany(mappedBy = "class1")
+	@OneToMany(mappedBy = "classes")
 	List<Schedule> schedules;
 	
-	@OneToMany(mappedBy = "class1")
+	@OneToMany(mappedBy = "classes")
 	List<Task> tasks;
 	
-	@OneToMany(mappedBy = "class1")
+	@OneToMany(mappedBy = "classes")
 	List<RegisterCourse> registerCourses ;
+	
+	@ManyToOne
+	@JoinColumn(name = "admin_id")
+	Admin admin;
 }

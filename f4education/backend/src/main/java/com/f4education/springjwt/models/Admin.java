@@ -23,6 +23,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -32,21 +33,21 @@ import lombok.NoArgsConstructor;
 public class Admin {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "adminid")
+	@Column(name = "admin_id")
 	private String adminId;
 
-	@Column(name = "fullname")
 	private String fullname;
 
 	private Boolean gender;
 
-	@Column(name = "dateofbirth")
+	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
 
-	@Column(name = "citizenidentification")
+	@Column(name = "citizen_identification")
 	private String citizenIdentification;
-
-	@Column(name = "address")
+	
+	private String levels;
+	
 	private String address;
 
 	private String phone;
@@ -57,20 +58,27 @@ public class Admin {
 	List<Bill> bill;
 
 	@OneToMany(mappedBy = "admin")
-	List<ClassHistory> classHistories;
+	List<Classes> classes;
 
 	@OneToMany(mappedBy = "admin")
-	List<CourseHistory> courseHistories;
+	List<Course> courses;
 
 	@OneToMany(mappedBy = "admin")
-	List<QuestionHistory> questionHistories;
+	List<Question> questions;
 
 	@OneToMany(mappedBy = "admin")
-	List<ResourcesHistory> resourcesHistories;
+	List<Resources> resources;
 
 	@OneToMany(mappedBy = "admin")
 	List<Schedule> schedules;
 
 	@OneToMany(mappedBy = "admin")
 	List<Subject> subject;
+
+	@Override
+	public String toString() {
+		return "Admin [adminId=" + adminId + ", fullname=" + fullname + ", gender=" + gender + ", dateOfBirth="
+				+ dateOfBirth + ", citizenIdentification=" + citizenIdentification + ", levels=" + levels + ", address="
+				+ address + ", phone=" + phone + ", image=" + image + "]";
+	}
 }

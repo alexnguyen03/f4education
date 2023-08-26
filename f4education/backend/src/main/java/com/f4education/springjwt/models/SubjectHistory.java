@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -31,18 +33,26 @@ public class SubjectHistory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer subjectHistoryId;
-
-	private String operation;
-
-	private Date operationDate;
 	
+	@Column(name = "subject_name")
 	private String subjectName;
+
+	private String action;
+
+	@Column(name = "modify_date")
+	private Date modifyDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "adminId")
+	@JoinColumn(name = "admin_id")
 	Admin admin; 
 	
 	@ManyToOne
-	@JoinColumn(name = "subjectId")
-	Subject subject; 	
+	@JoinColumn(name = "subject_id")
+	Subject subject;
+
+	@Override
+	public String toString() {
+		return "SubjectHistory [subjectHistoryId=" + subjectHistoryId + ", subjectName=" + subjectName + ", action="
+				+ action + ", modifyDate=" + modifyDate + "]";
+	} 	
 }

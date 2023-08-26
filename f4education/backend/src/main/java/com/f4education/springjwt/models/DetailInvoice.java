@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,24 +22,35 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "DetailInvoice")
+@Table(name = "Detailinvoice")
 public class DetailInvoice {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "detail_invoice_id")
 	private Integer detailInvoiceId;
 
 	private Float price;
 
-	private Float totalMoney;
+	@Column(name = "total_price")
+	private Float totalPrice;
 	
 	private String note;
 	
 	@ManyToOne
-	@JoinColumn(name = "billId")
-	Bill bill; 
+	@JoinColumn(name = "bill_id")
+	Bill bill;
+
+	@Override
+	public String toString() {
+		return "DetailInvoice [detailInvoiceId=" + detailInvoiceId + ", price=" + price + ", totalPrice=" + totalPrice
+				+ ", note=" + note + "]";
+	} 
+	
+	
 }
