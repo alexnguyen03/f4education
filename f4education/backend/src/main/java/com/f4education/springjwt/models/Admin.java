@@ -38,6 +38,7 @@ public class Admin {
 
 	private String fullname;
 
+	@Column(name = "gender")
 	private Boolean gender;
 
 	@Column(name = "date_of_birth")
@@ -45,13 +46,15 @@ public class Admin {
 
 	@Column(name = "citizen_identification")
 	private String citizenIdentification;
-	
+
 	private String levels;
-	
+
 	private String address;
 
+	@Column(name = "phone")
 	private String phone;
 
+	@Column(name = "image")
 	private String image;
 
 	@OneToMany(mappedBy = "admin")
