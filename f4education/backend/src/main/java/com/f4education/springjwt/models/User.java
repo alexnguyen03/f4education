@@ -21,6 +21,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -43,6 +44,9 @@ public class User {
 
 	@OneToMany(mappedBy = "user")
 	List<Account_role> account_role;
+	
+	@OneToMany(mappedBy = "user")
+	List<Teacher> teachers;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
@@ -54,4 +58,9 @@ public class User {
 		this.password = password;
 	}
 
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", username=" + username + ", email=" + email + ", password=" + password + ", token="
+				+ token + ", roles=" + roles + "]";
+	}
 }

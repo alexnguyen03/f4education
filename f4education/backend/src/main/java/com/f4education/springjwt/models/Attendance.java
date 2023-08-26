@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -30,22 +32,33 @@ import lombok.NoArgsConstructor;
 public class Attendance {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "attendance_id")
 	private Integer attendanceId;
 
+	@Column(name = "attendance_date")
 	private Date attendanceDate;
 
+	@Column(name = "end_date")
 	private Date endDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "studentId")
+	@JoinColumn(name = "student_id")
 	Student student; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 
+	@JoinColumn(name = "class_id")
+	Classes classes; 
 	
 	@ManyToOne
-	@JoinColumn(name = "academicId")
-	Academic academic; 
+	@JoinColumn(name = "academic_id")
+	Academic academic;
+
+	@Override
+	public String toString() {
+		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" + attendanceDate + ", endDate="
+				+ endDate + "]";
+	} 
+	
+	
 	
 }

@@ -23,6 +23,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -35,7 +36,6 @@ public class Admin {
 	@Column(name = "admin_id")
 	private String adminId;
 
-	@Column(name = "fullname")
 	private String fullname;
 
 	@Column(name = "gender")
@@ -47,7 +47,8 @@ public class Admin {
 	@Column(name = "citizen_identification")
 	private String citizenIdentification;
 
-	@Column(name = "address")
+	private String levels;
+
 	private String address;
 
 	@Column(name = "phone")
@@ -60,8 +61,27 @@ public class Admin {
 	List<Bill> bill;
 
 	@OneToMany(mappedBy = "admin")
+	List<Classes> classes;
+
+	@OneToMany(mappedBy = "admin")
+	List<Course> courses;
+
+	@OneToMany(mappedBy = "admin")
+	List<Question> questions;
+
+	@OneToMany(mappedBy = "admin")
+	List<Resources> resources;
+
+	@OneToMany(mappedBy = "admin")
 	List<Schedule> schedules;
 
 	@OneToMany(mappedBy = "admin")
 	List<Subject> subject;
+
+	@Override
+	public String toString() {
+		return "Admin [adminId=" + adminId + ", fullname=" + fullname + ", gender=" + gender + ", dateOfBirth="
+				+ dateOfBirth + ", citizenIdentification=" + citizenIdentification + ", levels=" + levels + ", address="
+				+ address + ", phone=" + phone + ", image=" + image + "]";
+	}
 }

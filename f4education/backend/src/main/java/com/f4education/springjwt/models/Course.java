@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -32,16 +34,22 @@ import lombok.NoArgsConstructor;
 public class Course {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "course_id")
 	private Integer courseId;
 
+	@Column(name = "course_name")
 	private String courseName;
 
+	@Column(name = "course_price")
 	private Float coursePrice;
 	
+	@Column(name = "course_duration")
 	private String courseDuration;
 	
+	@Column(name = "course_description")
 	private String courseDescription;
 	
+	@Column(name = "number_session")
 	private Integer numberSession;
 	
 	private String image;
@@ -59,6 +67,19 @@ public class Course {
 	List<Resources> resources;
 	
 	@ManyToOne
-	@JoinColumn(name = "subjectId")
+	@JoinColumn(name = "subject_id")
 	Subject subject; 
+	
+	@ManyToOne
+	@JoinColumn(name = "admin_id")
+	Admin admin;
+
+	@Override
+	public String toString() {
+		return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
+				+ numberSession + ", image=" + image + "]";
+	} 
+	
+	
 }

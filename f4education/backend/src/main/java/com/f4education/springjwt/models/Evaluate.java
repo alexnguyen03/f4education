@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -30,19 +32,27 @@ import lombok.NoArgsConstructor;
 public class Evaluate {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "evaluate_id")
 	private Integer evaluateId;
 
 	private Integer rating;
 
-	private String content;
+	private String contents;
 	
+	@Column(name = "review_date")
 	private Date reviewDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "studentId")
+	@JoinColumn(name = "student_id")
 	Student student; 
 	
 	@ManyToOne
-	@JoinColumn(name = "registerCourseId")
-	RegisterCourse registerCourse; 
+	@JoinColumn(name = "register_course_id")
+	RegisterCourse registerCourse;
+
+	@Override
+	public String toString() {
+		return "Evaluate [evaluateId=" + evaluateId + ", rating=" + rating + ", contents=" + contents + ", reviewDate="
+				+ reviewDate + "]";
+	} 
 }

@@ -12,12 +12,13 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "PaymentMethod")
+@Table(name = "Paymentmethod")
 public class PaymentMethod {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,4 +30,9 @@ public class PaymentMethod {
 
 	@OneToMany(mappedBy = "paymentMethod")
 	List<Bill> bills;
+
+	@Override
+	public String toString() {
+		return "PaymentMethod [paymentMethodId=" + paymentMethodId + ", paymentMethodName=" + paymentMethodName + "]";
+	}
 }

@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -30,31 +32,39 @@ import lombok.NoArgsConstructor;
 public class Schedule {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "schedule_id")
 	private Integer scheduleId;
 
-	private Date schoolDay;
+	@Column(name = "study_date")
+	private Date studyDate;
 
-	private String content;
+	private String contents;
 	
 	private String note;
 	
 	@ManyToOne
-	@JoinColumn(name = "adminId")
+	@JoinColumn(name = "admin_id")
 	Admin admin; 
 	
 	@ManyToOne
-	@JoinColumn(name = "academicId")
+	@JoinColumn(name = "academic_id")
 	Academic academic; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
-	Class class1; 
+	@JoinColumn(name = "class_id")
+	Classes classes; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classroomId")
+	@JoinColumn(name = "classroom_id")
 	ClassRoom classRoom; 
 	
 	@ManyToOne
-	@JoinColumn(name = "studentId")
-	Student student; 
+	@JoinColumn(name = "student_id")
+	Student student;
+
+	@Override
+	public String toString() {
+		return "Schedule [scheduleId=" + scheduleId + ", studyDate=" + studyDate + ", contents=" + contents + ", note="
+				+ note + "]";
+	} 
 }

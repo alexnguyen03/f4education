@@ -20,6 +20,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -37,5 +38,12 @@ public class Account_role {
 	
 	@ManyToOne
 	@JoinColumn(name = "role_id")
-	Role role; 
+	Role role;
+
+	@Override
+	public String toString() {
+		return "Account_role [id=" + id + "]";
+	} 
+	
+	
 }

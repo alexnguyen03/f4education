@@ -12,6 +12,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -56,4 +57,10 @@ public class Student {
 	
 	@OneToMany(mappedBy = "student")
 	List<Schedule> schedules;
+
+	@Override
+	public String toString() {
+		return "Student [studentId=" + studentId + ", fullname=" + fullname + ", gender=" + gender + ", address="
+				+ address + ", phone=" + phone + ", image=" + image + "]";
+	}
 }

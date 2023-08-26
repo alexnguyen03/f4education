@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -39,4 +40,9 @@ public class Subject implements Serializable {
 
 	@OneToMany(mappedBy = "subject")
 	List<Course> courses;
+
+	@Override
+	public String toString() {
+		return "Subject [subjectId=" + subjectId + ", subjectName=" + subjectName + "]";
+	}
 }

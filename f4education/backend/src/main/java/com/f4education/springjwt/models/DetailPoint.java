@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -21,6 +22,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -30,13 +32,22 @@ import lombok.NoArgsConstructor;
 public class DetailPoint {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "detail_point_id")
 	private Integer detailPointId;
 
+	@Column(name = "entry_date")
 	private Date entryDate;
 
 	private Float point;
 	
 	@ManyToOne
-	@JoinColumn(name = "pointId")
-	Point point1; 	
+	@JoinColumn(name = "point_id")
+	Point point1;
+
+	@Override
+	public String toString() {
+		return "DetailPoint [detailPointId=" + detailPointId + ", entryDate=" + entryDate + ", point=" + point + "]";
+	} 	
+	
+	
 }

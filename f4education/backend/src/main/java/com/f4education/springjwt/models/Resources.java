@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -23,6 +24,7 @@ import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Entity
@@ -32,8 +34,10 @@ import lombok.NoArgsConstructor;
 public class Resources {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "resources_id")
 	private Integer resourcesId;
 
+	@Column(name = "resources_name")
 	private String resourcesName;
 
 	private String link;
@@ -42,6 +46,16 @@ public class Resources {
 	List<ResourcesHistory> resourcesHistories;
 	
 	@ManyToOne
-	@JoinColumn(name = "courseId")
+	@JoinColumn(name = "course_id")
 	Course course; 
+	
+	@ManyToOne
+	@JoinColumn(name = "admin_id")
+	Admin admin;
+
+	@Override
+	public String toString() {
+		return "Resources [resourcesId=" + resourcesId + ", resourcesName=" + resourcesName + ", link=" + link + "]";
+	} 
+	
 }
