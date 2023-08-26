@@ -35,8 +35,7 @@ public class CourseServiceImpl implements CoursesService {
 	@Override
 	public CourseDTO addCourse(CourseDTO courseDTO) {
 		Course course = this.convertDTOToEntity(courseDTO);
-		String  adminId = courseDTO.getAdminId();
-		course.setAdmin(adminRepository.findById(adminId).get());
+
 		courseRepository.save(course);
 		return courseDTO;
 	}
@@ -44,7 +43,7 @@ public class CourseServiceImpl implements CoursesService {
 	private CourseDTO convertEntityToDTO(Course course) {
 		CourseDTO dto = new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
 				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
-				course.getSubject(), course.getAdmin().getAdminId());
+				course.getSubject());
 		return dto;
 	}
 

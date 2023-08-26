@@ -25,6 +25,12 @@ public class CourseDTO {
     private Integer numberSession;
 
     private Subject subject;
-    private  String adminId ;
 
+    @Override
+    public String toString() {
+        return "CourseDTO{" +
+                "courseId=" + courseId +
+                ", courseName='" + courseName + '\'' +
+                '}';
+    }
 }

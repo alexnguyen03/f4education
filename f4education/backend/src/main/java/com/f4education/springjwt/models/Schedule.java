@@ -4,17 +4,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -29,32 +19,35 @@ import lombok.NoArgsConstructor;
 @Table(name = "Schedule")
 public class Schedule {
 	@Id
+	@Column(name = "schedule_id")
+
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer scheduleId;
 
-	private Date schoolDay;
+	@Column(name = "study_date")
+	private Date studyDate;
 
-	private String content;
+	private String contents;
 	
 	private String note;
 	
 	@ManyToOne
-	@JoinColumn(name = "adminId")
+	@JoinColumn(name = "admin_id")
 	Admin admin; 
 	
 	@ManyToOne
-	@JoinColumn(name = "academicId")
+	@JoinColumn(name = "academic_id")
 	Academic academic; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classId")
+	@JoinColumn(name = "class_id")
 	Class class1; 
 	
 	@ManyToOne
-	@JoinColumn(name = "classroomId")
+	@JoinColumn(name = "classroom_id")
 	ClassRoom classRoom; 
 	
 	@ManyToOne
-	@JoinColumn(name = "studentId")
+	@JoinColumn(name = "student_id")
 	Student student; 
 }

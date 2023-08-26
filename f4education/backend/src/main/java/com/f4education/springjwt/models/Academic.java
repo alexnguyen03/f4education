@@ -44,4 +44,14 @@ public class Academic {
 	
 	@OneToMany(mappedBy = "academic")
 	List<Schedule> schedules;
+
+	@Override
+	public String toString() {
+		return "Academic{" +
+				"academicId=" + academicId +
+				", academicName='" + academicName + '\'' +
+				", startDate=" + startDate +
+				", endDate=" + endDate +
+				'}';
+	}
 }

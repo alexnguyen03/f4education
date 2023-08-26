@@ -46,4 +46,15 @@ public class Teacher {
 	private String phone;
 	
 	private String image;
+
+	@Override
+	public String toString() {
+		return "Teacher{" +
+				"teacherId='" + teacherId + '\'' +
+				", fullname='" + fullname + '\'' +
+				", gender=" + gender +
+				", dateOfBirth=" + dateOfBirth +
+				", citizenIdentification='" + citizenIdentification + '\'' +
+				'}';
+	}
 }
