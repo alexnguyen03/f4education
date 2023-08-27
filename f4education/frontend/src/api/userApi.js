@@ -3,7 +3,7 @@ import axiosClient from './axiosClient';
 // api/productApi.js
 const userApi = {
 	signin: (body) => {
-		const url = 'http://localhost:8080/api/auth/signin';
+		const url = '/auth/signin';
 		return axiosClient.post(url, body);
 	},
 	signup: (params) => {

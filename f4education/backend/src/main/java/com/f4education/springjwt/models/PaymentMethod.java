@@ -18,7 +18,7 @@ import lombok.ToString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Paymentmethod")
+@Table(name = "paymentmethod")
 public class PaymentMethod {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

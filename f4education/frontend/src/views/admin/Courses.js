@@ -7,7 +7,7 @@ import Refresh from '@material-ui/icons/Refresh';
 import Save from '@material-ui/icons/Save';
 
 import {MaterialReactTable} from 'material-react-table';
-import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
+import {Edit as EditIcon, Delete as DeleteIcon, RemoveCircleOutline as RemoveCircleOutlineIcon} from '@mui/icons-material';
 import {Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
 const data = [
 	{
@@ -127,6 +127,14 @@ const Courses = () => {
 					enableStickyHeader
 					enableStickyFooter
 					enableRowNumbers
+					displayColumnDefOptions={{
+						'mrt-row-actions': {
+							header: 'Thao tác',
+							size: 20,
+							// Something else here
+						},
+					}}
+					positionActionsColumn='last'
 					columns={columns}
 					data={data}
 					renderTopToolbarCustomActions={() => (
@@ -144,7 +152,7 @@ const Courses = () => {
 								onClick={() => {
 									setShowForm(true);
 									setCourse({...row.original});
-									console.log(course);
+									console.log(row);
 								}}>
 								<EditIcon />
 							</IconButton>
@@ -153,7 +161,7 @@ const Courses = () => {
 								onClick={() => {
 									data.splice(row.index, 1); //assuming simple data table
 								}}>
-								<DeleteIcon />
+								<RemoveCircleOutlineIcon />
 							</IconButton>
 						</Box>
 					)}

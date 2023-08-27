@@ -42,18 +42,18 @@ public class Teacher {
 
 	@Column(name = "date_of_birth")
 	private Date dateOfBirth;
-	
+
 	@Column(name = "citizen_identification")
 	private String citizenIdentification;
-	
+
 	private String levels;
-	
+
 	private String address;
-	
+
 	private String phone;
-	
+
 	private String image;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	User user;
