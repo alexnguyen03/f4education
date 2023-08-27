@@ -1,6 +1,7 @@
 package com.f4education.springjwt.controllers;
 
 import com.f4education.springjwt.payload.request.CourseDTO;
+import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,20 @@ public class CoursesController {
 
 	@PostMapping
 	@PreAuthorize("hasRole('ADMIN')")
-	public CourseDTO addCourse(@RequestBody CourseDTO courseDTO ){
-		return  courseService.addCourse(courseDTO);
+	public CourseDTO addCourse(@RequestBody CourseRequest courseRequest) {
+		return courseService.saveCourse(courseRequest);
 	}
+
+	@PutMapping
+	@PreAuthorize("hasRole('ADMIN')")
+	public CourseDTO updateCourse(@RequestBody CourseRequest courseRequest) {
+		return courseService.saveCourse(courseRequest);
+	}
+
+	@GetMapping("/actor/{adminId}")
+	@PreAuthorize("hasRole('ADMIN')")
+	public List<CourseDTO> findAllByAdminId(@PathVariable("adminId") String adminId) {
+		return courseService.findAllByAdminId(adminId);
+	}
+
 }

@@ -1,20 +1,13 @@
 package com.f4education.springjwt.models;
 
-import java.io.Serializable;
-import java.util.List;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Entity
@@ -59,4 +52,12 @@ public class Course implements Serializable {
 	@JoinColumn(name = "admin_id")
 	Admin admin;
 
+	public Course(String courseName, Float coursePrice, String courseDuration, String courseDescription, Integer numberSession, String image) {
+		this.courseName = courseName;
+		this.coursePrice = coursePrice;
+		this.courseDuration = courseDuration;
+		this.courseDescription = courseDescription;
+		this.numberSession = numberSession;
+		this.image = image;
+	}
 }
