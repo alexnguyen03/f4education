@@ -19,12 +19,13 @@ import {
 // import "react-toastify/dist/ReactToastify.css";
 
 // Axios
-import axios from "axios";
+// import axios from "axios";
+import subjectApi from "../../api/subjectApi";
 
 // API URL
-const ROOT_URL = "http://localhost:8080/api/subjects";
+// const ROOT_URL = "http://localhost:8080/api/subjects";
 
-const Subjects = (props) => {
+const Subjects = () => {
   // Main variable
   const [subjects, setSubjects] = useState([]);
 
@@ -32,11 +33,12 @@ const Subjects = (props) => {
   const [showModalUpdateSubject, setShowModalUpdateSubject] = useState(false);
   const [showModalAddSubject, setShowModalAddSubject] = useState(false);
 
-  // Form avariable
+  // Form variable
   const [errorInputAddSubject, setErrorInputAddSubject] = useState({
     status: false,
     message: "",
   });
+
   const [errorInputUpdateSubject, setErrorInputUpdateSubject] = useState({
     status: false,
     message: "",
@@ -70,10 +72,15 @@ const Subjects = (props) => {
 
   // API Area
   const fetchSubjects = async () => {
-    const resp = await axios(ROOT_URL);
-    console.log(resp.data);
-    console.log("restarted application");
-    setSubjects(resp.data);
+    try {
+      const resp = await subjectApi.getAllSubject();
+      setSubjects(resp);
+      console.log("restarted application");
+    } catch (error) {
+      console.log(error);
+    }
+    // const resp = await axios(ROOT_URL);
+    // console.log(resp.data);
   };
 
   // API_AREA > CRUD
@@ -82,40 +89,38 @@ const Subjects = (props) => {
 
     const action = "add";
     if (validateForm(action)) {
-      axios({
-        method: "post",
-        url: ROOT_URL,
-        data: subject,
-      });
-
-      console.log(subject);
+      try {
+        const body = subject;
+        const resp = await subjectApi.createSubject(body);
+        console.log(resp);
+        // axios({
+        //   method: "post",
+        //   url: ROOT_URL,
+        //   data: subject,
+        // });
+      } catch (error) {}
       console.log("Add Success");
       setShowModalAddSubject(false);
     } else console.log("Error in validation");
   };
 
-  const handleUpdateSubject = () => {
-    // console.log(subject);
-    // const newSubjects = [...subjects];
-
-    // const subjectIndex = newSubjects.findIndex((sb) => sb.id === subject.id);
-
-    // console.log(subjectIndex);
-
-    // if (subjectIndex !== -1) {
-    //   newSubjects[subjectIndex] = subject;
-
-    //   setSubjects(newSubjects);
-    // }
+  const handleUpdateSubject = async () => {
     console.log(subject);
 
     const action = "update";
     if (validateForm(action)) {
-      axios({
-        method: "put",
-        url: `${ROOT_URL}/${subject.subjectId}`,
-        data: subject,
-      });
+      try {
+        const body = subject;
+        const resp = await subjectApi.updateSubject(body, subject.subjectId);
+        console.log(resp);
+      } catch (error) {
+        console.log(error);
+      }
+      // axios({
+      //   method: "put",
+      //   url: `${ROOT_URL}/${subject.subjectId}`,
+      //   data: subject,
+      // });
 
       console.log("Update success");
       fetchSubjects();
@@ -182,7 +187,7 @@ const Subjects = (props) => {
 
   // Use effect area
   useEffect(() => {
-    fetchSubjects();
+      fetchSubjects();
   }, []);
 
   return (
@@ -362,7 +367,7 @@ const Subjects = (props) => {
                   id="id"
                   // onChange={handleChangeInput}
                   disabled
-                  name="id"
+                  name="subjectId"
                   value={subject.subjectId}
                 />
               </FormGroup>

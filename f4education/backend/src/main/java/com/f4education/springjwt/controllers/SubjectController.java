@@ -16,14 +16,13 @@ public class SubjectController {
 	SubjectServiceImpl subjectService;
 
 	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	public List<SubjectDTO> findAll() {
 		return subjectService.getAllSubjects();
 	}
 
 	@GetMapping("/{id}")
-
-	@PreAuthorize("hasRole('ADMIN')")
+//	@PreAuthorize("hasRole('ADMIN')")
 	public SubjectDTO findById(@PathVariable("id") Integer subjectId) {
 		return subjectService.getSubjectById(subjectId);
 	}
@@ -34,10 +33,8 @@ public class SubjectController {
 	}
 
 	@PutMapping("/{id}")
-
-	@PreAuthorize("hasRole('ADMIN')")
-	public SubjectDTO updateSubject(@PathVariable("id") Integer subjectId,
-									@RequestBody SubjectDTO subjectDTO) {
+//	@PreAuthorize("hasRole('ADMIN')")
+	public SubjectDTO updateSubject(@PathVariable("id") Integer subjectId, @RequestBody SubjectDTO subjectDTO) {
 		return subjectService.updateSubject(subjectId, subjectDTO);
 	}
 
