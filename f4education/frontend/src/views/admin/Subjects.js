@@ -125,6 +125,7 @@ const Subjects = () => {
       console.log("Update success");
       fetchSubjects();
       setShowModalUpdateSubject(false);
+
       setSubject({
         subjectId: "",
         adminId: admin.admin_id,
@@ -174,7 +175,7 @@ const Subjects = () => {
       },
       {
         accessorKey: "adminId",
-        header: "Tên người tạo",
+        header: "Mã người tạo",
         size: 10,
       },
       {
@@ -187,7 +188,7 @@ const Subjects = () => {
 
   // Use effect area
   useEffect(() => {
-      fetchSubjects();
+    fetchSubjects();
   }, []);
 
   return (
@@ -261,6 +262,7 @@ const Subjects = () => {
           className="modal-dialog-centered"
           isOpen={showModalAddSubject}
           toggle={showModalAddSubject}
+          backdrop={"static"}
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">
@@ -280,7 +282,7 @@ const Subjects = () => {
             <form method="post">
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="adminId">
-                  Mã Admin
+                  Mã người tạo
                 </label>
                 <Input
                   className="form-control-alternative"
@@ -341,6 +343,7 @@ const Subjects = () => {
           className="modal-dialog-centered"
           isOpen={showModalUpdateSubject}
           toggle={showModalUpdateSubject}
+          backdrop={"static"}
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">
