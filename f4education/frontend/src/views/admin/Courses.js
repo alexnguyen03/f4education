@@ -1,71 +1,18 @@
-import {Button, Card, CardHeader, CardBody, FormGroup, Form, Input, Container, Row, Col, Label, Modal} from 'reactstrap';
-import UserHeader from 'components/Headers/UserHeader.js';
 import CoursesHeader from 'components/Headers/CoursesHeader';
-import {useState, useMemo} from 'react';
-import Delete from '@material-ui/icons/Delete';
-import Refresh from '@material-ui/icons/Refresh';
-import Save from '@material-ui/icons/Save';
+import {useEffect, useMemo, useState} from 'react';
+import {Button, Col, Container, Form, FormGroup, Input, Label, Modal, Row} from 'reactstrap';
 
+import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon} from '@mui/icons-material';
+import {Box, IconButton} from '@mui/material';
+import courseApi from 'api/courseApi';
 import {MaterialReactTable} from 'material-react-table';
-import {Edit as EditIcon, Delete as DeleteIcon, RemoveCircleOutline as RemoveCircleOutlineIcon} from '@mui/icons-material';
-import {Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
-const data = [
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
-		description: 'Khóa học Java cho người mới bắt đầu',
-	},
-	{
-		subjectName: 'C#',
-		courseName: 'C# cơ bản',
-		duration: 120,
-		price: 130000,
-		description: 'Khóa học C# cho người mới bắt đầu',
-	},
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
-		description: 'Khóa học Java cho người mới bắt đầu',
-	},
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
-		description: 'Khóa học Java cho người mới bắt đầu',
-	},
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
-		description: 'Khóa học Java cho người mới bắt đầu',
-	},
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
-		description: 'Khóa học Java cho người mới bắt đầu',
-	},
-	{
-		subjectName: 'Java',
-		courseName: 'Java cơ bản',
-		duration: 150,
-		price: 120000,
-		description: 'Khóa học Java cho người mới bắt đầu',
-	},
-];
 
 const Courses = () => {
 	const [subjectList, setSubjectList] = useState([{key: 'java', value: 'Java'}, {key: 'c#', value: 'C#'}, , {key: 'python', value: 'Python'}, {key: 'PHP', value: 'PHP'}]);
 	const [image, setImage] = useState(null);
 	const [imgData, setImgData] = useState(null);
 	const [showForm, setShowForm] = useState(false);
+	const [courses, setCourses] = useState([]);
 	const [course, setCourse] = useState({
 		subjectName: '',
 		courseName: '',
@@ -73,12 +20,25 @@ const Courses = () => {
 		price: 0,
 		description: '',
 		image: '',
+		subject: {
+			subjectId: 0,
+			subjectName: '',
+			admin: {
+				adminId: '',
+				fullname: '',
+				gender: true,
+				dateOfBirth: '',
+				citizenIdentification: '',
+				address: '',
+				phone: '',
+				image: '',
+			},
+		},
 	});
 
 	const handelOnChangeInput = (e) => {
 		setCourse({[e.target.name]: e.target.value});
 	};
-	// ['https://image8.cdn.seaart.ai/2023-07-13/44636826861637/9a63261b1c0f75815a7a3cf8da39724adf3629cf.png', 'https://image7.cdn.seaart.ai/2023-06-15/34756618563653/95386e96704af92a42448bebb7e302603ec46e4d.png'];
 	const onChangePicture = (e) => {
 		if (e.target.files[0]) {
 			setImage(e.target.files[0]);
@@ -92,7 +52,7 @@ const Courses = () => {
 	const columns = useMemo(
 		() => [
 			{
-				accessorKey: 'subjectName',
+				accessorKey: 'subject.subjectName',
 				header: 'Tên môn học',
 				size: 150,
 			},
@@ -102,19 +62,30 @@ const Courses = () => {
 				size: 150,
 			},
 			{
-				accessorKey: 'duration', //normal accessorKey
+				accessorKey: 'courseDuration',
 				header: 'Thời lượng',
 				size: 100,
 			},
 			{
-				accessorKey: 'price',
+				accessorKey: 'coursePrice',
 				header: 'Giá',
 				size: 100,
 			},
 		],
 		[],
 	);
-
+	const fetchCourses = async () => {
+		try {
+			const resp = await courseApi.getAll();
+			setCourses(resp);
+		} catch (error) {
+			console.log('failed to fetch data', error);
+		}
+	};
+	const fetchSubject = () => {};
+	useEffect(() => {
+		fetchCourses();
+	}, []);
 	return (
 		<>
 			<CoursesHeader />
@@ -136,7 +107,7 @@ const Courses = () => {
 					}}
 					positionActionsColumn='last'
 					columns={columns}
-					data={data}
+					data={courses}
 					renderTopToolbarCustomActions={() => (
 						<Button
 							onClick={() => setShowForm((pre) => !pre)}
@@ -159,7 +130,7 @@ const Courses = () => {
 							<IconButton
 								color='error'
 								onClick={() => {
-									data.splice(row.index, 1); //assuming simple data table
+									courses.splice(row.index, 1); //assuming simple data table
 								}}>
 								<RemoveCircleOutlineIcon />
 							</IconButton>

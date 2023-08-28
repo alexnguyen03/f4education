@@ -10,14 +10,13 @@ const Login = () => {
 		roles: [],
 	});
 	const handleLogin = () => {
-		localStorage.setItem('user', JSON.stringify(user));
-		console.log('user' + user.accessToken);
+		localStorage.setItem('accessToken', JSON.stringify(user.accessToken));
 	};
 	useEffect(() => {
 		const fetchData = async () => {
 			try {
 				const body = {
-					username: 'johnnguyen',
+					username: 'namnguyen',
 					password: '123456789',
 				};
 				const resp = await userApi.signin(body);
@@ -27,7 +26,6 @@ const Login = () => {
 			}
 		};
 		fetchData();
-		handleLogin();
 	}, []);
 	return (
 		<>
@@ -117,7 +115,8 @@ const Login = () => {
 								<Button
 									className='my-4'
 									color='primary'
-									type='button'>
+									type='button'
+									onClick={handleLogin}>
 									Sign in
 								</Button>
 							</div>
