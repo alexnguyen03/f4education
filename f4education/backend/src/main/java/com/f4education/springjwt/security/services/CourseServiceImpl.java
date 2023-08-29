@@ -68,7 +68,7 @@ public class CourseServiceImpl implements CoursesService {
 	private CourseDTO convertEntityToDTO(Course course) {
 		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
 				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
-				course.getSubject());
+				course.getSubject(), course.getImage());
 	}
 
 	private Course convertRequestToEntity(CourseRequest courseRequest) {

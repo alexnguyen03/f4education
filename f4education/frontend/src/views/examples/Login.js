@@ -11,6 +11,7 @@ const Login = () => {
 	});
 	const handleLogin = () => {
 		localStorage.setItem('accessToken', JSON.stringify(user.accessToken));
+		console.log('accessToken' + user.accessToken);
 	};
 	useEffect(() => {
 		const fetchData = async () => {

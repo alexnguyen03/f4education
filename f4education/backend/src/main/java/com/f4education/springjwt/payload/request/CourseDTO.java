@@ -25,6 +25,7 @@ public class CourseDTO {
     private Integer numberSession;
 
     private Subject subject;
+    private String image;
 
     @Override
     public String toString() {
