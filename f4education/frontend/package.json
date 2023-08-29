@@ -81,6 +81,7 @@
     "react-dom": ">=16.0.0",
     "react-router-dom": "6.11.1",
     "react-scripts": "5.0.1",
+    "moment-timezone": "^0.5.31",
     "reactstrap": "8.10.0",
     "sass": "1.62.1"
   },
