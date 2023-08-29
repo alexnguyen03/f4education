@@ -11,7 +11,8 @@ const Login = () => {
 	});
 	const handleLogin = () => {
 		localStorage.setItem('accessToken', JSON.stringify(user.accessToken));
-		console.log('accessToken' + user.accessToken);
+		localStorage.setItem('user', JSON.stringify(user));
+		console.log('user' + user);
 	};
 	useEffect(() => {
 		const fetchData = async () => {
@@ -37,6 +38,7 @@ const Login = () => {
 					<CardHeader className='bg-transparent pb-5'>
 						<div className='text-muted text-center mt-2 mb-3'>
 							<small>Sign in with</small>
+							{user.id != null && <span> loged</span>}
 						</div>
 						<div className='btn-wrapper text-center'>
 							<Button
