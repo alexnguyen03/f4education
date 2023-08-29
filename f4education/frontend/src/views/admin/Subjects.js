@@ -19,19 +19,18 @@ import {
 // import "react-toastify/dist/ReactToastify.css";
 
 // Axios
-// import axios from "axios";
 import subjectApi from "../../api/subjectApi";
-
-// API URL
-// const ROOT_URL = "http://localhost:8080/api/subjects";
+import subjectHistoryApi from "../../api/subjectHistoryApi";
 
 const Subjects = () => {
   // Main variable
   const [subjects, setSubjects] = useState([]);
+  const [subjectHistories, setSubjectHistories] = useState([]);
 
   // Action variable
-  const [showModalUpdateSubject, setShowModalUpdateSubject] = useState(false);
-  const [showModalAddSubject, setShowModalAddSubject] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [isUpdate, setIsUpdate] = useState(false);
+  const [isSubjectHistoryShowing, setIsSubjectHistoryShowing] = useState(false);
 
   // Form variable
   const [errorInputAddSubject, setErrorInputAddSubject] = useState({
@@ -56,6 +55,7 @@ const Subjects = () => {
     image: "image1.png",
   };
 
+  // *************** Subject AREA
   const [subject, setSubject] = useState({
     subjectId: "",
     adminId: admin.admin_id,
@@ -93,14 +93,16 @@ const Subjects = () => {
         const body = subject;
         const resp = await subjectApi.createSubject(body);
         console.log(resp);
-        // axios({
-        //   method: "post",
-        //   url: ROOT_URL,
-        //   data: subject,
-        // });
-      } catch (error) {}
+
+        // Create SubjectHistory
+        handleCreateNewSubjectHistory(subject, action);
+      } catch (error) {
+        console.log(error);
+      }
       console.log("Add Success");
-      setShowModalAddSubject(false);
+
+      fetchSubjects();
+      setShowModal(false);
     } else console.log("Error in validation");
   };
 
@@ -113,19 +115,19 @@ const Subjects = () => {
         const body = subject;
         const resp = await subjectApi.updateSubject(body, subject.subjectId);
         console.log(resp);
+
+        // Add subjectHistory
+        handleCreateNewSubjectHistory(subject, action);
       } catch (error) {
         console.log(error);
       }
-      // axios({
-      //   method: "put",
-      //   url: `${ROOT_URL}/${subject.subjectId}`,
-      //   data: subject,
-      // });
 
       console.log("Update success");
-      fetchSubjects();
-      setShowModalUpdateSubject(false);
 
+      setShowModal(false);
+      setIsUpdate(false);
+
+      fetchSubjects();
       setSubject({
         subjectId: "",
         adminId: admin.admin_id,
@@ -163,7 +165,7 @@ const Subjects = () => {
   };
 
   // React Data table area
-  const columns = useMemo(
+  const columnSubject = useMemo(
     () => [
       {
         accessorKey: "subjectId",
@@ -171,12 +173,12 @@ const Subjects = () => {
         enableColumnOrdering: false,
         enableEditing: false, //disable editing on this column
         enableSorting: false,
-        size: 10,
+        size: 40,
       },
       {
         accessorKey: "adminId",
         header: "Mã người tạo",
-        size: 10,
+        size: 80,
       },
       {
         accessorKey: "subjectName",
@@ -186,9 +188,96 @@ const Subjects = () => {
     []
   );
 
-  // Use effect area
+  const columnSubjectHistory = useMemo(
+    () => [
+      {
+        accessorKey: "subjectHistoryId",
+        header: "History ID",
+        size: 40,
+      },
+      {
+        accessorKey: "subjectName",
+        header: "Tên Môn Học",
+      },
+      {
+        accessorKey: "modifyDate",
+        header: "Ngày chỉnh sửa",
+        size: 120,
+      },
+      {
+        accessorKey: "adminId",
+        header: "Mã người tạo",
+        size: 80,
+      },
+    ],
+    []
+  );
+
+  // *************** Header Button area
+  const handleChangeSubjectListAndHistory = () => {
+    setIsSubjectHistoryShowing(!isSubjectHistoryShowing);
+  };
+
+  // *************** Subject History AREA
+  // Utils
+  const convertToDateTime = () => {
+    const currentDate = new Date();
+    const day = currentDate.getDate().toString().padStart(2, "0");
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, "0");
+    const year = currentDate.getFullYear().toString();
+    let hour = currentDate.getHours();
+    const minute = currentDate.getMinutes().toString().padStart(2, "0");
+    const period = hour;
+
+    // Convert hour from 24-hour format to 12-hour format
+    hour = hour % 12 || 12;
+
+    const formattedDateTime = `${day}-${month}-${year}, ${hour}:${minute}${period}`;
+
+    return formattedDateTime;
+  };
+
+  const [subjectHistory] = useState({
+    subjectHistoryId: "",
+    action: "",
+    modifyDate: convertToDateTime(),
+    adminId: subject.adminId,
+    subjectName: "",
+    subjectId: "",
+  });
+
+  // API
+  const fetchSubjectHistory = async () => {
+    try {
+      const resp = await subjectHistoryApi.getAllSubjectHistory();
+      setSubjectHistories(resp);
+      console.log("restarted subjectHistory application");
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // API_AREA > CRUD
+  const handleCreateNewSubjectHistory = async (subject, action) => {
+    try {
+      subjectHistory.subjectName = subject.subjectName;
+      subjectHistory.subjectId = subject.subjectId;
+      subjectHistory.action = action === "add" ? "Thêm mới" : "Cập nhật";
+
+      const body = subjectHistory;
+      console.log(body);
+      // const resp = await subjectHistoryApi.createSubjectHistory(body);
+      // console.log(resp);
+    } catch (error) {
+      console.log(error);
+    }
+    // fetchSubjectHistory();
+  };
+
+  // *************** Use effect area
   useEffect(() => {
     fetchSubjects();
+    fetchSubjectHistory();
   }, []);
 
   return (
@@ -202,9 +291,17 @@ const Subjects = () => {
         <Card className="bg-secondary shadow">
           {/* Header */}
           <CardHeader className="bg-white border-0 d-flex justify-content-between">
-            <h3 className="mb-0">Bảng Môn học</h3>
-            <Button color="default" type="button">
-              Lịch sử môn học
+            <h3 className="mb-0">
+              {isSubjectHistoryShowing ? "Bảng lịch sử môn học" : "Bảng Môn học"}
+            </h3>
+            <Button
+              color="default"
+              type="button"
+              onClick={() => handleChangeSubjectListAndHistory()}
+            >
+              {isSubjectHistoryShowing
+                ? "Danh sách môn học"
+                : "Lịch sử môn học"}
             </Button>
           </CardHeader>
           <CardBody>
@@ -217,34 +314,52 @@ const Subjects = () => {
                   // Something else here
                 },
               }}
-              columns={columns}
-              data={subjects}
+              columns={
+                isSubjectHistoryShowing ? columnSubjectHistory : columnSubject
+              }
+              data={isSubjectHistoryShowing ? subjectHistories : subjects}
+              positionActionsColumn="last"
               editingMode="modal" //default
               enableColumnOrdering
               enableEditing
-              positionActionsColumn="last" // actions row at the end
-              renderRowActions={({ row }) => (
-                <div className="d-flex justify-content-start">
-                  <Button
-                    color="warning"
-                    outline
-                    onClick={() => {
-                      setShowModalUpdateSubject(true);
-                      setSubject({ ...row.original });
-                    }}
-                  >
-                    <i className="bx bx-edit"></i>
-                  </Button>
-                </div>
-              )}
+              enableColumnResizing
+              renderRowActions={({ row }) =>
+                !isSubjectHistoryShowing ? (
+                  <div className="d-flex justify-content-start">
+                    <Button
+                      color="warning"
+                      outline
+                      onClick={() => {
+                        setShowModal(true);
+                        setSubject({ ...row.original });
+                        setIsUpdate(true);
+                      }}
+                    >
+                      <i className="bx bx-edit"></i>
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="d-flex justify-content-start">
+                    <Button
+                      color="info"
+                      outline
+                      onClick={() => {
+                        console.log("Restored Object");
+                      }}
+                    >
+                      <i className="bx bx-revision"></i>
+                    </Button>
+                  </div>
+                )
+              }
               // Top Add new Subject button
               renderTopToolbarCustomActions={() => (
                 <Button
                   color="primary"
-                  onClick={() => setShowModalAddSubject(true)}
+                  onClick={() => setShowModal(true)}
                   variant="contained"
-                  data-placement="top"
                   id="addSubjects"
+                  disabled={isSubjectHistoryShowing}
                 >
                   <i className="bx bx-layer-plus"></i> Thêm môn học
                 </Button>
@@ -256,124 +371,46 @@ const Subjects = () => {
         {/* Toast */}
         {/* <ToastContainer /> */}
 
-        {/* Modal */}
-        {/* Modal Add Subject */}
+        {/* Modal Add - Update Suject*/}
         <Modal
           className="modal-dialog-centered"
-          isOpen={showModalAddSubject}
-          toggle={showModalAddSubject}
+          isOpen={showModal}
+          toggle={showModal}
           backdrop={"static"}
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">
-              Thêm môn học
+              {isUpdate ? "Cập nhật môn học" : "Thêm môn học mới"}
             </h3>
             <button
               aria-label="Close"
               className="close"
               data-dismiss="modal"
               type="button"
-              onClick={() => setShowModalAddSubject(false)}
+              onClick={() => setShowModal(false)}
             >
-              <span aria-hidden={true}>×</span>
+              <span aria-hidden={true} onClick={() => setIsUpdate(false)}>
+                ×
+              </span>
             </button>
           </div>
           <div className="modal-body">
             <form method="post">
-              <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="adminId">
-                  Mã người tạo
-                </label>
-                <Input
-                  className="form-control-alternative"
-                  disabled
-                  id="adminId"
-                  // onChange={handleChangeInput}
-                  name="adminId"
-                  value={subject.adminId}
-                />
-              </FormGroup>
-              <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="name">
-                  Tên môn học
-                </label>
-                <Input
-                  // className="is-invalid"
-                  className={`${
-                    errorInputAddSubject.status
-                      ? "is-invalid"
-                      : "form-control-alternative"
-                  }`}
-                  id="name"
-                  onChange={handleChangeInput}
-                  name="subjectName"
-                  value={subject.subjectName}
-                />
-                <span className="text-danger">
-                  {errorInputAddSubject.message}
-                </span>
-              </FormGroup>
-            </form>
-          </div>
-          <div className="modal-footer">
-            <Button
-              color="default"
-              outline
-              data-dismiss="modal"
-              type="button"
-              onClick={() => setShowModalAddSubject(false)}
-            >
-              Trở lại
-            </Button>
-            <Button
-              color="primary"
-              type="button"
-              onClick={() => {
-                handleCreateNewSubject();
-                // toast("Cập nhật môn học thành công");
-              }}
-            >
-              Tạo môn học mới
-            </Button>
-          </div>
-        </Modal>
-
-        {/* Modal Update Suject*/}
-        <Modal
-          className="modal-dialog-centered"
-          isOpen={showModalUpdateSubject}
-          toggle={showModalUpdateSubject}
-          backdrop={"static"}
-        >
-          <div className="modal-header">
-            <h3 className="modal-title" id="modal-title-default">
-              Cập nhật môn học
-            </h3>
-            <button
-              aria-label="Close"
-              className="close"
-              data-dismiss="modal"
-              type="button"
-              onClick={() => setShowModalUpdateSubject(false)}
-            >
-              <span aria-hidden={true}>×</span>
-            </button>
-          </div>
-          <div className="modal-body">
-            <form method="post">
-              <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="id">
-                  Mã môn học
-                </label>
-                <Input
-                  className="form-control-alternative"
-                  id="id"
-                  // onChange={handleChangeInput}
-                  disabled
-                  name="subjectId"
-                  value={subject.subjectId}
-                />
-              </FormGroup>
+              {isUpdate && (
+                <FormGroup className="mb-3">
+                  <label className="form-control-label" htmlFor="id">
+                    Mã môn học
+                  </label>
+                  <Input
+                    className="form-control-alternative"
+                    id="id"
+                    onChange={handleChangeInput}
+                    disabled
+                    name="subjectId"
+                    value={subject.subjectId}
+                  />
+                </FormGroup>
+              )}
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="adminId">
                   Mã Admin
@@ -382,7 +419,7 @@ const Subjects = () => {
                   className="form-control-alternative"
                   disabled
                   id="adminId"
-                  // onChange={handleChangeInput}
+                  onChange={handleChangeInput}
                   name="adminId"
                   value={subject.adminId}
                 />
@@ -414,7 +451,10 @@ const Subjects = () => {
               outline
               data-dismiss="modal"
               type="button"
-              onClick={() => setShowModalUpdateSubject(false)}
+              onClick={() => {
+                setShowModal(false);
+                setIsUpdate(false);
+              }}
             >
               Trở lại
             </Button>
@@ -422,11 +462,11 @@ const Subjects = () => {
               color="primary"
               type="button"
               onClick={() => {
-                handleUpdateSubject();
+                isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
                 // toast("Cập nhật môn học thành công");
               }}
             >
-              Cập nhật
+              {isUpdate ? "Cập nhật" : "Thêm môn học"}
             </Button>
           </div>
         </Modal>

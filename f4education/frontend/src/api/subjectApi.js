@@ -1,7 +1,7 @@
 import axiosClient from "./axiosClient";
-
+ 
 // api/productApi.js
-const userApi = {
+const subjectApi = {
   getAllSubject: () => {
     const url = "/subjects";
     return axiosClient.get(url);
@@ -16,4 +16,4 @@ const userApi = {
   },
 };
 
-export default userApi;
+export default subjectApi;
