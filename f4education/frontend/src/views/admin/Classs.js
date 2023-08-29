@@ -6,57 +6,84 @@ import {MaterialReactTable} from 'material-react-table';
 import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
 import {Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
 
-// Axios
-import axios from "axios";
-
-// URL
-const ROOT_URL = "http://localhost:8080/api/classs";
+// gọi API từ classApi
+import classApi from 'api/classApi';
 
 const Classs = () => {
-	const [classses, setclassses] = useState([]);
+	const [classses, setClassses] = useState([]);
 	const [showForm, setShowForm] = useState(false);
+	const [update, setUpdate] = useState(true);
+	const [statusList, setStatusList] = useState([{key: 'W', value: 'Đang chờ'},{key: 'R', value: 'Đang diễn ra'},{key: 'C', value: 'Kết thúc'}]);
 	const [classs, setClasss] = useState({
+		classId: '',
 		className: '',
-		starDate: '',
+		startDate: '',
 		endDate: '',
 		maximumQuantity: 0,
+		status: 'Đang chờ',
 	});
+
+	const formatStartDate = (startDate) => {
+		// Chuyển đổi định dạng ngày tháng từ 'yyyy-MM-dd' thành 'dd/MM/yyyy'
+		const parts = startDate.split("T")[0].split("-");
+		const year = parts[0];
+		const month = parts[1];
+		const day = parts[2];
+		const formattedStartDate = `${day}/${month}/${year}`;
+		return formattedStartDate;
+	};
 
 	// lấy dữ liệu từ form
 	const handelOnChangeInput = (e) => {
 		setClasss({
 			...classs,
 			[e.target.name]: e.target.value
-		  });
-	};
-	
-	// lấy dữ liệu từ database (gọi api)
-	const getDataClass = async () => {
-		const resp = await axios(ROOT_URL);
-		console.log(resp.data)
-		setclassses(resp.data);
+		});
+		console.log(e.target.value);
 	};
 
-	const handleSubmit = (event) => {
-		event.preventDefault();
-		console.log(classs);
-		// Gửi dữ liệu đến API
-		axios.post(ROOT_URL, classs)
-		  .then((response) => {
-			// Xử lý response thành công
-			console.log(response.data);
-			// Reset form
-			setClasss({
-				className: '',
-				startate: '',
-				endDate: '',
-				maximumQuantity: 0,
-			});
-		  })
-		  .catch((error) => {
-			console.error(error);
-		  });
-	  };
+	const handleResetForm = () => {
+		setShowForm(pre=>!pre);
+		setClasss({
+			classId: '',
+			className: '',
+			startDate: '',
+			endDate: '',
+			maximumQuantity: 0,
+			status: 'Đang chờ',
+		})
+	}
+	
+	// lấy tấc cả dữ liệu từ database (gọi api)
+	const getDataClass = async () => {
+		const resp = await classApi.getAllClass();
+		setClassses(resp);
+	};
+
+	// thêm class
+	const createClass = async () => {
+		try {
+			const resp = await classApi.createClass(classs);
+			alert("Thêm thành công");
+			handleResetForm();
+			getDataClass();
+		} catch (error) {
+			console.log('Thêm thất bại', error);
+		}
+	};
+
+	// cập nhật class
+		const updateClass = async () => {
+		try {
+			const body = classs;
+			const resp = await classApi.updateClass(body, classs.classId);
+			alert("Cập nhật thành công");
+			handleResetForm();
+			getDataClass();
+		} catch (error) {
+			console.log('Cập nhật thất bại', error);
+		}
+	};
 
 	const columns = useMemo(
 		() => [
@@ -71,7 +98,7 @@ const Classs = () => {
 				size: 90,
 			},
 			{
-				accessorKey: 'endDate', //normal accessorKey
+				accessorKey: 'endDate', 
 				header: 'Ngày kết thúc',
 				size: 90,
 			},
@@ -83,6 +110,11 @@ const Classs = () => {
 			{
 				accessorKey: 'admin.fullname',
 				header: 'Người tạo',
+				size: 95,
+			},
+			{
+				accessorKey: 'status',
+				header: 'Trạng thái',
 				size: 95,
 			},
 		],
@@ -105,8 +137,7 @@ const Classs = () => {
 					displayColumnDefOptions={{
 						"mrt-row-actions": {
 						header: "Thao tác",
-						size: 50,
-						// Something else here
+						size: 50
 						},
 					}}
 					enableColumnResizing
@@ -130,42 +161,36 @@ const Classs = () => {
 							<IconButton
 								color='secondary'
 								onClick={() => {
+									const formattedStartDate = formatStartDate(row.original.startDate);
+									console.log('formattedStartDate:', formattedStartDate);
 									setShowForm(true);
-									setClasss({...row.original});
-									console.log(classs);
+									setUpdate(false);
+									setClasss({...row.original})
 								}}>
 								<EditIcon />
-							</IconButton>
-							<IconButton
-								color='error'
-								onClick={() => {
-									classses.splice(row.index, 1); //assuming simple data table
-								}}>
-								<DeleteIcon />
 							</IconButton>
 						</Box>
 					)}
 				/>
 
 				<Modal
+					backdrop='static'
 					className='modal-dialog-centered'
 					isOpen={showForm}
 					toggle={() => setShowForm((pre) => !pre)}>
 					<div className='modal-header'>
 						<h3 className='mb-0'>Thông tin lớp học</h3>
-
 						<button
 							aria-label='Close'
 							className='close'
 							data-dismiss='modal'
 							type='button'
-							onClick={() => setShowForm((pre) => !pre)}>
+							onClick={handleResetForm}>
 							<span aria-hidden={true}>×</span>
 						</button>
 					</div>
 					<div className='modal-body'>
 						<Form>
-							{/* <h6 className='heading-small text-muted mb-4'>Thông tin môn học</h6> */}
 							<div className='px-lg-2'>
 								<FormGroup>
 									<label
@@ -175,7 +200,6 @@ const Classs = () => {
 									</label>
 									<Input
 										className='form-control-alternative'
-										// defaultValue='Java cơ bản cho người mới'
 										id='input-class-name'
 										placeholder='Tên lớp học'
 										type='text'
@@ -196,8 +220,8 @@ const Classs = () => {
 												className='form-control-alternative'
 												id='input-start-date'
 												type='date'
-												value={classs.starDate}
-												name='starDate'
+												value={classs.startDate}
+												name='startDate'
 												onChange={handelOnChangeInput}
 											/>
 										</FormGroup>
@@ -240,6 +264,28 @@ const Classs = () => {
 											/>
 										</FormGroup>
 									</Col>
+									<Col md={12}>
+									<FormGroup>
+									<label
+										className='form-control-label'
+										htmlFor='input-username'>
+										Trạng thái
+									</label>
+									<Input
+										id='exampleSelect'
+										name='status'
+										type='select'
+										onChange={handelOnChangeInput}
+										defaultValue={statusList[0].value}
+										value={classs.status}>
+										{statusList.map((item) => (
+											<option key={item.key} value={item.value}>
+											{item.value}
+											</option>
+										))}
+									</Input>
+								</FormGroup>
+									</Col>
 								</Row>
 							</div>
 						</Form>
@@ -249,14 +295,14 @@ const Classs = () => {
 							color='secondary'
 							data-dismiss='modal'
 							type='button'
-							onClick={() => setShowForm((pre) => !pre)}>
+							onClick={handleResetForm}>
 							Đóng
 						</Button>
 						<Button
 							color='primary'
 							type='button'
-							onClick={handleSubmit}>
-							Lưu
+							onClick={update ? createClass : updateClass}>
+							{update ? 'Lưu' : 'Cập nhật'}
 						</Button>
 					</div>
 				</Modal>
