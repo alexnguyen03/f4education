@@ -1,9 +1,7 @@
 package com.f4education.springjwt.models;
 
 import java.io.Serializable;
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonFormat;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,8 +11,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -34,7 +30,7 @@ public class SubjectHistory implements Serializable {
 	private String action;
 
 	@Column(name = "modify_date")
-	private LocalDateTime modifyDate;
+	private Date modifyDate;
 
 	@Column(name = "subject_name")
 	private String subjectName;

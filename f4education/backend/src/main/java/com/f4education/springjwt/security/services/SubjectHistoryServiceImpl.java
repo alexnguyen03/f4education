@@ -1,7 +1,9 @@
 package com.f4education.springjwt.security.services;
 
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,15 +47,19 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 	public SubjectHistoryDTO createSubjectHistory(SubjectHistoryDTO SubjectHistoryDTO) {
 		SubjectHistory subjectHistory = new SubjectHistory();
 		Admin admin = adminService.getAdminById(SubjectHistoryDTO.getAdminId());
-		Subject subject = subjectRepository.findById(SubjectHistoryDTO.getSubjectId()).get();
+		Subject subject = new Subject();
+
+		if (SubjectHistoryDTO.getSubjectId() == null) {
+			Integer subjectId = subjectRepository.getMaxSubjectId();
+			System.out.println(subjectId);
+			subject = subjectRepository.findById(subjectId).get();
+		} else {
+			subject = subjectRepository.findById(SubjectHistoryDTO.getSubjectId()).get();
+		}
+
 		subjectHistory.setAdmin(admin);
 		subjectHistory.setSubject(subject);
-
-		String dateTimeString = SubjectHistoryDTO.getModifyDate();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		LocalDateTime localDateTime = LocalDateTime.parse(dateTimeString, formatter);
-
-		subjectHistory.setModifyDate(localDateTime);
+		subjectHistory.setModifyDate(new Date());
 
 		convertToEntity(SubjectHistoryDTO, subjectHistory);
 		SubjectHistory savedSubject = subjectHistoryRepository.save(subjectHistory);
@@ -73,23 +79,23 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 		String adminId = subjectHistory.getAdmin().getAdminId();
 		Integer subjectId = subjectHistory.getSubject().getSubjectId();
 
-		LocalDateTime localDateTime = subjectHistory.getModifyDate();
-		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-		String modifyDate = localDateTime.format(formatter);
-		
+		SimpleDateFormat dateFormat = new SimpleDateFormat("MM-dd-yyyy hh:mm:ss");
+		String str = dateFormat.format(subjectHistory.getModifyDate());
+//		System.out.println(str);
+		try {
+			Date modifyDate = dateFormat.parse(str);
+			System.out.println((Date) dateFormat.parse(str));
+			subjectHistoryDTO.setModifyDate(modifyDate);
+		} catch (Exception e) {
+			// TODO: handle exception
+		}
+
 		subjectHistoryDTO.setAdminId(adminId);
 		subjectHistoryDTO.setSubjectId(subjectId);
-		subjectHistoryDTO.setModifyDate(modifyDate);
-		
+
 		BeanUtils.copyProperties(subjectHistory, subjectHistoryDTO);
 		return subjectHistoryDTO;
 	}
-
-//	public SubjectHistoryDTO mapSubjectToDTO(SubjectHistory subjectHistory) {
-//		String adminId = subjectHistory.getAdmin().getAdminId();
-//		return new SubjectHistoryDTO(subjectHistory.getSubjectHistoryId(), subjectHistory.getAction(),
-//				subjectHistory.getModifyDate(), adminId, subjectHistory.getSubject());
-//	}
 
 	private void convertToEntity(SubjectHistoryDTO SubjectHistoryDTO, SubjectHistory subjectHistory) {
 		BeanUtils.copyProperties(SubjectHistoryDTO, subjectHistory);

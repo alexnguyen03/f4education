@@ -1,6 +1,6 @@
 package com.f4education.springjwt.payload.request;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +14,7 @@ public class SubjectHistoryDTO {
 
 	private String action;
 
-	private String modifyDate;
+	private Date modifyDate;
 
 	private String adminId;
 	

@@ -25,9 +25,6 @@ public class SubjectServiceImpl implements SubjectService {
 	@Override
 	public List<SubjectDTO> getAllSubjects() {
 		List<Subject> subjects = subjectRepository.findAll();
-		for (Subject s : subjects) {
-			System.out.println(s.getSubjectName());
-		}
 		return subjects.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
