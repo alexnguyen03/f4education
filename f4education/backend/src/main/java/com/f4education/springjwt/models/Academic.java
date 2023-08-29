@@ -44,18 +44,20 @@ public class Academic {
 
 	@Column(name = "end_date")
 	private Date endDate;
-	
+
 	@OneToMany(mappedBy = "academic")
 	List<Attendance> attendance;
-	
+
 	@OneToMany(mappedBy = "academic")
 	List<Schedule> schedules;
 
 	@Override
 	public String toString() {
-		return "Academic [academicId=" + academicId + ", academicName=" + academicName + ", startDate=" + startDate
-				+ ", endDate=" + endDate + "]";
+		return "Academic{" +
+				"academicId=" + academicId +
+				", academicName='" + academicName + '\'' +
+				", startDate=" + startDate +
+				", endDate=" + endDate +
+				'}';
 	}
-	
-	
 }

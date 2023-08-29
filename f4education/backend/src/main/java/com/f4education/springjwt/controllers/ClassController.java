@@ -28,25 +28,21 @@ public class ClassController {
 	ClassService classService;
 	
 	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
 	public List<ClassDTO> getAll() {
 		return classService.findAll();
 	}
 	
 	@GetMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
 	public ClassDTO findById(@PathVariable("id") Integer classId) {
 		return classService.getClassById(classId);
 	}
 
 	@PostMapping
-	@PreAuthorize("hasRole('ADMIN')")
 	public ClassDTO createSubject(@RequestBody ClassDTO classDTO) {
 		return classService.createClass(classDTO);
 	}
 
 	@PutMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
 	public ClassDTO updateSubject(@PathVariable("id") Integer classId, 
 			@RequestBody ClassDTO classDTO) {
 		return classService.updateClass(classId, classDTO);

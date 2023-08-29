@@ -22,5 +22,7 @@ public class ClassDTO {
 	
 	private Integer maximumQuantity;
 	
+	private String status;
+	
 	private AdminDTO admin;
 }

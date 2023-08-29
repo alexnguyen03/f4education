@@ -68,7 +68,8 @@ public class UserDetailsImpl implements UserDetails {
 
   @Override
   public String getUsername() {
-    return username;
+//    return email;// nếu lấy email làm username để đăng nhập
+     return username;//nếu nhập username để đăng nhập
   }
 
   @Override
