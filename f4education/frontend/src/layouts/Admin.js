@@ -62,16 +62,16 @@ const Admin = (props) => {
 		}
 		return 'Brand';
 	};
-	const getAdminInfo = () => {
-		console.log(JSON.parse(localStorage.getItem('user')).username + ' user ');
-		const uname = JSON.parse(localStorage.getItem('user')).username;
-		if (uname) {
-			setAdminName(uname);
-		}
-	};
-	useEffect(() => {
-		// getAdminInfo();
-	});
+	// const getAdminInfo = () => {
+	// 	console.log(JSON.parse(localStorage.getItem('user')).username + ' user ');
+	// 	const uname = JSON.parse(localStorage.getItem('user')).username;
+	// 	if (uname) {
+	// 		setAdminName(uname);
+	// 	}
+	// };
+	// useEffect(() => {
+	// 	getAdminInfo();
+	// });
 
 	return (
 		<>
