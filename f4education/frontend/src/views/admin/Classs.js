@@ -1,10 +1,9 @@
-import {Button, Card, CardHeader, CardBody, FormGroup, Form, Input, Container, Row, Col, Label, Modal} from 'reactstrap';
-import UserHeader from 'components/Headers/UserHeader.js';
+import {Button, FormGroup, Form, Input, Container, Row, Col, Modal} from 'reactstrap';
 import ClasssHeader from 'components/Headers/ClasssHeader';
 import {useState, useMemo, useEffect} from 'react';
 import {MaterialReactTable} from 'material-react-table';
 import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
-import {Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton, MenuItem, Stack, TextField, Tooltip} from '@mui/material';
+import {Box, IconButton} from '@mui/material';
 
 // gọi API từ classApi
 import classApi from 'api/classApi';
@@ -13,6 +12,7 @@ const Classs = () => {
 	const [classses, setClassses] = useState([]);
 	const [showForm, setShowForm] = useState(false);
 	const [update, setUpdate] = useState(true);
+	const [errors, setErrors] = useState({});
 	const [statusList, setStatusList] = useState([
 		{key: 'W', value: 'Đang chờ'},
 		{key: 'R', value: 'Đang diễn ra'},
@@ -42,10 +42,17 @@ const Classs = () => {
 		setClasss({
 			...classs,
 			[e.target.name]: e.target.value,
-		});
-		console.log(e.target.value);
+		});	
+
+		// bắt lỗi form
+		const validationErrors = {};
+		if(!classs.className.trim()){
+			validationErrors.className = 'Vui lòng nhập tên lớp !!!';
+		}
+		setErrors(validationErrors);
 	};
 
+	// xóa trắng form
 	const handleResetForm = () => {
 		setShowForm((pre) => !pre);
 		setClasss({
@@ -56,6 +63,7 @@ const Classs = () => {
 			maximumQuantity: 0,
 			status: 'Đang chờ',
 		});
+		setUpdate(true);
 	};
 
 	// lấy tấc cả dữ liệu từ database (gọi api)
@@ -74,10 +82,9 @@ const Classs = () => {
 			const resp = await classApi.createClass(classs);
 			alert('Thêm thành công');
 			handleResetForm();
-			getDataClass();
 		} catch (error) {
 			console.log('Thêm thất bại', error);
-		}
+		}	
 	};
 
 	// cập nhật class
@@ -87,10 +94,9 @@ const Classs = () => {
 			const resp = await classApi.updateClass(body, classs.classId);
 			alert('Cập nhật thành công');
 			handleResetForm();
-			getDataClass();
 		} catch (error) {
 			console.log('Cập nhật thất bại', error);
-		}
+		}	
 	};
 
 	const columns = useMemo(
@@ -104,7 +110,7 @@ const Classs = () => {
 				accessorKey: 'startDate',
 				header: 'Ngày bắt đầu',
 				size: 90,
-			},
+			  },
 			{
 				accessorKey: 'endDate',
 				header: 'Ngày kết thúc',
@@ -168,8 +174,6 @@ const Classs = () => {
 							<IconButton
 								color='secondary'
 								onClick={() => {
-									const formattedStartDate = formatStartDate(row.original.startDate);
-									console.log('formattedStartDate:', formattedStartDate);
 									setShowForm(true);
 									setUpdate(false);
 									setClasss({...row.original});
@@ -214,6 +218,7 @@ const Classs = () => {
 										name='className'
 										value={classs.className}
 									/>
+									{errors.className && <span>{errors.className}</span>}
 								</FormGroup>
 								<Row>
 									<Col md={12}>
@@ -264,6 +269,7 @@ const Classs = () => {
 												id='input-maximumQuantity'
 												type='number'
 												min={0}
+												step={1}
 												max={50}
 												value={classs.maximumQuantity}
 												name='maximumQuantity'

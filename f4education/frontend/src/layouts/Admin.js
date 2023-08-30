@@ -70,7 +70,7 @@ const Admin = (props) => {
 		}
 	};
 	useEffect(() => {
-		getAdminInfo();
+		// getAdminInfo();
 	});
 
 	return (
