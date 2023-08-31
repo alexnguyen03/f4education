@@ -1,24 +1,29 @@
-import CoursesHeader from 'components/Headers/CoursesHeader';
-import {memo, useEffect, useMemo, useState} from 'react';
-import {Button, Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Modal, Row} from 'reactstrap';
-import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon} from '@mui/icons-material';
+import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
 import {Box, IconButton} from '@mui/material';
 import courseApi from 'api/courseApi';
+import CoursesHeader from 'components/Headers/CoursesHeader';
 import {MaterialReactTable} from 'material-react-table';
+import {memo, useEffect, useMemo, useState} from 'react';
+import {Button, Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Modal, Row} from 'reactstrap';
 import subjectApi from '../../api/subjectApi';
+import Select from 'react-select';
 const Courses = () => {
+	const user = JSON.parse(localStorage.getItem('user') ?? '');
 	const [image, setImage] = useState(null);
 	const [imgData, setImgData] = useState(null);
 	const [showForm, setShowForm] = useState(false);
-	const [selectedId, setSelectedId] = useState(-1);
+	// const [selectedId, setSelectedId] = useState(-1);
 	const [update, setUpdate] = useState(false);
 	const [courses, setCourses] = useState([]);
 	const [subjects, setSubjects] = useState([]);
+	const [selectedSubject, setSelectedSubject] = useState({value: '0', label: ''});
+	const [options, setOptions] = useState([{value: '0', label: ''}]);
+	const [subjectId, setSubjectId] = useState(0);
 	const [course, setCourse] = useState({
-		subjectName: '',
+		// subjectName: '',
 		courseName: '',
-		courseDuration: 0,
-		coursePrice: 0,
+		courseDuration: 100,
+		coursePrice: 6000000,
 		courseDescription: '',
 		image: '',
 		subject: {
@@ -36,8 +41,26 @@ const Courses = () => {
 			},
 		},
 	});
+	const [courseRequest, setCourseRequest] = useState({
+		subjectId: 0,
+		adminId: '',
+		courseName: '',
+		coursePrice: 0,
+		courseDuration: '',
+		courseDescription: '',
+		numberSession: 0,
+		image: '',
+	});
 	const handelOnChangeInput = (e) => {
-		setCourse({[e.target.name]: e.target.value});
+		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
+	};
+	const handleOnChangeSelect = (e) => {
+		const selectedIndex = e.target.options.selectedIndex;
+		setSubjectId(e.target.options[selectedIndex].getAttribute('data-value'));
+		setCourseRequest((preCourse) => ({
+			...preCourse,
+			subjectId: parseInt(subjectId),
+		}));
 	};
 	const onChangePicture = (e) => {
 		setImage(null);
@@ -69,7 +92,6 @@ const Courses = () => {
 			{
 				accessorKey: 'courseDuration',
 				header: 'Thời lượng (h)',
-
 				size: 75,
 			},
 			{
@@ -97,20 +119,25 @@ const Courses = () => {
 		try {
 			const resp = await subjectApi.getAllSubject();
 			setSubjects(resp);
-			console.log(subjects);
 		} catch (error) {
 			console.log(error);
 		}
 	};
+	const convertToArray = () => {
+		const convertedArray = subjects.map((item) => ({
+			value: item.subjectId,
+			label: item.subjectName,
+		}));
+		console.log(options);
+		return convertedArray;
+	};
 	const handleEditFrom = (row) => {
-		console.log(row.original.courseId);
-
-		const selectedCourse = courses.find((course) => course.courseId === row.original.courseId);
-		setSelectedId(row.original.courseId);
-		console.log(selectedId);
-		setUpdate((pre) => !pre);
 		setShowForm(true);
+		const selectedCourse = courses.find((course) => course.courseId === row.original.courseId);
+		setUpdate((pre) => !pre);
 		setCourse({...selectedCourse});
+		setSelectedSubject({...selectedSubject, value: selectedCourse.subject.subjectId, label: selectedCourse.subject.subjectName});
+		console.log(selectedSubject);
 	};
 	const handleResetForm = () => {
 		// hide form
@@ -118,10 +145,10 @@ const Courses = () => {
 		setImgData(null);
 		// set course == null
 		setCourse({
-			subjectName: '',
+			// subjectName: '',
 			courseName: '',
-			courseDuration: 0,
-			coursePrice: 0,
+			courseDuration: 100,
+			coursePrice: 6000000,
 			courseDescription: '',
 			image: '',
 			subject: {
@@ -142,31 +169,66 @@ const Courses = () => {
 	};
 	const handleShowAddForm = () => {
 		setShowForm((pre) => !pre);
-		setUpdate((pre) => !pre);
+		setUpdate(false);
+		handleSelect(options[0]);
+		console.log(courseRequest);
 	};
-	const handleSubmitForm = () => {
+	const handleSubmitForm = (e) => {
+		e.preventDefault();
 		if (update) {
 			console.log('updated');
-			// console.log(image.name);
-			setCourse((preCourse) => ({
-				...preCourse,
-				image: image.name,
-			}));
-			console.log(course.image);
-			// send data to update course
+			if (image) {
+				setCourse((preCourse) => ({
+					...preCourse,
+					image: image.name,
+				}));
+			}
+			setUpdate(false);
+			console.log(courseRequest);
 		} else {
-			console.log('added');
-			// send data to add course
+			// console.log(subjectId);
+			setCourseRequest((preCourse) => ({
+				...preCourse,
+				adminId: user.username,
+				numberSession: 0,
+			}));
+			addCourse();
 		}
 	};
+	const addCourse = async () => {
+		const formData = new FormData();
+		formData.append('courseRequest', JSON.stringify(courseRequest));
+		formData.append('file', image);
+		console.log([...formData]);
+		console.log({...courseRequest});
+		try {
+			const resp = await courseApi.addCourse(formData);
+			setCourses([...resp]);
+		} catch (error) {
+			console.log('failed to fetch data', error);
+		}
+	};
+	function handleSelect(data) {
+		setSelectedSubject(data);
+		setCourseRequest((pre) => ({...pre, subjectId: parseInt(selectedSubject.value)}));
+		console.log(courseRequest);
+	}
 	useEffect(() => {
 		fetchCourses();
 		fetchSubject();
 	}, []);
+	useEffect(() => {
+		const convertedOptions = convertToArray();
+		setOptions(convertedOptions);
+	}, [subjects, selectedSubject]);
+	useEffect(() => {
+		const {courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
+
+		setCourseRequest({courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
+	}, [course, selectedSubject]);
 	return (
 		<>
 			<CoursesHeader />
-
 			<Container
 				className='mt--7'
 				fluid>
@@ -192,6 +254,9 @@ const Courses = () => {
 									header: 'Thao tác',
 									size: 20,
 									// Something else here
+								},
+								'mrt-row-numbers': {
+									size: 5,
 								},
 							}}
 							positionActionsColumn='last'
@@ -225,51 +290,66 @@ const Courses = () => {
 									</IconButton>
 								</Box>
 							)}
+							muiTablePaginationProps={{
+								rowsPerPageOptions: [10, 20, 50, 100],
+								showFirstButton: true,
+								showLastButton: true,
+							}}
 						/>
 						<Modal
 							className='modal-dialog-centered  modal-lg '
 							isOpen={showForm}
 							backdrop='static'
 							toggle={() => setShowForm((pre) => !pre)}>
-							<div className='modal-header'>
-								<h3 className='mb-0'>Thông tin khóa học</h3>
-								<button
-									aria-label='Close'
-									className='close'
-									data-dismiss='modal'
-									type='button'
-									onClick={handleResetForm}>
-									<span aria-hidden={true}>×</span>
-								</button>
-							</div>
-							<div className='modal-body'>
-								<Form>
+							<Form
+								onSubmit={handleSubmitForm}
+								encType='multipart/form-data'>
+								<div className='modal-header'>
+									<h3 className='mb-0'>Thông tin khóa học</h3>
+									<button
+										aria-label='Close'
+										className='close'
+										data-dismiss='modal'
+										type='button'
+										onClick={handleResetForm}>
+										<span aria-hidden={true}>×</span>
+									</button>
+								</div>
+								<div className='modal-body'>
 									<div className='px-lg-2'>
 										<Row>
 											<Col sm={6}>
-												{' '}
 												<FormGroup>
 													<label
 														className='form-control-label'
 														htmlFor='input-username'>
 														Tên môn học
 													</label>
-													<Input
+													{/* <Input
 														id='exampleSelect'
 														name='subjectName'
 														type='select'
-														onChange={handelOnChangeInput}
+														onChange={handleOnChangeSelect}
 														value={course.subjectName}>
+														<option>Chọn môn học</option>
 														{subjects.map((item) => {
 															return (
 																<option
 																	key={item.subjectId}
+																	data-value={item.subjectId}
 																	value={item.subjectName}>
 																	{item.subjectName}
 																</option>
 															);
 														})}
-													</Input>
+													</Input> */}
+													<Select
+														options={options}
+														placeholder='Select color'
+														value={selectedSubject}
+														onChange={handleSelect}
+														isSearchable={true}
+													/>
 												</FormGroup>
 												<FormGroup>
 													<label
@@ -284,7 +364,7 @@ const Courses = () => {
 														placeholder='Tên khóa học'
 														type='text'
 														onChange={handelOnChangeInput}
-														name='course.courseName'
+														name='courseName'
 														value={course.courseName}
 													/>
 												</FormGroup>
@@ -357,10 +437,12 @@ const Courses = () => {
 															<div className='custom-file'>
 																<input
 																	type='file'
+																	name='imageFile'
+																	accept='image/*'
 																	className='custom-file-input form-control-alternative'
 																	id='customFile'
 																	onChange={onChangePicture}
-																	multiple={true}
+																	// multiple={true}
 																/>
 																<label
 																	className='custom-file-label'
@@ -383,24 +465,23 @@ const Courses = () => {
 										</Row>
 									</div>
 									<hr className='my-4' />
-								</Form>
-							</div>
-							<div className='modal-footer'>
-								<Button
-									color='secondary'
-									data-dismiss='modal'
-									type='button'
-									onClick={handleResetForm}>
-									Hủy
-								</Button>
-								<Button
-									color='primary'
-									type='button'
-									className='px-5'
-									onClick={handleSubmitForm}>
-									Lưu
-								</Button>
-							</div>
+								</div>
+								<div className='modal-footer'>
+									<Button
+										color='secondary'
+										data-dismiss='modal'
+										type='button'
+										onClick={handleResetForm}>
+										Hủy
+									</Button>
+									<Button
+										color='primary'
+										type='submit'
+										className='px-5'>
+										Lưu
+									</Button>
+								</div>
+							</Form>
 						</Modal>
 					</CardBody>
 				</Card>

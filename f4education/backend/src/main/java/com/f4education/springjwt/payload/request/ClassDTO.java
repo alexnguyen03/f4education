@@ -19,10 +19,10 @@ public class ClassDTO {
 	private Date startDate;
 
 	private Date endDate;
-	
+
 	private Integer maximumQuantity;
-	
+
 	private String status;
-	
+
 	private AdminDTO admin;
 }

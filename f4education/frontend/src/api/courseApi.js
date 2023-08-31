@@ -8,7 +8,7 @@ const courseApi = {
 	},
 	addCourse: (body) => {
 		const url = '/courses';
-		return axiosClient.post(url, body);
+		return axiosClient.post(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
 	},
 };
 

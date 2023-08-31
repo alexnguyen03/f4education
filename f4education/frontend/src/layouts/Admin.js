@@ -30,7 +30,6 @@ const Admin = (props) => {
 	const mainContent = useRef(null);
 	const location = useLocation();
 	const [adminName, setAdminName] = useState('');
-	console.log(props);
 	useEffect(() => {
 		document.documentElement.scrollTop = 0;
 		document.scrollingElement.scrollTop = 0;
@@ -63,7 +62,6 @@ const Admin = (props) => {
 		return 'Brand';
 	};
 	const getAdminInfo = () => {
-		console.log(JSON.parse(localStorage.getItem('user')).username + ' user ');
 		const uname = JSON.parse(localStorage.getItem('user')).username;
 		if (uname) {
 			setAdminName(uname);
