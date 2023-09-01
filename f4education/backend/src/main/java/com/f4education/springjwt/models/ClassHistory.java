@@ -64,7 +64,7 @@ public class ClassHistory implements Serializable{
 	public String toString() {
 		return "ClassHistory [classHistoryId=" + classHistoryId + ", action=" + action + ", modifyDate=" + modifyDate
 				+ ", className=" + className + ", startDate=" + startDate + ", endDate=" + endDate
-				+ ", maximumQuantity=" + maximumQuantity + ", adminId=" + adminId + ", classes=" + classes + "]";
+				+ ", maximumQuantity=" + maximumQuantity + ", adminId=" + adminId;
 	} 	
 	
 	
