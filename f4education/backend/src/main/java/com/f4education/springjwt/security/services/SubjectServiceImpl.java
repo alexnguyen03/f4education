@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,6 +13,7 @@ import com.f4education.springjwt.interfaces.SubjectService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.repository.SubjectHistoryRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
 @Service
@@ -39,7 +41,8 @@ public class SubjectServiceImpl implements SubjectService {
 		Subject subject = new Subject();
 		Admin admin = adminService.getAdminById(subjectDTO.getAdminId());
 		subject.setAdmin(admin);
-		System.out.println(admin);
+		subject.setCreateDate(new Date());
+//		System.out.println(admin);
 
 		convertToEntity(subjectDTO, subject);
 		Subject savedSubject = subjectRepository.save(subject);
@@ -64,7 +67,7 @@ public class SubjectServiceImpl implements SubjectService {
 
 	public SubjectDTO mapSubjectToDTO(Subject subject) {
 		String adminId = subject.getAdmin().getAdminId();
-		return new SubjectDTO(subject.getSubjectId(), subject.getSubjectName(), adminId);
+		return new SubjectDTO(subject.getSubjectId(), subject.getSubjectName(), adminId, subject.getCreateDate());
 	}
 
 	private void convertToEntity(SubjectDTO subjectDTO, Subject subject) {

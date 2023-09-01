@@ -1,6 +1,7 @@
 import { FormGroup } from "@mui/material";
 import SubjectHeader from "components/Headers/SubjectHeader";
 import { MaterialReactTable } from "material-react-table";
+import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 
 // reactstrap components
@@ -26,6 +27,7 @@ const Subjects = () => {
   // Main variable
   const [subjects, setSubjects] = useState([]);
   const [subjectHistories, setSubjectHistories] = useState([]);
+  const [subjectArray, setSubjectArray] = useState([]);
 
   // Action variable
   const [showModal, setShowModal] = useState(false);
@@ -74,17 +76,29 @@ const Subjects = () => {
   const fetchSubjects = async () => {
     try {
       const resp = await subjectApi.getAllSubject();
+      setSubjectArray(resp);
       setSubjects(resp);
+      console.log(resp);
       console.log("restarted application");
     } catch (error) {
       console.log(error);
     }
-    // const resp = await axios(ROOT_URL);
-    // console.log(resp.data);
   };
 
   // API_AREA > CRUD
   const handleCreateNewSubject = async () => {
+    subject.subjectName = "";
+
+    const lastSubject = subjects.slice(-1)[0];
+    const lastSubjectId = lastSubject.subjectId;
+
+    subject.subjectId = Number(lastSubjectId + 1);
+
+    subjectArray.push(subject);
+    setSubjectArray([...subjectArray]);
+
+    console.log(subjectArray.slice(-1)[0]);
+
     subject.subjectId = "";
 
     const action = "add";
@@ -107,7 +121,18 @@ const Subjects = () => {
   };
 
   const handleUpdateSubject = async () => {
-    console.log(subject);
+    const newSubjects = [...subjects];
+
+    const index = newSubjects.findIndex(
+      (item) => item.subjectId === subject.subjectId
+    );
+
+    if (index !== -1) {
+      newSubjects[index] = subject;
+      setSubjectArray(newSubjects);
+    }
+    // **
+    setSubject(newSubjects[index]);
 
     const action = "update";
     if (validateForm(action)) {
@@ -121,19 +146,24 @@ const Subjects = () => {
       } catch (error) {
         console.log(error);
       }
-
-      console.log("Update success");
-
-      setShowModal(false);
-      setIsUpdate(false);
-
-      fetchSubjects();
-      setSubject({
-        subjectId: "",
-        adminId: admin.admin_id,
-        subjectName: "",
-      });
     }
+
+    //   console.log("Update success");
+    setShowModal(false);
+    setIsUpdate(false);
+
+    fetchSubjects();
+    setSubject({
+      subjectId: "",
+      adminId: admin.admin_id,
+      subjectName: "",
+    });
+  };
+
+  const handleEditSubject = (row) => {
+    setShowModal(true);
+    setSubject({ ...row.original });
+    setIsUpdate(true);
   };
 
   // Validation area
@@ -184,6 +214,11 @@ const Subjects = () => {
         accessorKey: "subjectName",
         header: "Tên Môn Học",
       },
+      {
+        accessorFn: (row) =>
+          moment(row.createDate).format("dd-MM-yyyy, h:mm:ss a"),
+        header: "Ngày Tạo",
+      },
     ],
     []
   );
@@ -192,11 +227,12 @@ const Subjects = () => {
     () => [
       {
         accessorKey: "subjectHistoryId",
-        header: "History ID",
+        header: "#",
         size: 40,
       },
       {
         accessorKey: "action",
+        accessorFn: (row) => displayActionHistory(row.action),
         header: "Hành động",
         size: 40,
       },
@@ -206,7 +242,8 @@ const Subjects = () => {
         size: 120,
       },
       {
-        accessorKey: "modifyDate",
+        accessorFn: (row) =>
+          moment(row.modifyDate).format("dd-MM-yyyy, h:mm:ss a"),
         header: "Ngày chỉnh sửa",
         size: 120,
       },
@@ -218,6 +255,10 @@ const Subjects = () => {
     ],
     []
   );
+
+  const displayActionHistory = (action) => {
+    return action === "CREATE" ? "Thêm mới" : "Cập nhật";
+  };
 
   // *************** Header Button area
   const handleChangeSubjectListAndHistory = () => {
@@ -311,13 +352,16 @@ const Subjects = () => {
                 // columnSubjectHistory
               }
               data={
-                isSubjectHistoryShowing ? subjectHistories : subjects
+                isSubjectHistoryShowing ? subjectHistories : subjectArray
                 // subjectHistories
               }
+              initialState={{ columnVisibility: { subjectId: false } }}
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering
+              // enableRowOrdering
               enableEditing
+              enableStickyHeader
               enableColumnResizing
               muiTablePaginationProps={{
                 rowsPerPageOptions: [10, 20, 50, 100],
@@ -325,14 +369,12 @@ const Subjects = () => {
                 showLastButton: false,
               }}
               renderRowActions={({ row }) => (
-                <div className="d-flex justify-content-start">
+                <div className="d-flex justify-content-start py-1">
                   <Button
                     color={`${!isSubjectHistoryShowing ? "warning" : "info"}`}
                     outline
                     onClick={() => {
-                      setShowModal(true);
-                      setSubject({ ...row.original });
-                      setIsUpdate(true);
+                      handleEditSubject(row);
                     }}
                   >
                     {isSubjectHistoryShowing ? (
