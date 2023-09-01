@@ -39,7 +39,6 @@ public class SubjectServiceImpl implements SubjectService {
 		Subject subject = new Subject();
 		Admin admin = adminService.getAdminById(subjectDTO.getAdminId());
 		subject.setAdmin(admin);
-		System.out.println(admin);
 
 		convertToEntity(subjectDTO, subject);
 		Subject savedSubject = subjectRepository.save(subject);
@@ -71,13 +70,13 @@ public class SubjectServiceImpl implements SubjectService {
 		BeanUtils.copyProperties(subjectDTO, subject);
 	}
 
-//	 private SubjectDTO convertToDto(Subject subject) {
-//	 SubjectDTO subjectDTO = new SubjectDTO();
-//	 subjectDTO.setSubjectId(subject.getSubjectId());
-//	 subjectDTO.setSubjectName(subject.getSubjectName());
-//	 subjectDTO.setAdminId(subject.getAdminId());
-//	 // Set other properties if any
-//	 return subjectDTO;
-//	 }
+	// private SubjectDTO convertToDto(Subject subject) {
+	// SubjectDTO subjectDTO = new SubjectDTO();
+	// subjectDTO.setSubjectId(subject.getSubjectId());
+	// subjectDTO.setSubjectName(subject.getSubjectName());
+	// subjectDTO.setAdminId(subject.getAdminId());
+	// // Set other properties if any
+	// return subjectDTO;
+	// }
 
 }
