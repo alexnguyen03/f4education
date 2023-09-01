@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
-import com.f4education.springjwt.ultils.FileStorageUtil;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -37,9 +36,6 @@ import lombok.RequiredArgsConstructor;
 public class CoursesController {
 	@Autowired
 	CourseServiceImpl courseService;
-
-	@Autowired
-	FileStorageUtil fileService;
 
 	@Autowired
 	XFile xfileService;
