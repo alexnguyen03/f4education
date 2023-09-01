@@ -1,6 +1,7 @@
 import { FormGroup } from "@mui/material";
 import SubjectHeader from "components/Headers/SubjectHeader";
 import { MaterialReactTable } from "material-react-table";
+import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 
 // reactstrap components
@@ -77,6 +78,7 @@ const Subjects = () => {
       const resp = await subjectApi.getAllSubject();
       setSubjectArray(resp);
       setSubjects(resp);
+      console.log(resp);
       console.log("restarted application");
     } catch (error) {
       console.log(error);
@@ -85,6 +87,8 @@ const Subjects = () => {
 
   // API_AREA > CRUD
   const handleCreateNewSubject = async () => {
+    subject.subjectName = "";
+
     const lastSubject = subjects.slice(-1)[0];
     const lastSubjectId = lastSubject.subjectId;
 
@@ -156,6 +160,12 @@ const Subjects = () => {
     });
   };
 
+  const handleEditSubject = (row) => {
+    setShowModal(true);
+    setSubject({ ...row.original });
+    setIsUpdate(true);
+  };
+
   // Validation area
   const validateForm = (action) => {
     if (subject.subjectName.length === 0) {
@@ -204,6 +214,11 @@ const Subjects = () => {
         accessorKey: "subjectName",
         header: "Tên Môn Học",
       },
+      {
+        accessorFn: (row) =>
+          moment(row.createDate).format("dd-MM-yyyy, h:mm:ss a"),
+        header: "Ngày Tạo",
+      },
     ],
     []
   );
@@ -212,11 +227,12 @@ const Subjects = () => {
     () => [
       {
         accessorKey: "subjectHistoryId",
-        header: "History ID",
+        header: "#",
         size: 40,
       },
       {
         accessorKey: "action",
+        accessorFn: (row) => displayActionHistory(row.action),
         header: "Hành động",
         size: 40,
       },
@@ -226,7 +242,8 @@ const Subjects = () => {
         size: 120,
       },
       {
-        accessorKey: "modifyDate",
+        accessorFn: (row) =>
+          moment(row.modifyDate).format("dd-MM-yyyy, h:mm:ss a"),
         header: "Ngày chỉnh sửa",
         size: 120,
       },
@@ -238,6 +255,10 @@ const Subjects = () => {
     ],
     []
   );
+
+  const displayActionHistory = (action) => {
+    return action === "CREATE" ? "Thêm mới" : "Cập nhật";
+  };
 
   // *************** Header Button area
   const handleChangeSubjectListAndHistory = () => {
@@ -338,7 +359,9 @@ const Subjects = () => {
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering
+              // enableRowOrdering
               enableEditing
+              enableStickyHeader
               enableColumnResizing
               muiTablePaginationProps={{
                 rowsPerPageOptions: [10, 20, 50, 100],
@@ -346,14 +369,12 @@ const Subjects = () => {
                 showLastButton: false,
               }}
               renderRowActions={({ row }) => (
-                <div className="d-flex justify-content-start">
+                <div className="d-flex justify-content-start py-1">
                   <Button
                     color={`${!isSubjectHistoryShowing ? "warning" : "info"}`}
                     outline
                     onClick={() => {
-                      setShowModal(true);
-                      setSubject({ ...row.original });
-                      setIsUpdate(true);
+                      handleEditSubject(row);
                     }}
                   >
                     {isSubjectHistoryShowing ? (
