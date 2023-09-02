@@ -27,4 +27,6 @@ public class ClassHistoryDTO {
 	private String status;
 	
 	private String adminId;
+	
+	private Integer classId;
 }
