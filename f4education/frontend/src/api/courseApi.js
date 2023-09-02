@@ -10,6 +10,10 @@ const courseApi = {
 		const url = '/courses';
 		return axiosClient.post(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
 	},
+	updateCourse: (body) => {
+		const url = '/courses';
+		return axiosClient.put(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
+	},
 };
 
 export default courseApi;
