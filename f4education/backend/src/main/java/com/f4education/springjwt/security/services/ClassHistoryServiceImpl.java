@@ -44,6 +44,7 @@ public class ClassHistoryServiceImpl implements ClassHistoryService {
 	private ClassHistoryDTO convertToDto(ClassHistory classHistory ) {
 		ClassHistoryDTO classHistoryDTO = new ClassHistoryDTO();
 		BeanUtils.copyProperties(classHistory, classHistoryDTO);
+		classHistoryDTO.setClassId(classHistory.getClasses().getClassId());
 		return classHistoryDTO;
 	}
 }

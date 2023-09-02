@@ -31,7 +31,6 @@ const Classs = () => {
   const [update, setUpdate] = useState(true);
   const [isClassHistoryShowing, setIsClassHistoryShowing] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
-  const [error, setError] = useState(false);
 
   // khởi tạo Class
   const [classs, setClasss] = useState({
@@ -46,16 +45,6 @@ const Classs = () => {
   // thay đổi giá trị của biến
   const handleChangeClassListAndHistory = () => {
     setIsClassHistoryShowing(!isClassHistoryShowing);
-  };
-
-  // Chuyển đổi định dạng ngày tháng từ 'yyyy-MM-dd' thành 'dd/MM/yyyy'
-  const formatStartDate = (startDate) => {
-    const parts = startDate.split("T")[0].split("-");
-    const year = parts[0];
-    const month = parts[1];
-    const day = parts[2];
-    const formattedStartDate = `${day}/${month}/${year}`;
-    return formattedStartDate;
   };
 
   // xử lý status
@@ -181,6 +170,11 @@ const Classs = () => {
   const columnClass = useMemo(
     () => [
       {
+        accessorKey: "classId",
+        header: "Mã lớp học",
+        size: 100,
+      },
+      {
         accessorKey: "className",
         header: "Tên lớp học",
         size: 100,
@@ -194,23 +188,16 @@ const Classs = () => {
       },
       {
         accessorKey: "endDate",
-        // accessorFn: (row) => {
-        // 	if(row.endDate !== null){
-        // 		return moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a");
-        // 	}else{
-        // 		return 'Chưa kết thúc';
-        // 	}
-        // },
         accessorFn: (row) => row,
         Cell: ({ cell }) => {
           const row = cell.getValue();
           if (row.endDate !== null) {
             return (
               <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a")}</span>
-			  );
-			} else {
-				return <span>Chưa kết thúc</span>;
-			}
+            );
+          } else {
+            return <span>Chưa kết thúc</span>;
+          }
         },
         header: "Ngày kết thúc",
         size: 90,
@@ -243,9 +230,9 @@ const Classs = () => {
   const columnClassHistory = useMemo(
     () => [
       {
-        accessorKey: "classHistoryId",
-        header: "ID",
-        size: 40,
+        accessorKey: "classId",
+        header: "Mã lớp học",
+        size: 90,
       },
       {
         accessorKey: "className",
@@ -257,14 +244,23 @@ const Classs = () => {
         accessorFn: (row) =>
           moment(row.startDate).format("DD/MM/yyyy, h:mm:ss a"),
         header: "Ngày bắt đầu",
-        size: 90,
+        size: 105,
       },
       {
         accessorKey: "endDate",
-        accessorFn: (row) =>
-          moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a"),
+        accessorFn: (row) => row,
+        Cell: ({ cell }) => {
+          const row = cell.getValue();
+          if (row.endDate !== null) {
+            return (
+              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a")}</span>
+            );
+          } else {
+            return <span>Chưa kết thúc</span>;
+          }
+        },
         header: "Ngày kết thúc",
-        size: 90,
+        size: 105,
       },
       {
         accessorKey: "maximumQuantity",
@@ -273,8 +269,8 @@ const Classs = () => {
       },
       {
         accessorKey: "adminId",
-        header: "Người tạo",
-        size: 95,
+        header: "Người chỉnh sửa",
+        size: 100,
       },
       {
         accessorKey: "status",
@@ -282,16 +278,16 @@ const Classs = () => {
         size: 95,
       },
       {
+        accessorFn: (row) =>
+          moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
+        header: "Ngày Chỉnh Sửa",
+        size: 120,
+      },
+      {
         accessorKey: "action",
         accessorFn: (row) => displayActionHistory(row.action),
         header: "Hành động",
-        size: 40,
-      },
-      {
-        accessorFn: (row) =>
-          moment(row.modifyDate).format("dd-MM-yyyy, h:mm:ss a"),
-        header: "Ngày Chỉnh Sửa",
-        size: 120,
+        size: 100,
       },
     ],
     []
@@ -338,53 +334,72 @@ const Classs = () => {
               {isClassHistoryShowing ? "Danh sách lớp học" : "Lịch sử lớp học"}
             </Button>
           </CardHeader>
-          <CardBody>
-            <MaterialReactTable
-              displayColumnDefOptions={
-                !isClassHistoryShowing && {
+
+          {/* bảng lớp học */}
+          {isClassHistoryShowing ? null : (
+            <CardBody>
+              <MaterialReactTable
+                displayColumnDefOptions={{
                   "mrt-row-actions": {
                     header: "Thao tác",
                     size: 50,
                   },
-                }
-              }
-              enableColumnResizing
-              enableGrouping
-              enableStickyHeader
-              enableStickyFooter
-              enableRowNumbers
-              columns={isClassHistoryShowing ? columnClassHistory : columnClass}
-              data={isClassHistoryShowing ? classHistories : classses}
-              positionActionsColumn="last"
-              renderTopToolbarCustomActions={() => (
-                <Button
-                  onClick={() => setShowForm((pre) => !pre)}
-                  color="success"
-                  disabled={isClassHistoryShowing}
-                >
-                  Thêm lớp học
-                </Button>
-              )}
-              enableRowActions
-              renderRowActions={({ row, table }) => (
-                <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => {
-                      handleEditRow(row);
-                    }}
+                }}
+                enableColumnResizing
+                enableGrouping
+                enableStickyHeader
+                enableStickyFooter
+                columns={columnClass}
+                data={classses}
+                positionActionsColumn="last"
+                renderTopToolbarCustomActions={() => (
+                  <Button
+                    onClick={() => setShowForm((pre) => !pre)}
+                    color="success"
                   >
-                    <EditIcon />
-                  </IconButton>
-                </Box>
-              )}
-              muiTablePaginationProps={{
-                rowsPerPageOptions: [10, 20, 50, 100],
-                showFirstButton: false,
-                showLastButton: false,
-              }}
-            />
-          </CardBody>
+                    Thêm lớp học
+                  </Button>
+                )}
+                enableRowActions
+                renderRowActions={({ row, table }) => (
+                  <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
+                    <IconButton
+                      color="secondary"
+                      onClick={() => {
+                        handleEditRow(row);
+                      }}
+                    >
+                      <EditIcon />
+                    </IconButton>
+                  </Box>
+                )}
+                muiTablePaginationProps={{
+                  rowsPerPageOptions: [10, 20, 50, 100],
+                  showFirstButton: false,
+                  showLastButton: false,
+                }}
+              />
+            </CardBody>
+          )}
+
+          {/* bảng lịch sử lớp học  */}
+          {isClassHistoryShowing ? (
+            <CardBody>
+              <MaterialReactTable
+                enableColumnResizing
+                enableGrouping
+                enableStickyHeader
+                enableStickyFooter
+                columns={columnClassHistory}
+                data={classHistories}
+                muiTablePaginationProps={{
+                  rowsPerPageOptions: [10, 20, 50, 100],
+                  showFirstButton: false,
+                  showLastButton: false,
+                }}
+              />
+            </CardBody>
+          ) : null}
         </Card>
         <Modal
           backdrop="static"
@@ -407,6 +422,24 @@ const Classs = () => {
           <div className="modal-body">
             <Form>
               <div className="px-lg-2">
+                <FormGroup className={update ? "hidden-form-group" : ""}>
+                  <label
+                    className="form-control-label"
+                    htmlFor="input-class-id"
+                  >
+                    Mã lớp học
+                  </label>
+                  <Input
+                    className="form-control-alternative"
+                    id="input-class-id"
+                    type="text"
+                    onChange={handelOnChangeInput}
+                    placeholder="Mã lớp học"
+                    name="classId"
+                    readOnly={update ? "readOnly" : "readOnly"}
+                    value={classs.classId}
+                  />
+                </FormGroup>
                 <FormGroup>
                   <label
                     className="form-control-label"
@@ -421,7 +454,6 @@ const Classs = () => {
                     type="text"
                     onChange={handelOnChangeInput}
                     name="className"
-                    readOnly={update ? undefined : "readOnly"}
                     value={classs.className}
                   />
                 </FormGroup>
@@ -481,11 +513,6 @@ const Classs = () => {
                         name="maximumQuantity"
                         onChange={handelOnChangeInput}
                       />
-                      {error ? (
-                        <span>Số lượng tối đa phải lớn hơn 0 !!!</span>
-                      ) : (
-                        ""
-                      )}
                     </FormGroup>
                   </Col>
                   <Col md={12}>
