@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 public class ClassHistoryDTO {
 	private Integer classHistoryId;
 
-	private String operation;
+	private String action;
 
-	private Date operationDate;
+	private Date modifyDate;
 	
 	private String className;
 	
@@ -23,4 +23,8 @@ public class ClassHistoryDTO {
 	private Date endDate;
 	
 	private Integer maximumQuantity;
+	
+	private String status;
+	
+	private String adminId;
 }
