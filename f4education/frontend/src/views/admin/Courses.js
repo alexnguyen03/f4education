@@ -7,6 +7,7 @@ import {memo, useEffect, useMemo, useState} from 'react';
 import {Button, Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Modal, Row} from 'reactstrap';
 import subjectApi from '../../api/subjectApi';
 import Select from 'react-select';
+const IMG_URL = '/courses/';
 const Courses = () => {
 	const user = JSON.parse(localStorage.getItem('user') ?? '');
 	const [image, setImage] = useState(null);
@@ -20,7 +21,7 @@ const Courses = () => {
 	const [options, setOptions] = useState([{value: '0', label: ''}]);
 	const [subjectId, setSubjectId] = useState(0);
 	const [course, setCourse] = useState({
-		// subjectName: '',
+		courseId: 0,
 		courseName: '',
 		courseDuration: 100,
 		coursePrice: 6000000,
@@ -44,6 +45,7 @@ const Courses = () => {
 	const [courseRequest, setCourseRequest] = useState({
 		subjectId: 0,
 		adminId: '',
+		courseId: '',
 		courseName: '',
 		coursePrice: 0,
 		courseDuration: '',
@@ -79,6 +81,14 @@ const Courses = () => {
 	};
 	const columns = useMemo(
 		() => [
+			{
+				enableColumnOrdering: true,
+				enableEditing: false, //disable editing on this column
+				enableSorting: true,
+				accessorKey: 'courseId',
+				header: 'Mã khóa học',
+				size: 20,
+			},
 			{
 				accessorKey: 'subject.subjectName',
 				header: 'Tên môn học',
@@ -134,8 +144,9 @@ const Courses = () => {
 	const handleEditFrom = (row) => {
 		setShowForm(true);
 		const selectedCourse = courses.find((course) => course.courseId === row.original.courseId);
-		setUpdate((pre) => !pre);
+		setUpdate(true);
 		setCourse({...selectedCourse});
+		console.log(course);
 		setSelectedSubject({...selectedSubject, value: selectedCourse.subject.subjectId, label: selectedCourse.subject.subjectName});
 		console.log(selectedSubject);
 	};
@@ -176,23 +187,26 @@ const Courses = () => {
 	const handleSubmitForm = (e) => {
 		e.preventDefault();
 		if (update) {
-			console.log('updated');
-			if (image) {
-				setCourse((preCourse) => ({
-					...preCourse,
-					image: image.name,
-				}));
-			}
-			setUpdate(false);
+			updateCourse();
 			console.log(courseRequest);
+			console.log('updated');
+			// if (image) {
+			// 	setCourse((preCourse) => ({
+			// 		...preCourse,
+			// 		image: image.name,
+			// 	}));
+			// }
+			// console.log(courseRequest);
 		} else {
-			// console.log(subjectId);
-			setCourseRequest((preCourse) => ({
-				...preCourse,
-				adminId: user.username,
-				numberSession: 0,
-			}));
+			console.log(courseRequest);
 			addCourse();
+
+			console.log('add');
+			// setCourseRequest((preCourse) => ({
+			// 	...preCourse,
+			// 	adminId: user.username,
+			// 	numberSession: 0,
+			// }));
 		}
 	};
 	const addCourse = async () => {
@@ -203,7 +217,20 @@ const Courses = () => {
 		console.log({...courseRequest});
 		try {
 			const resp = await courseApi.addCourse(formData);
-			setCourses([...resp]);
+			// setCourses([...resp]);
+		} catch (error) {
+			console.log('failed to fetch data', error);
+		}
+	};
+	const updateCourse = async () => {
+		const formData = new FormData();
+		formData.append('courseRequest', JSON.stringify(courseRequest));
+		formData.append('file', image);
+		console.log([...formData]);
+		console.log({...courseRequest});
+		try {
+			const resp = await courseApi.updateCourse(formData);
+			// setCourses([...resp]);
 		} catch (error) {
 			console.log('failed to fetch data', error);
 		}
@@ -211,7 +238,7 @@ const Courses = () => {
 	function handleSelect(data) {
 		setSelectedSubject(data);
 		setCourseRequest((pre) => ({...pre, subjectId: parseInt(selectedSubject.value)}));
-		console.log(courseRequest);
+		// console.log(courseRequest);
 	}
 	useEffect(() => {
 		fetchCourses();
@@ -222,9 +249,10 @@ const Courses = () => {
 		setOptions(convertedOptions);
 	}, [subjects, selectedSubject]);
 	useEffect(() => {
-		const {courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
-
-		setCourseRequest({courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
+		const {courseId, courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
+		if (selectedSubject.value !== undefined) {
+			setCourseRequest({courseId: courseId, courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
+		}
 	}, [course, selectedSubject]);
 	return (
 		<>
@@ -453,12 +481,22 @@ const Courses = () => {
 														</FormGroup>
 													</Col>
 													<div className='previewProfilePic px-3'>
-														<img
-															alt=''
-															width={120}
-															className='playerProfilePic_home_tile'
-															src={imgData}
-														/>
+														{imgData && (
+															<img
+																alt=''
+																width={120}
+																className='playerProfilePic_home_tile'
+																src={imgData}
+															/>
+														)}
+														{update && !imgData && (
+															<img
+																alt=''
+																width={120}
+																className=''
+																src={process.env.REACT_APP_IMAGE_URL + IMG_URL + course.image}
+															/>
+														)}
 													</div>
 												</Row>
 											</Col>

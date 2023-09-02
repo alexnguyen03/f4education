@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
 import java.util.Date;
 
 @Data
@@ -16,12 +15,6 @@ import java.util.Date;
 @Table(name = "coursehistory")
 @Builder
 public class CourseHistory {
-	@ManyToOne
-	@JoinColumn(name = "adminId")
-	Admin admin;
-	@ManyToOne
-	@JoinColumn(name = "courseId")
-	Course course;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer courseHistoryId;
@@ -33,10 +26,11 @@ public class CourseHistory {
 	private String courseDuration;
 	@Column(name = "course_description")
 	private String courseDescription;
-
 	private Integer numberSession;
 	private String image;
-
 	private String action;
 	private Date modifyDate;
+	@ManyToOne
+	@JoinColumn(name = "courseId")
+	Course course;
 }
