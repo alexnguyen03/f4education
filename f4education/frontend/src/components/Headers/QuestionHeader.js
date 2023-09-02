@@ -1,7 +1,7 @@
 // reactstrap components
 import { Container, Row, Col } from "reactstrap";
 
-const SubjectHeader = () => {
+const QuestionHeader = () => {
   return (
     <>
       <div
@@ -19,7 +19,7 @@ const SubjectHeader = () => {
         <Container className="d-flex " fluid>
           <Row>
             <Col lg="7" widths={["md"]}>
-              <h1 className="display-1 text-white">MÔN HỌC</h1>
+              <h1 className="display-1 text-white">CÂU HỎI</h1>
             </Col>
           </Row>
         </Container>
@@ -28,4 +28,4 @@ const SubjectHeader = () => {
   );
 };
 
-export default SubjectHeader;
+export default QuestionHeader;

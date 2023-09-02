@@ -1,7 +1,6 @@
-import { FormGroup } from "@mui/material";
-import SubjectHeader from "components/Headers/SubjectHeader";
+import { Box, FormGroup, Typography } from "@mui/material";
+import QuestionHeader from "components/Headers/QuestionHeader";
 import { MaterialReactTable } from "material-react-table";
-import moment from "moment";
 import { useEffect, useMemo, useState } from "react";
 
 // reactstrap components
@@ -15,24 +14,27 @@ import {
   Modal,
 } from "reactstrap";
 
-// Stoatify component
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
-
 // Axios
-import subjectApi from "../../api/subjectApi";
-import subjectHistoryApi from "../../api/subjectHistoryApi";
+import questionApi from "../../api/questionApi";
+import courseApi from "../../api/courseApi";
 
-const Subjects = () => {
+//React Select
+import Select from "react-select";
+
+const options = [
+  { value: "chocolate", label: "Chocolate" },
+  { value: "strawberry", label: "Strawberry" },
+  { value: "vanilla", label: "Vanilla" },
+];
+
+const Questions = () => {
   // Main variable
-  const [subjects, setSubjects] = useState([]);
-  const [subjectHistories, setSubjectHistories] = useState([]);
-  const [subjectArray, setSubjectArray] = useState([]);
+  const [questions, setQuestions] = useState([]);
+  const [courses, setCourses] = useState([]);
 
   // Action variable
   const [showModal, setShowModal] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [isSubjectHistoryShowing, setIsSubjectHistoryShowing] = useState(false);
 
   // Form variable
   const [errorInputAddSubject, setErrorInputAddSubject] = useState({
@@ -45,41 +47,34 @@ const Subjects = () => {
     message: "",
   });
 
-  const admin = {
-    admin_id: "namnguyen",
-    fullname: "Nguyễn Hoài Nam",
-    gender: true,
-    date_of_birth: "2003-01-01",
-    citizen_identification: "930475892189",
-    levels: "Admin",
-    address: "Can Tho",
-    phone: "1234567890",
-    image: "image1.png",
-  };
+  // Get LocalStorage
+  const user = JSON.parse(localStorage.getItem("user"));
 
-  // *************** Subject AREA
-  const [subject, setSubject] = useState({
-    subjectId: "",
-    adminId: admin.admin_id,
-    subjectName: "",
+  // ************* Question Area
+  const [question, setQuestion] = useState({
+    questionId: "",
+    questionContent: [],
+    answer: "",
+    level: "",
+    courseId: "",
+    adminId: "",
   });
 
-  // Form action area
-  const handleChangeInput = (e) => {
-    setSubject((prevSubject) => ({
-      ...prevSubject,
-      [e.target.name]: e.target.value,
-    }));
+  // Api Area
+  const fetchQuestions = async () => {
+    try {
+      const resp = await questionApi.getAllQuestion();
+      setQuestions(resp);
+      console.log("restarted application");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  // API Area
-  const fetchSubjects = async () => {
+  const fetchCourse = async () => {
     try {
-      const resp = await subjectApi.getAllSubject();
-      setSubjectArray(resp);
-      setSubjects(resp);
-      console.log(resp);
-      console.log("restarted application");
+      const resp = await courseApi.getAll();
+      setCourses(resp);
     } catch (error) {
       console.log(error);
     }
@@ -87,88 +82,34 @@ const Subjects = () => {
 
   // API_AREA > CRUD
   const handleCreateNewSubject = async () => {
-    subject.subjectName = "";
-
-    const lastSubject = subjects.slice(-1)[0];
-    const lastSubjectId = lastSubject.subjectId;
-
-    subject.subjectId = Number(lastSubjectId + 1);
-
-    subjectArray.push(subject);
-    setSubjectArray([...subjectArray]);
-
-    console.log(subjectArray.slice(-1)[0]);
-
-    subject.subjectId = "";
+    question.questionId = "";
+    const questionContent = [
+      {
+        id: 1,
+        question: [{}],
+      },
+    ];
 
     const action = "add";
     if (validateForm(action)) {
       try {
-        const body = subject;
-        const resp = await subjectApi.createSubject(body);
-        console.log(resp);
-
-        // Create SubjectHistory
-        handleCreateNewSubjectHistory(subject, action);
+        const body = question;
+        console.log(body);
+        // const resp = await questionApi.createSubject(body);
+        // console.log(resp);
       } catch (error) {
         console.log(error);
       }
       console.log("Add Success");
 
-      fetchSubjects();
+      fetchQuestions();
       setShowModal(false);
     } else console.log("Error in validation");
   };
 
-  const handleUpdateSubject = async () => {
-    const newSubjects = [...subjects];
-
-    const index = newSubjects.findIndex(
-      (item) => item.subjectId === subject.subjectId
-    );
-
-    if (index !== -1) {
-      newSubjects[index] = subject;
-      setSubjectArray(newSubjects);
-    }
-    // **
-    setSubject(newSubjects[index]);
-
-    const action = "update";
-    if (validateForm(action)) {
-      try {
-        const body = subject;
-        const resp = await subjectApi.updateSubject(body, subject.subjectId);
-        console.log(resp);
-
-        // Add subjectHistory
-        handleCreateNewSubjectHistory(subject, action);
-      } catch (error) {
-        console.log(error);
-      }
-    }
-
-    //   console.log("Update success");
-    setShowModal(false);
-    setIsUpdate(false);
-
-    fetchSubjects();
-    setSubject({
-      subjectId: "",
-      adminId: admin.admin_id,
-      subjectName: "",
-    });
-  };
-
-  const handleEditSubject = (row) => {
-    setShowModal(true);
-    setSubject({ ...row.original });
-    setIsUpdate(true);
-  };
-
   // Validation area
   const validateForm = (action) => {
-    if (subject.subjectName.length === 0) {
+    if (question.questionContent.length === 0) {
       if (action === "add") {
         setErrorInputAddSubject({
           status: true,
@@ -194,11 +135,19 @@ const Subjects = () => {
     return true;
   };
 
+  // Form action area
+  const handleChangeInput = (e) => {
+    setQuestion((prevQuestion) => ({
+      ...prevQuestion,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
   // React Data table area
-  const columnSubject = useMemo(
+  const columnQuestion = useMemo(
     () => [
       {
-        accessorKey: "subjectId",
+        accessorKey: "questionId",
         header: "ID",
         enableColumnOrdering: false,
         enableEditing: false, //disable editing on this column
@@ -206,114 +155,44 @@ const Subjects = () => {
         size: 40,
       },
       {
-        accessorKey: "adminId",
-        header: "Mã người tạo",
+        accessorKey: "questionContent",
+        header: "Câu hỏi",
         size: 80,
       },
       {
-        accessorKey: "subjectName",
+        accessorKey: "answer",
         header: "Tên Môn Học",
+        size: 80,
       },
       {
-        accessorFn: (row) =>
-          moment(row.createDate).format("DD-MM-yyyy, h:mm:ss a"),
-        header: "Ngày Tạo",
-      },
-    ],
-    []
-  );
-
-  const columnSubjectHistory = useMemo(
-    () => [
-      {
-        accessorKey: "subjectHistoryId",
-        header: "#",
+        accessorKey: "level",
+        header: "Cấp độ",
         size: 40,
       },
       {
-        accessorKey: "action",
-        accessorFn: (row) => displayActionHistory(row.action),
-        header: "Hành động",
-        size: 40,
-      },
-      {
-        accessorKey: "subjectName",
-        header: "Tên Môn Học",
+        accessorKey: "courseName",
+        header: "Tên khóa học",
         size: 120,
       },
       {
-        accessorFn: (row) =>
-          moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
-        header: "Ngày chỉnh sửa",
-        size: 120,
-      },
-      {
-        accessorKey: "adminId",
-        header: "Mã người tạo",
+        accessorKey: "adminName",
+        header: "Tên người tạo",
         size: 80,
       },
     ],
     []
   );
-
-  const displayActionHistory = (action) => {
-    return action === "CREATE" ? "Thêm mới" : "Cập nhật";
-  };
-
-  // *************** Header Button area
-  const handleChangeSubjectListAndHistory = () => {
-    setIsSubjectHistoryShowing(!isSubjectHistoryShowing);
-  };
-
-  // *************** Subject History AREA
-  const [subjectHistory] = useState({
-    subjectHistoryId: "",
-    action: "",
-    modifyDate: new Date(),
-    adminId: subject.adminId,
-    subjectName: "",
-    subjectId: "",
-  });
-
-  // API
-  const fetchSubjectHistory = async () => {
-    try {
-      const resp = await subjectHistoryApi.getAllSubjectHistory();
-      setSubjectHistories(resp);
-      console.log(resp);
-      console.log("restarted subjectHistory application");
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // API_AREA > CRUD
-  const handleCreateNewSubjectHistory = async (subject, action) => {
-    try {
-      subjectHistory.subjectName = subject.subjectName;
-      subjectHistory.subjectId = subject.subjectId;
-      subjectHistory.action = action === "add" ? "CREATE" : "UPDATE";
-
-      const body = subjectHistory;
-      console.log(body);
-      const resp = await subjectHistoryApi.createSubjectHistory(body);
-      console.log(resp);
-    } catch (error) {
-      console.log(error);
-    }
-    fetchSubjectHistory();
-  };
 
   // *************** Use effect area
   useEffect(() => {
-    fetchSubjects();
-    fetchSubjectHistory();
+    fetchQuestions();
+    fetchCourse();
   }, []);
 
   return (
     <>
       {/* HeaderSubject start */}
-      <SubjectHeader />
+      <QuestionHeader />
       {/* HeaderSubject End */}
 
       {/* Page content */}
@@ -322,40 +201,49 @@ const Subjects = () => {
           {/* Header */}
           <CardHeader className="bg-white border-0 d-flex justify-content-between">
             <h3 className="mb-0">
-              {isSubjectHistoryShowing
+              {/* {isSubjectHistoryShowing
                 ? "Bảng lịch sử môn học"
-                : "Bảng Môn học"}
+                : "Bảng Môn học"} */}
+              Bảng câu hỏi
             </h3>
             <Button
               color="default"
               type="button"
-              onClick={() => handleChangeSubjectListAndHistory()}
+              // onClick={() => handleChangeSubjectListAndHistory()}
             >
-              {isSubjectHistoryShowing
+              {/* {isSubjectHistoryShowing
                 ? "Danh sách môn học"
-                : "Lịch sử môn học"}
+                : "Lịch sử môn học"} */}
+              Lịch sử câu hỏi
             </Button>
           </CardHeader>
           <CardBody>
             {/* Table view */}
             <MaterialReactTable
-              displayColumnDefOptions={
-                !isSubjectHistoryShowing && {
-                  "mrt-row-actions": {
-                    header: "Thao tác",
-                    size: 20,
-                  },
-                }
-              }
-              columns={
-                isSubjectHistoryShowing ? columnSubjectHistory : columnSubject
-                // columnSubjectHistory
-              }
-              data={
-                isSubjectHistoryShowing ? subjectHistories : subjectArray
-                // subjectHistories
-              }
-              initialState={{ columnVisibility: { subjectId: false } }}
+              displayColumnDefOptions={{
+                "mrt-row-actions": {
+                  header: "Thao tác",
+                  size: 20,
+                },
+              }}
+              columns={columnQuestion}
+              data={questions}
+              renderDetailPanel={({ row }) => (
+                <Box
+                  sx={{
+                    display: 'grid',
+                    margin: 'auto',
+                    gridTemplateColumns: '1fr 1fr',
+                    width: '100%',
+                  }}
+                >
+                  <Typography>Address: </Typography>
+                  <Typography>City</Typography>
+                  <Typography>State</Typography>
+                  <Typography>Country</Typography>
+                </Box>
+              )}
+              // initialState={{ columnVisibility: { subjectId: false } }}
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering
@@ -371,17 +259,18 @@ const Subjects = () => {
               renderRowActions={({ row }) => (
                 <div className="d-flex justify-content-start py-1">
                   <Button
-                    color={`${!isSubjectHistoryShowing ? "warning" : "info"}`}
+                    color="warning"
                     outline
                     onClick={() => {
-                      handleEditSubject(row);
+                      // handleEditSubject(row);
                     }}
                   >
-                    {isSubjectHistoryShowing ? (
+                    {/* {isSubjectHistoryShowing ? (
                       <i className="bx bx-revision"></i>
                     ) : (
-                      <i className="bx bx-edit"></i>
-                    )}
+                      
+                    )} */}
+                    <i className="bx bx-edit"></i>
                   </Button>
                 </div>
               )}
@@ -392,9 +281,9 @@ const Subjects = () => {
                   onClick={() => setShowModal(true)}
                   variant="contained"
                   id="addSubjects"
-                  disabled={isSubjectHistoryShowing}
+                  // disabled={isSubjectHistoryShowing}
                 >
-                  <i className="bx bx-layer-plus"></i> Thêm môn học
+                  <i className="bx bx-layer-plus"></i> Thêm câu hỏi
                 </Button>
               )}
             />
@@ -404,7 +293,7 @@ const Subjects = () => {
         {/* Toast */}
         {/* <ToastContainer /> */}
 
-        {/* Modal Add - Update Suject*/}
+        {/* Modal Add - Update Question*/}
         <Modal
           className="modal-dialog-centered"
           isOpen={showModal}
@@ -413,7 +302,7 @@ const Subjects = () => {
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">
-              {isUpdate ? "Cập nhật môn học" : "Thêm môn học mới"}
+              {isUpdate ? "Cập nhật câu hỏi" : "Thêm câu hỏi mới"}
             </h3>
             <button
               aria-label="Close"
@@ -431,22 +320,73 @@ const Subjects = () => {
             <form method="post">
               {isUpdate && (
                 <FormGroup className="mb-3">
-                  <label className="form-control-label" htmlFor="id">
-                    Mã môn học
+                  <label className="form-control-label" htmlFor="questionId">
+                    Mã câu hỏi
                   </label>
                   <Input
                     className="form-control-alternative"
-                    id="id"
+                    id="questionId"
                     onChange={handleChangeInput}
                     disabled
-                    name="subjectId"
-                    value={subject.subjectId}
+                    name="questionId"
+                    value={question.questionId}
                   />
                 </FormGroup>
               )}
               <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="adminId">
-                  Mã Admin
+                <label className="form-control-label" htmlFor="name">
+                  Môn học
+                </label>
+                <Select options={options} defaultInputValue={"Môn học"}/>
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="name">
+                  Khóa học
+                </label>
+                <Select options={options} defaultInputValue={"Khóa học"}/>
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="questionContent">
+                  Thông tin câu hỏi
+                </label>
+                <Input
+                  className="form-control-alternative"
+                  disabled
+                  id="questionContent"
+                  onChange={handleChangeInput}
+                  name="questionContent"
+                  value={question.questionContent}
+                />
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="name">
+                  câu trả lời
+                </label>
+                <Input
+                  className="form-control-alternative"
+                  disabled
+                  id="answer"
+                  onChange={handleChangeInput}
+                  name="answer"
+                  value={question.answer}
+                />
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="name">
+                  câu trả lời
+                </label>
+                <Input
+                  className="form-control-alternative"
+                  disabled
+                  id="level"
+                  onChange={handleChangeInput}
+                  name="level"
+                  value={question.level}
+                />
+              </FormGroup>
+              <FormGroup className="mb-3">
+                <label className="form-control-label" htmlFor="name">
+                  Tên người tạo
                 </label>
                 <Input
                   className="form-control-alternative"
@@ -454,27 +394,8 @@ const Subjects = () => {
                   id="adminId"
                   onChange={handleChangeInput}
                   name="adminId"
-                  value={subject.adminId}
+                  value={question.adminId}
                 />
-              </FormGroup>
-              <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="name">
-                  Tên môn học
-                </label>
-                <Input
-                  className={`${
-                    errorInputUpdateSubject.status
-                      ? "is-invalid"
-                      : "form-control-alternative"
-                  }`}
-                  id="name"
-                  onChange={handleChangeInput}
-                  name="subjectName"
-                  value={subject.subjectName}
-                />
-                <span className="text-danger">
-                  {errorInputUpdateSubject.message}
-                </span>
               </FormGroup>
             </form>
           </div>
@@ -495,7 +416,7 @@ const Subjects = () => {
               color="primary"
               type="button"
               onClick={() => {
-                isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
+                // isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
                 // toast("Cập nhật môn học thành công");
               }}
             >
@@ -509,4 +430,4 @@ const Subjects = () => {
   );
 };
 
-export default Subjects;
+export default Questions;
