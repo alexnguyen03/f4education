@@ -95,7 +95,12 @@ const Classs = () => {
   const handleOnChangeSelect = (e) => {
     const selectedIndex = e.target.options.selectedIndex;
     const status = e.target.options[selectedIndex].getAttribute("data-value");
-    setSelectedStatus(status);
+    // setSelectedStatus(status);
+    setClasss({
+      ...classs,
+      status: status,
+    });
+    console.log(status);
   };
 
   // edit row
@@ -529,7 +534,7 @@ const Classs = () => {
                         type="select"
                         onChange={handleOnChangeSelect}
                         readOnly={update ? "readOnly" : undefined}
-                        value={selectedStatus}
+                        value={classs.status}
                       >
                         {(classs.status === "Đang chờ" ||
                           classs.status === "Đang diễn ra" ||
@@ -539,7 +544,7 @@ const Classs = () => {
                               Đang chờ
                             </option>
                           ) : (
-                            renderSelect(classs.status)
+                            renderSelect(selectedStatus)
                           ))}
                       </Input>
                     </FormGroup>
