@@ -16,6 +16,9 @@ public class CourseRequest {
 	@JsonProperty("adminId")
 	private String adminId;
 
+	@JsonProperty("courseId")
+	private Integer courseId;
+
 	@JsonProperty("courseName")
 	private String courseName;
 

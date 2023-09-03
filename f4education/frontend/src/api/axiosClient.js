@@ -15,6 +15,7 @@ axiosClient.interceptors.request.use(async (config) => {
 	if (accessToken) {
 		config.headers.Authorization = `Bearer ${accessToken}`;
 	}
+	// config.headers['Content-Type'] = 'application/json';
 	return config;
 });
 axiosClient.interceptors.response.use(

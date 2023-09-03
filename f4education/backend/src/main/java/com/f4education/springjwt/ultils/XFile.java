@@ -22,10 +22,10 @@ public class XFile {
             dir.mkdirs();
         }
         String s = file.getOriginalFilename();
-        String name = Integer.toHexString(s.hashCode()) + s.substring(s.lastIndexOf("."));
-        System.out.println(s);
+        String name = System.currentTimeMillis() + Integer.toHexString(s.hashCode()) + s.substring(s.lastIndexOf("."));
+        System.out.println(name);
         try {
-            File saveFile = new File(dir, s);
+            File saveFile = new File(dir, name);
             if (!saveFile.exists()) {
                 file.transferTo(saveFile);
                 System.out.println(saveFile);
