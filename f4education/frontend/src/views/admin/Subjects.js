@@ -339,27 +339,38 @@ const Subjects = () => {
           <CardBody>
             {/* Table view */}
             <MaterialReactTable
-              displayColumnDefOptions={
-                !isSubjectHistoryShowing && {
-                  "mrt-row-actions": {
-                    header: "Thao tác",
-                    size: 20,
-                  },
-                }
-              }
+              displayColumnDefOptions={{
+                "mrt-row-actions": {
+                  header: "Thao tác",
+                  size: 20,
+                },
+              }}
               columns={
                 isSubjectHistoryShowing ? columnSubjectHistory : columnSubject
-                // columnSubjectHistory
               }
-              data={
-                isSubjectHistoryShowing ? subjectHistories : subjectArray
-                // subjectHistories
-              }
-              initialState={{ columnVisibility: { subjectId: false } }}
+              data={isSubjectHistoryShowing ? subjectHistories : subjectArray}
+              initialState={{
+                columnVisibility: { subjectId: false },
+                columnOrder: !isSubjectHistoryShowing
+                  ? [
+                      "subjectId",
+                      "adminId",
+                      "subjectName",
+                      "crateDate",
+                      "mrt-row-actions",
+                    ]
+                  : [
+                      "subjectHistoryId",
+                      "action",
+                      "subjectName",
+                      "modifyDate",
+                      "adminId",
+                      "mrt-row-actions",
+                    ],
+              }}
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering
-              // enableRowOrdering
               enableEditing
               enableStickyHeader
               enableColumnResizing
