@@ -1,4 +1,4 @@
-import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
+import {Edit as EditIcon, EscalatorWarningOutlined, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
 import {Box, IconButton} from '@mui/material';
 import courseApi from 'api/courseApi';
 import moment from 'moment';
@@ -11,8 +11,9 @@ import Select from 'react-select';
 import {Typography} from '@material-ui/core';
 import {formatCurrency} from 'utils/formater';
 import {IconEyeSearch} from '@tabler/icons-react';
-
+import ReactLoading from 'react-loading';
 import {Timeline, Event} from 'react-timeline-scribble';
+import {Warning} from '@material-ui/icons';
 const IMG_URL = '/courses/';
 const Courses = () => {
 	const user = JSON.parse(localStorage.getItem('user') ?? '');
@@ -22,6 +23,8 @@ const Courses = () => {
 	const [showHistoryTable, setShowHistoryTable] = useState(false);
 	// const [selectedId, setSelectedId] = useState(-1);
 	const [update, setUpdate] = useState(false);
+	const [loadingCourses, setLoadingCourses] = useState(true);
+	const [loadingCoursesHistory, setLoadingCoursesHistory] = useState(true);
 	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
 	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
 	const [courses, setCourses] = useState([]);
@@ -173,10 +176,16 @@ const Courses = () => {
 		[],
 	);
 	const getAllCourse = async () => {
-		if (courses.length > 0) return;
+		if (courses.length > 0) {
+			setLoadingCourses(false);
+
+			return;
+		}
 		try {
+			setLoadingCourses(true);
 			const resp = await courseApi.getAll();
-			setCourses([...resp]);
+			setCourses(resp.reverse());
+			setLoadingCourses(false);
 		} catch (error) {
 			console.log('failed to fetch data', error);
 		}
@@ -184,7 +193,7 @@ const Courses = () => {
 	const getAllSubject = async () => {
 		try {
 			const resp = await subjectApi.getAllSubject();
-			setSubjects(resp);
+			setSubjects(resp.reverse());
 		} catch (error) {
 			console.log(error);
 		}
@@ -196,9 +205,15 @@ const Courses = () => {
 		setShowHistoryTable((pre) => !pre);
 	};
 	const getAllCourseHistory = async () => {
+		// if (courseHistories.length >= 0) {
+		// 	setLoadingCoursesHistory(false);
+		// 	return;
+		// }
 		try {
+			setLoadingCoursesHistory(true);
 			const resp = await courseApi.getAllCourseHistory();
-			setCourseHistories(resp);
+			setCourseHistories(resp.reverse());
+			setLoadingCoursesHistory(false);
 			console.log(courseHistories);
 		} catch (error) {
 			console.log(error);
@@ -371,6 +386,7 @@ const Courses = () => {
 								enableStickyHeader
 								enableStickyFooter
 								enableRowNumbers
+								state={{isLoading: loadingCourses}}
 								displayColumnDefOptions={{
 									'mrt-row-actions': {
 										header: 'Thao tác',
@@ -427,9 +443,7 @@ const Courses = () => {
 								enableStickyHeader
 								enableStickyFooter
 								enableRowNumbers
-								renderEmptyRowsFallback={() => {
-									<p> loading...</p>;
-								}}
+								state={{isLoading: loadingCoursesHistory}}
 								displayColumnDefOptions={{
 									// 'mrt-row-actions': {
 									// 	header: 'Thao tác',
@@ -647,10 +661,9 @@ const Courses = () => {
 						<Modal
 							className='modal-dialog-centered  modal-lg'
 							isOpen={showHistoryInfo}
-							backdrop='static'
 							toggle={() => setShowHistoryInfo((pre) => !pre)}>
 							<div className='modal-header'>
-								<h3 className='mb-0'>Lịch sử chỉnh sửa kháo học </h3>
+								<h3 className='mb-0'>Lịch sử chỉnh sửa khóa học </h3>
 								<button
 									aria-label='Close'
 									className='close'
@@ -666,7 +679,12 @@ const Courses = () => {
 								<div className='text-center  mb-3'>HIỆN TẠI - {moment(new Date()).format('DD/MM/yyyy, h:mm A')}</div>
 
 								{loadingHistoryInfo ? (
-									<span>loading...</span>
+									<div className='d-flex justify-content-center'>
+										<ReactLoading
+											type={'cylon'}
+											color='#357edd'
+										/>
+									</div>
 								) : (
 									listHistoryById.map((item) => (
 										<Timeline key={item.courseHistoryId}>
@@ -704,6 +722,12 @@ const Courses = () => {
 											</Event>
 										</Timeline>
 									))
+								)}
+
+								{listHistoryById.length === 0 && !loadingHistoryInfo && (
+									<div className='text-warning text-center my-5 py-5'>
+										<Warning /> Không tìm thấy lịch sử{' '}
+									</div>
 								)}
 								<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>
 							</div>
