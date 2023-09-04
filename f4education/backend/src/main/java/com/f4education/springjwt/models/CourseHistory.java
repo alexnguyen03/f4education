@@ -33,4 +33,5 @@ public class CourseHistory {
 	@ManyToOne
 	@JoinColumn(name = "courseId")
 	Course course;
+
 }

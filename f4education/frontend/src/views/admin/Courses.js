@@ -1,25 +1,37 @@
 import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
 import {Box, IconButton} from '@mui/material';
 import courseApi from 'api/courseApi';
+import moment from 'moment';
 import CoursesHeader from 'components/Headers/CoursesHeader';
 import {MaterialReactTable} from 'material-react-table';
 import {memo, useEffect, useMemo, useState} from 'react';
-import {Button, Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Modal, Row} from 'reactstrap';
+import {Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Row, Modal, Button, CardSubtitle, CardText, CardTitle, CardImg, CardGroup, ListGroupItem, ListGroup} from 'reactstrap';
 import subjectApi from '../../api/subjectApi';
 import Select from 'react-select';
+import {Typography} from '@material-ui/core';
+import {formatCurrency} from 'utils/formater';
+import {IconEyeSearch} from '@tabler/icons-react';
+
+import {Timeline, Event} from 'react-timeline-scribble';
 const IMG_URL = '/courses/';
 const Courses = () => {
 	const user = JSON.parse(localStorage.getItem('user') ?? '');
 	const [image, setImage] = useState(null);
 	const [imgData, setImgData] = useState(null);
 	const [showForm, setShowForm] = useState(false);
+	const [showHistoryTable, setShowHistoryTable] = useState(false);
 	// const [selectedId, setSelectedId] = useState(-1);
 	const [update, setUpdate] = useState(false);
+	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
+	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
 	const [courses, setCourses] = useState([]);
+	const [courseHistories, setCourseHistories] = useState([]);
 	const [subjects, setSubjects] = useState([]);
 	const [selectedSubject, setSelectedSubject] = useState({value: '0', label: ''});
 	const [options, setOptions] = useState([{value: '0', label: ''}]);
 	const [subjectId, setSubjectId] = useState(0);
+	const [listHistoryById, setListHistoryById] = useState([]);
+
 	const [course, setCourse] = useState({
 		courseId: 0,
 		courseName: '',
@@ -79,20 +91,12 @@ const Courses = () => {
 			}));
 		}
 	};
-	const columns = useMemo(
+	const columnsCourses = useMemo(
 		() => [
-			{
-				enableColumnOrdering: true,
-				enableEditing: false, //disable editing on this column
-				enableSorting: true,
-				accessorKey: 'courseId',
-				header: 'Mã khóa học',
-				size: 20,
-			},
 			{
 				accessorKey: 'subject.subjectName',
 				header: 'Tên môn học',
-				size: 150,
+				size: 100,
 			},
 			{
 				accessorKey: 'courseName',
@@ -106,18 +110,70 @@ const Courses = () => {
 			},
 			{
 				accessorKey: 'coursePrice',
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					return <span>{formatCurrency(row.coursePrice)}</span>;
+				},
 				header: 'Giá (đ)',
 				size: 60,
 			},
 			{
-				accessorKey: 'subject.admin.adminId',
+				accessorKey: 'subject.admin.fullname',
 				header: 'Mã người tạo',
 				size: 80,
 			},
 		],
 		[],
 	);
-	const fetchCourses = async () => {
+	const columnsCoursesHistory = useMemo(
+		() => [
+			{
+				enableColumnOrdering: true,
+				enableEditing: false, //disable editing on this column
+				enableSorting: true,
+				accessorKey: 'courseId',
+				header: 'Mã khóa học',
+				size: 20,
+			},
+			{
+				accessorKey: 'subjectName',
+				header: 'Tên môn học',
+				size: 150,
+			},
+			{
+				accessorKey: 'courseName',
+				header: 'Tên khóa học',
+				size: 150,
+			},
+			{
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					if (row.endDate !== null) {
+						return <span>{row.action}</span>;
+					} else {
+						return <span>Chưa kết thúc</span>;
+					}
+				},
+				header: 'Hành động',
+				size: 75,
+			},
+			{
+				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss a'),
+				header: 'Ngày thao tác',
+				size: 60,
+			},
+			{
+				accessorKey: 'adminName',
+				header: 'Tên người tạo',
+				size: 80,
+			},
+		],
+		[],
+	);
+	const getAllCourse = async () => {
+		if (courses.length > 0) return;
 		try {
 			const resp = await courseApi.getAll();
 			setCourses([...resp]);
@@ -125,7 +181,7 @@ const Courses = () => {
 			console.log('failed to fetch data', error);
 		}
 	};
-	const fetchSubject = async () => {
+	const getAllSubject = async () => {
 		try {
 			const resp = await subjectApi.getAllSubject();
 			setSubjects(resp);
@@ -133,6 +189,22 @@ const Courses = () => {
 			console.log(error);
 		}
 	};
+	const handleShowAllHistory = () => {
+		if (courseHistories.length === 0) {
+			getAllCourseHistory();
+		}
+		setShowHistoryTable((pre) => !pre);
+	};
+	const getAllCourseHistory = async () => {
+		try {
+			const resp = await courseApi.getAllCourseHistory();
+			setCourseHistories(resp);
+			console.log(courseHistories);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
 	const convertToArray = () => {
 		const convertedArray = subjects.map((item) => ({
 			value: item.subjectId,
@@ -209,6 +281,21 @@ const Courses = () => {
 			// }));
 		}
 	};
+
+	const handelShowHistory = async (id) => {
+		setShowHistoryInfo(true);
+		setLoadingHistoryInfo(true);
+		try {
+			const resp = await courseApi.getHistoryByCourseid(id);
+			console.log('🚀 ~ file: Courses.js:290 ~ handelShowHistory ~ id:', id);
+			setListHistoryById(resp.reverse());
+			console.log('🚀 ~ file: Courses.js:291 ~ handelShowHistory ~ resp:', resp);
+			setLoadingHistoryInfo(false);
+			console.log('🚀 ~ file: Courses.js:284 ~ handelShowHistory ~ history:', listHistoryById);
+		} catch (error) {
+			console.log('failed to fetch data', error);
+		}
+	};
 	const addCourse = async () => {
 		const formData = new FormData();
 		formData.append('courseRequest', JSON.stringify(courseRequest));
@@ -241,8 +328,13 @@ const Courses = () => {
 		// console.log(courseRequest);
 	}
 	useEffect(() => {
-		fetchCourses();
-		fetchSubject();
+		setListHistoryById([...listHistoryById]);
+		console.log('🚀 ~ file: Courses.js:330 ~ useEffect ~ listHistoryById:', listHistoryById);
+	}, [loadingHistoryInfo]);
+	useEffect(() => {
+		if (courses.length > 0) return;
+		getAllCourse();
+		getAllSubject();
 	}, []);
 	useEffect(() => {
 		const convertedOptions = convertToArray();
@@ -263,67 +355,115 @@ const Courses = () => {
 				<Card className='bg-secondary shadow'>
 					{/* Header */}
 					<CardHeader className='bg-white border-0 d-flex justify-content-between'>
-						<h3 className='mb-0'>BẢNG KHÓA HỌC</h3>
+						<h3 className='mb-0'>{showHistoryTable ? 'LỊCH SỬ CHỈNH SỬA KHÓA HỌC' : 'BẢNG KHÓA HỌC'}</h3>
 						<Button
-							color='default'
-							type='button'>
-							Lịch sử khóa học
+							color='info'
+							type='button'
+							onClick={handleShowAllHistory}>
+							{showHistoryTable ? 'Danh sách khóa học' : 'Lịch sử khóa học'}
 						</Button>
 					</CardHeader>
 					<CardBody>
-						<MaterialReactTable
-							enableColumnResizing
-							enableGrouping
-							enableStickyHeader
-							enableStickyFooter
-							enableRowNumbers
-							displayColumnDefOptions={{
-								'mrt-row-actions': {
-									header: 'Thao tác',
-									size: 20,
-									// Something else here
-								},
-								'mrt-row-numbers': {
-									size: 5,
-								},
-							}}
-							positionActionsColumn='last'
-							columns={columns}
-							data={courses}
-							renderTopToolbarCustomActions={() => (
-								<Button
-									onClick={handleShowAddForm}
-									color='primary'
-									variant='contained'>
-									<i className='bx bx-layer-plus'></i>
-									Thêm khóa học
-								</Button>
-							)}
-							enableRowActions
-							renderRowActions={({row, table}) => (
-								<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-									<IconButton
-										color='secondary'
-										onClick={() => {
-											handleEditFrom(row);
+						{!showHistoryTable && (
+							<MaterialReactTable
+								enableColumnResizing
+								enableGrouping
+								enableStickyHeader
+								enableStickyFooter
+								enableRowNumbers
+								displayColumnDefOptions={{
+									'mrt-row-actions': {
+										header: 'Thao tác',
+										size: 20,
+										// Something else here
+									},
+									'mrt-row-numbers': {
+										size: 5,
+									},
+								}}
+								positionActionsColumn='last'
+								columns={columnsCourses}
+								data={courses}
+								renderTopToolbarCustomActions={() => (
+									<Button
+										onClick={handleShowAddForm}
+										color='success'
+										variant='contained'>
+										<i className='bx bx-layer-plus'></i>
+										Thêm khóa học
+									</Button>
+								)}
+								enableRowActions
+								renderRowActions={({row, table}) => (
+									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
+										<IconButton
+											color='secondary'
+											onClick={() => {
+												handleEditFrom(row);
+											}}>
+											<EditIcon />
+										</IconButton>
+										<IconButton
+											color='info'
+											onClick={() => {
+												handelShowHistory(row.original.courseId);
+											}}>
+											<IconEyeSearch />
+										</IconButton>
+									</Box>
+								)}
+								muiTablePaginationProps={{
+									rowsPerPageOptions: [10, 20, 50, 100],
+									showFirstButton: true,
+									showLastButton: true,
+								}}
+							/>
+						)}
+
+						{showHistoryTable && (
+							<MaterialReactTable
+								enableColumnResizing
+								enableGrouping
+								enableStickyHeader
+								enableStickyFooter
+								enableRowNumbers
+								renderEmptyRowsFallback={() => {
+									<p> loading...</p>;
+								}}
+								displayColumnDefOptions={{
+									// 'mrt-row-actions': {
+									// 	header: 'Thao tác',
+									// 	size: 20,
+									// 	// Something else here
+									// },
+									'mrt-row-numbers': {
+										size: 5,
+									},
+								}}
+								columns={columnsCoursesHistory}
+								data={courseHistories}
+								renderDetailPanel={({row}) => (
+									<Box
+										sx={{
+											display: 'grid',
+											margin: 'auto',
+											gridTemplateColumns: '1fr 1fr',
+											width: '100%',
 										}}>
-										<EditIcon />
-									</IconButton>
-									<IconButton
-										color='error'
-										onClick={() => {
-											courses.splice(row.index, 1);
-										}}>
-										<RemoveCircleOutlineIcon />
-									</IconButton>
-								</Box>
-							)}
-							muiTablePaginationProps={{
-								rowsPerPageOptions: [10, 20, 50, 100],
-								showFirstButton: true,
-								showLastButton: true,
-							}}
-						/>
+										<Typography>Giá khóa học: {row.original.coursePrice}</Typography>
+										<Typography>Số học phần: {row.original.numberSession}</Typography>
+										<Typography>Thời lượng: {row.original.courseDuration}</Typography>
+										<Typography>Mô tả: {row.original.courseDescription}</Typography>
+									</Box>
+								)}
+								muiTablePaginationProps={{
+									rowsPerPageOptions: [10, 20, 50, 100],
+									showFirstButton: true,
+									showLastButton: true,
+								}}
+							/>
+						)}
+
 						<Modal
 							className='modal-dialog-centered  modal-lg '
 							isOpen={showForm}
@@ -353,24 +493,7 @@ const Courses = () => {
 														htmlFor='input-username'>
 														Tên môn học
 													</label>
-													{/* <Input
-														id='exampleSelect'
-														name='subjectName'
-														type='select'
-														onChange={handleOnChangeSelect}
-														value={course.subjectName}>
-														<option>Chọn môn học</option>
-														{subjects.map((item) => {
-															return (
-																<option
-																	key={item.subjectId}
-																	data-value={item.subjectId}
-																	value={item.subjectName}>
-																	{item.subjectName}
-																</option>
-															);
-														})}
-													</Input> */}
+
 													<Select
 														options={options}
 														placeholder='Select color'
@@ -513,13 +636,89 @@ const Courses = () => {
 										Hủy
 									</Button>
 									<Button
-										color='primary'
+										color={update ? 'primary' : 'success'}
 										type='submit'
 										className='px-5'>
 										Lưu
 									</Button>
 								</div>
 							</Form>
+						</Modal>
+						<Modal
+							className='modal-dialog-centered  modal-lg'
+							isOpen={showHistoryInfo}
+							backdrop='static'
+							toggle={() => setShowHistoryInfo((pre) => !pre)}>
+							<div className='modal-header'>
+								<h3 className='mb-0'>Lịch sử chỉnh sửa kháo học </h3>
+								<button
+									aria-label='Close'
+									className='close'
+									data-dismiss='modal'
+									type='button'
+									onClick={() => {
+										setShowHistoryInfo(false);
+									}}>
+									<span aria-hidden={true}>×</span>
+								</button>
+							</div>
+							<div className='modal-body'>
+								<div className='text-center  mb-3'>HIỆN TẠI - {moment(new Date()).format('DD/MM/yyyy, h:mm A')}</div>
+
+								{loadingHistoryInfo ? (
+									<span>loading...</span>
+								) : (
+									listHistoryById.map((item) => (
+										<Timeline key={item.courseHistoryId}>
+											<Event
+												interval={<span className='fw-bold fs-3'>{moment(item.modifyDate).format('DD/MM/yyyy, h:mm A')}</span>}
+												title={<span className={`alert alert-${item.action === 'UPDATE' ? 'primary' : 'success'} px-3 mb-3`}> {item.action === 'UPDATE' ? 'Cập nhật' : 'Thêm mới'} </span>}
+												subtitle={<u> {item.adminName}</u>}>
+												<Card>
+													<CardImg
+														alt='Card image cap'
+														src={process.env.REACT_APP_IMAGE_URL + IMG_URL + item.image}
+														width='30%'
+													/>
+													<CardBody>
+														<Row>
+															<Col
+																xl={5}
+																className='text-center'>
+																<div className='d-flex justify-content-center'>
+																	<strong>Thời lượng:</strong> {item.courseDuration}
+																	<strong>Học phí:</strong> {formatCurrency(item.coursePrice)}
+																</div>
+															</Col>
+														</Row>
+														<Row>
+															<Col
+																xl={5}
+																className='text-center'>
+																<strong>Tên môn học:</strong> {item.subjectName}
+																<strong>Mô tả: </strong> {item.courseDescription}
+															</Col>
+														</Row>
+													</CardBody>
+												</Card>
+											</Event>
+										</Timeline>
+									))
+								)}
+								<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>
+							</div>
+
+							<div className='modal-footer'>
+								<Button
+									color='secondary'
+									data-dismiss='modal'
+									type='button'
+									onClick={() => {
+										setShowHistoryInfo(false);
+									}}>
+									Đóng
+								</Button>
+							</div>
 						</Modal>
 					</CardBody>
 				</Card>

@@ -1,9 +1,12 @@
 package com.f4education.springjwt.interfaces;
 
+import com.f4education.springjwt.payload.response.CourseHistoryDTO;
+
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 public interface CourseHistoryService {
-    public List<CourseHistoryService> findAll();
+	List<CourseHistoryDTO> findAll();
+
+	List<CourseHistoryDTO> findByCourseID(Integer Id);
+
 }
