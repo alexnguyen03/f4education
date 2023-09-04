@@ -12,8 +12,8 @@ import com.f4education.springjwt.interfaces.AdminService;
 import com.f4education.springjwt.interfaces.SubjectService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Subject;
+import com.f4education.springjwt.payload.request.RequestSubjectDTO;
 import com.f4education.springjwt.payload.request.SubjectDTO;
-import com.f4education.springjwt.repository.SubjectHistoryRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
 @Service
@@ -37,16 +37,15 @@ public class SubjectServiceImpl implements SubjectService {
 	}
 
 	@Override
-	public SubjectDTO createSubject(SubjectDTO subjectDTO) {
+	public RequestSubjectDTO createSubject(RequestSubjectDTO requestSubjectDTO) {
 		Subject subject = new Subject();
-		Admin admin = adminService.getAdminById(subjectDTO.getAdminId());
+		Admin admin = adminService.getAdminById(requestSubjectDTO.getAdminId());
 		subject.setAdmin(admin);
 		subject.setCreateDate(new Date());
 //		System.out.println(admin);
-
-		convertToEntity(subjectDTO, subject);
+		convertToEntityRequest(requestSubjectDTO, subject);
 		Subject savedSubject = subjectRepository.save(subject);
-		return convertToDto(savedSubject);
+		return convertToDtoRequest(savedSubject);
 	}
 
 	@Override
@@ -59,10 +58,18 @@ public class SubjectServiceImpl implements SubjectService {
 
 	private SubjectDTO convertToDto(Subject subject) {
 		SubjectDTO subjectDTO = new SubjectDTO();
-		String adminId = subject.getAdmin().getAdminId();
-		subjectDTO.setAdminId(adminId);
+		String adminId = subject.getAdmin().getFullname();
+		subjectDTO.setAdminName(adminId);
 		BeanUtils.copyProperties(subject, subjectDTO);
 		return subjectDTO;
+	}
+
+	private RequestSubjectDTO convertToDtoRequest(Subject subject) {
+		RequestSubjectDTO requestSubjectDTO = new RequestSubjectDTO();
+		String adminId = subject.getAdmin().getAdminId();
+		requestSubjectDTO.setAdminId(adminId);
+		BeanUtils.copyProperties(subject, requestSubjectDTO);
+		return requestSubjectDTO;
 	}
 
 	public SubjectDTO mapSubjectToDTO(Subject subject) {
@@ -74,13 +81,8 @@ public class SubjectServiceImpl implements SubjectService {
 		BeanUtils.copyProperties(subjectDTO, subject);
 	}
 
-//	 private SubjectDTO convertToDto(Subject subject) {
-//	 SubjectDTO subjectDTO = new SubjectDTO();
-//	 subjectDTO.setSubjectId(subject.getSubjectId());
-//	 subjectDTO.setSubjectName(subject.getSubjectName());
-//	 subjectDTO.setAdminId(subject.getAdminId());
-//	 // Set other properties if any
-//	 return subjectDTO;
-//	 }
+	private void convertToEntityRequest(RequestSubjectDTO subjectDTO, Subject subject) {
+		BeanUtils.copyProperties(subjectDTO, subject);
+	}
 
 }

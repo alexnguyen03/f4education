@@ -44,6 +44,12 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 	}
 
 	@Override
+	public List<SubjectHistoryDTO> findBySubjectId(Integer subjectId) {
+		List<SubjectHistory> subjectHistory = subjectHistoryRepository.findBySubjectId(subjectId);
+		return subjectHistory.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+
+	@Override
 	public SubjectHistoryDTO createSubjectHistory(SubjectHistoryDTO SubjectHistoryDTO) {
 		SubjectHistory subjectHistory = new SubjectHistory();
 		Admin admin = adminService.getAdminById(SubjectHistoryDTO.getAdminId());
@@ -100,4 +106,5 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 	private void convertToEntity(SubjectHistoryDTO SubjectHistoryDTO, SubjectHistory subjectHistory) {
 		BeanUtils.copyProperties(SubjectHistoryDTO, subjectHistory);
 	}
+
 }

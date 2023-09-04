@@ -34,6 +34,11 @@ public class SubjectHistoryController {
 		return subjectHistoryService.getSubjectHistoryById(subjectHistoryId);
 	}
 
+	@GetMapping("/subjectid/{id}")
+	public List<SubjectHistoryDTO> findBySubjectId(@PathVariable("id") Integer subjectId) {
+		return subjectHistoryService.findBySubjectId(subjectId);
+	}
+
 	@PostMapping
 	public SubjectHistoryDTO createSubjectHistory(@RequestBody SubjectHistoryDTO SubjectHistoryDTO) {
 		return subjectHistoryService.createSubjectHistory(SubjectHistoryDTO);

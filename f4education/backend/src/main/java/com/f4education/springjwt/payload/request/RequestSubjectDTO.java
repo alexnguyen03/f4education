@@ -9,12 +9,12 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectDTO {
+public class RequestSubjectDTO {
 	private Integer subjectId;
 
 	private String subjectName;
 	
-	private String adminName;
+	private String adminId;
 	
 	private Date createDate;
 }

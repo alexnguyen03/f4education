@@ -15,4 +15,6 @@ public interface SubjectHistoryService {
 	SubjectHistoryDTO createSubjectHistory(SubjectHistoryDTO SubjectHistoryDTO);
 
 	SubjectHistoryDTO updateSubjectHistory(Integer subjectHistoryId, SubjectHistoryDTO SubjectHistoryDTO);
+
+	List<SubjectHistoryDTO> findBySubjectId(Integer subjectId);
 }
