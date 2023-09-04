@@ -44,11 +44,12 @@ const Subjects = () => {
   const [subjectHistoryShowing, setSubjectHistoryShowing] = useState(false);
   const [ModalHistory, setModalHistory] = useState(false);
   const [loadingPopupHistory, setLoadingPopupHistory] = useState(false);
-  const [showNotification, setNotification] = useState({
+  const [showNotification, setShowNotification] = useState({
     status: false,
-    title:"",
+    title: "",
     message: "",
   });
+  const [subjectLoading, setSubjectLoading] = useState(false);
 
   // Form variable
   const [errorInputSubject, setErrorInputSubject] = useState({
@@ -98,11 +99,13 @@ const Subjects = () => {
   // API Area
   const fetchSubjects = async () => {
     try {
+      setSubjectLoading(true);
       const resp = await subjectApi.getAllSubject();
       setSubjectArray(resp);
       setSubjects(resp);
       console.log(resp);
       console.log("restarted application");
+      setSubjectLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -238,19 +241,23 @@ const Subjects = () => {
         enableColumnOrdering: false,
         enableEditing: false, //disable editing on this column
         enableSorting: false,
+        size: 20,
       },
       {
         accessorKey: "adminName",
         header: "Tên người tạo",
+        size: 80,
       },
       {
         accessorKey: "subjectName",
         header: "Tên Môn Học",
+        size: 120,
       },
       {
         accessorFn: (row) =>
           moment(row.createDate).format("DD-MM-yyyy, h:mm:ss a"),
         header: "Ngày Tạo",
+        size: 120,
       },
       // {
       //   accessorFn: (row) => (
@@ -273,23 +280,28 @@ const Subjects = () => {
         enableColumnOrdering: false,
         enableEditing: false, //disable editing on this column
         enableSorting: false,
+        size: 20,
       },
       {
         accessorFn: (row) => displayActionHistory(row.action),
         header: "Hành động",
+        size: 40,
       },
       {
         accessorKey: "subjectName",
         header: "Tên Môn Học",
+        size: 80,
       },
       {
         accessorFn: (row) =>
           moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
         header: "Ngày chỉnh sửa",
+        size: 120,
       },
       {
         accessorKey: "adminId",
         header: "Tên người tạo",
+        size: 80,
       },
     ],
     []
@@ -351,6 +363,17 @@ const Subjects = () => {
     fetchSubjectHistory();
   }, []);
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setShowNotification({
+        status: false,
+        title: "",
+        message: "",
+      });
+    }, 4000);
+    return () => clearTimeout(timeout);
+  }, [showNotification]);
+
   return (
     <>
       {/* HeaderSubject start */}
@@ -381,6 +404,7 @@ const Subjects = () => {
                 displayColumnDefOptions={{
                   "mrt-row-actions": {
                     header: "Thao tác",
+                    size: 40,
                   },
                 }}
                 positionActionsColumn="last"
@@ -420,14 +444,17 @@ const Subjects = () => {
                 displayColumnDefOptions={{
                   "mrt-row-actions": {
                     header: "Thao tác",
-                    size: 20,
+                    size: 40,
                   },
                 }}
                 positionActionsColumn="last"
                 columns={columnSubject}
-                data={subjectArray}
+                data={subjectArray ?? []}
                 initialState={{
                   columnVisibility: { subjectId: false },
+                }}
+                state={{
+                  isLoading: subjectLoading,
                 }}
                 // editingMode="modal" //default
                 enableColumnOrdering
