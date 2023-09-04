@@ -23,7 +23,6 @@ import {
 // Axios
 import subjectApi from "../../api/subjectApi";
 import subjectHistoryApi from "../../api/subjectHistoryApi";
-import { notifications } from "@mantine/notifications";
 
 const Subjects = () => {
   // Main variable
@@ -45,6 +44,11 @@ const Subjects = () => {
   const [subjectHistoryShowing, setSubjectHistoryShowing] = useState(false);
   const [ModalHistory, setModalHistory] = useState(false);
   const [loadingPopupHistory, setLoadingPopupHistory] = useState(false);
+  const [showNotification, setNotification] = useState({
+    status: false,
+    title:"",
+    message: "",
+  });
 
   // Form variable
   const [errorInputSubject, setErrorInputSubject] = useState({
@@ -238,35 +242,25 @@ const Subjects = () => {
       {
         accessorKey: "adminName",
         header: "Tên người tạo",
-        size: 120,
       },
       {
         accessorKey: "subjectName",
         header: "Tên Môn Học",
-        size: 180,
       },
       {
         accessorFn: (row) =>
           moment(row.createDate).format("DD-MM-yyyy, h:mm:ss a"),
         header: "Ngày Tạo",
-        size: 180,
       },
-      {
-        accessorFn: (row) => (
-          <div className="d-flex justify-content-start">
-            <IconButton
-              onClick={() => {
-                setModalHistory(true);
-                fetchSubjectHistoryPerSubject(row);
-              }}
-            >
-              <i className="fa fa-eye-slash primary" aria-hidden="true"></i>
-            </IconButton>
-          </div>
-        ),
-        header: "Lịch sử chỉnh sửa",
-        sỉze: "20",
-      },
+      // {
+      //   accessorFn: (row) => (
+      //     <div className="d-flex justify-content-start">
+
+      //     </div>
+      //   ),
+      //   header: "Lịch sử chỉnh sửa",
+      //   sỉze: "20",
+      // },
     ],
     []
   );
@@ -446,7 +440,7 @@ const Subjects = () => {
                   showLastButton: false,
                 }}
                 renderRowActions={({ row }) => (
-                  <div className="d-flex justify-content-start">
+                  <div className="d-flex justify-content-start gap-2">
                     <IconButton
                       color="warning"
                       // outline
@@ -455,6 +449,17 @@ const Subjects = () => {
                       }}
                     >
                       <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      onClick={() => {
+                        setModalHistory(true);
+                        fetchSubjectHistoryPerSubject(row.original);
+                      }}
+                    >
+                      <i
+                        className="fa fa-eye-slash text-primary"
+                        aria-hidden="true"
+                      ></i>
                     </IconButton>
                   </div>
                 )}
@@ -475,9 +480,21 @@ const Subjects = () => {
         </Card>
 
         {/* Notifycation */}
-        {/* <Notification color="green" title="We notify you that">
-          You are now obligated to give a star to Mantine project on GitHub
-        </Notification> */}
+        {showNotification.status && (
+          <Notification
+            color="green"
+            title={showNotification.title}
+            style={{
+              position: "fixed",
+              top: "20px",
+              right: "20px",
+              zIndex: "2023",
+              maxWidth: "400px",
+            }}
+          >
+            {showNotification.message}
+          </Notification>
+        )}
 
         {/* Modal Add - Update Suject*/}
         <Modal
