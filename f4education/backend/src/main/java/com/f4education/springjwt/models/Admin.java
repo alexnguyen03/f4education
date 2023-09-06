@@ -50,6 +50,9 @@ public class Admin {
 	List<Classes> classes;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
+	List<ClassRoom> classRooms;
+	@JsonIgnore
+	@OneToMany(mappedBy = "admin")
 	List<Course> courses;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")

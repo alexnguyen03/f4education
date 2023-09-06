@@ -1,7 +1,9 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -13,7 +15,6 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Email;
@@ -28,31 +29,34 @@ import lombok.ToString;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Classroom")
-public class ClassRoom {
+@Table(name = "Classroomhistory")
+public class ClassRoomHistory implements Serializable{
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "classroom_id")
-	private Integer classroomId;
+	@Column(name = "classroom_history_id")
+	private Integer classroomHistoryId;
 
+	private String action;
+
+	@Column(name = "modify_date")
+	private Date modifyDate;
+	
 	@Column(name = "classroom_name")
 	private String classroomName;
 	
 	private String status;
 	
-	@OneToMany(mappedBy = "classRoom")
-	List<Schedule> schedules;
-	
-	@OneToMany(mappedBy = "classRoom")
-	List<ClassRoomHistory> classRoomHistories ;
+	@Column(name = "admin_id")
+	private String adminId;
 	
 	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	Admin admin;
+	@JoinColumn(name = "classroom_id")
+	ClassRoom classRoom;
 
 	@Override
 	public String toString() {
-		return "ClassRoom [classroomId=" + classroomId + ", classroomName=" + classroomName + ", status=" + status
-				+ "]";
+		return "ClassRoomHistory [classroomHistoryId=" + classroomHistoryId + ", action=" + action + ", modifyDate="
+				+ modifyDate + ", classroomName=" + classroomName + ", status=" + status + ", adminId=" + adminId
+				+ ", classRoom=" + classRoom + "]";
 	}
 }

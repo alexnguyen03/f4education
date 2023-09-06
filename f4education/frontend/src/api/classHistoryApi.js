@@ -6,6 +6,10 @@ const classHistoryApi = {
     const url = "/classhistory";
     return axiosClient.get(url);
   },
+  getClassHistoryByClassId: (classId) => {
+		const url = `/classhistory/${classId}`;
+		return axiosClient.get(url);
+	}
 };
 
 export default classHistoryApi;

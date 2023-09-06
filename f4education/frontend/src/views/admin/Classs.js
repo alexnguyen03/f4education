@@ -17,6 +17,7 @@ import { MaterialReactTable } from "material-react-table";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
 import moment from "moment";
+import { notifications } from '@mantine/notifications';
 
 // gọi API từ classApi
 import classApi from "api/classApi";
@@ -27,10 +28,13 @@ import classHistoryApi from "api/classHistoryApi";
 const Classs = () => {
   const [classses, setClassses] = useState([]);
   const [classHistories, setClassHistories] = useState([]);
-  const [showForm, setShowForm] = useState(false);
+  const [classHistoryByClassId, setClassHistotyByClassId] = useState([]);
+  const [showFormClass, setShowFormClass] = useState(false);
+  const [showFormClassHistory, setShowFormClassHistory] = useState(false);
   const [update, setUpdate] = useState(true);
   const [isClassHistoryShowing, setIsClassHistoryShowing] = useState(false);
   const [selectedStatus, setSelectedStatus] = useState("");
+  const [errors, setErrors] = useState({});
 
   // khởi tạo Class
   const [classs, setClasss] = useState({
@@ -41,6 +45,21 @@ const Classs = () => {
     maximumQuantity: 0,
     status: "Đang chờ",
   });
+
+  // bắt lỗi form
+  const validateForm = () => {
+    let validationErrors = {};
+    if (!classs.className) {
+      validationErrors.className = "Vui lòng nhập tên lớp học !!!";
+    }
+    if (classs.maximumQuantity <= 0) {
+      validationErrors.maximumQuantity = "Số lượng tối đa phải lớn hơn 0 !!!";
+    }
+    if (classs.maximumQuantity >= 50) {
+      validationErrors.maximumQuantity = "Số lượng tối đa không được lớn hơn 50 !!!";
+    }
+    return validationErrors;
+  };
 
   // thay đổi giá trị của biến
   const handleChangeClassListAndHistory = () => {
@@ -98,13 +117,19 @@ const Classs = () => {
     setSelectedStatus(status);
   };
 
-  // edit row
+  // edit row class
   const handleEditRow = (row) => {
-    setShowForm(true);
+    setShowFormClass(true);
     setUpdate(false);
     setSelectedStatus(row.original.status);
     console.log(selectedStatus);
     setClasss({ ...row.original });
+  };
+
+  // show modal classhistory
+  const handleShowClassHistory = (row) => {
+    setShowFormClassHistory(true);
+    getDataClassHistoryByClassId(row.original.classId);
   };
 
   // lấy dữ liệu từ form
@@ -117,14 +142,18 @@ const Classs = () => {
 
   // xóa trắng form
   const handleResetForm = () => {
-    setShowForm((pre) => !pre);
+    setShowFormClass((pre) => !pre);
     setClasss({
-      classId: "",
       className: "",
       maximumQuantity: 0,
       status: "Đang chờ",
     });
     setUpdate(true);
+  };
+
+  // resetModal ClassHistory
+  const handleResetClassHistory = () => {
+    setShowFormClassHistory((pre) => !pre);
   };
 
   // lấy tấc cả dữ liệu Class từ database (gọi api)
@@ -138,31 +167,43 @@ const Classs = () => {
   };
 
   // thêm class
-  const createClass = async () => {
-    try {
-      const resp = await classApi.createClass(classs);
-      alert("Thêm thành công");
-      handleResetForm();
-    } catch (error) {
-      console.log("Thêm thất bại", error);
+  const createClass = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        const resp = await classApi.createClass(classs);
+        alert("Thêm thành công");
+        handleResetForm();
+      } catch (error) {
+        console.log("Thêm thất bại", error);
+      }
+    }else {
+      setErrors(validationErrors);
     }
   };
 
   // cập nhật class
-  const updateClass = async () => {
-    try {
-      console.log(classs);
-      const body = classs;
-      if (body.status === "Đang chờ" || body.status === "Đang diễn ra") {
-        body.endDate = null;
-      } else {
-        body.endDate = new Date();
+  const updateClass = async (e) => {
+    e.preventDefault();
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length === 0) {
+      try {
+        console.log(classs);
+        const body = classs;
+        if (body.status === "Đang chờ" || body.status === "Đang diễn ra") {
+          body.endDate = null;
+        } else {
+          body.endDate = new Date();
+        }
+        const resp = await classApi.updateClass(body, classs.classId);
+        alert("Cập nhật thành công");
+        handleResetForm();
+      } catch (error) {
+        console.log("Cập nhật thất bại", error);
       }
-      const resp = await classApi.updateClass(body, classs.classId);
-      alert("Cập nhật thành công");
-      handleResetForm();
-    } catch (error) {
-      console.log("Cập nhật thất bại", error);
+    } else {
+      setErrors(validationErrors);
     }
   };
 
@@ -268,7 +309,7 @@ const Classs = () => {
         size: 95,
       },
       {
-        accessorKey: "adminId",
+        accessorKey: "admin.fullname",
         header: "Người chỉnh sửa",
         size: 100,
       },
@@ -303,6 +344,17 @@ const Classs = () => {
     }
   };
 
+  // lấy dữ liệu ClassHistory theo ClassId từ database (gọi api)
+  const getDataClassHistoryByClassId = async (classId) => {
+    try {
+      const resp = await classHistoryApi.getClassHistoryByClassId(classId);
+      setClassHistotyByClassId(resp);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // khi thay đổi selectedStatus thì sẽ tự động cập nhật lại
   useEffect(() => {
     setClasss({
       ...classs,
@@ -314,6 +366,7 @@ const Classs = () => {
   useEffect(() => {
     getDataClass();
     getDataClassHistory();
+    getDataClassHistoryByClassId();
   }, []);
 
   return (
@@ -342,7 +395,7 @@ const Classs = () => {
                 displayColumnDefOptions={{
                   "mrt-row-actions": {
                     header: "Thao tác",
-                    size: 50,
+                    size: 100,
                   },
                 }}
                 enableColumnResizing
@@ -354,7 +407,7 @@ const Classs = () => {
                 positionActionsColumn="last"
                 renderTopToolbarCustomActions={() => (
                   <Button
-                    onClick={() => setShowForm((pre) => !pre)}
+                    onClick={() => setShowFormClass((pre) => !pre)}
                     color="success"
                   >
                     Thêm lớp học
@@ -370,6 +423,14 @@ const Classs = () => {
                       }}
                     >
                       <EditIcon />
+                    </IconButton>
+                    <IconButton
+                      color="info"
+                      onClick={() => {
+                        handleShowClassHistory(row);
+                      }}
+                    >
+                      <i class="fa-sharp fa-solid fa-eye"></i>
                     </IconButton>
                   </Box>
                 )}
@@ -401,11 +462,12 @@ const Classs = () => {
             </CardBody>
           ) : null}
         </Card>
+        {/* Modal Class */}
         <Modal
           backdrop="static"
           className="modal-dialog-centered"
-          isOpen={showForm}
-          toggle={() => setShowForm((pre) => !pre)}
+          isOpen={showFormClass}
+          toggle={() => setShowFormClass((pre) => !pre)}
         >
           <div className="modal-header">
             <h3 className="mb-0">Thông tin lớp học</h3>
@@ -422,24 +484,6 @@ const Classs = () => {
           <div className="modal-body">
             <Form>
               <div className="px-lg-2">
-                <FormGroup className={update ? "hidden-form-group" : ""}>
-                  <label
-                    className="form-control-label"
-                    htmlFor="input-class-id"
-                  >
-                    Mã lớp học
-                  </label>
-                  <Input
-                    className="form-control-alternative"
-                    id="input-class-id"
-                    type="text"
-                    onChange={handelOnChangeInput}
-                    placeholder="Mã lớp học"
-                    name="classId"
-                    readOnly={update ? "readOnly" : "readOnly"}
-                    value={classs.classId}
-                  />
-                </FormGroup>
                 <FormGroup>
                   <label
                     className="form-control-label"
@@ -456,6 +500,9 @@ const Classs = () => {
                     name="className"
                     value={classs.className}
                   />
+                  {errors.className && (
+                    <div className="text-danger mt-2">{errors.className}</div>
+                  )}
                 </FormGroup>
                 {/* <Row>
 									<Col md={12}>
@@ -513,6 +560,11 @@ const Classs = () => {
                         name="maximumQuantity"
                         onChange={handelOnChangeInput}
                       />
+                      {errors.maximumQuantity && (
+                        <div className="text-danger mt-2">
+                          {errors.maximumQuantity}
+                        </div>
+                      )}
                     </FormGroup>
                   </Col>
                   <Col md={12}>
@@ -564,6 +616,41 @@ const Classs = () => {
             >
               {update ? "Lưu" : "Cập nhật"}
             </Button>
+          </div>
+        </Modal>
+        {/* Modal ClassHistory */}
+        <Modal
+          backdrop="static"
+          className="modal-dialog-centered modal-xl"
+          isOpen={showFormClassHistory}
+          toggle={() => setShowFormClassHistory((pre) => !pre)}
+        >
+          <div className="modal-header">
+            <h3 className="mb-0">Lịch sử chi tiết</h3>
+            <button
+              aria-label="Close"
+              className="close"
+              data-dismiss="modal"
+              type="button"
+              onClick={handleResetClassHistory}
+            >
+              <span aria-hidden={true}>×</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            <MaterialReactTable
+              enableColumnResizing
+              enableGrouping
+              enableStickyHeader
+              enableStickyFooter
+              columns={columnClassHistory}
+              data={classHistoryByClassId}
+              muiTablePaginationProps={{
+                rowsPerPageOptions: [10, 20, 50, 100],
+                showFirstButton: false,
+                showLastButton: false,
+              }}
+            />
           </div>
         </Modal>
       </Container>

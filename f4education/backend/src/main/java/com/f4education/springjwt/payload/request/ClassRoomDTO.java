@@ -13,4 +13,8 @@ public class ClassRoomDTO {
 	private Integer classroomId;
 
 	private String classroomName;
+	
+	private String status;
+	
+	private AdminDTO admin;
 }

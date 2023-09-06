@@ -9,24 +9,18 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class ClassHistoryDTO {
-	private Integer classHistoryId;
+public class ClassRoomHistoryDTO {
+	private Integer classroomHistoryId;
 
 	private String action;
 
 	private Date modifyDate;
 	
-	private String className;
-	
-	private Date startDate;
-
-	private Date endDate;
-	
-	private Integer maximumQuantity;
+	private String classroomName;
 	
 	private String status;
 	
 	private AdminDTO admin;
 	
-	private Integer classId;
+	private Integer classroomId;
 }
