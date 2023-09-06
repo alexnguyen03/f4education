@@ -53,6 +53,8 @@ public class ClassHistory implements Serializable{
 	@Column(name = "maximum_quantity")
 	private Integer maximumQuantity;
 	
+	private String status;
+	
 	@Column(name = "admin_id")
 	private String adminId;
 	
@@ -64,8 +66,6 @@ public class ClassHistory implements Serializable{
 	public String toString() {
 		return "ClassHistory [classHistoryId=" + classHistoryId + ", action=" + action + ", modifyDate=" + modifyDate
 				+ ", className=" + className + ", startDate=" + startDate + ", endDate=" + endDate
-				+ ", maximumQuantity=" + maximumQuantity + ", adminId=" + adminId;
-	} 	
-	
-	
+				+ ", maximumQuantity=" + maximumQuantity + ", status=" + status + ", adminId=" + adminId + "]";
+	}
 }

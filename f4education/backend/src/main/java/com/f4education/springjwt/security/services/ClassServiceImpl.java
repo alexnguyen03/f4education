@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,10 +13,12 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.ClassService;
 import com.f4education.springjwt.models.Admin;
+import com.f4education.springjwt.models.ClassHistory;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.payload.request.AdminDTO;
 import com.f4education.springjwt.payload.request.ClassDTO;
 import com.f4education.springjwt.repository.AdminRepository;
+import com.f4education.springjwt.repository.ClassHistoryRepository;
 import com.f4education.springjwt.repository.ClassRepository;
 
 @Service
@@ -25,12 +28,14 @@ public class ClassServiceImpl implements ClassService {
 	ClassRepository classRepository;
 	
 	@Autowired
+	ClassHistoryRepository classHistoryRepository;
+	
+	@Autowired
 	private AdminRepository adminRepository;
 
 	@Override
 	public List<ClassDTO> findAll() {
 		List<Classes> classes = classRepository.findAll();
-		System.out.println(classes);
 		return classes.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
@@ -42,19 +47,25 @@ public class ClassServiceImpl implements ClassService {
 	
 	@Override
 	public ClassDTO createClass(ClassDTO classDTO) {
+		String action = "CREATE";
 		Classes classes = new Classes();
 		Admin admin = adminRepository.findById("namnguyen").get();
-		classes.setAdmin(admin);
 		convertToEntity(classDTO, classes);
+		classes.setAdmin(admin);
+		classes.setStartDate(new Date());
+		classes.setEndDate(null);
 		Classes saveClasses = classRepository.save(classes);
+		this.saveClassHistory(saveClasses, action);
 		return convertToDto(saveClasses);
 	}
 
 	@Override
 	public ClassDTO updateClass(Integer classId, ClassDTO classDTO) {
+		String action = "UPDATE";
 		Classes classes = classRepository.findById(classId).get();
 		convertToEntity(classDTO, classes);
 		Classes updateClasses = classRepository.save(classes);
+		this.saveClassHistory(updateClasses, action);
 		return convertToDto(updateClasses);
 	}
 	
@@ -70,5 +81,15 @@ public class ClassServiceImpl implements ClassService {
 	
 	private void convertToEntity(ClassDTO classDTO, Classes classes) {
 		BeanUtils.copyProperties(classDTO, classes);
+	}
+	
+	private void saveClassHistory(Classes classes, String action) {
+		ClassHistory classHistory = new ClassHistory();
+		BeanUtils.copyProperties(classes, classHistory);
+		classHistory.setClasses(classes);
+		classHistory.setModifyDate(new Date());
+		classHistory.setAction(action);
+		classHistory.setAdminId(classes.getAdmin().getAdminId());
+		classHistoryRepository.save(classHistory);
 	}
 }
