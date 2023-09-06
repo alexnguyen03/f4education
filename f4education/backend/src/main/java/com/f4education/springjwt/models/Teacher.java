@@ -33,7 +33,8 @@ import lombok.ToString;
 @Table(name = "Teacher")
 public class Teacher {
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	// @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "teacher_id")
 	private String teacherId;
 
 	private String fullname;
