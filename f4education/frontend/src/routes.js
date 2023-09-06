@@ -24,7 +24,8 @@ import Tables from 'views/examples/Tables.js';
 import Icons from 'views/examples/Icons.js';
 import Subjects from 'views/admin/Subjects';
 import Courses from 'views/admin/Courses.js';
-import Classs from 'views/admin/Classs';
+import Classs from 'views/admin/Classs.js';
+import ClasssRoom from 'views/admin/ClasssRoom.js';
 
 var routes = [
 	{
@@ -95,6 +96,13 @@ var routes = [
 		name: 'Lớp học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <Classs />,
+		layout: '/admin',
+	},
+	{
+		path: '/classsroom',
+		name: 'Phòng học',
+		icon: 'ni ni-key-25 text-info',
+		component: <ClasssRoom />,
 		layout: '/admin',
 	},
 ];

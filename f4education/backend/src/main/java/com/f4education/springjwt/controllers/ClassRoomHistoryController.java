@@ -14,28 +14,24 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.f4education.springjwt.interfaces.ClassHistoryService;
-import com.f4education.springjwt.interfaces.ClassService;
-import com.f4education.springjwt.models.Classes;
-import com.f4education.springjwt.payload.request.ClassDTO;
-import com.f4education.springjwt.payload.request.ClassHistoryDTO;
-import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.interfaces.ClassRoomHistoryService;
+import com.f4education.springjwt.payload.request.ClassRoomHistoryDTO;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/classhistory")
-public class ClassHistoryController {
+@RequestMapping("/api/classroomhistory")
+public class ClassRoomHistoryController {
 	
 	@Autowired
-	ClassHistoryService classHistoryService;
+	ClassRoomHistoryService classRoomHistoryService;
 	
 	@GetMapping
-	public List<ClassHistoryDTO> getAll() {
-		return classHistoryService.findAll();
+	public List<ClassRoomHistoryDTO> getAll() {
+		return classRoomHistoryService.findAll();
 	}
 	
 	@GetMapping("/{id}")
-	public List<ClassHistoryDTO> findByClassId(@PathVariable("id") Integer classId) {
-		return classHistoryService.getClassHistoryByClassId(classId);
+	public List<ClassRoomHistoryDTO> findByClassId(@PathVariable("id") Integer classroomId) {
+		return classRoomHistoryService.getClassRoomHistoryByClassRoomId(classroomId);
 	}
 }

@@ -41,10 +41,20 @@ public class ClassHistoryServiceImpl implements ClassHistoryService {
 		return classHistories.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 	
+	@Override
+	public List<ClassHistoryDTO> getClassHistoryByClassId(Integer classId) {
+		List<ClassHistory> classHistories = classHistoryRepository.findByClassId(classId);
+		return classHistories.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+	
 	private ClassHistoryDTO convertToDto(ClassHistory classHistory ) {
 		ClassHistoryDTO classHistoryDTO = new ClassHistoryDTO();
 		BeanUtils.copyProperties(classHistory, classHistoryDTO);
 		classHistoryDTO.setClassId(classHistory.getClasses().getClassId());
+		Admin admin = adminRepository.findById(classHistory.getAdminId()).get();
+		AdminDTO adminDTO = new AdminDTO();
+		BeanUtils.copyProperties(admin, adminDTO);
+		classHistoryDTO.setAdmin(adminDTO);		
 		return classHistoryDTO;
 	}
 }
