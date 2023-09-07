@@ -46,7 +46,7 @@ public class CourseServiceImpl implements CoursesService {
 	public CourseDTO saveCourse(CourseRequest courseRequest) {
 		String action = "CREATE";
 		Course course = this.convertRequestToEntity(courseRequest);
-		Integer idCourse = course.getCourseId();
+		Integer idCourse = courseRequest.getCourseId();
 		if (idCourse != null) {
 			action = "UPDATE";
 		}

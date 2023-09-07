@@ -83,9 +83,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		http.csrf(csrf -> csrf.disable())
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**", "/api/subjects/**", "/api/classs/**","/api/classhistory/**").permitAll()
-						.requestMatchers("/api/test/**", "/api/subjects/**", "/api/classs/**","/api/subjectHistory/**", "/img/**", "/api/courses/**", "/api/teachers/**").permitAll().anyRequest().authenticated());
-
+				.authorizeHttpRequests(auth -> auth
+						.requestMatchers("/api/auth/**", "/api/classs/**")
+						.permitAll()
+						.requestMatchers("/api/test/**", "/api/subjects/**", "/api/classs/**", "/api/courses/**",
+								"/api/classhistory/**", "/api/teachers/**", "/api/courses-history/**",
+								"/img/**")
+						.permitAll().anyRequest()
+						.authenticated());
 		http.authenticationProvider(authenticationProvider());
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

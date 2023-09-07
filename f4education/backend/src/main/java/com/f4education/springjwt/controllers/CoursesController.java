@@ -3,7 +3,6 @@ package com.f4education.springjwt.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
@@ -27,7 +25,6 @@ import com.f4education.springjwt.security.services.CourseServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -37,31 +34,30 @@ import lombok.RequiredArgsConstructor;
 public class CoursesController {
 	@Autowired
 	CourseServiceImpl courseService;
-
 	@Autowired
 	XFile xfileService;
 
 	@GetMapping
-	// @PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<CourseDTO> getAllCourse() {
 		return courseService.findAllCourseDTO();
 	}
 
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
-	// @PreAuthorize("hasRole('ADMIN')")
+	@PreAuthorize("hasRole('ADMIN')")
 	public CourseDTO addCourse(@RequestPart("courseRequest") String courseRequestString,
 			@RequestParam("file") MultipartFile file) {
 		ObjectMapper mapper = new ObjectMapper();
 		// String newFile = "";
 		CourseRequest courseRequest = new CourseRequest();
-
 		try {
-			if (!file.isEmpty()) {
-				File savedFile = xfileService.save(file, "/courses");
-			}
 			courseRequest = mapper.readValue(courseRequestString,
 					CourseRequest.class);
+			if (!file.isEmpty()) {
+				File savedFile = xfileService.save(file, "/courses");
+				courseRequest.setImage(savedFile.getName());
+			}
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -70,9 +66,25 @@ public class CoursesController {
 		return courseService.saveCourse(courseRequest);
 	}
 
-	@PutMapping
+	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasRole('ADMIN')")
-	public CourseDTO updateCourse(@RequestBody CourseRequest courseRequest) {
+	public CourseDTO updateCourse(@RequestPart("courseRequest") String courseRequestString,
+			@RequestParam("file") MultipartFile file) {
+		ObjectMapper mapper = new ObjectMapper();
+		CourseRequest courseRequest = new CourseRequest();
+		try {
+			courseRequest = mapper.readValue(courseRequestString,
+					CourseRequest.class);
+			if (!file.isEmpty()) {
+				File savedFile = xfileService.save(file, "/courses");
+				courseRequest.setImage(savedFile.getName());
+			}
+
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return courseService.saveCourse(courseRequest);
 	}
 
@@ -81,5 +93,4 @@ public class CoursesController {
 	public List<CourseDTO> findAllByAdminId(@PathVariable("adminId") String adminId) {
 		return courseService.findAllByAdminId(adminId);
 	}
-
 }
