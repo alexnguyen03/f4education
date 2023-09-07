@@ -26,6 +26,7 @@ import Subjects from "views/admin/Subjects";
 import Courses from "views/admin/Courses.js";
 import Classs from "views/admin/Classs";
 import Questions from "views/admin/Questions";
+import QuestionDetail from "views/admin/QuestionDetail";
 
 var routes = [
   {
@@ -103,6 +104,11 @@ var routes = [
     name: "Câu hỏi",
     icon: "ni ni-ui-04 text-primary",
     component: <Questions />,
+    layout: "/admin",
+  },
+  {
+    path: "/questionDetail/:id",
+    component: <QuestionDetail />,
     layout: "/admin",
   },
 ];

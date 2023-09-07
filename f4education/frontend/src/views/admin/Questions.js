@@ -18,14 +18,9 @@ import {
 import questionApi from "../../api/questionApi";
 import courseApi from "../../api/courseApi";
 
-//React Select
-import Select from "react-select";
-
-const options = [
-  { value: "chocolate", label: "Chocolate" },
-  { value: "strawberry", label: "Strawberry" },
-  { value: "vanilla", label: "Vanilla" },
-];
+//React Mantine
+import { Select } from "@mantine/core";
+import { Link } from "react-router-dom";
 
 const Questions = () => {
   // Main variable
@@ -144,6 +139,16 @@ const Questions = () => {
   };
 
   // React Data table area
+  function renderCellWithLink(row) {
+    console.log(row);
+    const id = row.questionId;
+    return (
+      <span key={id}>
+        <Link to={`/admin/questionDetail/${id}`}>{row.courseName}</Link>
+      </span>
+    );
+  }
+
   const columnQuestion = useMemo(
     () => [
       {
@@ -155,24 +160,26 @@ const Questions = () => {
         size: 40,
       },
       {
-        accessorKey: "questionContent",
-        header: "Câu hỏi",
+        accessorKey: "subjectName",
+        header: "Tên môn học",
         size: 80,
       },
       {
-        accessorKey: "answer",
-        header: "Tên Môn Học",
-        size: 80,
+        // accessorKey: "courseName",
+        accessorFn: (row) => row.courseName,
+        Cell: ({ cell }) => renderCellWithLink(cell.row.original),
+        header: "Tên khóa học",
+        size: 120,
+      },
+      {
+        accessorKey: "questionTitle",
+        header: "Câu hỏi",
+        size: 180,
       },
       {
         accessorKey: "level",
         header: "Cấp độ",
         size: 40,
-      },
-      {
-        accessorKey: "courseName",
-        header: "Tên khóa học",
-        size: 120,
       },
       {
         accessorKey: "adminName",
@@ -182,6 +189,25 @@ const Questions = () => {
     ],
     []
   );
+
+  const dataFake = [
+    {
+      questionId: "1",
+      subjectName: "Angular",
+      courseName: "Angular cơ bản cho người mới",
+      questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
+      level: "dễ",
+      adminName: "adminName",
+    },
+    {
+      questionId: "2",
+      subjectName: "ReactJs",
+      courseName: "React & React Hook ",
+      questionTitle: "Làm thế nào để deploy project lên mạng",
+      level: "vừa",
+      adminName: "adminName2",
+    },
+  ];
 
   // *************** Use effect area
   useEffect(() => {
@@ -227,23 +253,8 @@ const Questions = () => {
                 },
               }}
               columns={columnQuestion}
-              data={questions}
-              renderDetailPanel={({ row }) => (
-                <Box
-                  sx={{
-                    display: 'grid',
-                    margin: 'auto',
-                    gridTemplateColumns: '1fr 1fr',
-                    width: '100%',
-                  }}
-                >
-                  <Typography>Address: </Typography>
-                  <Typography>City</Typography>
-                  <Typography>State</Typography>
-                  <Typography>Country</Typography>
-                </Box>
-              )}
-              // initialState={{ columnVisibility: { subjectId: false } }}
+              // data={questions}
+              data={dataFake}
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering
@@ -277,7 +288,7 @@ const Questions = () => {
               // Top Add new Subject button
               renderTopToolbarCustomActions={() => (
                 <Button
-                  color="primary"
+                  color={isUpdate ? "primary" : "success"}
                   onClick={() => setShowModal(true)}
                   variant="contained"
                   id="addSubjects"
@@ -337,25 +348,44 @@ const Questions = () => {
                 <label className="form-control-label" htmlFor="name">
                   Môn học
                 </label>
-                <Select options={options} defaultInputValue={"Môn học"}/>
+                {/* <Select options={options} defaultInputValue={"Môn học"}/> */}
+                <Select
+                  // label="Your favorite framework/library"
+                  placeholder="Chon mon hoc"
+                  searchable
+                  clearable
+                  nothingFound="No options"
+                  data={["React", "Angular", "Java", "Vue"]}
+                />
               </FormGroup>
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Khóa học
                 </label>
-                <Select options={options} defaultInputValue={"Khóa học"}/>
+                <Select
+                  // label="Your favorite framework/library"
+                  placeholder="Chon khoa hoc"
+                  searchable
+                  clearable
+                  nothingFound="No options"
+                  data={[
+                    "React & Hook co ban",
+                    "Angular RestAPI",
+                    "Java Spring Boot RestFull Api",
+                    "VueJs co ban",
+                  ]}
+                />
               </FormGroup>
               <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="questionContent">
-                  Thông tin câu hỏi
+                <label className="form-control-label" htmlFor="questionTitle">
+                  Tiêu đề câu hỏi?
                 </label>
                 <Input
                   className="form-control-alternative"
-                  disabled
-                  id="questionContent"
+                  id="questionTitle"
                   onChange={handleChangeInput}
-                  name="questionContent"
-                  value={question.questionContent}
+                  name="questionTitle"
+                  value={question.questionTitle}
                 />
               </FormGroup>
               <FormGroup className="mb-3">
@@ -364,7 +394,6 @@ const Questions = () => {
                 </label>
                 <Input
                   className="form-control-alternative"
-                  disabled
                   id="answer"
                   onChange={handleChangeInput}
                   name="answer"
@@ -373,18 +402,17 @@ const Questions = () => {
               </FormGroup>
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
-                  câu trả lời
+                  Cấp độ
                 </label>
                 <Input
                   className="form-control-alternative"
-                  disabled
                   id="level"
                   onChange={handleChangeInput}
                   name="level"
                   value={question.level}
                 />
               </FormGroup>
-              <FormGroup className="mb-3">
+              {/* <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Tên người tạo
                 </label>
@@ -396,7 +424,7 @@ const Questions = () => {
                   name="adminId"
                   value={question.adminId}
                 />
-              </FormGroup>
+              </FormGroup> */}
             </form>
           </div>
           <div className="modal-footer">
@@ -413,7 +441,7 @@ const Questions = () => {
               Trở lại
             </Button>
             <Button
-              color="primary"
+              color={isUpdate ? "primary" : "success"}
               type="button"
               onClick={() => {
                 // isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
