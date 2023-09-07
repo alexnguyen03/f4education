@@ -11,7 +11,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CourseHistoryDTO {
     private Integer courseHistoryId;
-    private String courseId;
+    private Integer courseId;
+    private String subjectName;
+    private String adminName;
     private String courseName;
     private Float coursePrice;
     private String courseDuration;
