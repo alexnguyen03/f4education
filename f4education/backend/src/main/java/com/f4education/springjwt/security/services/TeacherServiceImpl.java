@@ -8,14 +8,19 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.models.Teacher;
+import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.repository.TeacherRepository;
+import com.f4education.springjwt.repository.UserRepository;
 
 @Service
 public class TeacherServiceImpl implements TeacherService {
 
     @Autowired
     private TeacherRepository teacherRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Override
     public List<TeacherDTO> getAllTeachersDTO() {
@@ -30,7 +35,8 @@ public class TeacherServiceImpl implements TeacherService {
     @Override
     public TeacherDTO createTeacher(TeacherDTO teacherDTO) {
         Teacher teacher = new Teacher();
-            
+        User user = userRepository.findById(teacherDTO.getAcccountID()).get();
+        teacher.setUser(user);
         convertToEntity(teacherDTO, teacher);
         teacherRepository.save(teacher);
         return new TeacherDTO(teacher);

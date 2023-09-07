@@ -117,6 +117,15 @@ const AdminNavbar = () => {
 							<NavItem>
 								<NavLink
 									className='nav-link-icon'
+									to='/admin/teacher'
+									tag={Link}>
+									<i className='ni ni-single-02' />
+									<span className='nav-link-inner--text'>Teachers</span>
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink
+									className='nav-link-icon'
 									to='/admin/classs'
 									tag={Link}>
 									<i className='ni ni-single-02' />

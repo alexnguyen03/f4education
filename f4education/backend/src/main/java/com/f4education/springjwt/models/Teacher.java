@@ -23,14 +23,17 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.Setter;
 
 @Data
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Teacher")
+@Getter
+@Setter
 public class Teacher {
 	@Id
 	// @GeneratedValue(strategy = GenerationType.IDENTITY)
