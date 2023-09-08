@@ -1,7 +1,8 @@
-import { Box, FormGroup, Typography } from "@mui/material";
+import { Box, FormGroup, IconButton } from "@mui/material";
 import QuestionHeader from "components/Headers/QuestionHeader";
 import { MaterialReactTable } from "material-react-table";
 import { useEffect, useMemo, useState } from "react";
+import { Edit as EditIcon } from "@mui/icons-material";
 
 // reactstrap components
 import {
@@ -172,20 +173,20 @@ const Questions = () => {
         size: 120,
       },
       {
-        accessorKey: "questionTitle",
-        header: "Câu hỏi",
-        size: 180,
-      },
-      {
-        accessorKey: "level",
-        header: "Cấp độ",
-        size: 40,
-      },
-      {
-        accessorKey: "adminName",
-        header: "Tên người tạo",
+        accessorKey: "avgQuestion",
+        header: "Tổng câu hỏi ",
         size: 80,
       },
+      // {
+      //   accessorKey: "level",
+      //   header: "Cấp độ",
+      //   size: 40,
+      // },
+      // {
+      //   accessorKey: "adminName",
+      //   header: "Tên người tạo",
+      //   size: 80,
+      // },
     ],
     []
   );
@@ -196,16 +197,16 @@ const Questions = () => {
       subjectName: "Angular",
       courseName: "Angular cơ bản cho người mới",
       questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
-      level: "dễ",
       adminName: "adminName",
+      avgQuestion: 5,
     },
     {
       questionId: "2",
       subjectName: "ReactJs",
       courseName: "React & React Hook ",
       questionTitle: "Làm thế nào để deploy project lên mạng",
-      level: "vừa",
       adminName: "adminName2",
+      avgQuestion: 10,
     },
   ];
 
@@ -226,12 +227,7 @@ const Questions = () => {
         <Card className="bg-secondary shadow">
           {/* Header */}
           <CardHeader className="bg-white border-0 d-flex justify-content-between">
-            <h3 className="mb-0">
-              {/* {isSubjectHistoryShowing
-                ? "Bảng lịch sử môn học"
-                : "Bảng Môn học"} */}
-              Bảng câu hỏi
-            </h3>
+            <h3 className="mb-0">Bảng câu hỏi</h3>
             <Button
               color="default"
               type="button"
@@ -269,20 +265,9 @@ const Questions = () => {
               }}
               renderRowActions={({ row }) => (
                 <div className="d-flex justify-content-start py-1">
-                  <Button
-                    color="warning"
-                    outline
-                    onClick={() => {
-                      // handleEditSubject(row);
-                    }}
-                  >
-                    {/* {isSubjectHistoryShowing ? (
-                      <i className="bx bx-revision"></i>
-                    ) : (
-                      
-                    )} */}
-                    <i className="bx bx-edit"></i>
-                  </Button>
+                  <IconButton>
+                    <EditIcon />
+                  </IconButton>
                 </div>
               )}
               // Top Add new Subject button

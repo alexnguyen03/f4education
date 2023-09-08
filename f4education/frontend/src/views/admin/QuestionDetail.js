@@ -1,9 +1,10 @@
 import { Badge, Tabs } from "@mantine/core";
 import QuestionDetailHeader from "components/Headers/QuestionDetailHeader";
 import moment from "moment";
+import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { Button, Card, CardBody, Col, Row } from "reactstrap";
-       
+
 const dataFake = [
   {
     questionId: "1",
@@ -24,9 +25,18 @@ const dataFake = [
 ];
 
 const QuestionDetail = () => {
+  // Main variable
+
+  // Action variable
+  const [editAnswer, setEditAnswer] = useState(false);
+
   const { id } = useParams();
 
   const question = dataFake.find((pj) => pj.questionId.toString() === id);
+
+  const setEditAbleInput = (prev) => {
+    setEditAnswer(!prev);
+  };
 
   return (
     <>
@@ -35,7 +45,7 @@ const QuestionDetail = () => {
       {/* HeaderSubject End */}
 
       <div className="container">
-        <h1>Môn học: {question.subjectName}</h1>
+        <h1 className="mb-3">Môn học: {question.subjectName}</h1>
         <div className="d-flex align-items-center">
           <div>
             <img
@@ -47,7 +57,7 @@ const QuestionDetail = () => {
             />
           </div>
           <div className="ml-3">
-            <h2 className="text-primary mb-0 pb-0">{question.courseName}</h2>
+            <h2 className="text-primary mb-0">{question.courseName}</h2>
             <div className="d-flex align-items-center">
               <h6>{question.adminName}</h6>
               <span className="mx-3 font-weight-400 mt--1">
@@ -63,7 +73,7 @@ const QuestionDetail = () => {
         </div>
         <hr className="text-muted" />
         <div>
-          <Tabs defaultValue="chat">
+          <Tabs defaultValue="overview">
             <Tabs.List>
               <Tabs.Tab
                 rightSection={
@@ -78,12 +88,12 @@ const QuestionDetail = () => {
                     6
                   </Badge>
                 }
-                value="chat"
+                value="overview"
               >
-                Chat
+                Tổng quan
               </Tabs.Tab>
-              <Tabs.Tab value="settings">Settings</Tabs.Tab>
-              <Tabs.Tab value="money">Gallery</Tabs.Tab>
+              <Tabs.Tab value="settings">Gì đó</Tabs.Tab>
+              <Tabs.Tab value="money">Gì đó</Tabs.Tab>
             </Tabs.List>
           </Tabs>
         </div>
@@ -107,7 +117,25 @@ const QuestionDetail = () => {
                       <div style={{ width: "40px", height: "40px" }}>
                         <i className="bx bx-check-circle text-success"></i>
                       </div>
-                      <span className="text-dark ml--2">This is answer 1</span>
+                      {editAnswer ? (
+                        <span
+                          className="text-dark bg- p-1 bg-info ml--2"
+                          contenteditable="true"
+                          style={{
+                            transform: "tranlate(-50%,-50%)",
+                          }}
+                        >
+                          This is answer 1 edit able
+                        </span>
+                      ) : (
+                        <span
+                          className="text-dark ml--2"
+                          // contenteditable="true"
+                          // style={{ background }}
+                        >
+                          This is answer 1
+                        </span>
+                      )}
                     </div>
                   </Col>
                   <Col lg={12} xl={12} md={12} sm={12}>
@@ -121,7 +149,7 @@ const QuestionDetail = () => {
                   <Col lg={12} xl={12} md={12} sm={12}>
                     <div className="d-flex gap-3">
                       <div style={{ width: "40px", height: "40px" }}>
-                        <i className="bx bx-check-circle text-success"></i>
+                        <i class="bx bx-x-circle text-danger"></i>
                       </div>
                       <span className="text-dark ml--2">This is answer 1</span>
                     </div>
@@ -129,7 +157,7 @@ const QuestionDetail = () => {
                   <Col lg={12} xl={12} md={12} sm={12}>
                     <div className="d-flex gap-3">
                       <div style={{ width: "40px", height: "40px" }}>
-                        <i className="bx bx-check-circle text-success"></i>
+                        <i class="bx bx-x-circle text-danger"></i>
                       </div>
                       <span className="text-dark ml--2">This is answer 1</span>
                     </div>
@@ -137,10 +165,15 @@ const QuestionDetail = () => {
                   <Col lg={12} xl={12} md={12} sm={12}>
                     <Button
                       color="primary"
+                      outline
                       role="button"
                       className="float-right"
+                      onClick={() => setEditAbleInput(editAnswer)}
                     >
-                      Cập nhật
+                      <i class="bx bx-edit"></i>
+                    </Button>
+                    <Button color="danger" className="float-right mr-2">
+                      <i class="bx bx-trash"></i>
                     </Button>
                   </Col>
                 </Row>
@@ -192,10 +225,14 @@ const QuestionDetail = () => {
                   <Col lg={12} xl={12} md={12} sm={12}>
                     <Button
                       color="primary"
+                      outline
                       role="button"
                       className="float-right"
                     >
-                      Cập nhật
+                      <i class="bx bx-edit"></i>
+                    </Button>
+                    <Button color="danger" className="float-right mr-2">
+                      <i class="bx bx-trash"></i>
                     </Button>
                   </Col>
                 </Row>
