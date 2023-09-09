@@ -1,41 +1,37 @@
 package com.f4education.springjwt.models;
 
-import java.time.LocalTime;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.sql.Time;
+import java.util.Date;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SessionsHistory {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "session_history_id")
-    private Integer sessionHistoryId;
-
-    @Column(name = "session_name")
-    private String sessionName;
-
-    @Column(name = "start_time")
-    private LocalTime startTime;
-
-    @Column(name = "end_time")
-    private LocalTime endTime;
-
-    @Column(name = "admin_id")
-    private String adminId;
-
-    @ManyToOne
-    @JoinColumn(name = "session_id")
-    private Sessions sessions;
+@Table(name = "sessionshistory")
+public class SessionsHistory implements Serializable {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "session_history_id")
+	private Integer sessionHistoryId;
+	@Column(name = "session_name")
+	private String sessionName;
+	@Column(name = "start_time")
+	private Time startTime;
+	@Column(name = "end_time")
+	private Time endTime;
+	@Column(name = "admin_id")
+	private String adminId;
+	@ManyToOne
+	@JoinColumn(name = "session_id")
+	private Sessions sessions;
+	@Column(name = "modify_date")
+	private Date modifyDate;
+	@Column(name = "action")
+	private String action;
 }

@@ -85,13 +85,27 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(
 						auth -> auth
-								.requestMatchers("/api/auth/**", "/api/subjects/**", "/api/classs/**",
-										"/api/classhistory/**", "/api/classroom/**", "/api/classroomhistory/**",
-										"/img/**")
+								.requestMatchers(
+										"/api/auth/**",
+										"/api/subjects/**",
+										"/api/classs/**",
+										"/api/classhistory/**",
+										"/api/classroom/**",
+										"/api/classroomhistory/**",
+										"/img/**"
+								)
 								.permitAll()
-								.requestMatchers("/api/test/**", "/api/subjects/**", "/api/classs/**",
+								.requestMatchers(
+										"/api/test/**",
+										"/api/subjects/**",
+										"/api/classs/**",
 										"/api/courses-history/**",
-										"/api/subjectHistory/**", "/api/courses/**", "/api/classroom/**", "/img/**")
+										"/api/subjectHistory/**",
+										"/api/courses/**",
+										"/api/classroom/**",
+										"/api/sessions/**",
+										"/img/**"
+								)
 								.permitAll().anyRequest().authenticated());
 
 		http.authenticationProvider(authenticationProvider());
