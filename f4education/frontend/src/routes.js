@@ -23,6 +23,7 @@ import Login from 'views/examples/Login.js';
 import Tables from 'views/examples/Tables.js';
 import Icons from 'views/examples/Icons.js';
 import Subjects from 'views/admin/Subjects';
+import Sessions from 'views/admin/Sessions';
 import Courses from 'views/admin/Courses.js';
 import Classs from 'views/admin/Classs.js';
 import ClasssRoom from 'views/admin/ClasssRoom.js';
@@ -82,6 +83,13 @@ var routes = [
 		name: 'Môn học',
 		icon: 'ni ni-bullet-list-67 text-pink',
 		component: <Subjects />,
+		layout: '/admin',
+	},
+	{
+		path: '/sessions',
+		name: 'Ca học',
+		icon: 'ni ni-bullet-list-67 text-pink',
+		component: <Sessions />,
 		layout: '/admin',
 	},
 	{
