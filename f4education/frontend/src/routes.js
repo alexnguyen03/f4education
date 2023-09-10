@@ -26,6 +26,7 @@ import Subjects from 'views/admin/Subjects';
 import Courses from 'views/admin/Courses.js';
 import Classs from 'views/admin/Classs.js';
 import ClasssRoom from 'views/admin/ClasssRoom.js';
+import Resources from 'views/admin/Resources.js'
 
 var routes = [
 	{
@@ -103,6 +104,13 @@ var routes = [
 		name: 'Phòng học',
 		icon: 'ni ni-key-25 text-info',
 		component: <ClasssRoom />,
+		layout: '/admin',
+	},
+	{
+		path: '/resources',
+		name: 'Tài nguyên',
+		icon: 'ni ni-key-25 text-info',
+		component: <Resources />,
 		layout: '/admin',
 	},
 ];
