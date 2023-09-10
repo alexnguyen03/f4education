@@ -6,12 +6,12 @@ const classApi = {
 		const url = '/teachers';
 		return axiosClient.get(url);
 	},
-	createClass: (body) => {
-		const url = '/classs';
+	addTeacher: (body) => {
+		const url = '/teachers';
 		return axiosClient.post(url, body);
 	},
-	updateClass: (body, classId) => {
-		const url = `/classs/${classId}`;
+	updateTeacher: (body) => {
+		const url = '/teachers';
 		return axiosClient.put(url, body);
 	}
 };

@@ -17,6 +17,7 @@ import java.util.Date;
 public class CourseHistory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "course_history_id")
 	private Integer courseHistoryId;
 	@Column(name = "course_name")
 	private String courseName;
@@ -26,12 +27,14 @@ public class CourseHistory {
 	private String courseDuration;
 	@Column(name = "course_description")
 	private String courseDescription;
+	@Column(name = "number_session")
 	private Integer numberSession;
 	private String image;
 	private String action;
+	@Column(name = "modify_date")
 	private Date modifyDate;
 	@ManyToOne
-	@JoinColumn(name = "courseId")
+	@JoinColumn(name = "course_id")
 	Course course;
 
 }

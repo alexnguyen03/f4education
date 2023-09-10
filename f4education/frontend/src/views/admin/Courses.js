@@ -57,6 +57,7 @@ const Courses = () => {
 			},
 		},
 	});
+
 	const [courseRequest, setCourseRequest] = useState({
 		subjectId: 0,
 		adminId: '',
@@ -68,17 +69,21 @@ const Courses = () => {
 		numberSession: 0,
 		image: '',
 	});
+
+	// Thực hiện binding data
 	const handelOnChangeInput = (e) => {
 		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
 	};
-	const handleOnChangeSelect = (e) => {
-		const selectedIndex = e.target.options.selectedIndex;
-		setSubjectId(e.target.options[selectedIndex].getAttribute('data-value'));
-		setCourseRequest((preCourse) => ({
-			...preCourse,
-			subjectId: parseInt(subjectId),
-		}));
-	};
+
+	// const handleOnChangeSelect = (e) => {
+	// 	const selectedIndex = e.target.options.selectedIndex;
+	// 	setSubjectId(e.target.options[selectedIndex].getAttribute('data-value'));
+	// 	setCourseRequest((preCourse) => ({
+	// 		...preCourse,
+	// 		subjectId: parseInt(subjectId),
+	// 	}));
+	// };
+
 	const onChangePicture = (e) => {
 		setImage(null);
 		if (e.target.files[0]) {
@@ -98,7 +103,7 @@ const Courses = () => {
 		() => [
 			{
 				accessorKey: 'subject.subjectName',
-				header: 'Tên môn học',
+				header: 'Tên môn học nè',
 				size: 100,
 			},
 			{
@@ -129,6 +134,7 @@ const Courses = () => {
 		],
 		[],
 	);
+
 	const columnsCoursesHistory = useMemo(
 		() => [
 			{
@@ -178,7 +184,6 @@ const Courses = () => {
 	const getAllCourse = async () => {
 		if (courses.length > 0) {
 			setLoadingCourses(false);
-
 			return;
 		}
 		try {
@@ -228,6 +233,7 @@ const Courses = () => {
 		console.log(options);
 		return convertedArray;
 	};
+
 	const handleEditFrom = (row) => {
 		setShowForm(true);
 		const selectedCourse = courses.find((course) => course.courseId === row.original.courseId);
@@ -237,6 +243,7 @@ const Courses = () => {
 		setSelectedSubject({...selectedSubject, value: selectedCourse.subject.subjectId, label: selectedCourse.subject.subjectName});
 		console.log(selectedSubject);
 	};
+	
 	const handleResetForm = () => {
 		// hide form
 		setShowForm((pre) => !pre);
@@ -265,6 +272,7 @@ const Courses = () => {
 			},
 		});
 	};
+	
 	const handleShowAddForm = () => {
 		setShowForm((pre) => !pre);
 		setUpdate(false);
@@ -324,6 +332,7 @@ const Courses = () => {
 			console.log('failed to fetch data', error);
 		}
 	};
+
 	const updateCourse = async () => {
 		const formData = new FormData();
 		formData.append('courseRequest', JSON.stringify(courseRequest));
@@ -337,37 +346,53 @@ const Courses = () => {
 			console.log('failed to fetch data', error);
 		}
 	};
+
+
+	//chọn 1 môn học trong select box
 	function handleSelect(data) {
 		setSelectedSubject(data);
 		setCourseRequest((pre) => ({...pre, subjectId: parseInt(selectedSubject.value)}));
 		// console.log(courseRequest);
 	}
+
+
 	useEffect(() => {
 		setListHistoryById([...listHistoryById]);
 		console.log('🚀 ~ file: Courses.js:330 ~ useEffect ~ listHistoryById:', listHistoryById);
 	}, [loadingHistoryInfo]);
+
 	useEffect(() => {
 		if (courses.length > 0) return;
 		getAllCourse();
 		getAllSubject();
-	}, []);
+	}, []);// không có ngoặc vuông thì thực hiện gọi return trước call back// thực hiện 1 lần duy nhất
+
 	useEffect(() => {
 		const convertedOptions = convertToArray();
 		setOptions(convertedOptions);
-	}, [subjects, selectedSubject]);
+	}, [subjects, selectedSubject]);// nếu có thì thực hiện khi có sử thay đổi
+
 	useEffect(() => {
 		const {courseId, courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
 		if (selectedSubject.value !== undefined) {
 			setCourseRequest({courseId: courseId, courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
 		}
 	}, [course, selectedSubject]);
+
+
+
 	return (
 		<>
 			<CoursesHeader />
+
+
 			<Container
 				className='mt--7'
 				fluid>
 				<Card className='bg-secondary shadow'>
+
+
+
 					{/* Header */}
 					<CardHeader className='bg-white border-0 d-flex justify-content-between'>
 						<h3 className='mb-0'>{showHistoryTable ? 'LỊCH SỬ CHỈNH SỬA KHÓA HỌC' : 'BẢNG KHÓA HỌC'}</h3>
@@ -378,6 +403,9 @@ const Courses = () => {
 							{showHistoryTable ? 'Danh sách khóa học' : 'Lịch sử khóa học'}
 						</Button>
 					</CardHeader>
+
+
+
 					<CardBody>
 						{!showHistoryTable && (
 							<MaterialReactTable
@@ -436,6 +464,8 @@ const Courses = () => {
 							/>
 						)}
 
+
+
 						{showHistoryTable && (
 							<MaterialReactTable
 								enableColumnResizing
@@ -477,6 +507,8 @@ const Courses = () => {
 								}}
 							/>
 						)}
+
+
 
 						<Modal
 							className='modal-dialog-centered  modal-lg '
@@ -658,6 +690,9 @@ const Courses = () => {
 								</div>
 							</Form>
 						</Modal>
+
+
+
 						<Modal
 							className='modal-dialog-centered  modal-lg'
 							isOpen={showHistoryInfo}
@@ -744,6 +779,9 @@ const Courses = () => {
 								</Button>
 							</div>
 						</Modal>
+						
+
+
 					</CardBody>
 				</Card>
 			</Container>
