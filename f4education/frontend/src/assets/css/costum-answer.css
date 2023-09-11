@@ -4,6 +4,7 @@
 
 .answer-input {
     transform: translate(-2px, -6px);
+    font-size: 16px;
     border: none;
     outline: none;
     color: #bdbdbd !important;

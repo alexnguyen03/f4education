@@ -42,14 +42,91 @@ const dataFake = [
   },
 ];
 
+const QuestionData = [
+  {
+    questionId: 1,
+    subjectName: "NextJS",
+    courseName: "NextJS cơ bản cho người mới",
+    questionTitle: "Làm thế nào để tạo mới nextjs project",
+    answer: [
+      {
+        answerId: 1,
+        text: "câu trả lời 1",
+        isCorrect: false,
+      },
+      {
+        answerId: 2,
+        text: "câu trả lời 2",
+        isCorrect: false,
+      },
+      {
+        answerId: 3,
+        text: "câu trả lời 3",
+        isCorrect: true,
+      },
+      {
+        answerId: 4,
+        text: "câu trả lời 4",
+        isCorrect: false,
+      },
+    ],
+    adminName: "Nguyễn Hoài Nam",
+  },
+  {
+    questionId: 2,
+    subjectName: "Python",
+    courseName: "Python web nâng cao P2",
+    questionTitle: "in hello world ra console",
+    answer: [
+      {
+        answerId: 5,
+        text: "câu trả lời 1",
+        isCorrect: false,
+      },
+      {
+        answerId: 6,
+        text: "câu trả lời 2",
+        isCorrect: true,
+      },
+      {
+        answerId: 7,
+        text: "câu trả lời 3",
+        isCorrect: false,
+      },
+    ],
+    adminName: "Nguyễn Hoài Nam",
+  },
+  {
+    questionId: 18,
+    subjectName: "Java",
+    courseName: "Java cơ bản cho người mới",
+    questionTitle: "Làm sao để tạo project java mới?",
+    answer: [
+      {
+        answerId: 17,
+        text: "answer one",
+        isCorrect: false,
+      },
+      {
+        answerId: 18,
+        text: "answer two",
+        isCorrect: false,
+      },
+    ],
+    adminName: "Nguyễn Hoài Nam",
+  },
+];
+
 const Questions = () => {
   // Main variable
-  const [questions, setQuestions] = useState(dataFake);
+  const [questions, setQuestions] = useState(QuestionData);
   const [courses, setCourses] = useState([]);
 
   // Action variable
   const [showModal, setShowModal] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
+  const [numberInputs, setNumberInputs] = useState(0); // Num input user choosen
+  const [answerInputValues, setAnswerInputValues] = useState([]);
 
   // Form variable
   const [errorInputAddSubject, setErrorInputAddSubject] = useState({
@@ -190,23 +267,18 @@ const Questions = () => {
         accessorFn: (row) => row.courseName,
         Cell: ({ cell }) => renderCellWithLink(cell.row.original),
         header: "Tên khóa học",
-        size: 120,
+        size: 180,
       },
       {
         accessorKey: "avgQuestion",
         header: "Tổng câu hỏi ",
         size: 80,
       },
-      // {
-      //   accessorKey: "level",
-      //   header: "Cấp độ",
-      //   size: 40,
-      // },
-      // {
-      //   accessorKey: "adminName",
-      //   header: "Tên người tạo",
-      //   size: 80,
-      // },
+      {
+        accessorKey: "adminName",
+        header: "Tên người tạo",
+        size: 120,
+      },
     ],
     []
   );
@@ -216,6 +288,45 @@ const Questions = () => {
   //   fetchQuestions();
   //   fetchCourse();
   // }, []);
+
+  // Render Input buy number choosen
+  const handleNumInputsChange = (event) => {
+    const newNumInputs = parseInt(event.target.value);
+
+    if (newNumInputs < numberInputs) {
+      const newInputValues = answerInputValues.slice(0, newNumInputs);
+      setAnswerInputValues(newInputValues);
+    }
+
+    setNumberInputs(newNumInputs);
+  };
+
+  const renderInputs = () => {
+    const inputs = [];
+
+    for (let i = 0; i < numberInputs; i++) {
+      const handleChange = (e) => {
+        const newValues = [...answerInputValues];
+        newValues[i] = e.target.value;
+        setAnswerInputValues(newValues);
+      };
+
+      inputs.push(
+        <FormGroup className="mt-3">
+          <label className="form-control-label">Câu trả lời {i + 1}</label>
+          <Input
+            className="form-control-alternative"
+            key={i}
+            type="text"
+            value={answerInputValues[i] || ""}
+            onChange={handleChange}
+          />
+        </FormGroup>
+      );
+    }
+
+    return inputs;
+  };
 
   return (
     <>
@@ -232,6 +343,7 @@ const Questions = () => {
             <Button
               color="default"
               type="button"
+              disabled
               // onClick={() => handleChangeSubjectListAndHistory()}
             >
               {/* {isSubjectHistoryShowing
@@ -255,7 +367,6 @@ const Questions = () => {
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering
-              // enableRowOrdering
               enableEditing
               enableStickyHeader
               enableColumnResizing
@@ -274,7 +385,7 @@ const Questions = () => {
               // Top Add new Subject button
               renderTopToolbarCustomActions={() => (
                 <Button
-                  color={isUpdate ? "primary" : "success"}
+                  color="primary"
                   onClick={() => setShowModal(true)}
                   variant="contained"
                   id="addSubjects"
@@ -427,7 +538,7 @@ const Questions = () => {
               Trở lại
             </Button>
             <Button
-              color={isUpdate ? "primary" : "success"}
+              color="primary"
               type="button"
               onClick={() => {
                 // isUpdate ? handleUpdateSubject() : handleCreateNewSubject();

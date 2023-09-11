@@ -15,246 +15,87 @@ import {
   Row,
 } from "reactstrap";
 
-// const dataFake = [
-//   {
-//     questionId: "1",
-//     subjectName: "Angular",
-//     courseName: "Angular cơ bản cho người mới",
-//     questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
-//     adminName: "adminName",
-//     correctAnswerId: "3",
-//   },
-//   {
-//     questionId: "2",
-//     subjectName: "ReactJs",
-//     courseName: "React & React Hook ",
-//     questionTitle: "Làm thế nào để deploy project lên mạng",
-//     adminName: "abc123admin",
-//     correctAnswerId: "6",
-//   },
-// ];
-
-const answerFake = [
+const QuestionVSAnswerDate = [
   {
-    answerId: "1",
-    questionId: "1",
-    correctAnswerId: "3",
-    questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
+    questionId: 1,
+    subjectName: "NextJS",
+    courseName: "NextJS cơ bản cho người mới",
+    questionTitle: "Làm thế nào để tạo mới nextjs project",
     answer: [
       {
-        id: "1",
-        answerText: "Answer 1",
-        questionId: "1",
+        answerId: 1,
+        text: "câu trả lời 1",
+        isCorrect: false,
       },
       {
-        id: "2",
-        answerText: "Answer 2",
-        questionId: "1",
+        answerId: 2,
+        text: "câu trả lời 2",
+        isCorrect: false,
       },
       {
-        id: "3",
-        answerText: "Answer 3",
-        questionId: "1",
+        answerId: 3,
+        text: "câu trả lời 3",
+        isCorrect: true,
       },
       {
-        id: "4",
-        answerText: "Answer 4",
-        questionId: "1",
+        answerId: 4,
+        text: "câu trả lời 4",
+        isCorrect: false,
       },
     ],
+    adminName: "Nguyễn Hoài Nam",
   },
   {
-    answerId: "2",
-    questionId: "2",
-    correctAnswerId: "6",
-    questionTitle: "State & Hook in angular ",
+    questionId: 6,
+    subjectName: "NextJS",
+    courseName: "NextJS cơ bản cho người mới",
+    questionTitle: "Làm thế nào để run project",
     answer: [
       {
-        id: "5",
-        answerText: "Answer 1",
-        questionId: "2",
+        answerId: 10,
+        text: "câu trả lời 1",
+        isCorrect: true,
       },
       {
-        id: "6",
-        answerText: "Answer 2",
-        questionId: "2",
-      },
-      {
-        id: "7",
-        answerText: "Answer 3",
-        questionId: "2",
-      },
-      {
-        id: "8",
-        answerText: "Answer 4",
-        questionId: "2",
+        answerId: 11,
+        text: "câu trả lời 2",
+        isCorrect: false,
       },
     ],
+    adminName: "Nguyễn Hoài Nam",
   },
 ];
-
-const questionData = [
-  {
-    questionId: "1",
-    subjectName: "Angular",
-    courseName: "Angular cơ bản cho người mới",
-    adminName: "adminName",
-    totalQuestion: 5,
-    correctAnswerId: 3,
-  },
-  {
-    questionId: "2",
-    subjectName: "ReactJs",
-    courseName: "React & React Hook ",
-    adminName: "adminName123",
-    totalQuestion: 10,
-    correctAnswerId: 7,
-  },
-];
-
-const answerData = [
-  {
-    answerId: "1",
-    text: "answer one",
-    question: {
-      questionId: "1",
-      subjectName: "Angular",
-      courseName: "Angular cơ bản cho người mới",
-      questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
-      adminName: "adminName",
-      totalQuestion: 5,
-      correctAnswerId: 1,
-    },
-  },
-  {
-    answerId: "2",
-    text: "answer two",
-    question: {
-      questionId: "1",
-      subjectName: "Angular",
-      courseName: "Angular cơ bản cho người mới",
-      questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
-      adminName: "adminName",
-      totalQuestion: 5,
-      correctAnswerId: 1,
-    },
-  },
-  {
-    answerId: "3",
-    text: "answer one",
-    question: {
-      questionId: "2",
-      subjectName: "ReactJs",
-      courseName: "React & React Hook ",
-      questionTitle: "Làm thế nào để deploy project lên mạng",
-      adminName: "adminName123",
-      totalQuestion: 10,
-      correctAnswerId: 3,
-    },
-  },
-  {
-    answerId: "4",
-    text: "answer two",
-    question: {
-      questionId: "2",
-      subjectName: "ReactJs",
-      courseName: "React & React Hook ",
-      questionTitle: "Làm thế nào để deploy project lên mạng",
-      adminName: "adminName123",
-      totalQuestion: 10,
-      correctAnswerId: 3,
-    },
-  },
-];
-
-const questionDataTest = [
-  {
-    questionId: "1",
-    subjectName: "Angular",
-    courseName: "Angular cơ bản cho người mới",
-    questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
-    adminName: "adminName",
-    totalQuestion: 5,
-    correctAnswerId: 1,
-    answers: [
-      { answerId: "1", text: "answer one" },
-      { answerId: "2", text: "answer two" },
-      { answerId: "3", text: "answer three" },
-      { answerId: "4", text: "answer four" },
-    ],
-  },
-  {
-    questionId: "2",
-    subjectName: "ReactJs",
-    courseName: "React & React Hook",
-    questionTitle: "Làm thế nào để deploy project lên mạng",
-    adminName: "adminName123",
-    totalQuestion: 10,
-    correctAnswerId: 3,
-    answers: [
-      { answerId: "5", text: "answer five" },
-      { answerId: "6", text: "answer six" },
-      { answerId: "7", text: "answer seven" },
-      { answerId: "8", text: "answer eight" },
-    ],
-  },
-];
-
-const QuestionComponent = ({ question }) => {
-  return (
-    <div>
-      <h3>{question.questionTitle}</h3>
-      <p>Subject: {question.subjectName}</p>
-      <p>Course: {question.courseName}</p>
-      {/* Hiển thị các câu trả lời */}
-      <ul>
-        {question.answers.map((answer) => (
-          <li key={answer.answerId}>{answer.text}</li>
-        ))}
-      </ul>
-    </div>
-  );
-};
-
-const CourseComponent = ({ courseName, questions }) => {
-  return (
-    <div>
-      <h2>{courseName}</h2>
-      {questions.map((question) => (
-        <QuestionComponent key={question.questionId} question={question} />
-      ))}
-    </div>
-  );
-};
 
 const QuestionDetail = () => {
   // Route and Params
-  const { courseName } = useParams();
+  const courseName = "NextJS cơ bản cho người mới";
+  // const { courseName } = useParams();
 
   // const questionFromRoute = dataFake.find(
   //   (pj) => pj.courseName.trim() === courseName.trim()
   // );
 
-  const questionByCourseNameRoute = questionData.find(
+  const questionByCourseNameRoute = QuestionVSAnswerDate.find(
     (pj) => pj.courseName.trim() === courseName.trim()
   );
 
   console.log(questionByCourseNameRoute);
 
   // Main variable
-  const [questions, setQuestions] = useState(answerFake);
+  const [questions, setQuestions] = useState(QuestionVSAnswerDate);
   // const [answers, setAnswers] = useState(questions.map((item) => item.answer));
-  const [answers, setAnswers] = useState(answerData);
+  // const [answers, setAnswers] = useState(answerData);
 
-  const questionByCourNameFilter = answers.filter(
-    (answer) =>
-      answer.question.courseName === questionByCourseNameRoute.courseName
-  );
+  // const questionByCourNameFilter = answers.filter(
+  //   (answer) =>
+  //     answer.question.courseName === questionByCourseNameRoute.courseName
+  // );
 
-  const [questionsByCourseName, setQuestionsByCourseName] = useState(
-    questionByCourNameFilter
-  );
+  // const [questionsByCourseName, setQuestionsByCourseName] = useState(
+  //   questionByCourNameFilter
+  // );
 
+  // Number of render Input for answer
   const [numberInputs, setNumberInputs] = useState(0); // Num input user choosen
   const [answerInputValues, setAnswerInputValues] = useState([]);
 
@@ -274,26 +115,26 @@ const QuestionDetail = () => {
   });
 
   // Lấy danh sách các câu hỏi theo courseName
-  const getQuestionsByCourseName = (courseName) => {
-    return answerData
-      .filter((answer) => answer.question.courseName === courseName)
-      .map((answer) => answer.question);
-  };
+  // const getQuestionsByCourseName = (courseName) => {
+  //   return answerData
+  //     .filter((answer) => answer.question.courseName === courseName)
+  //     .map((answer) => answer.question);
+  // };
 
   // Lấy các câu trả lời cho một câu hỏi dựa trên questionId
-  const getAnswersByQuestionId = (questionId) => {
-    return answerData.filter(
-      (answer) => answer.question.questionId === questionId
-    );
-  };
+  // const getAnswersByQuestionId = (questionId) => {
+  //   return answerData.filter(
+  //     (answer) => answer.question.questionId === questionId
+  //   );
+  // };
 
   // Lấy danh sách các khóa học duy nhất
-  const getUniqueCourses = () => {
-    const uniqueCourses = [
-      ...new Set(answerData.map((answer) => answer.question.courseName)),
-    ];
-    return uniqueCourses;
-  };
+  // const getUniqueCourses = () => {
+  //   const uniqueCourses = [
+  //     ...new Set(answerData.map((answer) => answer.question.courseName)),
+  //   ];
+  //   return uniqueCourses;
+  // };
 
   // Question GRID AREA
   // input footer Card
@@ -332,7 +173,7 @@ const QuestionDetail = () => {
     // Handle Change Data
   };
 
-  // Render Input buy number choosen are
+  // Render Input buy number choosen
   const handleNumInputsChange = (event) => {
     const newNumInputs = parseInt(event.target.value);
 
@@ -357,13 +198,18 @@ const QuestionDetail = () => {
       inputs.push(
         <FormGroup className="mt-3">
           <label className="form-control-label">Câu trả lời {i + 1}</label>
-          <Input
-            className="form-control-alternative"
-            key={i}
-            type="text"
-            value={answerInputValues[i] || ""}
-            onChange={handleChange}
-          />
+          <div className="d-flex jusitfy-content-between align-items-center mb-3">
+            <input className="mr-2" id={`answeradio${i}`} name="answerQuestion"  type="radio" />
+            <label className="w-100" htmlFor={`answeradio${i}`}>
+              <Input
+                className="form-control-alternative"
+                key={i}
+                type="text"
+                value={answerInputValues[i] || ""}
+                onChange={handleChange}
+              />
+            </label>
+          </div>
         </FormGroup>
       );
     }
@@ -448,7 +294,7 @@ const QuestionDetail = () => {
                     size="xs"
                     p={0}
                   >
-                    6
+                    {questions.length}
                   </Badge>
                 }
                 value="overview"
@@ -461,82 +307,78 @@ const QuestionDetail = () => {
           </Tabs>
         </div>
       </div>
-      <div>
-        <h1>Khóa học</h1>
-        {getUniqueCourses().map((courseName) => (
-          <CourseComponent
-            key={courseName}
-            courseName={courseName}
-            questions={getQuestionsByCourseName(courseName)}
-          />
-        ))}
-      </div>
 
       {/* Main content */}
       <main className="container">
         <Row className="mt-3">
           {/* Item */}
-          {questionsByCourseName.map((qs, index) => (
+          {questions.map((qs, index) => (
             <Col
               lg={6}
               xl={6}
               md={12}
               sm={12}
-              key={qs.answerId}
+              key={qs.questionId}
               className="mb-3"
             >
               <Card style={{ minWidth: "400px", minHeight: "365px" }}>
                 <CardBody>
                   {/* Title Question */}
-                  <h4 className="bg-secondary p-2">
+                  <h4
+                    className="p-2"
+                    style={{ background: "#f1f1f1", borderRadius: "3px" }}
+                  >
                     <span className="text-dark font-weight-600">
-                      Question {index + 1}: {qs.question.questionTitle}
+                      Question {index + 1}: {qs.questionTitle}
                     </span>
                   </h4>
                   {/* Answer Display Area */}
-                  <Row>
-                    {/* {as.answer.map((answerDetail) => (
-                      <>
-                        <Col
-                          lg={12}
-                          xl={12}
-                          md={12}
-                          sm={12}
-                          key={answerDetail.id}
-                        >
-                          <div className="d-flex gap-3">
-                            <div style={{ width: "40px", height: "40px" }}>
-                              {as.correctAnswerId === answerDetail.id ? (
-                                <i className="bx bx-check-circle text-success"></i>
+                  <div style={{ height: "180px", overflowY: "auto" }}>
+                    <Row>
+                      {qs.answer.map((answerDetail) => (
+                        <>
+                          <Col
+                            lg={12}
+                            xl={12}
+                            md={12}
+                            sm={12}
+                            key={answerDetail.answerId}
+                          >
+                            <div className="d-flex gap-3">
+                              <div style={{ width: "40px", height: "40px" }}>
+                                {answerDetail.isCorrect ? (
+                                  <i className="bx bx-check-circle text-success"></i>
+                                ) : (
+                                  <i className="bx bx-x-circle text-danger"></i>
+                                )}
+                              </div>
+
+                              {editAnswer &&
+                              qs.questionId === editQuestionId ? (
+                                <input
+                                  className="answer-input text-dark ml--2 mb-1"
+                                  onChange={(e) => handleOnchangeInputAnswer(e)}
+                                  key={answerDetail.answerId}
+                                  name="answerText"
+                                  value={answerDetail.text}
+                                />
                               ) : (
-                                <i className="bx bx-x-circle text-danger"></i>
+                                <span
+                                  className="text-dark ml--2 mb-1"
+                                  key={answerDetail.answerId}
+                                >
+                                  {answerDetail.text}
+                                </span>
                               )}
                             </div>
-
-                            {editAnswer && as.questionId === editQuestionId ? (
-                              <input
-                                className="answer-input text-dark ml--2 mb-1"
-                                onChange={(e) => handleOnchangeInputAnswer(e)}
-                                key={answerDetail.id}
-                                name="answerText"
-                                value={answerDetail.answerText}
-                              />
-                            ) : (
-                              <span
-                                className="text-dark ml--2 mb-1"
-                                key={answerDetail.id}
-                              >
-                                {answerDetail.answerText}
-                              </span>
-                            )}
-                          </div>
-                        </Col>
-                      </>
-                    ))} */}
-                  </Row>
+                          </Col>
+                        </>
+                      ))}
+                    </Row>
+                  </div>
                 </CardBody>
                 {/* Action Area */}
-                {/* <CardFooter>
+                <CardFooter>
                   <FormGroup>
                     <Select
                       // label="Chọn câu trả lời đúng"
@@ -544,20 +386,20 @@ const QuestionDetail = () => {
                       searchable
                       clearable
                       nothingFound="Vui lòng nhập câu trả lời khác"
-                      value={getAnswerTextByQuestionId(as.questionId)}
+                      value={getAnswerTextByQuestionId(qs.questionId)}
                       onChange={(value) =>
                         setSelectedAnswers((prevSelectedAnswers) => ({
                           ...prevSelectedAnswers,
-                          [as.questionId]: value, // Update selected answer for the specific questionId
+                          [qs.questionId]: value, // Update selected answer for the specific questionId
                         }))
                       }
-                      data={as.answer.map((answerDetail) => ({
-                        value: answerDetail.id,
-                        label: answerDetail.answerText,
+                      data={qs.answer.map((answerDetail) => ({
+                        value: answerDetail.answerId,
+                        label: answerDetail.text,
                       }))}
                     />
                   </FormGroup>
-                  {editAnswer && as.questionId === editQuestionId ? (
+                  {editAnswer && qs.questionId === editQuestionId ? (
                     <Button
                       color="warning"
                       role="button"
@@ -575,12 +417,12 @@ const QuestionDetail = () => {
                     outline
                     role="button"
                     className="float-right"
-                    onClick={() => handleEditQuestion(as)}
+                    onClick={() => handleEditQuestion(qs)}
                   >
                     <i className="bx bx-edit"></i>
                   </Button>
 
-                  {!isEditing && as.questionId !== editQuestionId ? (
+                  {!isEditing && qs.questionId !== editQuestionId ? (
                     <Button
                       color="danger"
                       className="float-right mr-2"
@@ -591,7 +433,7 @@ const QuestionDetail = () => {
                   ) : (
                     <></>
                   )}
-                </CardFooter> */}
+                </CardFooter>
               </Card>
             </Col>
           ))}
@@ -624,40 +466,12 @@ const QuestionDetail = () => {
         <div className="modal-body">
           <form method="post">
             <FormGroup className="mb-3">
-              <label className="form-control-label" htmlFor="name">
-                Môn học
-              </label>
-              {/* <Select options={options} defaultInputValue={"Môn học"}/> */}
-              <Select
-                // label="Your favorite framework/library"
-                placeholder="Chon mon hoc"
-                disabled
-                searchable
-                clearable
-                defaultValue="React"
-                nothingFound="No options"
-                data={["React", "Angular", "Java", "Vue"]}
-              />
+              <label className="form-control-label">Môn học</label>
+              <Input disabled value={questionByCourseNameRoute.subjectName} />
             </FormGroup>
             <FormGroup className="mb-3">
-              <label className="form-control-label" htmlFor="name">
-                Khóa học
-              </label>
-              <Select
-                // label="Your favorite framework/library"
-                placeholder="Chon khoa hoc"
-                disabled
-                searchable
-                clearable
-                defaultValue="React & Hook co ban"
-                nothingFound="No options"
-                data={[
-                  "React & Hook co ban",
-                  "Angular RestAPI",
-                  "Java Spring Boot RestFull Api",
-                  "VueJs co ban",
-                ]}
-              />
+              <label className="form-control-label">Khóa học</label>
+              <Input disabled value={questionByCourseNameRoute.courseName} />
             </FormGroup>
             <FormGroup className="mb-3">
               <label className="form-control-label" htmlFor="questionTitle">
