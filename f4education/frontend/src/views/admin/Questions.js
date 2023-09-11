@@ -23,9 +23,28 @@ import courseApi from "../../api/courseApi";
 import { Select } from "@mantine/core";
 import { Link } from "react-router-dom";
 
+const dataFake = [
+  {
+    questionId: "1",
+    subjectName: "Angular",
+    courseName: "Angular cơ bản cho người mới",
+    questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
+    adminName: "adminName",
+    avgQuestion: 5,
+  },
+  {
+    questionId: "2",
+    subjectName: "ReactJs",
+    courseName: "React & React Hook ",
+    questionTitle: "Làm thế nào để deploy project lên mạng",
+    adminName: "adminName2",
+    avgQuestion: 10,
+  },
+];
+
 const Questions = () => {
   // Main variable
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState(dataFake);
   const [courses, setCourses] = useState([]);
 
   // Action variable
@@ -57,24 +76,24 @@ const Questions = () => {
   });
 
   // Api Area
-  const fetchQuestions = async () => {
-    try {
-      const resp = await questionApi.getAllQuestion();
-      setQuestions(resp);
-      console.log("restarted application");
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchQuestions = async () => {
+  //   try {
+  //     const resp = await questionApi.getAllQuestion();
+  //     setQuestions(resp);
+  //     console.log("restarted application");
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
-  const fetchCourse = async () => {
-    try {
-      const resp = await courseApi.getAll();
-      setCourses(resp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchCourse = async () => {
+  //   try {
+  //     const resp = await courseApi.getAll();
+  //     setCourses(resp);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // API_AREA > CRUD
   const handleCreateNewSubject = async () => {
@@ -98,7 +117,7 @@ const Questions = () => {
       }
       console.log("Add Success");
 
-      fetchQuestions();
+      // fetchQuestions();
       setShowModal(false);
     } else console.log("Error in validation");
   };
@@ -141,11 +160,12 @@ const Questions = () => {
 
   // React Data table area
   function renderCellWithLink(row) {
-    console.log(row);
+    // console.log(row);
+    const courseName = row.courseName;
     const id = row.questionId;
     return (
       <span key={id}>
-        <Link to={`/admin/questionDetail/${id}`}>{row.courseName}</Link>
+        <Link to={`/admin/questionDetail/${courseName}`}>{row.courseName}</Link>
       </span>
     );
   }
@@ -191,30 +211,11 @@ const Questions = () => {
     []
   );
 
-  const dataFake = [
-    {
-      questionId: "1",
-      subjectName: "Angular",
-      courseName: "Angular cơ bản cho người mới",
-      questionTitle: "Làm thế nào để tích hợp route vào dự án angular",
-      adminName: "adminName",
-      avgQuestion: 5,
-    },
-    {
-      questionId: "2",
-      subjectName: "ReactJs",
-      courseName: "React & React Hook ",
-      questionTitle: "Làm thế nào để deploy project lên mạng",
-      adminName: "adminName2",
-      avgQuestion: 10,
-    },
-  ];
-
   // *************** Use effect area
-  useEffect(() => {
-    fetchQuestions();
-    fetchCourse();
-  }, []);
+  // useEffect(() => {
+  //   fetchQuestions();
+  //   fetchCourse();
+  // }, []);
 
   return (
     <>
@@ -250,7 +251,7 @@ const Questions = () => {
               }}
               columns={columnQuestion}
               // data={questions}
-              data={dataFake}
+              data={questions}
               positionActionsColumn="last"
               // editingMode="modal" //default
               enableColumnOrdering

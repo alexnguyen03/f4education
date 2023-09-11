@@ -1,0 +1,29 @@
+:root {
+    --smothAnswer: all 0.3s ease;
+}
+
+.answer-input {
+    transform: translate(-2px, -6px);
+    border: none;
+    outline: none;
+    color: #bdbdbd !important;
+    transition: var(--smothAnswer);
+}
+
+.answer-input:focus {
+    border: none;
+    border-left: 6px solid #fb6340;
+    transition: var(--smothAnswer);
+}
+
+.slide-in {
+    transform: translateX(50px);
+    opacity: 0;
+    transition: var(--smothAnswer);
+}
+
+.slide-in.show {
+    opacity: 1;
+    transform: translateX(0);
+    transition: var(--smothAnswer);
+}

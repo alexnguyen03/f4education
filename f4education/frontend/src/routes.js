@@ -107,7 +107,7 @@ var routes = [
     layout: "/admin",
   },
   {
-    path: "/questionDetail/:id",
+    path: "/questionDetail/:courseName",
     component: <QuestionDetail />,
     layout: "/admin",
   },
