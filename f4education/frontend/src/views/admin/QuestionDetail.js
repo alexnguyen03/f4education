@@ -1,6 +1,7 @@
 import { Alert, Badge, Select, Tabs } from "@mantine/core";
 import QuestionDetailHeader from "components/Headers/QuestionDetailHeader";
 import moment from "moment";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
@@ -14,6 +15,7 @@ import {
   Modal,
   Row,
 } from "reactstrap";
+import { IconButton } from "@mui/material";
 
 const QuestionVSAnswerDate = [
   {
@@ -21,6 +23,7 @@ const QuestionVSAnswerDate = [
     subjectName: "NextJS",
     courseName: "NextJS cơ bản cho người mới",
     questionTitle: "Làm thế nào để tạo mới nextjs project",
+    createDate: "2023-09-11T13:45:55.371+00:00",
     answer: [
       {
         answerId: 1,
@@ -50,6 +53,7 @@ const QuestionVSAnswerDate = [
     subjectName: "NextJS",
     courseName: "NextJS cơ bản cho người mới",
     questionTitle: "Làm thế nào để run project",
+    createDate: "2023-09-11T13:45:55.371+00:00",
     answer: [
       {
         answerId: 10,
@@ -104,6 +108,7 @@ const QuestionDetail = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editQuestionId, setEditQuestionId] = useState(null);
+  const [isUpdate, setIsUpdate] = useState(false);
   // const [deleteQuestion, setDeleteQuestion] = useState(false);
 
   // Form Variable
@@ -173,59 +178,71 @@ const QuestionDetail = () => {
     // Handle Change Data
   };
 
-  // Render Input buy number choosen
-  const handleNumInputsChange = (event) => {
-    const newNumInputs = parseInt(event.target.value);
-
-    if (newNumInputs < numberInputs) {
-      const newInputValues = answerInputValues.slice(0, newNumInputs);
-      setAnswerInputValues(newInputValues);
-    }
-
-    setNumberInputs(newNumInputs);
-  };
-
-  const renderInputs = () => {
-    const inputs = [];
-
-    for (let i = 0; i < numberInputs; i++) {
-      const handleChange = (e) => {
-        const newValues = [...answerInputValues];
-        newValues[i] = e.target.value;
-        setAnswerInputValues(newValues);
-      };
-
-      inputs.push(
-        <FormGroup className="mt-3">
-          <label className="form-control-label">Câu trả lời {i + 1}</label>
-          <div className="d-flex jusitfy-content-between align-items-center mb-3">
-            <input className="mr-2" id={`answeradio${i}`} name="answerQuestion"  type="radio" />
-            <label className="w-100" htmlFor={`answeradio${i}`}>
-              <Input
-                className="form-control-alternative"
-                key={i}
-                type="text"
-                value={answerInputValues[i] || ""}
-                onChange={handleChange}
-              />
-            </label>
-          </div>
-        </FormGroup>
-      );
-    }
-
-    return inputs;
-  };
-
+  // FORM VARIABLE
   const handleStoreNewQuestion = () => {
     // Lưu giá trị vào mảng hoặc thực hiện các xử lý khác
-    console.log(answerInputValues);
+    console.log(groups);
   };
 
   //  handle get valule of answerText in foooter Card select
   const getAnswerTextByQuestionId = (questionId) => {
     console.log(selectedAnswers);
     return selectedAnswers[questionId] || null;
+  };
+
+  // Render Add new questions
+  const [groups, setGroups] = useState([
+    { radioValue: false, inputValue: "" },
+    { radioValue: false, inputValue: "" },
+  ]);
+
+  const handleRadioChange = (index) => {
+    const updatedGroups = groups.map((group, i) => {
+      if (i === index) {
+        return { ...group, radioValue: true };
+      } else {
+        return { ...group, radioValue: false };
+      }
+    });
+    setGroups(updatedGroups);
+  };
+
+  const handleInputChange = (index, value) => {
+    const updatedGroups = [...groups];
+    updatedGroups[index].inputValue = value;
+    setGroups(updatedGroups);
+  };
+
+  const handleAddGroup = () => {
+    const newGroup = { radioValue: false, inputValue: "" };
+    setGroups([...groups, newGroup]);
+  };
+
+  const renderAnswerInputs = () => {
+    return groups.map((group, index) => (
+      <Col xl={6} lg={6} md={6} sm={12} key={index + 1}>
+        <FormGroup className="mt-3">
+          <label className="form-control-label">Câu trả lời {index + 1}</label>
+          <div className="d-flex align-items-center">
+            <div>
+              <label>
+                <input
+                  type="radio"
+                  checked={group.radioValue}
+                  onChange={() => handleRadioChange(index)}
+                />
+              </label>
+            </div>
+            <Input
+              className="form-control-alternative ml-2"
+              type="text"
+              value={group.inputValue}
+              onChange={(e) => handleInputChange(index, e.target.value)}
+            />
+          </div>
+        </FormGroup>
+      </Col>
+    ));
   };
 
   return (
@@ -264,7 +281,11 @@ const QuestionDetail = () => {
                 <span className="mx-3 font-weight-400 mt--1">
                   <i className="bx bx-x text-gray"></i>
                 </span>
-                <h6>{moment(new Date()).format("DD-MM-yyyy, h:mm:ss a")}</h6>
+                <h6>
+                  {moment(questionByCourseNameRoute.createDate).format(
+                    "DD-MM-yyyy, h:mm:ss a"
+                  )}
+                </h6>
               </div>
             </div>
           </div>
@@ -409,29 +430,51 @@ const QuestionDetail = () => {
                       Cập nhật
                     </Button>
                   ) : (
-                    <></>
+                    <>
+                      <Button
+                        color="warning"
+                        disabled
+                        role="button"
+                        className="float-left"
+                        onClick={handleUpdateQuestion}
+                      >
+                        Cập nhật
+                      </Button>
+                    </>
                   )}
 
-                  <Button
+                  {/* <Button
                     color="primary"
                     outline
                     role="button"
                     className="float-right"
                     onClick={() => handleEditQuestion(qs)}
                   >
-                    <i className="bx bx-edit"></i>
-                  </Button>
+                    {/* <i className="bx bx-edit"></i> */}
+                  {/* <EditIcon />
+                  </Button>  */}
+
+                  <IconButton
+                    color="secondary"
+                    className="float-right"
+                    onClick={() => handleEditQuestion(qs)}
+                  >
+                    <EditIcon />
+                  </IconButton>
 
                   {!isEditing && qs.questionId !== editQuestionId ? (
-                    <Button
-                      color="danger"
-                      className="float-right mr-2"
-                      onClick={() => alert("xóa rồi bạn ơi bớt click đi!")}
-                    >
-                      <i className="bx bx-trash"></i>
-                    </Button>
+                    <IconButton className="float-right mr-2 text-danger">
+                      <DeleteIcon />
+                    </IconButton>
                   ) : (
-                    <></>
+                    <>
+                      <IconButton
+                        className="float-right mr-2 text-danger"
+                        disabled
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </>
                   )}
                 </CardFooter>
               </Card>
@@ -442,14 +485,14 @@ const QuestionDetail = () => {
 
       {/* Modal */}
       <Modal
-        className="modal-dialog-centered"
+        className="modal-dialog-centered modal-lg"
         isOpen={showModal}
-        toggle={showModal}
+        // toggle={showModal}
         backdrop={"static"}
       >
         <div className="modal-header">
           <h3 className="modal-title" id="modal-title-default">
-            Thêm câu hỏi
+            {isUpdate ? "Cập nhật câu hỏi" : "Thêm câu hỏi mới"}
           </h3>
           <button
             aria-label="Close"
@@ -458,69 +501,109 @@ const QuestionDetail = () => {
             type="button"
             onClick={() => setShowModal(false)}
           >
-            <span aria-hidden={true} onClick={() => setShowModal(false)}>
+            <span aria-hidden={true} onClick={() => setIsUpdate(false)}>
               ×
             </span>
           </button>
         </div>
         <div className="modal-body">
           <form method="post">
-            <FormGroup className="mb-3">
-              <label className="form-control-label">Môn học</label>
-              <Input disabled value={questionByCourseNameRoute.subjectName} />
-            </FormGroup>
-            <FormGroup className="mb-3">
-              <label className="form-control-label">Khóa học</label>
-              <Input disabled value={questionByCourseNameRoute.courseName} />
-            </FormGroup>
-            <FormGroup className="mb-3">
-              <label className="form-control-label" htmlFor="questionTitle">
-                Tiêu đề câu hỏi?
-              </label>
-              <Input
-                className="form-control-alternative"
-                id="questionTitle"
-                // onChange={handleChangeInput}
-                name="questionTitle"
-                // value={question.questionTitle}
-              />
-            </FormGroup>
-            <FormGroup className="mb-3">
-              <label className="form-control-label" htmlFor="name">
-                Số câu trả lời
-              </label>
-              <Input
-                // label="Your favorite framework/library"
-                type="number"
-                placeholder="0"
-                value={numberInputs}
-                onChange={handleNumInputsChange}
-                className="form-control-alternative"
-              />
-
-              {/* {numberInputs > 0 ? (
-                <>
-                  {Array.from({ length: numberInputs }, (_, index) => (
-                    <FormGroup className="mt-3">
-                      <label className="form-control-label" htmlFor="name">
-                        Câu trả lời <strong>{index + 1}</strong>
+            <Row>
+              {/* {isUpdate && (
+                <FormGroup className="mb-3">
+                  <label className="form-control-label" htmlFor="questionId">
+                    Mã câu hỏi
+                  </label>
+                  <Input
+                    className="form-control-alternative"
+                    id="questionId"
+                    onChange={handleChangeInput}
+                    disabled
+                    name="questionId"
+                    value={question.questionId}
+                  />
+                </FormGroup>
+              )} */}
+              <Col xl={6} lg={6} md={6} sm={12}>
+                <FormGroup className="mb-3 col-6 col-sm-12">
+                  <label className="form-control-label" htmlFor="name">
+                    Môn học
+                  </label>
+                  <Select
+                    // label="Your favorite framework/library"
+                    placeholder="Chon mon hoc"
+                    searchable
+                    clearable
+                    nothingFound="No options"
+                    data={["React", "Angular", "Java", "Vue"]}
+                  />
+                </FormGroup>
+              </Col>
+              <Col xl={6} lg={6} md={6} sm={12}>
+                <FormGroup className="mb-3 col-6 col-sm-12">
+                  <label className="form-control-label" htmlFor="name">
+                    Khóa học
+                  </label>
+                  <Select
+                    // label="Your favorite framework/library"
+                    placeholder="Chon khoa hoc"
+                    searchable
+                    clearable
+                    nothingFound="No options"
+                    data={[
+                      "React & Hook co ban",
+                      "Angular RestAPI",
+                      "Java Spring Boot RestFull Api",
+                      "VueJs co ban",
+                    ]}
+                  />
+                </FormGroup>
+              </Col>
+              <Col xl={6} lg={6} md={6} sm={12}>
+                <FormGroup className="mb-3 col-6 col-sm-12">
+                  <label className="form-control-label" htmlFor="questionTitle">
+                    Tiêu đề câu hỏi?
+                  </label>
+                  <Input
+                    className="form-control-alternative"
+                    id="questionTitle"
+                    // onChange={handleChangeInput}
+                    name="questionTitle"
+                    // value={question.questionContent}
+                  />
+                </FormGroup>
+              </Col>
+              <Col xl={12} lg={12} md={12} sm={12}>
+                <hr />
+                <h5 className="font-weight-600">Câu trả lời</h5>
+                <div className="container">
+                  <Row>
+                    {/* <label className="form-control-label" htmlFor="name">
+                        Số câu trả lời
                       </label>
                       <Input
-                        key={index}
+                        // label="Your favorite framework/library"
+                        type="number"
+                        placeholder="0"
+                        value={numberInputs}
+                        onChange={handleNumInputsChange}
                         className="form-control-alternative"
-                        type="text"
-                        value={answerInputValues[index]}
-                        onChange={(event) => handleInputChange(event, index)}
-                      />
-                    </FormGroup>
-                  ))}
-                </>
-              ) : (
-                <></>
-              )} */}
-
-              <div>{renderInputs()}</div>
-            </FormGroup>
+                      /> */}
+                    {renderAnswerInputs()}
+                  </Row>
+                </div>
+              </Col>
+              <div className="container">
+                <Button
+                  color="primary"
+                  outline
+                  className="mt-3 ml-3 float-left"
+                  onClick={handleAddGroup}
+                >
+                  <i class="bx bx-list-plus"></i> Thêm câu trả lời
+                </Button>
+              </div>
+            </Row>
           </form>
         </div>
         <div className="modal-footer">
@@ -531,18 +614,21 @@ const QuestionDetail = () => {
             type="button"
             onClick={() => {
               setShowModal(false);
+              setIsUpdate(false);
             }}
           >
             Trở lại
           </Button>
           <Button
-            color="success"
+            color={isUpdate ? "primary" : "success"}
             type="button"
             onClick={() => {
+              // isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
+              // toast("Cập nhật môn học thành công");
               handleStoreNewQuestion();
             }}
           >
-            Thêm câu hỏi mới
+            {isUpdate ? "Cập nhật" : "Thêm môn học"}
           </Button>
         </div>
       </Modal>

@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,45 +23,43 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "Question")
 public class Question {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "question_id")
-    private Integer questionId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "question_id")
+	private Integer questionId;
 
-    @Column(name = "subject_name")
-    private String subjectName;
+	@Column(name = "subject_name")
+	private String subjectName;
 
-    @Column(name = "course_name")
-    private String courseName;
+	@Column(name = "course_name")
+	private String courseName;
 
-    @Column(name = "question_title")
-    private String questionTitle;
+	@Column(name = "question_title")
+	private String questionTitle;
 
-    private String levels;
+	@Column(name = "create_date")
+	private Date createDate;
+
+	private String levels;
 
 //	@OneToMany(mappedBy = "question")
 //	List<QuestionHistory> questionHistory;
 
-    @OneToMany(mappedBy = "question")
-    List<Answer> answer;
+	@OneToMany(mappedBy = "question")
+	List<Answer> answer;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "course_id")
-    Course course;
+	@ManyToOne
+	@JsonIgnore
+	@JoinColumn(name = "course_id")
+	Course course;
 
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    Admin admin;
+	@ManyToOne
+	@JoinColumn(name = "admin_id")
+	Admin admin;
 
-    @Override
-    public String toString() {
-        return "Question{" +
-                "questionId=" + questionId +
-                ", subjectName='" + subjectName + '\'' +
-                ", courseName='" + courseName + '\'' +
-                ", questionTitle='" + questionTitle + '\'' +
-                ", levels='" + levels + '\'' +
-                '}';
-    }
+	@Override
+	public String toString() {
+		return "Question{" + "questionId=" + questionId + ", subjectName='" + subjectName + '\'' + ", courseName='"
+				+ courseName + '\'' + ", questionTitle='" + questionTitle + '\'' + ", levels='" + levels + '\'' + '}';
+	}
 }

@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -63,6 +64,7 @@ public class QuestionServiceImpl implements QuestionService {
         QuestionDTO questionDTO = new QuestionDTO();
         questionDTO.setAdminName(question.getAdmin().getFullname());
         questionDTO.setAnswer(question.getAnswer());
+        question.setCreateDate(new Date());
         BeanUtils.copyProperties(question, questionDTO);
         return questionDTO;
     }
