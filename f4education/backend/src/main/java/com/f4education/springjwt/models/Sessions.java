@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.sql.Time;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -25,9 +27,10 @@ public class Sessions implements Serializable {
 	private Time startTime;
 	@Column(name = "end_time")
 	private Time endTime;
-
+	@JsonIgnore
 	@OneToMany(mappedBy = "sessions")
 	private List<SessionsHistory> sessionsHistorys;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	private Admin admin;

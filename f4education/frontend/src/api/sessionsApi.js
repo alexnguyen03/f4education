@@ -13,6 +13,10 @@ const sessionsApi = {
 		const url = `/sessions`;
 		return axiosClient.put(url, body);
 	},
+	getAllSessionsHistory: () => {
+		const url = '/sessions-history';
+		return axiosClient.get(url);
+	},
 };
 
 export default sessionsApi;

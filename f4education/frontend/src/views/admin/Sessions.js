@@ -7,7 +7,7 @@ import moment from 'moment';
 import {useEffect, useMemo, useState} from 'react';
 
 // reactstrap components
-import {Button, Card, CardBody, CardHeader, Container, Form, Input, Modal} from 'reactstrap';
+import {Badge, Button, Card, CardBody, CardHeader, Container, Form, Input, Modal} from 'reactstrap';
 
 import sessionsApi from 'api/sessionsApi';
 import SessionsHeader from 'components/Headers/SessionsHeader';
@@ -19,7 +19,9 @@ import {IconClock} from '@tabler/icons-react';
 const Sessions = () => {
 	// Main variable
 	const [sessions, setSessions] = useState([]);
+	const [sessionsHistories, setSessionsHistories] = useState([]);
 	const user = JSON.parse(localStorage.getItem('user') ?? '');
+	const [showHistoryTable, setShowHistoryTable] = useState(false);
 
 	const [session, setSession] = useState({
 		admin: {
@@ -98,30 +100,45 @@ const Sessions = () => {
 	const columnSessionsHistory = useMemo(
 		() => [
 			{
-				accessorKey: 'subjectHistoryId',
-				header: '#',
-				size: 40,
+				accessorKey: 'sessionName',
+				header: 'Tên ca học',
+				size: 80,
 			},
 			{
-				accessorKey: 'action',
-				// accessorFn: (row) => row.action,
-				header: 'Hành động',
-				size: 40,
-			},
-			{
-				accessorKey: 'subjectName',
-				header: 'Tên ca Học',
+				accessorKey: 'adminName',
+				header: 'Tên người tạo',
 				size: 120,
 			},
 			{
-				accessorFn: (row) => moment(row.modifyDate).format('dd-MM-yyyy, h:mm:ss a'),
+				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss A'),
 				header: 'Ngày chỉnh sửa',
 				size: 120,
 			},
 			{
-				accessorKey: 'adminId',
-				header: 'Mã người tạo',
-				size: 80,
+				accessorKey: 'startTime',
+				header: 'Giờ bắt đầu',
+				size: 90,
+			},
+			{
+				accessorKey: 'endTime',
+				header: 'Giờ kết thúc',
+				size: 90,
+			},
+			{
+				accessorKey: 'action',
+
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+
+					if (row.action === 'UPDATE') {
+						return <Badge color='primary'>Cập nhật</Badge>;
+					} else {
+						return <Badge color='success'>Tạo mới </Badge>;
+					}
+				},
+				header: 'Hành động',
+				size: 60,
 			},
 		],
 		[],
@@ -192,6 +209,22 @@ const Sessions = () => {
 			console.log('failed to fetch data', error);
 		}
 	};
+	const handleShowAllHistory = () => {
+		setShowHistoryTable((pre) => !pre);
+		if (sessionsHistories.length === 0) {
+			getAllSesssionHistory();
+		}
+	};
+
+	const getAllSesssionHistory = async () => {
+		try {
+			const resp = await sessionsApi.getAllSessionsHistory();
+			setSessionsHistories(resp);
+			console.log(resp);
+		} catch (error) {
+			console.log(error);
+		}
+	};
 	useEffect(() => {
 		fetchSessions();
 	}, []);
@@ -220,57 +253,77 @@ const Sessions = () => {
 						<Button
 							color='default'
 							type='button'
-							onClick={() => {}}>
-							{showSessionsHistory ? 'Danh sách ca học' : 'Lịch sử ca học'}
+							onClick={() => {
+								handleShowAllHistory();
+							}}>
+							{showHistoryTable ? 'Danh sách ca học' : 'Lịch sử ca học'}
 						</Button>
 					</CardHeader>
 					<CardBody>
 						{/* Table view */}
-						<MaterialReactTable
-							displayColumnDefOptions={
-								!showSessionsHistory && {
-									'mrt-row-actions': {
-										header: 'Thao tác',
-										size: 20,
-									},
+						{!showHistoryTable && (
+							<MaterialReactTable
+								displayColumnDefOptions={
+									!showSessionsHistory && {
+										'mrt-row-actions': {
+											header: 'Thao tác',
+											size: 20,
+										},
+									}
 								}
-							}
-							columns={columnSessions}
-							data={sessions}
-							initialState={{columnVisibility: {subjectId: false}}}
-							positionActionsColumn='last'
-							// editingMode="modal" //default
-							enableColumnOrdering
-							// enableRowOrdering
-							enableEditing
-							enableStickyHeader
-							enableColumnResizing
-							muiTablePaginationProps={{
-								rowsPerPageOptions: [10, 20, 50, 100],
-								showFirstButton: false,
-								showLastButton: false,
-							}}
-							renderRowActions={({row}) => (
-								<IconButton
-									color='secondary'
-									onClick={() => {
-										handleEditForm(row);
-									}}>
-									<EditIcon />
-								</IconButton>
-							)}
-							// Top Add new Subject button
-							renderTopToolbarCustomActions={() => (
-								<Button
-									color='success'
-									onClick={handleShowAddForm}
-									variant='contained'
-									id='addSessions'
-									disabled={showSessionsHistory}>
-									<i className='bx bx-layer-plus'></i> Thêm ca học
-								</Button>
-							)}
-						/>
+								columns={columnSessions}
+								data={sessions}
+								initialState={{columnVisibility: {subjectId: false}}}
+								positionActionsColumn='last'
+								// editingMode="modal" //default
+								enableColumnOrdering
+								// enableRowOrdering
+								enableEditing
+								enableStickyHeader
+								enableColumnResizing
+								muiTablePaginationProps={{
+									rowsPerPageOptions: [10, 20, 50, 100],
+									showFirstButton: false,
+									showLastButton: false,
+								}}
+								renderRowActions={({row}) => (
+									<IconButton
+										color='secondary'
+										onClick={() => {
+											handleEditForm(row);
+										}}>
+										<EditIcon />
+									</IconButton>
+								)}
+								// Top Add new Subject button
+								renderTopToolbarCustomActions={() => (
+									<Button
+										color='success'
+										onClick={handleShowAddForm}
+										variant='contained'
+										id='addSessions'
+										disabled={showSessionsHistory}>
+										<i className='bx bx-layer-plus'></i> Thêm ca học
+									</Button>
+								)}
+							/>
+						)}
+
+						{showHistoryTable && (
+							<MaterialReactTable
+								columns={columnSessionsHistory}
+								data={sessionsHistories}
+								initialState={{columnVisibility: {subjectId: false}}}
+								enableColumnOrdering
+								enableStickyHeader
+								enableColumnResizing
+								muiTablePaginationProps={{
+									rowsPerPageOptions: [10, 20, 50, 100],
+									showFirstButton: false,
+									showLastButton: false,
+								}}
+							/>
+						)}
 					</CardBody>
 				</Card>
 

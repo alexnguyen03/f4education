@@ -15,25 +15,22 @@ public class SessionsController {
 	@Autowired
 	SessionsServiceImpl sessionsService;
 
-
 	@GetMapping("")
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public List<SessionsDTO> getAllSession() {
 		return sessionsService.findAll();
 	}
 
 	@PostMapping("")
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public SessionsDTO createSessions(@RequestBody SessionsRequest sessionsRequest) {
 		return sessionsService.saveSessions(sessionsRequest);
 	}
 
-
 	@PutMapping("")
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public SessionsDTO updateSessions(@RequestBody SessionsRequest sessionsRequest) {
 		return sessionsService.saveSessions(sessionsRequest);
 	}
-
 
 }

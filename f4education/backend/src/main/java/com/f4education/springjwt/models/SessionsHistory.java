@@ -34,4 +34,11 @@ public class SessionsHistory implements Serializable {
 	private Date modifyDate;
 	@Column(name = "action")
 	private String action;
+
+	@Override
+	public String toString() {
+		return ", sessionName='" + sessionName + '\'' +
+				", startTime=" + startTime +
+				", endTime=" + endTime + '}';
+	}
 }

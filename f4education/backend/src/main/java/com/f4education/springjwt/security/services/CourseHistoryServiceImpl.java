@@ -17,7 +17,8 @@ public class CourseHistoryServiceImpl implements CourseHistoryService {
 
 	@Override
 	public List<CourseHistoryDTO> findAll() {
-		return courseHistoryRepository.findAll()
+		return courseHistoryRepository
+				.findAll()
 				.stream()
 				.map(this::convertEntityToDTO)
 				.collect(Collectors.toList());
