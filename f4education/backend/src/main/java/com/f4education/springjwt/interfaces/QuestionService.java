@@ -2,6 +2,7 @@ package com.f4education.springjwt.interfaces;
 
 import java.util.List;
 
+import com.f4education.springjwt.payload.request.QuestionDTORequest;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.payload.request.QuestionDTO;
@@ -12,7 +13,7 @@ public interface QuestionService {
 
 	QuestionDTO getQuestionById(Integer questionId);
 
-	QuestionDTO createQuestion(QuestionDTO questionDTO);
+	QuestionDTORequest createQuestion(QuestionDTORequest questionDTO);
 
 	QuestionDTO updateQuestion(Integer questionId, QuestionDTO questionDTO);
 }

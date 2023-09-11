@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findAllByAdmin_AdminId(String adminId);
+
+	List<Course> findAllByCourseName(String courseName);
 }

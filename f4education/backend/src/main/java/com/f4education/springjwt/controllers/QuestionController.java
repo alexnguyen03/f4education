@@ -2,6 +2,7 @@ package com.f4education.springjwt.controllers;
 
 import java.util.List;
 
+import com.f4education.springjwt.payload.request.QuestionDTORequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,30 +20,30 @@ import com.f4education.springjwt.security.services.QuestionServiceImpl;
 @RestController
 @RequestMapping("/api/questions")
 public class QuestionController {
-	@Autowired
-	QuestionServiceImpl questionService;
+    @Autowired
+    QuestionServiceImpl questionService;
 
-	@GetMapping
+    @GetMapping
 //	@PreAuthorize("hasRole('ADMIN')")
-	public List<QuestionDTO> findAll() {
-		return questionService.getAllQuestion();
-	}
+    public List<QuestionDTO> findAll() {
+        return questionService.getAllQuestion();
+    }
 
-	@GetMapping("/{id}")
+    @GetMapping("/{courseName}")
 //	@PreAuthorize("hasRole('ADMIN')")
-	public QuestionDTO findById(@PathVariable("id") Integer questionId) {
-		return questionService.getQuestionById(questionId);
-	}
+    public List<QuestionDTO> findByCourseName(@PathVariable("courseName") String courseName) {
+        return questionService.getQuestionByCourseName(courseName);
+    }
 
-	@PostMapping
-	public QuestionDTO createSubject(@RequestBody QuestionDTO questionDTO) {
-		return questionService.createQuestion(questionDTO);
-	}
+    @PostMapping
+    public QuestionDTORequest createSubject(@RequestBody QuestionDTORequest questionDTO) {
+        return questionService.createQuestion(questionDTO);
+    }
 
-	@PutMapping("/{id}")
+    @PutMapping("/{id}")
 //	@PreAuthorize("hasRole('ADMIN')")
-	public QuestionDTO updateSubject(@PathVariable("id") Integer questionId, @RequestBody QuestionDTO questionDTO) {
-		return questionService.updateQuestion(questionId, questionDTO);
-	}
+    public QuestionDTO updateSubject(@PathVariable("id") Integer questionId, @RequestBody QuestionDTO questionDTO) {
+        return questionService.updateQuestion(questionId, questionDTO);
+    }
 
 }

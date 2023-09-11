@@ -2,6 +2,7 @@ package com.f4education.springjwt.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,32 +22,45 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "Question")
 public class Question {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "question_id")
-	private Integer questionId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "question_id")
+    private Integer questionId;
 
-	@Column(name = "question_content")
-	private String questionContent;
+    @Column(name = "subject_name")
+    private String subjectName;
 
-	private String answer;
-	
-	private String levels;
-	
-	@OneToMany(mappedBy = "question")
-	List<QuestionHistory> questionHistory;
-	
-	@ManyToOne
-	@JoinColumn(name = "course_id")
-	Course course; 
-	
-	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	Admin admin;
+    @Column(name = "course_name")
+    private String courseName;
 
-	@Override
-	public String toString() {
-		return "Question [questionId=" + questionId + ", questionContent=" + questionContent + ", answer=" + answer
-				+ ", levels=" + levels + "]";
-	} 
+    @Column(name = "question_title")
+    private String questionTitle;
+
+    private String levels;
+
+//	@OneToMany(mappedBy = "question")
+//	List<QuestionHistory> questionHistory;
+
+    @OneToMany(mappedBy = "question")
+    List<Answer> answer;
+
+    @ManyToOne
+    @JsonIgnore
+    @JoinColumn(name = "course_id")
+    Course course;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    Admin admin;
+
+    @Override
+    public String toString() {
+        return "Question{" +
+                "questionId=" + questionId +
+                ", subjectName='" + subjectName + '\'' +
+                ", courseName='" + courseName + '\'' +
+                ", questionTitle='" + questionTitle + '\'' +
+                ", levels='" + levels + '\'' +
+                '}';
+    }
 }
