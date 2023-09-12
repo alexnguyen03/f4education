@@ -28,6 +28,8 @@ const Sessions = () => {
 	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
 	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
 	const [listHistoryById, setListHistoryById] = useState([]);
+	const [timeError, setTimeError] = useState('');
+	const [msgError, setMsgError] = useState({});
 
 	const [session, setSession] = useState({
 		admin: {
@@ -59,6 +61,8 @@ const Sessions = () => {
 
 	// Form action area
 	const handleChangeInput = (e) => {
+		validate();
+
 		setSession((preSession) => ({
 			...preSession,
 			[e.target.name]: e.target.value,
@@ -74,7 +78,25 @@ const Sessions = () => {
 			console.log(error);
 		}
 	};
-
+	const validate = () => {
+		if (session.sessionName === '') {
+			setMsgError((pre) => ({...pre, sessionNameError: 'Vui lòng nhập vào Tên ca học'}));
+		} else {
+			setMsgError((pre) => ({...pre, sessionNameError: ''}));
+		}
+		if (startRef.current.value === '') {
+			setMsgError((pre) => ({...pre, startTimeError: 'Vui lòng nhập vào Giờ bắt đầu'}));
+		} else {
+			setMsgError((pre) => ({...pre, startTimeError: ''}));
+		}
+		if (endRef.current.value === '') {
+			setMsgError((pre) => ({...pre, endTimeError: 'Vui lòng nhập vào Giờ kết thúc'}));
+		} else {
+			setMsgError((pre) => ({...pre, endTimeError: ''}));
+		}
+		if (session.sessionName != '' || startRef.current.value != '' || endRef.current.value != '') return true;
+		else return false;
+	};
 	const columnSessions = useMemo(
 		() => [
 			{
@@ -159,6 +181,13 @@ const Sessions = () => {
 	};
 
 	const handleInputTimeOnChange = (e) => {
+		validate();
+		if (startRef.current.value >= endRef.current.value) {
+			setTimeError('Giờ kết thúc phải sau giờ bắt đầu');
+		} else {
+			setTimeError('');
+		}
+
 		setSession((preSession) => ({
 			...preSession,
 			startTime: startRef.current.value,
@@ -167,23 +196,36 @@ const Sessions = () => {
 
 		console.log('🚀 ~ file: Sessions.js:145 ~ setSession ~ Session:', session);
 	};
+
 	const handleSubmitForm = (e) => {
 		e.preventDefault();
-
-		if (update) {
-			upateSessions();
-		} else {
-			addSessions();
+		validate();
+		if (!validate) {
+			return;
 		}
+		// if (update) {
+		// 	upateSessions();
+		// } else {
+		// 	addSessions();
+		// }
 	};
 
 	const handleShowAddForm = () => {
 		setShowModal(true);
+
 		setUpdate(false);
+		setSession((preSession) => ({
+			...preSession,
+			startTime: '',
+			endTime: '',
+		}));
 	};
 
 	const handleResetForm = () => {
 		setShowModal(false);
+		setTimeError('');
+		setMsgError({});
+
 		setSession({
 			admin: {
 				adminId: '',
@@ -395,27 +437,28 @@ const Sessions = () => {
 									/>
 								</FormGroup>
 							)}
-							<FormGroup className='mb-3'>
+							<FormGroup className=''>
 								<label
 									className='form-control-label'
 									htmlFor='name'>
-									Tên ca học
+									Tên ca học<span className='text-danger mx-1'>*</span>
 								</label>
+
 								<Input
 									className={''}
 									id='name'
-									required={true}
+									// required={true}
 									onChange={handleChangeInput}
 									name='sessionName'
 									value={session.sessionName}
 								/>
-								{/* <span className='text-danger'>{errorInputUpdateSubject.message}</span> */}
+
+								{msgError.sessionNameError && <span className='text-danger '>{msgError.sessionNameError}</span>}
 							</FormGroup>
 
 							<TimeInput
 								withSeconds
 								label='Giờ bắt đầu'
-								required={true}
 								ref={startRef}
 								onChange={handleInputTimeOnChange}
 								value={session.startTime}
@@ -430,14 +473,17 @@ const Sessions = () => {
 								}
 								// maw={400}
 								mx='auto'
-								className='mb-3'
+								className=''
 							/>
+							{msgError.startTimeError && <span className='text-danger mt-3'>{msgError.startTimeError}</span>}
+
 							<TimeInput
 								withSeconds
 								label='Giờ kết thúc'
 								ref={endRef}
 								radius='md'
-								required={true}
+								error={timeError}
+								min={session.startTime}
 								variant='default'
 								name='endTime'
 								onChange={handleInputTimeOnChange}
@@ -453,6 +499,7 @@ const Sessions = () => {
 								// maw={400}
 								mx='auto'
 							/>
+							{msgError.endTimeError && <span className='text-danger  mt-3'>{msgError.endTimeError}</span>}
 						</div>
 						<div className='modal-footer'>
 							<Button
