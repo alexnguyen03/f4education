@@ -1,5 +1,5 @@
-import {FormGroup, IconButton} from '@mui/material';
-import {Edit as EditIcon, EscalatorWarningOutlined, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
+import {Box, FormGroup, IconButton} from '@mui/material';
+import {Edit as EditIcon, EscalatorWarningOutlined, RemoveCircleOutline as RemoveCircleOutlineIcon, Search, Warning} from '@mui/icons-material';
 
 import SubjectHeader from 'components/Headers/SubjectHeader';
 import {MaterialReactTable} from 'material-react-table';
@@ -7,7 +7,7 @@ import moment from 'moment';
 import {useEffect, useMemo, useState} from 'react';
 
 // reactstrap components
-import {Badge, Button, Card, CardBody, CardHeader, Container, Form, Input, Modal} from 'reactstrap';
+import {Badge, Button, Card, CardBody, CardHeader, CardImg, Col, Container, Form, Input, Modal, Row} from 'reactstrap';
 
 import sessionsApi from 'api/sessionsApi';
 import SessionsHeader from 'components/Headers/SessionsHeader';
@@ -15,6 +15,9 @@ import {useRef} from 'react';
 import {TimeInput} from '@mantine/dates';
 import {ActionIcon} from '@mantine/core';
 import {IconClock} from '@tabler/icons-react';
+import {IconEyeSearch} from '@tabler/icons-react';
+import {Event, Timeline} from 'react-timeline-scribble';
+import ReactLoading from 'react-loading';
 
 const Sessions = () => {
 	// Main variable
@@ -22,6 +25,9 @@ const Sessions = () => {
 	const [sessionsHistories, setSessionsHistories] = useState([]);
 	const user = JSON.parse(localStorage.getItem('user') ?? '');
 	const [showHistoryTable, setShowHistoryTable] = useState(false);
+	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
+	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
+	const [listHistoryById, setListHistoryById] = useState([]);
 
 	const [session, setSession] = useState({
 		admin: {
@@ -225,6 +231,19 @@ const Sessions = () => {
 			console.log(error);
 		}
 	};
+	const handelShowHistory = async (id) => {
+		console.log('🚀 ~ file: Sessions.js:233 ~ handelShowHistory ~ id:', id);
+		setShowHistoryInfo(true);
+		setLoadingHistoryInfo(true);
+		try {
+			const resp = await sessionsApi.getHistoryBySessionId(id);
+			setListHistoryById(resp.reverse());
+			console.log('🚀 ~ file: Sessions.js:240 ~ handelShowHistory ~ resp:', resp);
+			setLoadingHistoryInfo(false);
+		} catch (error) {
+			console.log('failed to fetch data', error);
+		}
+	};
 	useEffect(() => {
 		fetchSessions();
 	}, []);
@@ -287,13 +306,22 @@ const Sessions = () => {
 									showLastButton: false,
 								}}
 								renderRowActions={({row}) => (
-									<IconButton
-										color='secondary'
-										onClick={() => {
-											handleEditForm(row);
-										}}>
-										<EditIcon />
-									</IconButton>
+									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
+										<IconButton
+											color='secondary'
+											onClick={() => {
+												handleEditForm(row);
+											}}>
+											<EditIcon />
+										</IconButton>
+										<IconButton
+											color='info'
+											onClick={() => {
+												handelShowHistory(row.original.sessionId);
+											}}>
+											<IconEyeSearch />
+										</IconButton>
+									</Box>
 								)}
 								// Top Add new Subject button
 								renderTopToolbarCustomActions={() => (
@@ -327,10 +355,6 @@ const Sessions = () => {
 					</CardBody>
 				</Card>
 
-				{/* Toast */}
-				{/* <ToastContainer /> */}
-
-				{/* Modal Add - Update Suject*/}
 				<Modal
 					className='modal-dialog-centered'
 					isOpen={showModal}
@@ -446,6 +470,81 @@ const Sessions = () => {
 							</Button>
 						</div>
 					</Form>
+				</Modal>
+				<Modal
+					className='modal-dialog-centered  modal-lg'
+					isOpen={showHistoryInfo}
+					toggle={() => setShowHistoryInfo((pre) => !pre)}>
+					<div className='modal-header'>
+						<h3 className='mb-0'>Lịch sử chỉnh sửa khóa học </h3>
+						<button
+							aria-label='Close'
+							className='close'
+							data-dismiss='modal'
+							type='button'
+							onClick={() => {
+								setShowHistoryInfo(false);
+							}}>
+							<span aria-hidden={true}>×</span>
+						</button>
+					</div>
+					<div className='modal-body'>
+						<div className='text-center  mb-3'>HIỆN TẠI - {moment(new Date()).format('DD/MM/yyyy, h:mm A')}</div>
+
+						{loadingHistoryInfo ? (
+							<div className='d-flex justify-content-center'>
+								<ReactLoading
+									type={'cylon'}
+									color='#357edd'
+								/>
+							</div>
+						) : (
+							listHistoryById.map((item) => (
+								<Timeline key={item.sessionsHistoryId}>
+									<Event
+										interval={<span className='fw-bold fs-3'>{moment(item.modifyDate).format('DD/MM/yyyy, h:mm A')}</span>}
+										title={<u className=''> {item.adminName}</u>}
+										subtitle={
+											<>
+												<p className='my-2'></p>
+												<span className={`alert alert-${item.action === 'UPDATE' ? 'primary' : 'success'} px-3 `}> {item.action === 'UPDATE' ? 'Cập nhật' : 'Thêm mới'} </span>
+											</>
+										}>
+										<Card>
+											<CardBody>
+												<div className='d-flex justify-content-center flex-column'>
+													<p>
+														<strong>Tên ca: </strong> {item.sessionName}
+														<p></p>
+														<strong>Thời gian học:</strong> Từ <strong> {item.startTime} </strong>- đến <strong> {item.endTime}</strong>
+													</p>
+												</div>
+											</CardBody>
+										</Card>
+									</Event>
+								</Timeline>
+							))
+						)}
+
+						{listHistoryById.length === 0 && !loadingHistoryInfo && (
+							<div className='text-warning text-center my-5 py-5'>
+								<Warning /> Không tìm thấy lịch sử{' '}
+							</div>
+						)}
+						<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>
+					</div>
+
+					<div className='modal-footer'>
+						<Button
+							color='secondary'
+							data-dismiss='modal'
+							type='button'
+							onClick={() => {
+								setShowHistoryInfo(false);
+							}}>
+							Đóng
+						</Button>
+					</div>
 				</Modal>
 			</Container>
 			{/* Page content end */}

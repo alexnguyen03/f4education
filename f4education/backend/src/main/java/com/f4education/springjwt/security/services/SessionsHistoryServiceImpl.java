@@ -45,4 +45,13 @@ public class SessionsHistoryServiceImpl implements SessionsHistoryService {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public List<SessionsHistoryDTO> findAllBySessionsId(Integer sessionId) {
+		return sessionsHistoryRepository
+				.findAllBySessionsSessionId(sessionId)
+				.stream()
+				.map(this::convertEntityToDTO)
+				.collect(Collectors.toList());
+	}
+
 }

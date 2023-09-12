@@ -17,6 +17,10 @@ const sessionsApi = {
 		const url = '/sessions-history';
 		return axiosClient.get(url);
 	},
+	getHistoryBySessionId: (id) => {
+		const url = `/sessions-history/${id}`;
+		return axiosClient.get(url);
+	},
 };
 
 export default sessionsApi;
