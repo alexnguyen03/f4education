@@ -596,7 +596,6 @@ const QuestionDetail = () => {
               <div className="container">
                 <Button
                   color="primary"
-                  outline
                   className="mt-3 ml-3 float-left"
                   onClick={handleAddGroup}
                 >

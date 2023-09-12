@@ -1,13 +1,12 @@
 package com.f4education.springjwt.repository;
 
-import com.f4education.springjwt.payload.request.QuestionDTO;
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import com.f4education.springjwt.models.Question;
-
-import java.util.List;
 
 @Repository
 public interface QuestionReposotory extends JpaRepository<Question, Integer> {
@@ -21,4 +20,7 @@ public interface QuestionReposotory extends JpaRepository<Question, Integer> {
 
     @Query("SELECT q FROM Question q WHERE q.courseName = :courseName")
     List<Question> findByCourseName(String courseName);
+    
+    @Query("SELECT MAX(q.questionId) FROM Question q")
+    Integer getMaxQuestionId();
 }

@@ -36,13 +36,13 @@ public class QuestionController {
     }
 
     @PostMapping
-    public QuestionDTORequest createSubject(@RequestBody QuestionDTORequest questionDTO) {
+    public QuestionDTORequest createQuestion(@RequestBody QuestionDTORequest questionDTO) {
         return questionService.createQuestion(questionDTO);
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{questionId}")
 //	@PreAuthorize("hasRole('ADMIN')")
-    public QuestionDTO updateSubject(@PathVariable("id") Integer questionId, @RequestBody QuestionDTO questionDTO) {
+    public QuestionDTORequest updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDTORequest questionDTO) {
         return questionService.updateQuestion(questionId, questionDTO);
     }
 

@@ -15,5 +15,5 @@ public interface QuestionService {
 
 	QuestionDTORequest createQuestion(QuestionDTORequest questionDTO);
 
-	QuestionDTO updateQuestion(Integer questionId, QuestionDTO questionDTO);
+	QuestionDTORequest updateQuestion(Integer questionId, QuestionDTORequest questionDTO);
 }

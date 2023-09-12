@@ -1,4 +1,4 @@
-import { Box, FormGroup, IconButton } from "@mui/material";
+import { FormGroup, IconButton } from "@mui/material";
 import QuestionHeader from "components/Headers/QuestionHeader";
 import { MaterialReactTable } from "material-react-table";
 import { useEffect, useMemo, useState } from "react";
@@ -20,9 +20,10 @@ import {
 // Axios
 import questionApi from "../../api/questionApi";
 import courseApi from "../../api/courseApi";
+import subjectApi from "../../api/subjectApi";
 
 //React Mantine
-import { Select } from "@mantine/core";
+import { Blockquote, Select } from "@mantine/core";
 import { Link } from "react-router-dom";
 import moment from "moment/moment";
 
@@ -105,33 +106,36 @@ const QuestionData = [
 ];
 
 const Questions = () => {
-  // Main variable
+  // ************* Main variable
   const [questions, setQuestions] = useState([]);
   const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [questionLoading, setQuestionLoading] = useState(false);
 
-  // Action variable
+  // ************* Get LocalStorage
+  const userDetail = JSON.parse(localStorage.getItem("user"));
+
+  // ************* Action variable
   const [showModal, setShowModal] = useState(false);
   const [isUpdate, setIsUpdate] = useState(false);
-  const [numberInputs, setNumberInputs] = useState(2); // Num input user choosen
-  const [answerInputValues, setAnswerInputValues] = useState({});
 
-  // Form variable
+  // ************* Form variable
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+  const [selectedCourseId, setSelectedCourseId] = useState("Default Null");
 
-  // Get LocalStorage
-  const user = JSON.parse(localStorage.getItem("user"));
-
-  // ************* Question Area
   const [question, setQuestion] = useState({
-    questionId: "",
-    questionTitle: [],
-    answer: "",
-    level: "",
-    courseId: "",
-    adminId: "",
+    subjectId: selectedSubjectId,
+    courseId: selectedCourseId,
+    questionTitle: "",
+    adminId: userDetail.username,
   });
 
-  // Api Area
+  const [answers, setAnswers] = useState({
+    text: "",
+    isCorrect: "",
+  });
+
+  // *************** Api Area
   const fetchQuestions = async () => {
     try {
       setQuestionLoading(true);
@@ -144,20 +148,52 @@ const Questions = () => {
     }
   };
 
-  // const fetchCourse = async () => {
-  //   try {
-  //     const resp = await courseApi.getAll();
-  //     setCourses(resp);
-  //   } catch (error) {
-  //     console.log(error);
-  //   }
-  // };
+  const fetchSubject = async () => {
+    try {
+      const resp = await subjectApi.getAllSubject();
+      setSubjects(resp);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCourse = async () => {
+    try {
+      const resp = await courseApi.getAll();
+      setCourses(resp);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   // API_AREA > CRUD
+  const handleStoreQuestions = async () => {
+    try {
+      console.log(question);
+      handleDataTranferAnswers();
 
-  // Validation area
+      // const body = question;
+      // const resp = await questionApi.createQuestion(body);
+      // console.log(resp.status);
+    } catch (error) {
+      console.log(error);
+    }
 
-  // Form action area
+    setShowModal(false);
+  };
+
+  const handleStoreAnswers = async () => {
+    try {
+      const body = answers;
+    } catch (error) {
+      console.log(error);
+    }
+    setShowModal(false);
+  };
+
+  // *************** Validation area
+
+  // *************** Form action area
   const handleChangeInput = (e) => {
     setQuestion((prevQuestion) => ({
       ...prevQuestion,
@@ -165,7 +201,17 @@ const Questions = () => {
     }));
   };
 
-  // React Data table area
+  // Tranfer and fill data to ANSWERS STATE
+  const handleDataTranferAnswers = () => {
+    const newAnswers = groups.map((group) => ({
+      isCorrect: group.radioValue,
+      text: group.inputValue,
+    }));
+    console.log(newAnswers);
+    setAnswers(newAnswers);
+  };
+
+  // *************** React Data table area
   function renderCellWithLink(row) {
     // console.log(row);
     const courseName = row.courseName;
@@ -213,12 +259,6 @@ const Questions = () => {
     ],
     []
   );
-
-  // *************** Use effect area
-  useEffect(() => {
-    fetchQuestions();
-    // fetchCourse();
-  }, []);
 
   // const [radioInputValues, setRadioInputValues] = useState([]);
   // Render Input buy number choosen
@@ -289,6 +329,7 @@ const Questions = () => {
   //   return inputs;
   // };
 
+  // *************** Render Input Answer AREA
   const [groups, setGroups] = useState([
     { radioValue: false, inputValue: "" },
     { radioValue: false, inputValue: "" },
@@ -342,6 +383,38 @@ const Questions = () => {
       </Col>
     ));
   };
+
+  // ************* Select Handle Logic AREA
+  const subjectSelectValues = subjects.map((item) => ({
+    value: item.subjectId,
+    label: item.subjectName,
+  }));
+
+  const handleChangeSelectSubject = (value) => {
+    setSelectedSubjectId(value);
+    question.subjectId = value;
+  };
+
+  const courseSelectValues = courses.map((item) => ({
+    value: item.courseId,
+    label: item.courseName,
+  }));
+
+  const handleChangeSelectCourse = (value) => {
+    setSelectedCourseId(value);
+    question.courseId = value;
+  };
+
+  // *************** UseEffect area
+  useEffect(() => {
+    fetchQuestions();
+    fetchSubject();
+    // fetchCourse();
+  }, []);
+
+  // useEffect(() => {
+  //   console.log(answers);
+  // }, [answers]);
 
   return (
     <>
@@ -465,13 +538,25 @@ const Questions = () => {
                     <label className="form-control-label" htmlFor="name">
                       Môn học
                     </label>
-                    <Select
+                    {/* <Select
                       // label="Your favorite framework/library"
-                      placeholder="Chon mon hoc"
+                      placeholder="Chọn môn học"
                       searchable
                       clearable
+                      value={value}
+                      onChange={setValue}
                       nothingFound="No options"
-                      data={["React", "Angular", "Java", "Vue"]}
+                      data={subjectSelectValue}
+                    /> */}
+                    <Select
+                      placeholder="Chọn môn học"
+                      searchable
+                      clearable
+                      name="subject"
+                      value={selectedSubjectId}
+                      onChange={handleChangeSelectSubject}
+                      nothingFound="No options"
+                      data={subjectSelectValues}
                     />
                   </FormGroup>
                 </Col>
@@ -482,7 +567,7 @@ const Questions = () => {
                     </label>
                     <Select
                       // label="Your favorite framework/library"
-                      placeholder="Chon khoa hoc"
+                      placeholder="Chọn khóa học"
                       searchable
                       clearable
                       nothingFound="No options"
@@ -508,13 +593,18 @@ const Questions = () => {
                       id="questionTitle"
                       onChange={handleChangeInput}
                       name="questionTitle"
-                      value={question.questionContent}
+                      value={question.questionTitle}
                     />
                   </FormGroup>
                 </Col>
                 <Col xl={12} lg={12} md={12} sm={12}>
                   <hr />
                   <h5 className="font-weight-600">Câu trả lời</h5>
+                  <Blockquote
+                    cite="Chọn vào radio để đánh dấu câu trả lời đúng!"
+                    icon={null}
+                    className="mt--4 p-0"
+                  ></Blockquote>
                   <div className="container">
                     <Row>
                       {/* <label className="form-control-label" htmlFor="name">
@@ -534,11 +624,11 @@ const Questions = () => {
                 </Col>
                 <div className="container">
                   <Button
-                    color="primary"
+                    color="dark"
                     className="mt-3 float-left"
                     onClick={handleAddGroup}
                   >
-                    Thêm câu trả lời
+                    <i className="bx bx-list-plus"></i> Thêm câu trả lời
                   </Button>
                 </div>
               </Row>
@@ -562,8 +652,7 @@ const Questions = () => {
               type="button"
               onClick={() => {
                 // isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
-                // toast("Cập nhật môn học thành công");
-                console.log(groups);
+                handleStoreQuestions();
               }}
             >
               {isUpdate ? "Cập nhật" : "Thêm môn học"}
