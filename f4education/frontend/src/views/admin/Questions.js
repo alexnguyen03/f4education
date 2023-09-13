@@ -13,6 +13,9 @@ import {
   Col,
   Container,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Modal,
   Row,
 } from "reactstrap";
@@ -107,7 +110,7 @@ const QuestionData = [
 
 const Questions = () => {
   // ************* Main variable
-  const [questions, setQuestions] = useState([]);
+  const [questions, setQuestions] = useState(QuestionData);
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [questionLoading, setQuestionLoading] = useState(false);
@@ -166,7 +169,7 @@ const Questions = () => {
     }
   };
 
-  // API_AREA > CRUD
+  // + API_AREA > CRUD
   const handleStoreQuestions = async () => {
     try {
       console.log(question);
@@ -207,7 +210,7 @@ const Questions = () => {
     setIsUpdate(true);
   };
 
-  // Tranfer and fill data to ANSWERS STATE
+  // + Tranfer and fill data to ANSWERS STATE
   const handleDataTranferAnswers = () => {
     const newAnswers = groups.map((group) => ({
       isCorrect: group.radioValue,
@@ -266,75 +269,6 @@ const Questions = () => {
     []
   );
 
-  // const [radioInputValues, setRadioInputValues] = useState([]);
-  // Render Input buy number choosen
-  // const handleNumInputsChange = (event) => {
-  //   const newNumInputs = parseInt(event.target.value);
-
-  //   if (newNumInputs < numberInputs) {
-  //     const newInputValues = answerInputValues.slice(0, newNumInputs);
-  //     const newRadioValues = radioInputValues.slice(0, newNumInputs);
-  //     setAnswerInputValues(newInputValues);
-  //     setRadioInputValues(newRadioValues);
-  //   }
-
-  //   setNumberInputs(newNumInputs);
-  // };
-
-  // const handleAddGroup = () => {
-  //   setNumberInputs(numberInputs + 1);
-  // };
-
-  // const renderInputs = () => {
-  //   const inputs = [];
-
-  //   for (let i = 0; i < numberInputs; i++) {
-  //     const handleChange = (e) => {
-  //       const newValues = [...answerInputValues];
-  //       newValues[i] = e.target.value;
-  //       setAnswerInputValues(newValues);
-  //     };
-
-  //     const handleRadioChange = (e) => {
-  //       const newRadioValues = [...radioInputValues];
-  //       newRadioValues[i] = e.target.value;
-  //       setRadioInputValues(newRadioValues);
-  //     };
-
-  //     inputs.push(
-  // <Col xl={6} lg={6} md={6} sm={12}>
-  //   <div key={i + 1}>
-  //     <FormGroup className="mt-3">
-  //       <label className="form-control-label">Câu trả lời {i + 1}</label>
-  //       <div className="d-flex align-items-center">
-  //         <div>
-  //           <label>
-  //             <input
-  //               type="radio"
-  //               value={`option${i}`}
-  //               className="mt-2"
-  //               name="answerCorrect"
-  //               checked={radioInputValues[i] === `option${i}`}
-  //               onChange={handleRadioChange}
-  //             />
-  //           </label>
-  //         </div>
-  //         <Input
-  //           className="form-control-alternative ml-2"
-  //           type="text"
-  //           value={answerInputValues[i] || ""}
-  //           onChange={handleChange}
-  //         />
-  //       </div>
-  //     </FormGroup>
-  //   </div>
-  // </Col>
-  //     );
-  //   }
-
-  //   return inputs;
-  // };
-
   // *************** Render Input Answer AREA
   const [groups, setGroups] = useState([
     { radioValue: false, inputValue: "" },
@@ -372,18 +306,47 @@ const Questions = () => {
             <div>
               <label>
                 <input
+                  className="mt-3"
                   type="radio"
                   checked={group.radioValue}
                   onChange={() => handleRadioChange(index)}
+                  style={{ width: "20px", height: "20px" }}
                 />
               </label>
             </div>
-            <Input
+            {/* <Input
               className="form-control-alternative ml-2"
               type="text"
               value={group.inputValue}
               onChange={(e) => handleInputChange(index, e.target.value)}
-            />
+            /> */}
+            {/* <InputGroup className="mb-4">
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <i className="ni ni-fat-delete" />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                placeholder="trả lời"
+                className="ml-2"
+                type="text"
+                value={group.inputValue}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+              />
+            </InputGroup> */}
+            <InputGroup className="ml-2">
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <i className="ni ni-fat-delete" />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                placeholder="question Title"
+                type="text"
+                value={group.inputValue}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+              />
+            </InputGroup>
           </div>
         </FormGroup>
       </Col>
@@ -413,14 +376,14 @@ const Questions = () => {
 
   // *************** UseEffect area
   useEffect(() => {
-    fetchQuestions();
-    fetchSubject();
+    // fetchQuestions();
+    // fetchSubject();
     // fetchCourse();
   }, []);
 
-  useEffect(() => {
-    console.log(userDetail);
-  }, [userDetail]);
+  // useEffect(() => {
+  //   console.log(userDetail);
+  // }, [userDetail]);
 
   return (
     <>
@@ -474,9 +437,11 @@ const Questions = () => {
               }}
               renderRowActions={({ row }) => (
                 <div className="d-flex justify-content-start py-1">
-                  <IconButton onClick={() => handleEditSubject(row)}>
-                    <EditIcon />
-                  </IconButton>
+                  <Link to={`/admin/questionDetail/${row.original.courseName}`}>
+                    <IconButton>
+                      <EditIcon />
+                    </IconButton>
+                  </Link>
                 </div>
               )}
               // Top Add new Subject button
@@ -594,13 +559,28 @@ const Questions = () => {
                     >
                       Tiêu đề câu hỏi?
                     </label>
-                    <Input
+                    {/* <Input
                       className="form-control-alternative"
                       id="questionTitle"
                       onChange={handleChangeInput}
                       name="questionTitle"
                       value={question.questionTitle}
-                    />
+                    /> */}
+                    <InputGroup>
+                      <InputGroupAddon addonType="prepend">
+                        <InputGroupText>
+                          <i className="ni ni-books" />
+                        </InputGroupText>
+                      </InputGroupAddon>
+                      <Input
+                        placeholder="question Title"
+                        type="text"
+                        id="questionTitle"
+                        onChange={handleChangeInput}
+                        name="questionTitle"
+                        value={question.questionTitle}
+                      />
+                    </InputGroup>
                   </FormGroup>
                 </Col>
                 <Col xl={12} lg={12} md={12} sm={12}>

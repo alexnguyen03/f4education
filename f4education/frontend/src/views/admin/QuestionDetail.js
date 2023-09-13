@@ -2,7 +2,7 @@ import { Alert, Badge, Blockquote, Select, Tabs } from "@mantine/core";
 import QuestionDetailHeader from "components/Headers/QuestionDetailHeader";
 import moment from "moment";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
-import { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import {
   Button,
@@ -12,6 +12,9 @@ import {
   Col,
   FormGroup,
   Input,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupText,
   Modal,
   Row,
 } from "reactstrap";
@@ -110,7 +113,7 @@ const AnswerData = [
 ];
 
 const QuestionDetail = () => {
-  // Route and Params
+  // ************* ROute and Params
   const courseName = "NextJS cơ bản cho người mới";
   // const { courseName } = useParams();
 
@@ -122,12 +125,11 @@ const QuestionDetail = () => {
     (pj) => pj.courseName.trim() === courseName.trim()
   );
 
-  // console.log(questionByCourseNameRoute);
-
-  // Main variable
+  // ************* Main variable
   const [questions, setQuestions] = useState(QuestionVSAnswerData);
-  // const [answers, setAnswers] = useState(questions.map((item) => item.answer));
   const [answers, setAnswers] = useState(AnswerData);
+  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
 
   // const questionByCourNameFilter = answers.filter(
   //   (answer) =>
@@ -138,72 +140,48 @@ const QuestionDetail = () => {
   //   questionByCourNameFilter
   // );
 
-  // Number of render Input for answer
-  const [numberInputs, setNumberInputs] = useState(0); // Num input user choosen
-  const [answerInputValues, setAnswerInputValues] = useState([]);
-
-  // Action variable
+  // ************* Action variable
   const [editAnswer, setEditAnswer] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editQuestionId, setEditQuestionId] = useState(null);
   const [isUpdate, setIsUpdate] = useState(false);
-  // const [deleteQuestion, setDeleteQuestion] = useState(false);
 
-  // Form Variable
+  // ************* Form variable
   const [selectedAnswers, setSelectedAnswers] = useState({});
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+  const [selectedCourseId, setSelectedCourseId] = useState("Default Null");
+
   const [answer, setAnswer] = useState({
     id: "",
     answerText: "",
     questionId: "",
   });
+  const [question, setQuestion] = useState({
+    subjectId: selectedSubjectId,
+    courseId: selectedCourseId,
+    questionTitle: "",
+    adminId: "namnguyen",
+  });
 
-  // Lấy danh sách các câu hỏi theo courseName
-  // const getQuestionsByCourseName = (courseName) => {
-  //   return answerData
-  //     .filter((answer) => answer.question.courseName === courseName)
-  //     .map((answer) => answer.question);
-  // };
+  // ************* API AREA
 
-  // Lấy các câu trả lời cho một câu hỏi dựa trên questionId
-  // const getAnswersByQuestionId = (questionId) => {
-  //   return answerData.filter(
-  //     (answer) => answer.question.questionId === questionId
-  //   );
-  // };
+  // + API > CRUD
 
-  // Lấy danh sách các khóa học duy nhất
-  // const getUniqueCourses = () => {
-  //   const uniqueCourses = [
-  //     ...new Set(answerData.map((answer) => answer.question.courseName)),
-  //   ];
-  //   return uniqueCourses;
-  // };
-
-  // Question GRID AREA
-  // input footer Card
-  const handleOnchangeInputAnswer = (e) => {
-    setAnswer({ ...answer, answerText: e.target.value });
-  };
-
+  // *************** Validation area
   // Change span to input and get value
   const handlesetEditAbleInput = (prev) => {
     setEditAnswer(!prev);
   };
 
-  const handleSetIsEditngFunction = (prev) => {
-    setIsEditing(!prev);
-  };
-
   //  function set Edit when click edit button
-  const handleEditQuestion = (as) => {
+  const handleEditQuestion = (qs) => {
     // set action render UI
-    answer.id = as.answerId;
-    answer.questionId = as.questionId;
-    handlesetEditAbleInput(editAnswer);
-    setEditQuestionId(as.questionId);
-    // Action change data
+    answer.id = qs.answerId;
+    answer.questionId = qs.questionId;
 
+    handlesetEditAbleInput(editAnswer);
+    setEditQuestionId(qs.questionId);
     // setIsEditngFunction(isEditing);
   };
 
@@ -217,31 +195,33 @@ const QuestionDetail = () => {
     // Handle Change Data
   };
 
-  // FORM VARIABLE
-  const [courses, setCourses] = useState([]);
-  const [subjects, setSubjects] = useState([]);
+  // *************** Form action area
+  const handleStoreQuestions = async () => {
+    try {
+      console.log(question);
+      handleDataTranferAnswers();
 
-  // ************* Form variable
-  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
-  const [selectedCourseId, setSelectedCourseId] = useState("Default Null");
-  const [question, setQuestion] = useState({
-    subjectId: selectedSubjectId,
-    courseId: selectedCourseId,
-    questionTitle: "",
-    adminId: "namnguyen",
-  });
+      // const body = question;
+      // const resp = await questionApi.createQuestion(body);
+      // console.log(resp.status);
+    } catch (error) {
+      console.log(error);
+    }
 
-  const handleStoreNewQuestion = () => {
-    // Lưu giá trị vào mảng hoặc thực hiện các xử lý khác
-    console.log(groups);
+    setShowModal(false);
   };
 
-  //  handle get valule of answerText in foooter Card select
-  const getAnswerTextByQuestionId = (questionId) => {
-    // console.log(selectedAnswers);
-    return selectedAnswers[questionId] || null;
+  // + Tranfer and fill data to ANSWERS STATE
+  const handleDataTranferAnswers = () => {
+    const newAnswers = groups.map((group) => ({
+      isCorrect: group.radioValue,
+      text: group.inputValue,
+    }));
+    console.log(newAnswers);
+    // setAnswers(newAnswers);
   };
 
+  // *************** render input in create new question modal
   const [groups, setGroups] = useState([
     { radioValue: false, inputValue: "" },
     { radioValue: false, inputValue: "" },
@@ -278,18 +258,48 @@ const QuestionDetail = () => {
             <div>
               <label>
                 <input
+                  className="mt-3"
                   type="radio"
                   checked={group.radioValue}
                   onChange={() => handleRadioChange(index)}
+                  style={{ width: "20px", height: "20px" }}
                 />
               </label>
             </div>
-            <Input
+            {/* <Input
               className="form-control-alternative ml-2"
               type="text"
               value={group.inputValue}
               onChange={(e) => handleInputChange(index, e.target.value)}
-            />
+            /> */}
+            {/* <InputGroup className="mb-4">
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <i className="ni ni-fat-delete" />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                placeholder="trả lời"
+                className="ml-2"
+                type="text"
+                value={group.inputValue}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+              />
+            </InputGroup> */}
+            <InputGroup className="ml-2">
+              <InputGroupAddon addonType="prepend">
+                <InputGroupText>
+                  <i className="ni ni-fat-delete" />
+                </InputGroupText>
+              </InputGroupAddon>
+              <Input
+                className="pl-2"
+                placeholder="câu trả lời"
+                type="text"
+                value={group.inputValue}
+                onChange={(e) => handleInputChange(index, e.target.value)}
+              />
+            </InputGroup>
           </div>
         </FormGroup>
       </Col>
@@ -303,32 +313,7 @@ const QuestionDetail = () => {
     }));
   };
 
-  const handleStoreQuestions = async () => {
-    try {
-      console.log(question);
-      handleDataTranferAnswers();
-
-      // const body = question;
-      // const resp = await questionApi.createQuestion(body);
-      // console.log(resp.status);
-    } catch (error) {
-      console.log(error);
-    }
-
-    setShowModal(false);
-  };
-
-  // Tranfer and fill data to ANSWERS STATE
-  const handleDataTranferAnswers = () => {
-    const newAnswers = groups.map((group) => ({
-      isCorrect: group.radioValue,
-      text: group.inputValue,
-    }));
-    console.log(newAnswers);
-    // setAnswers(newAnswers);
-  };
-
-  // ************* Select Handle Logic AREA
+  // ************* Select Handle Logic AREA create question modal
   const subjectSelectValues = subjects.map((item) => ({
     value: item.subjectId,
     label: item.subjectName,
@@ -349,19 +334,77 @@ const QuestionDetail = () => {
     question.courseId = value;
   };
 
-  const [questionAndAnswerGroups, setQuestionAndAnswerGroups] = useState({
-    questionId: "",
-    questionTitle: "",
-    answer: [
-      {
-        answerId: "",
-        text: "",
-        questionId: "",
-      },
-    ],
-  });
+  // *************** Render question and answer AREA
+  //  handle get valule of answerText in foooter Card select
+  const getAnswerTextByQuestionId = (questionId) => {
+    // console.log(selectedAnswers);
+    return selectedAnswers[questionId] || null;
+  };
 
-  const renderGroupsQuestionAndAnswers = () => {
+  // render UI answers inside question card
+  const renderAnswers = (question) => {
+    return answers.map((answerDetail) => (
+      <>
+        {answerDetail.questionId === question.questionId ? (
+          <Col lg={12} xl={12} md={12} sm={12} key={answerDetail.answerId}>
+            <div className="d-flex gap-3">
+              {editAnswer && question.questionId === editQuestionId ? (
+                <div className="d-flex align-items-center mb-2 mr-4">
+                  <label>
+                    <input
+                      type="radio"
+                      name={`radio_${answerDetail.questionId}`}
+                      // checked={answerDetail.isCorrect}
+                      // onChange={(e) => handleChangeAnswers(e)}
+                    />
+                  </label>
+                </div>
+              ) : (
+                <>
+                  <div style={{ width: "40px", height: "40px" }}>
+                    {answerDetail.isCorrect ? (
+                      <i className="bx bx-check-circle text-success"></i>
+                    ) : (
+                      <i className="bx bx-x-circle text-danger"></i>
+                    )}
+                  </div>
+                </>
+              )}
+
+              {editAnswer && question.questionId === editQuestionId ? (
+                <input
+                  className="answer-input text-dark ml--2 mb-1"
+                  // onChange={(e) => {
+                  // handleChangeAnswers(e);
+                  // }}
+                  key={answerDetail.answerId}
+                  name="text"
+                  // value={answerDetail.text}
+                />
+              ) : (
+                <span
+                  className="text-dark ml--2 mb-1"
+                  key={answerDetail.answerId}
+                >
+                  {answerDetail.text}
+                </span>
+              )}
+            </div>
+          </Col>
+        ) : (
+          <></>
+        )}
+      </>
+    ));
+  };
+
+  const handleEditQuestionByQuestionId = (qs) => {
+    handleEditQuestion(qs);
+    handleFilterByQuestionIdAnswer();
+  };
+
+  // render UI questions
+  const renderGroupsQuestion = () => {
     return QuestionVSAnswerData.map((qs, index) => (
       <>
         <Col lg={6} xl={6} md={12} sm={12} key={qs.questionId} className="mb-3">
@@ -379,58 +422,14 @@ const QuestionDetail = () => {
               {/* Answer Display Area */}
               <div style={{ height: "180px", overflowY: "auto" }}>
                 <Row>
-                  {/* Fil answer by questionId */}
                   {/* if answer.questionId === qs.questionId */}
-                  {answers.map((answerDetail) => (
-                    <>
-                      {answerDetail.questionId === qs.questionId ? (
-                        <>
-                          <Col
-                            lg={12}
-                            xl={12}
-                            md={12}
-                            sm={12}
-                            key={answerDetail.answerId}
-                          >
-                            <div className="d-flex gap-3">
-                              <div style={{ width: "40px", height: "40px" }}>
-                                {answerDetail.isCorrect ? (
-                                  <i className="bx bx-check-circle text-success"></i>
-                                ) : (
-                                  <i className="bx bx-x-circle text-danger"></i>
-                                )}
-                              </div>
-
-                              {editAnswer &&
-                              qs.questionId === editQuestionId ? (
-                                <input
-                                  className="answer-input text-dark ml--2 mb-1"
-                                  onChange={(e) => handleOnchangeInputAnswer(e)}
-                                  key={answerDetail.answerId}
-                                  name="answerText"
-                                  value={answerDetail.text}
-                                />
-                              ) : (
-                                <span
-                                  className="text-dark ml--2 mb-1"
-                                  key={answerDetail.answerId}
-                                >
-                                  {answerDetail.text}
-                                </span>
-                              )}
-                            </div>
-                          </Col>
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </>
-                  ))}
+                  {renderAnswers(qs)}
                 </Row>
               </div>
             </CardBody>
             {/* Action Area */}
             <CardFooter>
+              {/* Select true answer */}
               <FormGroup>
                 <Select
                   // label="Chọn câu trả lời đúng"
@@ -451,9 +450,11 @@ const QuestionDetail = () => {
                   }))}
                 />
               </FormGroup>
+              {/* Update button */}
               {editAnswer && qs.questionId === editQuestionId ? (
                 <Button
                   color="warning"
+                  outline
                   role="button"
                   className="float-left"
                   onClick={handleUpdateQuestion}
@@ -464,6 +465,7 @@ const QuestionDetail = () => {
                 <>
                   <Button
                     color="warning"
+                    outline
                     disabled
                     role="button"
                     className="float-left"
@@ -474,25 +476,18 @@ const QuestionDetail = () => {
                 </>
               )}
 
-              {/* <Button
-                    color="primary"
-                    outline
-                    role="button"
-                    className="float-right"
-                    onClick={() => handleEditQuestion(qs)}
-                  >
-                    {/* <i className="bx bx-edit"></i> */}
-              {/* <EditIcon />
-                  </Button>  */}
-
+              {/* Edit button */}
               <IconButton
                 color="secondary"
                 className="float-right"
-                onClick={() => handleEditQuestion(qs)}
+                onClick={() => {
+                  handleEditQuestionByQuestionId(qs);
+                }}
               >
                 <EditIcon />
               </IconButton>
 
+              {/* Delete button */}
               {!isEditing && qs.questionId !== editQuestionId ? (
                 <IconButton className="float-right mr-2 text-danger">
                   <DeleteIcon />
@@ -510,6 +505,38 @@ const QuestionDetail = () => {
       </>
     ));
   };
+
+  // *************** Action question and answer AREA
+  const [groupAnswer, setGroupAnswers] = useState(
+    answers.map((answer) => ({
+      answerId: answer.answerId,
+      text: answer.text,
+      isCorrect: answer.isCorrect,
+      questionId: answer.questionId,
+    }))
+  );
+  const [filterGroupAnswerByQuestionId, setFilterGroupAnswerByQuestionId] =
+    useState([]);
+
+  const handleFilterByQuestionIdAnswer = () => {
+    // if (isEditing) {
+    setFilterGroupAnswerByQuestionId(
+      groupAnswer.filter((answer) => answer.questionId === editQuestionId)
+    );
+    // }
+    console.log(filterGroupAnswerByQuestionId);
+  };
+
+  const handleOnchangeInputAnswersValue = (value, index) => {};
+
+  // *************** UseEffect AREA
+  // useEffect(() => {
+  //   console.log(groupAnswer);
+  // }, [groupAnswer]);
+
+  useEffect(() => {
+    handleFilterByQuestionIdAnswer();
+  }, [editQuestionId]);
 
   return (
     <>
@@ -557,11 +584,13 @@ const QuestionDetail = () => {
           </div>
           <div>
             <Button
-              color="primary"
+              color={isUpdate ? "primary" : "success"}
               onClick={() => setShowModal(true)}
-              className="mt-3 mt-lg-0 mt-xl-0"
+              variant="contained"
+              id="addSubjects"
+              // disabled={isSubjectHistoryShowing}
             >
-              Thêm câu hỏi mới
+              <i className="bx bx-layer-plus"></i> Thêm câu hỏi
             </Button>
           </div>
         </div>
@@ -569,7 +598,8 @@ const QuestionDetail = () => {
         <hr className="text-muted" />
         {/* Tabs */}
         <div>
-          <Tabs defaultValue="overview">
+          <Tabs>
+            {/* defaultValue="overview" */}
             <Tabs.List>
               <Tabs.Tab
                 rightSection={
@@ -599,7 +629,7 @@ const QuestionDetail = () => {
       <main className="container">
         <Row className="mt-3">
           {/* Item */}
-          {renderGroupsQuestionAndAnswers()}
+          {renderGroupsQuestion()}
         </Row>
       </main>
 
@@ -696,18 +726,34 @@ const QuestionDetail = () => {
                   <label className="form-control-label" htmlFor="questionTitle">
                     Tiêu đề câu hỏi?
                   </label>
-                  <Input
+                  {/* <Input
                     className="form-control-alternative"
                     id="questionTitle"
                     onChange={handleChangeInput}
                     name="questionTitle"
                     value={question.questionTitle}
-                  />
+                  /> */}
+                  <InputGroup>
+                    <InputGroupAddon addonType="prepend">
+                      <InputGroupText>
+                        <i className="ni ni-books" />
+                      </InputGroupText>
+                    </InputGroupAddon>
+                    <Input
+                      placeholder="câu hỏi?"
+                      className="pl-2"
+                      type="text"
+                      id="questionTitle"
+                      onChange={handleChangeInput}
+                      name="questionTitle"
+                      value={question.questionTitle}
+                    />
+                  </InputGroup>
                 </FormGroup>
               </Col>
               <Col xl={12} lg={12} md={12} sm={12}>
                 <hr />
-                <h5 className="font-weight-600">Câu trả lời</h5>
+                <h4 className="font-weight-600">Câu trả lời</h4>
                 <Blockquote
                   cite="Chọn vào radio để đánh dấu câu trả lời đúng!"
                   icon={null}
