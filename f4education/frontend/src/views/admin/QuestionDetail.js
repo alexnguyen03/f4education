@@ -1,4 +1,4 @@
-import { Alert, Badge, Select, Tabs } from "@mantine/core";
+import { Alert, Badge, Blockquote, Select, Tabs } from "@mantine/core";
 import QuestionDetailHeader from "components/Headers/QuestionDetailHeader";
 import moment from "moment";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
@@ -17,7 +17,7 @@ import {
 } from "reactstrap";
 import { IconButton } from "@mui/material";
 
-const QuestionVSAnswerDate = [
+const QuestionVSAnswerData = [
   {
     questionId: 1,
     subjectName: "NextJS",
@@ -70,6 +70,45 @@ const QuestionVSAnswerDate = [
   },
 ];
 
+const AnswerData = [
+  {
+    answerId: 1,
+    text: "câu trả lời 1",
+    isCorrect: false,
+    questionId: 1,
+  },
+  {
+    answerId: 2,
+    text: "câu trả lời 2",
+    isCorrect: false,
+    questionId: 1,
+  },
+  {
+    answerId: 3,
+    text: "câu trả lời 3",
+    isCorrect: true,
+    questionId: 1,
+  },
+  {
+    answerId: 4,
+    text: "câu trả lời 4",
+    isCorrect: false,
+    questionId: 1,
+  },
+  {
+    answerId: 5,
+    text: "câu trả lời 1",
+    isCorrect: true,
+    questionId: 6,
+  },
+  {
+    answerId: 6,
+    text: "câu trả lời 2",
+    isCorrect: false,
+    questionId: 6,
+  },
+];
+
 const QuestionDetail = () => {
   // Route and Params
   const courseName = "NextJS cơ bản cho người mới";
@@ -79,16 +118,16 @@ const QuestionDetail = () => {
   //   (pj) => pj.courseName.trim() === courseName.trim()
   // );
 
-  const questionByCourseNameRoute = QuestionVSAnswerDate.find(
+  const questionByCourseNameRoute = QuestionVSAnswerData.find(
     (pj) => pj.courseName.trim() === courseName.trim()
   );
 
-  console.log(questionByCourseNameRoute);
+  // console.log(questionByCourseNameRoute);
 
   // Main variable
-  const [questions, setQuestions] = useState(QuestionVSAnswerDate);
+  const [questions, setQuestions] = useState(QuestionVSAnswerData);
   // const [answers, setAnswers] = useState(questions.map((item) => item.answer));
-  // const [answers, setAnswers] = useState(answerData);
+  const [answers, setAnswers] = useState(AnswerData);
 
   // const questionByCourNameFilter = answers.filter(
   //   (answer) =>
@@ -179,6 +218,19 @@ const QuestionDetail = () => {
   };
 
   // FORM VARIABLE
+  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+
+  // ************* Form variable
+  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
+  const [selectedCourseId, setSelectedCourseId] = useState("Default Null");
+  const [question, setQuestion] = useState({
+    subjectId: selectedSubjectId,
+    courseId: selectedCourseId,
+    questionTitle: "",
+    adminId: "namnguyen",
+  });
+
   const handleStoreNewQuestion = () => {
     // Lưu giá trị vào mảng hoặc thực hiện các xử lý khác
     console.log(groups);
@@ -186,11 +238,10 @@ const QuestionDetail = () => {
 
   //  handle get valule of answerText in foooter Card select
   const getAnswerTextByQuestionId = (questionId) => {
-    console.log(selectedAnswers);
+    // console.log(selectedAnswers);
     return selectedAnswers[questionId] || null;
   };
 
-  // Render Add new questions
   const [groups, setGroups] = useState([
     { radioValue: false, inputValue: "" },
     { radioValue: false, inputValue: "" },
@@ -218,7 +269,7 @@ const QuestionDetail = () => {
     setGroups([...groups, newGroup]);
   };
 
-  const renderAnswerInputs = () => {
+  const renderInputs = () => {
     return groups.map((group, index) => (
       <Col xl={6} lg={6} md={6} sm={12} key={index + 1}>
         <FormGroup className="mt-3">
@@ -242,6 +293,221 @@ const QuestionDetail = () => {
           </div>
         </FormGroup>
       </Col>
+    ));
+  };
+
+  const handleChangeInput = (e) => {
+    setQuestion((prevQuestion) => ({
+      ...prevQuestion,
+      [e.target.name]: e.target.value,
+    }));
+  };
+
+  const handleStoreQuestions = async () => {
+    try {
+      console.log(question);
+      handleDataTranferAnswers();
+
+      // const body = question;
+      // const resp = await questionApi.createQuestion(body);
+      // console.log(resp.status);
+    } catch (error) {
+      console.log(error);
+    }
+
+    setShowModal(false);
+  };
+
+  // Tranfer and fill data to ANSWERS STATE
+  const handleDataTranferAnswers = () => {
+    const newAnswers = groups.map((group) => ({
+      isCorrect: group.radioValue,
+      text: group.inputValue,
+    }));
+    console.log(newAnswers);
+    // setAnswers(newAnswers);
+  };
+
+  // ************* Select Handle Logic AREA
+  const subjectSelectValues = subjects.map((item) => ({
+    value: item.subjectId,
+    label: item.subjectName,
+  }));
+
+  const handleChangeSelectSubject = (value) => {
+    setSelectedSubjectId(value);
+    question.subjectId = value;
+  };
+
+  const courseSelectValues = courses.map((item) => ({
+    value: item.courseId,
+    label: item.courseName,
+  }));
+
+  const handleChangeSelectCourse = (value) => {
+    setSelectedCourseId(value);
+    question.courseId = value;
+  };
+
+  const [questionAndAnswerGroups, setQuestionAndAnswerGroups] = useState({
+    questionId: "",
+    questionTitle: "",
+    answer: [
+      {
+        answerId: "",
+        text: "",
+        questionId: "",
+      },
+    ],
+  });
+
+  const renderGroupsQuestionAndAnswers = () => {
+    return QuestionVSAnswerData.map((qs, index) => (
+      <>
+        <Col lg={6} xl={6} md={12} sm={12} key={qs.questionId} className="mb-3">
+          <Card style={{ minWidth: "400px", minHeight: "365px" }}>
+            <CardBody>
+              {/* Title Question */}
+              <h4
+                className="p-2"
+                style={{ background: "#f1f1f1", borderRadius: "3px" }}
+              >
+                <span className="text-dark font-weight-600">
+                  Question {index + 1}: {qs.questionTitle}
+                </span>
+              </h4>
+              {/* Answer Display Area */}
+              <div style={{ height: "180px", overflowY: "auto" }}>
+                <Row>
+                  {/* Fil answer by questionId */}
+                  {/* if answer.questionId === qs.questionId */}
+                  {answers.map((answerDetail) => (
+                    <>
+                      {answerDetail.questionId === qs.questionId ? (
+                        <>
+                          <Col
+                            lg={12}
+                            xl={12}
+                            md={12}
+                            sm={12}
+                            key={answerDetail.answerId}
+                          >
+                            <div className="d-flex gap-3">
+                              <div style={{ width: "40px", height: "40px" }}>
+                                {answerDetail.isCorrect ? (
+                                  <i className="bx bx-check-circle text-success"></i>
+                                ) : (
+                                  <i className="bx bx-x-circle text-danger"></i>
+                                )}
+                              </div>
+
+                              {editAnswer &&
+                              qs.questionId === editQuestionId ? (
+                                <input
+                                  className="answer-input text-dark ml--2 mb-1"
+                                  onChange={(e) => handleOnchangeInputAnswer(e)}
+                                  key={answerDetail.answerId}
+                                  name="answerText"
+                                  value={answerDetail.text}
+                                />
+                              ) : (
+                                <span
+                                  className="text-dark ml--2 mb-1"
+                                  key={answerDetail.answerId}
+                                >
+                                  {answerDetail.text}
+                                </span>
+                              )}
+                            </div>
+                          </Col>
+                        </>
+                      ) : (
+                        <></>
+                      )}
+                    </>
+                  ))}
+                </Row>
+              </div>
+            </CardBody>
+            {/* Action Area */}
+            <CardFooter>
+              <FormGroup>
+                <Select
+                  // label="Chọn câu trả lời đúng"
+                  placeholder="Chọn câu trả lời đúng"
+                  searchable
+                  clearable
+                  nothingFound="Vui lòng nhập câu trả lời khác"
+                  value={getAnswerTextByQuestionId(qs.questionId)}
+                  onChange={(value) =>
+                    setSelectedAnswers((prevSelectedAnswers) => ({
+                      ...prevSelectedAnswers,
+                      [qs.questionId]: value, // Update selected answer for the specific questionId
+                    }))
+                  }
+                  data={qs.answer.map((answerDetail) => ({
+                    value: answerDetail.answerId,
+                    label: answerDetail.text,
+                  }))}
+                />
+              </FormGroup>
+              {editAnswer && qs.questionId === editQuestionId ? (
+                <Button
+                  color="warning"
+                  role="button"
+                  className="float-left"
+                  onClick={handleUpdateQuestion}
+                >
+                  Cập nhật
+                </Button>
+              ) : (
+                <>
+                  <Button
+                    color="warning"
+                    disabled
+                    role="button"
+                    className="float-left"
+                    onClick={handleUpdateQuestion}
+                  >
+                    Cập nhật
+                  </Button>
+                </>
+              )}
+
+              {/* <Button
+                    color="primary"
+                    outline
+                    role="button"
+                    className="float-right"
+                    onClick={() => handleEditQuestion(qs)}
+                  >
+                    {/* <i className="bx bx-edit"></i> */}
+              {/* <EditIcon />
+                  </Button>  */}
+
+              <IconButton
+                color="secondary"
+                className="float-right"
+                onClick={() => handleEditQuestion(qs)}
+              >
+                <EditIcon />
+              </IconButton>
+
+              {!isEditing && qs.questionId !== editQuestionId ? (
+                <IconButton className="float-right mr-2 text-danger">
+                  <DeleteIcon />
+                </IconButton>
+              ) : (
+                <>
+                  <IconButton className="float-right mr-2 text-danger" disabled>
+                    <DeleteIcon />
+                  </IconButton>
+                </>
+              )}
+            </CardFooter>
+          </Card>
+        </Col>
+      </>
     ));
   };
 
@@ -333,153 +599,7 @@ const QuestionDetail = () => {
       <main className="container">
         <Row className="mt-3">
           {/* Item */}
-          {questions.map((qs, index) => (
-            <Col
-              lg={6}
-              xl={6}
-              md={12}
-              sm={12}
-              key={qs.questionId}
-              className="mb-3"
-            >
-              <Card style={{ minWidth: "400px", minHeight: "365px" }}>
-                <CardBody>
-                  {/* Title Question */}
-                  <h4
-                    className="p-2"
-                    style={{ background: "#f1f1f1", borderRadius: "3px" }}
-                  >
-                    <span className="text-dark font-weight-600">
-                      Question {index + 1}: {qs.questionTitle}
-                    </span>
-                  </h4>
-                  {/* Answer Display Area */}
-                  <div style={{ height: "180px", overflowY: "auto" }}>
-                    <Row>
-                      {qs.answer.map((answerDetail) => (
-                        <>
-                          <Col
-                            lg={12}
-                            xl={12}
-                            md={12}
-                            sm={12}
-                            key={answerDetail.answerId}
-                          >
-                            <div className="d-flex gap-3">
-                              <div style={{ width: "40px", height: "40px" }}>
-                                {answerDetail.isCorrect ? (
-                                  <i className="bx bx-check-circle text-success"></i>
-                                ) : (
-                                  <i className="bx bx-x-circle text-danger"></i>
-                                )}
-                              </div>
-
-                              {editAnswer &&
-                              qs.questionId === editQuestionId ? (
-                                <input
-                                  className="answer-input text-dark ml--2 mb-1"
-                                  onChange={(e) => handleOnchangeInputAnswer(e)}
-                                  key={answerDetail.answerId}
-                                  name="answerText"
-                                  value={answerDetail.text}
-                                />
-                              ) : (
-                                <span
-                                  className="text-dark ml--2 mb-1"
-                                  key={answerDetail.answerId}
-                                >
-                                  {answerDetail.text}
-                                </span>
-                              )}
-                            </div>
-                          </Col>
-                        </>
-                      ))}
-                    </Row>
-                  </div>
-                </CardBody>
-                {/* Action Area */}
-                <CardFooter>
-                  <FormGroup>
-                    <Select
-                      // label="Chọn câu trả lời đúng"
-                      placeholder="Chọn câu trả lời đúng"
-                      searchable
-                      clearable
-                      nothingFound="Vui lòng nhập câu trả lời khác"
-                      value={getAnswerTextByQuestionId(qs.questionId)}
-                      onChange={(value) =>
-                        setSelectedAnswers((prevSelectedAnswers) => ({
-                          ...prevSelectedAnswers,
-                          [qs.questionId]: value, // Update selected answer for the specific questionId
-                        }))
-                      }
-                      data={qs.answer.map((answerDetail) => ({
-                        value: answerDetail.answerId,
-                        label: answerDetail.text,
-                      }))}
-                    />
-                  </FormGroup>
-                  {editAnswer && qs.questionId === editQuestionId ? (
-                    <Button
-                      color="warning"
-                      role="button"
-                      className="float-left"
-                      onClick={handleUpdateQuestion}
-                    >
-                      Cập nhật
-                    </Button>
-                  ) : (
-                    <>
-                      <Button
-                        color="warning"
-                        disabled
-                        role="button"
-                        className="float-left"
-                        onClick={handleUpdateQuestion}
-                      >
-                        Cập nhật
-                      </Button>
-                    </>
-                  )}
-
-                  {/* <Button
-                    color="primary"
-                    outline
-                    role="button"
-                    className="float-right"
-                    onClick={() => handleEditQuestion(qs)}
-                  >
-                    {/* <i className="bx bx-edit"></i> */}
-                  {/* <EditIcon />
-                  </Button>  */}
-
-                  <IconButton
-                    color="secondary"
-                    className="float-right"
-                    onClick={() => handleEditQuestion(qs)}
-                  >
-                    <EditIcon />
-                  </IconButton>
-
-                  {!isEditing && qs.questionId !== editQuestionId ? (
-                    <IconButton className="float-right mr-2 text-danger">
-                      <DeleteIcon />
-                    </IconButton>
-                  ) : (
-                    <>
-                      <IconButton
-                        className="float-right mr-2 text-danger"
-                        disabled
-                      >
-                        <DeleteIcon />
-                      </IconButton>
-                    </>
-                  )}
-                </CardFooter>
-              </Card>
-            </Col>
-          ))}
+          {renderGroupsQuestionAndAnswers()}
         </Row>
       </main>
 
@@ -529,13 +649,25 @@ const QuestionDetail = () => {
                   <label className="form-control-label" htmlFor="name">
                     Môn học
                   </label>
+                  {/* <Select
+                      // label="Your favorite framework/library"
+                      placeholder="Chọn môn học"
+                      searchable
+                      clearable
+                      value={value}
+                      onChange={setValue}
+                      nothingFound="No options"
+                      data={subjectSelectValue}
+                    /> */}
                   <Select
-                    // label="Your favorite framework/library"
-                    placeholder="Chon mon hoc"
+                    placeholder="Chọn môn học"
                     searchable
                     clearable
+                    name="subject"
+                    value={selectedSubjectId}
+                    onChange={handleChangeSelectSubject}
                     nothingFound="No options"
-                    data={["React", "Angular", "Java", "Vue"]}
+                    data={subjectSelectValues}
                   />
                 </FormGroup>
               </Col>
@@ -546,7 +678,7 @@ const QuestionDetail = () => {
                   </label>
                   <Select
                     // label="Your favorite framework/library"
-                    placeholder="Chon khoa hoc"
+                    placeholder="Chọn khóa học"
                     searchable
                     clearable
                     nothingFound="No options"
@@ -567,15 +699,20 @@ const QuestionDetail = () => {
                   <Input
                     className="form-control-alternative"
                     id="questionTitle"
-                    // onChange={handleChangeInput}
+                    onChange={handleChangeInput}
                     name="questionTitle"
-                    // value={question.questionContent}
+                    value={question.questionTitle}
                   />
                 </FormGroup>
               </Col>
               <Col xl={12} lg={12} md={12} sm={12}>
                 <hr />
                 <h5 className="font-weight-600">Câu trả lời</h5>
+                <Blockquote
+                  cite="Chọn vào radio để đánh dấu câu trả lời đúng!"
+                  icon={null}
+                  className="mt--4 p-0"
+                ></Blockquote>
                 <div className="container">
                   <Row>
                     {/* <label className="form-control-label" htmlFor="name">
@@ -589,17 +726,17 @@ const QuestionDetail = () => {
                         onChange={handleNumInputsChange}
                         className="form-control-alternative"
                       /> */}
-                    {renderAnswerInputs()}
+                    {renderInputs()}
                   </Row>
                 </div>
               </Col>
               <div className="container">
                 <Button
-                  color="primary"
-                  className="mt-3 ml-3 float-left"
+                  color="dark"
+                  className="mt-3 float-left"
                   onClick={handleAddGroup}
                 >
-                  <i class="bx bx-list-plus"></i> Thêm câu trả lời
+                  <i className="bx bx-list-plus"></i> Thêm câu trả lời
                 </Button>
               </div>
             </Row>
@@ -623,8 +760,7 @@ const QuestionDetail = () => {
             type="button"
             onClick={() => {
               // isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
-              // toast("Cập nhật môn học thành công");
-              handleStoreNewQuestion();
+              handleStoreQuestions();
             }}
           >
             {isUpdate ? "Cập nhật" : "Thêm môn học"}

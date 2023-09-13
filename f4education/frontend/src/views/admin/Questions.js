@@ -17,12 +17,12 @@ import {
   Row,
 } from "reactstrap";
 
-// Axios
+// Axios Custom API
 import questionApi from "../../api/questionApi";
 import courseApi from "../../api/courseApi";
 import subjectApi from "../../api/subjectApi";
 
-//React Mantine
+//React Mantine - route - moment
 import { Blockquote, Select } from "@mantine/core";
 import { Link } from "react-router-dom";
 import moment from "moment/moment";
@@ -199,6 +199,12 @@ const Questions = () => {
       ...prevQuestion,
       [e.target.name]: e.target.value,
     }));
+  };
+
+  const handleEditSubject = (row) => {
+    setShowModal(true);
+    setQuestion({ ...row.original });
+    setIsUpdate(true);
   };
 
   // Tranfer and fill data to ANSWERS STATE
@@ -412,9 +418,9 @@ const Questions = () => {
     // fetchCourse();
   }, []);
 
-  // useEffect(() => {
-  //   console.log(answers);
-  // }, [answers]);
+  useEffect(() => {
+    console.log(userDetail);
+  }, [userDetail]);
 
   return (
     <>
@@ -468,7 +474,7 @@ const Questions = () => {
               }}
               renderRowActions={({ row }) => (
                 <div className="d-flex justify-content-start py-1">
-                  <IconButton>
+                  <IconButton onClick={() => handleEditSubject(row)}>
                     <EditIcon />
                   </IconButton>
                 </div>

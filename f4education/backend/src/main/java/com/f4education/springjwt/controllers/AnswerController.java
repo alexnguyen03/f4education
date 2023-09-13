@@ -28,7 +28,7 @@ public class AnswerController {
 //	@PreAuthorize("hasRole('ADMIN')")
 	public List<AnswerDTO> findAll() {
 		return answerService.getAllAnswer();
-	}
+	} 
 
 	@PostMapping
 	public List<AnswerDTO> createAnswer(@RequestBody List<AnswerDTO> answerDTOList) {
