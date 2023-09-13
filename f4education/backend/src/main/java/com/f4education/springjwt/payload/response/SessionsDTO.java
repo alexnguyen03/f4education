@@ -19,7 +19,6 @@ public class SessionsDTO {
     private String sessionName;
     private Time startTime;
     private Time endTime;
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
+
     private Admin admin;
 }

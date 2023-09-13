@@ -12,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
@@ -37,13 +38,21 @@ public class ClassRoom {
 	@Column(name = "classroom_name")
 	private String classroomName;
 	
+	private String status;
+	
 	@OneToMany(mappedBy = "classRoom")
 	List<Schedule> schedules;
+	
+	@OneToMany(mappedBy = "classRoom")
+	List<ClassRoomHistory> classRoomHistories ;
+	
+	@ManyToOne
+	@JoinColumn(name = "admin_id")
+	Admin admin;
 
 	@Override
 	public String toString() {
-		return "ClassRoom [classroomId=" + classroomId + ", classroomName=" + classroomName + "]";
+		return "ClassRoom [classroomId=" + classroomId + ", classroomName=" + classroomName + ", status=" + status
+				+ "]";
 	}
-	
-	
 }

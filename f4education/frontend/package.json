@@ -71,7 +71,7 @@
     "dayjs": "^1.11.9",
     "material-react-table": "^1.14.0",
     "material-table": "^2.0.5",
-    "moment": "2.29.4",
+    "moment": "^2.29.4",
     "moment-timezone": "^0.5.31",
     "nouislider": "15.4.0",
     "query-string": "^8.1.0",

@@ -319,7 +319,7 @@ const Courses = () => {
 		console.log({...courseRequest});
 		try {
 			const resp = await courseApi.addCourse(formData);
-			// setCourses([...resp]);
+			getAllCourse();
 		} catch (error) {
 			console.log('failed to fetch data', error);
 		}
@@ -332,7 +332,7 @@ const Courses = () => {
 		console.log({...courseRequest});
 		try {
 			const resp = await courseApi.updateCourse(formData);
-			// setCourses([...resp]);
+			getAllCourse();
 		} catch (error) {
 			console.log('failed to fetch data', error);
 		}

@@ -1,12 +1,12 @@
 package com.f4education.springjwt.models;
 
-import java.util.Date;
-import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -15,19 +15,19 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Admin")
-public class Admin {
+public class Admin implements Serializable {
 	@OneToMany(mappedBy = "admin")
 	@JsonIgnore
-	List<Bill> bill;
+	private List<Bill> bill;
 	@OneToMany(mappedBy = "admin")
 	@JsonIgnore
-	List<Schedule> schedules;
+	private List<Schedule> schedules;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
-	List<Subject> subject;
+	private List<Subject> subject;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
-	List<Course> course;
+	private List<Course> course;
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "admin_id")
@@ -47,16 +47,19 @@ public class Admin {
 	private String image;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
-	List<Classes> classes;
+	private List<Classes> classes;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
-	List<Course> courses;
+	private List<ClassRoom> classRooms;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
-	List<Question> questions;
+	private List<Course> courses;
 	@JsonIgnore
 	@OneToMany(mappedBy = "admin")
-	List<Resources> resources;
+	private List<Question> questions;
+	@JsonIgnore
+	@OneToMany(mappedBy = "admin")
+	private List<Resources> resources;
 
 	@Override
 	public String toString() {

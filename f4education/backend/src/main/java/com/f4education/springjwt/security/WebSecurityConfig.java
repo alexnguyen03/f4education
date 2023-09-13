@@ -83,13 +83,31 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		http.csrf(csrf -> csrf.disable())
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth.requestMatchers("/api/auth/**", "/api/classs/**", "/img/**")
-						.permitAll()
-						.requestMatchers("/api/test/**", "/api/subjects/**", "/api/classs/**", "/api/courses/**",
-								"/api/courses-history/**",
-								"/img/**")
-						.permitAll().anyRequest()
-						.authenticated());
+				.authorizeHttpRequests(
+						auth -> auth
+								.requestMatchers(
+										"/api/auth/**",
+										"/api/subjects/**",
+										"/api/classs/**",
+										"/api/classhistory/**",
+										"/api/classroom/**",
+										"/api/classroomhistory/**",
+										"/api/sessions-history/**",
+										"/img/**")
+								.permitAll()
+								.requestMatchers(
+										"/api/test/**",
+										"/api/subjects/**",
+										"/api/classs/**",
+										"/api/courses-history/**",
+										"/api/subjectHistory/**",
+										"/api/courses/**",
+										"/api/classroom/**",
+										"/api/sessions/**",
+										"/api/sessions-history/**",
+										"/img/**")
+								.permitAll().anyRequest().authenticated());
+
 		http.authenticationProvider(authenticationProvider());
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
