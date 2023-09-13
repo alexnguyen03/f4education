@@ -203,11 +203,11 @@ const Sessions = () => {
 		if (!validate) {
 			return;
 		}
-		// if (update) {
-		// 	upateSessions();
-		// } else {
-		// 	addSessions();
-		// }
+		if (update) {
+			upateSessions();
+		} else {
+			addSessions();
+		}
 	};
 
 	const handleShowAddForm = () => {
@@ -453,7 +453,13 @@ const Sessions = () => {
 									value={session.sessionName}
 								/>
 
-								{msgError.sessionNameError && <span className='text-danger '>{msgError.sessionNameError}</span>}
+								{msgError.sessionNameError && (
+									<span
+										className='text-danger '
+										style={{transition: 'ease-in-out all 3s'}}>
+										{msgError.sessionNameError}
+									</span>
+								)}
 							</FormGroup>
 
 							<TimeInput
