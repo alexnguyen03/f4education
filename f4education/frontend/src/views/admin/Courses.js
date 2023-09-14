@@ -16,12 +16,12 @@ import {Timeline, Event} from 'react-timeline-scribble';
 import {Warning} from '@material-ui/icons';
 const IMG_URL = '/courses/';
 const Courses = () => {
-	const user = JSON.parse(localStorage.getItem('user') ?? '');
+	const user = JSON.parse(localStorage.getItem('user') | '');
 	const [image, setImage] = useState(null);
 	const [imgData, setImgData] = useState(null);
 	const [showForm, setShowForm] = useState(false);
+	const [valid, setValid] = useState(false);
 	const [showHistoryTable, setShowHistoryTable] = useState(false);
-	// const [selectedId, setSelectedId] = useState(-1);
 	const [update, setUpdate] = useState(false);
 	const [loadingCourses, setLoadingCourses] = useState(true);
 	const [loadingCoursesHistory, setLoadingCoursesHistory] = useState(true);
@@ -33,8 +33,8 @@ const Courses = () => {
 	const [selectedSubject, setSelectedSubject] = useState({value: '0', label: ''});
 	const [options, setOptions] = useState([{value: '0', label: ''}]);
 	const [subjectId, setSubjectId] = useState(0);
+	const [msgError, setMsgError] = useState({});
 	const [listHistoryById, setListHistoryById] = useState([]);
-
 	const [course, setCourse] = useState({
 		courseId: 0,
 		courseName: '',
@@ -69,6 +69,7 @@ const Courses = () => {
 		image: '',
 	});
 	const handelOnChangeInput = (e) => {
+		validate();
 		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
 	};
 	const handleOnChangeSelect = (e) => {
@@ -79,7 +80,47 @@ const Courses = () => {
 			subjectId: parseInt(subjectId),
 		}));
 	};
+	const validate = () => {
+		if (course.courseName === '') {
+			setMsgError((preErr) => ({...preErr, courseNameErr: 'Vui lòng nhập Tên khóa học'}));
+		} else if (course.courseName.length < 10) {
+			setMsgError((preErr) => ({...preErr, courseNameErr: 'Tên khóa học không hợp lệ (quá ngắn)'}));
+		} else {
+			setMsgError((preErr) => ({...preErr, courseNameErr: ''}));
+		}
+		if (course.courseDuration === '') {
+			setMsgError((preErr) => ({...preErr, courseDurationErr: 'Vui lòng nhập Thời lượng của khóa học'}));
+		} else if (course.courseDuration === '0' || parseInt(course.courseDuration) < 0) {
+			setMsgError((preErr) => ({...preErr, courseDurationErr: 'Thời lượng khóa học phải lớn hơn 0 '}));
+		} else {
+			setMsgError((preErr) => ({...preErr, courseDurationErr: ''}));
+		}
+		if (course.coursePrice === '') {
+			setMsgError((preErr) => ({...preErr, coursePriceErr: 'Vui lòng nhập Học phí của khóa học'}));
+		} else if (course.coursePrice === '0' || parseInt(course.coursePrice) < 0) {
+			setMsgError((preErr) => ({...preErr, coursePriceErr: 'Học phí phải lớn hơn 0'}));
+		} else {
+			setMsgError((preErr) => ({...preErr, coursePriceErr: ''}));
+		}
+		if (course.image === '') {
+			setMsgError((preErr) => ({...preErr, imgErr: 'Vui lòng chọn ảnh cho khóa học'}));
+		} else {
+			setMsgError((preErr) => ({...preErr, imgErr: ''}));
+		}
+		if (course.courseDescription === '') {
+			setMsgError((preErr) => ({...preErr, courseDescriptionErr: 'Vui lòng nhập mô tả cho khóa học'}));
+		} else {
+			setMsgError((preErr) => ({...preErr, courseDescriptionErr: ''}));
+		}
+		if (msgError.courseNameErr != '' || msgError.courseDescriptionErr != '' || msgError.courseDurationErr != '' || msgError.imgErr != '' || msgError.coursePriceErr != '') {
+			setValid(false);
+			return false;
+		}
+		setValid(true);
+		return true;
+	};
 	const onChangePicture = (e) => {
+		validate();
 		setImage(null);
 		if (e.target.files[0]) {
 			setImage(e.target.files[0]);
@@ -118,7 +159,7 @@ const Courses = () => {
 					const row = cell.getValue();
 					return <span>{formatCurrency(row.coursePrice)}</span>;
 				},
-				header: 'Giá (đ)',
+				header: 'Học phí (đ)',
 				size: 60,
 			},
 			{
@@ -178,7 +219,6 @@ const Courses = () => {
 	const getAllCourse = async () => {
 		if (courses.length > 0) {
 			setLoadingCourses(false);
-
 			return;
 		}
 		try {
@@ -205,10 +245,6 @@ const Courses = () => {
 		setShowHistoryTable((pre) => !pre);
 	};
 	const getAllCourseHistory = async () => {
-		// if (courseHistories.length >= 0) {
-		// 	setLoadingCoursesHistory(false);
-		// 	return;
-		// }
 		try {
 			setLoadingCoursesHistory(true);
 			const resp = await courseApi.getAllCourseHistory();
@@ -219,7 +255,6 @@ const Courses = () => {
 			console.log(error);
 		}
 	};
-
 	const convertToArray = () => {
 		const convertedArray = subjects.map((item) => ({
 			value: item.subjectId,
@@ -239,6 +274,7 @@ const Courses = () => {
 	};
 	const handleResetForm = () => {
 		// hide form
+		setMsgError({});
 		setShowForm((pre) => !pre);
 		setImgData(null);
 		// set course == null
@@ -273,30 +309,30 @@ const Courses = () => {
 	};
 	const handleSubmitForm = (e) => {
 		e.preventDefault();
-		if (update) {
-			updateCourse();
-			console.log(courseRequest);
-			console.log('updated');
-			// if (image) {
-			// 	setCourse((preCourse) => ({
-			// 		...preCourse,
-			// 		image: image.name,
-			// 	}));
-			// }
-			// console.log(courseRequest);
-		} else {
-			console.log(courseRequest);
-			addCourse();
-
-			console.log('add');
-			// setCourseRequest((preCourse) => ({
-			// 	...preCourse,
-			// 	adminId: user.username,
-			// 	numberSession: 0,
-			// }));
-		}
+		validate();
+		console.log('🚀 ~ file: Courses.js:306 ~ handleSubmitForm ~ validate:', validate());
+		// if (update) {
+		// 	updateCourse();
+		// 	console.log(courseRequest);
+		// 	console.log('updated');
+		// 	// if (image) {
+		// 	// 	setCourse((preCourse) => ({
+		// 	// 		...preCourse,
+		// 	// 		image: image.name,
+		// 	// 	}));
+		// 	// }
+		// 	// console.log(courseRequest);
+		// } else {
+		// 	console.log(courseRequest);
+		// 	addCourse();
+		// 	console.log('add');
+		// 	// setCourseRequest((preCourse) => ({
+		// 	// 	...preCourse,
+		// 	// 	adminId: user.username,
+		// 	// 	numberSession: 0,
+		// 	// }));
+		// }
 	};
-
 	const handelShowHistory = async (id) => {
 		setShowHistoryInfo(true);
 		setLoadingHistoryInfo(true);
@@ -339,7 +375,9 @@ const Courses = () => {
 	};
 	function handleSelect(data) {
 		setSelectedSubject(data);
-		setCourseRequest((pre) => ({...pre, subjectId: parseInt(selectedSubject.value)}));
+		if (selectedSubject != undefined) {
+			setCourseRequest((pre) => ({...pre, subjectId: parseInt(selectedSubject.value)}));
+		}
 		// console.log(courseRequest);
 	}
 	useEffect(() => {
@@ -357,10 +395,12 @@ const Courses = () => {
 	}, [subjects, selectedSubject]);
 	useEffect(() => {
 		const {courseId, courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
-		if (selectedSubject.value !== undefined) {
+		if (selectedSubject !== undefined) {
 			setCourseRequest({courseId: courseId, courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
 		}
+		validate();
 	}, [course, selectedSubject]);
+
 	return (
 		<>
 			<CoursesHeader />
@@ -386,7 +426,7 @@ const Courses = () => {
 								enableStickyHeader
 								enableStickyFooter
 								enableRowNumbers
-								state={{isLoading: loadingCourses}}
+								// state={{isLoading: loadingCourses}}
 								displayColumnDefOptions={{
 									'mrt-row-actions': {
 										header: 'Thao tác',
@@ -435,7 +475,6 @@ const Courses = () => {
 								}}
 							/>
 						)}
-
 						{showHistoryTable && (
 							<MaterialReactTable
 								enableColumnResizing
@@ -464,7 +503,7 @@ const Courses = () => {
 											gridTemplateColumns: '1fr 1fr',
 											width: '100%',
 										}}>
-										<Typography>Giá khóa học: {row.original.coursePrice}</Typography>
+										<Typography>Học phí: {row.original.coursePrice}</Typography>
 										<Typography>Số học phần: {row.original.numberSession}</Typography>
 										<Typography>Thời lượng: {row.original.courseDuration}</Typography>
 										<Typography>Mô tả: {row.original.courseDescription}</Typography>
@@ -477,7 +516,6 @@ const Courses = () => {
 								}}
 							/>
 						)}
-
 						<Modal
 							className='modal-dialog-centered  modal-lg '
 							isOpen={showForm}
@@ -507,13 +545,14 @@ const Courses = () => {
 														htmlFor='input-username'>
 														Tên môn học
 													</label>
-
 													<Select
 														options={options}
-														placeholder='Select color'
+														placeholder='Chọn môn học'
 														value={selectedSubject}
 														onChange={handleSelect}
 														isSearchable={true}
+														className='form-control-alternative '
+														styles={{outline: 'none'}}
 													/>
 												</FormGroup>
 												<FormGroup>
@@ -532,6 +571,7 @@ const Courses = () => {
 														name='courseName'
 														value={course.courseName}
 													/>
+													{msgError.courseNameErr && <p className='text-danger mt-1'>{msgError.courseNameErr}</p>}
 												</FormGroup>
 												<Row>
 													<Col md={12}>
@@ -546,12 +586,13 @@ const Courses = () => {
 																id='input-courseDuration'
 																placeholder='Thời lượng'
 																type='number'
-																min={120}
+																// min={120}
 																step={30}
 																value={course.courseDuration}
 																name='courseDuration'
 																onChange={handelOnChangeInput}
 															/>
+															{msgError.courseDurationErr && <p className='text-danger mt-1'>{msgError.courseDurationErr}</p>}
 														</FormGroup>
 													</Col>
 													<Col md={12}>
@@ -559,16 +600,19 @@ const Courses = () => {
 															<label
 																className='form-control-label'
 																htmlFor='input-last-name'>
-																Giá khóa học (đồng)
+																Học phí (đồng)
 															</label>
 															<Input
 																className='form-control-alternative'
 																value={course.coursePrice}
 																id='input-coursePrice'
 																type='number'
+																min={1000000}
 																name='coursePrice'
+																placeholder='Học phí'
 																onChange={handelOnChangeInput}
 															/>
+															{msgError.coursePriceErr && <p className='text-danger mt-1'>{msgError.coursePriceErr}</p>}
 														</FormGroup>
 													</Col>
 												</Row>
@@ -588,8 +632,10 @@ const Courses = () => {
 																name='courseDescription'
 																value={course.courseDescription}
 																type='textarea'
+																placeholder='Mô tả khóa học'
 																onChange={handelOnChangeInput}
 															/>
+															{msgError.courseDescriptionErr && <p className='text-danger mt-1'>{msgError.courseDescriptionErr}</p>}
 														</FormGroup>
 													</Col>
 													<Col md={12}>
@@ -612,9 +658,10 @@ const Courses = () => {
 																<label
 																	className='custom-file-label'
 																	htmlFor='customFile'>
-																	Chọn hình ảnh
+																	{imgData ? 'Chọn một ảnh khác' : 'Chọn hình ảnh'}
 																</label>
 															</div>
+															{msgError.imgErr && <p className='text-danger mt-1'>{msgError.imgErr}</p>}
 														</FormGroup>
 													</Col>
 													<div className='previewProfilePic px-3'>
@@ -652,7 +699,8 @@ const Courses = () => {
 									<Button
 										color={update ? 'primary' : 'success'}
 										type='submit'
-										className='px-5'>
+										className='px-5'
+										disabled={valid ? '' : 'true'}>
 										Lưu
 									</Button>
 								</div>
@@ -677,7 +725,6 @@ const Courses = () => {
 							</div>
 							<div className='modal-body'>
 								<div className='text-center  mb-3'>HIỆN TẠI - {moment(new Date()).format('DD/MM/yyyy, h:mm A')}</div>
-
 								{loadingHistoryInfo ? (
 									<div className='d-flex justify-content-center'>
 										<ReactLoading
@@ -723,7 +770,6 @@ const Courses = () => {
 										</Timeline>
 									))
 								)}
-
 								{listHistoryById.length === 0 && !loadingHistoryInfo && (
 									<div className='text-warning text-center my-5 py-5'>
 										<Warning /> Không tìm thấy lịch sử{' '}
@@ -731,7 +777,6 @@ const Courses = () => {
 								)}
 								<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>
 							</div>
-
 							<div className='modal-footer'>
 								<Button
 									color='secondary'
