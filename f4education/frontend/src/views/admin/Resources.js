@@ -17,118 +17,60 @@ import { MaterialReactTable } from "material-react-table";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
 import moment from "moment";
-import { notifications } from '@mantine/notifications';
+import Select from "react-select";
 
-// gọi API từ classApi
-import classApi from "api/classApi";
+// gọi API từ resourceApi
+import resourceApi from "api/resourceApi";
+
+// gọi API từ courseApi
+import courseApi from "api/courseApi";
 
 // gọi API từ classHistoryApi
 import classHistoryApi from "api/classHistoryApi";
 
-const Classs = () => {
-  const [classses, setClassses] = useState([]);
+const Resource = () => {
+  const [resources, setResources] = useState([]);
   const [classHistories, setClassHistories] = useState([]);
   const [classHistoryByClassId, setClassHistotyByClassId] = useState([]);
   const [showFormClass, setShowFormClass] = useState(false);
   const [showFormClassHistory, setShowFormClassHistory] = useState(false);
   const [update, setUpdate] = useState(true);
   const [isClassHistoryShowing, setIsClassHistoryShowing] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState("");
-  const [errors, setErrors] = useState({});
+
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setselectedCourse] = useState({
+    value: "0",
+    label: "",
+  });
+  const [options, setOptions] = useState([{ value: "0", label: "" }]);
+  const [file, setFile] = useState(null);
 
   // khởi tạo Class
-  const [classs, setClasss] = useState({
-    classId: "",
-    className: "",
-    startDate: "",
-    endDate: "",
-    maximumQuantity: 0,
-    status: "Đang chờ",
+  const [resource, setResource] = useState({
+    resourcesId: "",
+    resourcesName: "",
+    link: "",
+    course: {
+      courseId: 0,
+      courseName: "",
+    },
   });
-
-  // bắt lỗi form
-  const validateForm = () => {
-    let validationErrors = {};
-    if (!classs.className) {
-      validationErrors.className = "Vui lòng nhập tên lớp học !!!";
-    }
-    if (classs.maximumQuantity <= 0) {
-      validationErrors.maximumQuantity = "Số lượng tối đa phải lớn hơn 0 !!!";
-    }
-    if (classs.maximumQuantity >= 50) {
-      validationErrors.maximumQuantity = "Số lượng tối đa không được lớn hơn 50 !!!";
-    }
-    return validationErrors;
-  };
 
   // thay đổi giá trị của biến
   const handleChangeClassListAndHistory = () => {
     setIsClassHistoryShowing(!isClassHistoryShowing);
   };
 
-  // xử lý status
-  const renderSelect = (status) => {
-    switch (status) {
-      case "Đang chờ":
-        return (
-          <>
-            <option data-value="Đang chờ" value="Đang chờ">
-              Đang chờ
-            </option>
-            <option data-value="Đang diễn ra" value="Đang diễn ra">
-              Đang diễn ra
-            </option>
-          </>
-        );
-        break;
-      case "Đang diễn ra":
-        return (
-          <>
-            <option data-value="Đang diễn ra" value="Đang diễn ra">
-              Đang diễn ra
-            </option>
-            <option data-value="Kết thúc" value="Kết thúc">
-              Kết thúc
-            </option>
-          </>
-        );
-        break;
-      case "Kết thúc":
-        return (
-          <>
-            <option data-value="Đang diễn ra" value="Đang diễn ra">
-              Đang diễn ra
-            </option>
-            <option data-value="Kết thúc" value="Kết thúc">
-              Kết thúc
-            </option>
-          </>
-        );
-        break;
-      default:
-        break;
-    }
-  };
-
-  // lấy dữ liệu của select status
-  const handleOnChangeSelect = (e) => {
-    const selectedIndex = e.target.options.selectedIndex;
-    const status = e.target.options[selectedIndex].getAttribute("data-value");
-    // setSelectedStatus(status);
-    setClasss({
-      ...classs,
-      status: status,
-    });
-    console.log(status);
-  };
-
   // edit row class
   const handleEditRow = (row) => {
     setShowFormClass(true);
     setUpdate(false);
-    setSelectedStatus(row.original.status);
-    console.log(selectedStatus);
-    setClasss({ ...row.original });
+    setResource({ ...row.original });
+    setselectedCourse({
+      ...selectedCourse,
+      value: row.original.course.courseId,
+      label: row.original.course.courseName,
+    });
   };
 
   // show modal classhistory
@@ -139,130 +81,119 @@ const Classs = () => {
 
   // lấy dữ liệu từ form
   const handelOnChangeInput = (e) => {
-    setClasss({
-      ...classs,
+    setResource({
+      ...resource,
       [e.target.name]: e.target.value,
     });
+  };
+
+  const onChangeFile = (e) => {
+    setFile(null);
+    if (e.target.files[0]) {
+      setFile(e.target.files[0]);
+    }
   };
 
   // xóa trắng form
   const handleResetForm = () => {
     setShowFormClass((pre) => !pre);
-    setClasss({
-      className: "",
-      maximumQuantity: 0,
-      status: "Đang chờ",
+    setselectedCourse({});
+    setResource({
+      resourcesId: "",
+      resourcesName: "",
+      folderName: "",
+      link: "",
+      course: {
+        courseId: 0,
+        courseName: "",
+      },
+      adminName: "",
     });
     setUpdate(true);
-    setErrors({});
   };
+
+  const convertToArray = () => {
+    const convertedArray = courses.map((item) => ({
+      value: item.courseId,
+      label: item.courseName,
+    }));
+    return convertedArray;
+  };
+
+  function handleSelect(data) {
+    setselectedCourse(data);
+    setResource((pre) => ({
+      ...pre,
+      course: { ...pre.course, courseId: parseInt(selectedCourse.value), courseName: selectedCourse.label },
+    }));
+  }
 
   // resetModal ClassHistory
   const handleResetClassHistory = () => {
     setShowFormClassHistory((pre) => !pre);
   };
 
-  // lấy tấc cả dữ liệu Class từ database (gọi api)
-  const getDataClass = async () => {
+  // lấy tấc cả dữ liệu Resource từ database (gọi api)
+  const getDataResource = async () => {
     try {
-      const resp = await classApi.getAllClass();
-      setClassses(resp);
+      const resp = await resourceApi.getAllResource();
+      setResources(resp);
+      console.log(resp);
     } catch (error) {
       console.log(error);
     }
   };
 
-  // thêm class
-  const createClass = async (e) => {
-    e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        const resp = await classApi.createClass(classs);
-        alert("Thêm thành công");
-        handleResetForm();
-      } catch (error) {
-        console.log("Thêm thất bại", error);
-      }
-    }else {
-      setErrors(validationErrors);
+  const addResource = async () => {
+    const formData = new FormData();
+    formData.append("resource", JSON.stringify(resource));
+    formData.append("file", file);
+    console.log([...formData]);
+    console.log({ ...resource });
+    try {
+      const resp = await resourceApi.createResource(formData);
+      handleResetForm();
+    } catch (error) {
+      console.log("Thêm thất bại", error);
     }
   };
 
-  // cập nhật class
-  const updateClass = async (e) => {
-    e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length === 0) {
-      try {
-        console.log(classs);
-        const body = classs;
-        if (body.status === "Đang chờ" || body.status === "Đang diễn ra") {
-          body.endDate = null;
-        } else {
-          body.endDate = new Date();
-        }
-        const resp = await classApi.updateClass(body, classs.classId);
-        alert("Cập nhật thành công");
-        handleResetForm();
-      } catch (error) {
-        console.log("Cập nhật thất bại", error);
-      }
-    } else {
-      setErrors(validationErrors);
+  const getAllCourse = async () => {
+    try {
+      const resp = await courseApi.getAll();
+      setCourses(resp.reverse());
+    } catch (error) {
+      console.log(error);
     }
   };
 
-  // bảng lớp học
+  // bảng tài nguyên
   const columnClass = useMemo(
     () => [
       {
-        accessorKey: "classId",
-        header: "Mã lớp học",
-        size: 100,
+        accessorKey: "resourcesId",
+        header: "ID",
+        size: 80,
       },
       {
-        accessorKey: "className",
-        header: "Tên lớp học",
-        size: 100,
+        accessorKey: "resourcesName",
+        header: "Tên tài nguyên",
+        size: 110,
       },
       {
-        accessorKey: "startDate",
-        accessorFn: (row) =>
-          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss a"),
-        header: "Ngày bắt đầu",
-        size: 90,
+        accessorKey: "link",
+        header: "Link",
+        size: 200,
       },
       {
-        accessorKey: "endDate",
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          if (row.endDate !== null) {
-            return (
-              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a")}</span>
-            );
-          } else {
-            return <span>Chưa kết thúc</span>;
-          }
-        },
-        header: "Ngày kết thúc",
-        size: 90,
+        accessorKey: "course.courseName",
+        header: "Tên khóa học",
+        size: 120,
       },
       {
-        accessorKey: "maximumQuantity",
-        header: "Số lượng tối đa",
-        size: 95,
-      },
-      {
-        accessorKey: "admin.fullname",
+        accessorKey: "adminName",
         header: "Người tạo",
-        size: 95,
-      },
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        size: 95,
+        size: 110,
       },
     ],
     []
@@ -360,19 +291,26 @@ const Classs = () => {
     }
   };
 
-  // khi thay đổi selectedStatus thì sẽ tự động cập nhật lại
   useEffect(() => {
-    setClasss({
-      ...classs,
-      status: selectedStatus,
-    });
-  }, [selectedStatus]);
+    const convertedOptions = convertToArray();
+    setOptions(convertedOptions);
+  }, [courses, selectedCourse]);
+
+  useEffect(() => {
+    if (selectedCourse.value !== undefined) {
+      setResource((pre) => ({
+        ...pre,
+        course: { ...pre.course, courseId: parseInt(selectedCourse.value), courseName: selectedCourse.label },
+      }));
+    }
+  }, [resource, selectedCourse]);
 
   // Use effect
   useEffect(() => {
-    getDataClass();
-    getDataClassHistory();
-    getDataClassHistoryByClassId();
+    getDataResource();
+    getAllCourse();
+    // getDataClassHistory();
+    // getDataClassHistoryByClassId();
   }, []);
 
   return (
@@ -383,14 +321,18 @@ const Classs = () => {
           {/* Header */}
           <CardHeader className="bg-white border-0 d-flex justify-content-between">
             <h3 className="mb-0">
-              {isClassHistoryShowing ? "Bảng lịch sử tài nguyên" : "Bảng tài nguyên"}
+              {isClassHistoryShowing
+                ? "Bảng lịch sử tài nguyên"
+                : "Bảng tài nguyên"}
             </h3>
             <Button
               color="default"
               type="button"
               onClick={() => handleChangeClassListAndHistory()}
             >
-              {isClassHistoryShowing ? "Danh sách tài nguyên" : "Lịch sử tài nguyên"}
+              {isClassHistoryShowing
+                ? "Danh sách tài nguyên"
+                : "Lịch sử tài nguyên"}
             </Button>
           </CardHeader>
 
@@ -409,7 +351,7 @@ const Classs = () => {
                 enableStickyHeader
                 enableStickyFooter
                 columns={columnClass}
-                data={classses}
+                data={resources}
                 positionActionsColumn="last"
                 renderTopToolbarCustomActions={() => (
                   <Button
@@ -468,7 +410,7 @@ const Classs = () => {
             </CardBody>
           ) : null}
         </Card>
-        {/* Modal Class */}
+        {/* Modal Resource */}
         <Modal
           backdrop="static"
           className="modal-dialog-centered"
@@ -476,7 +418,7 @@ const Classs = () => {
           toggle={() => setShowFormClass((pre) => !pre)}
         >
           <div className="modal-header">
-            <h3 className="mb-0">Thông tin lớp học</h3>
+            <h3 className="mb-0">Thông tin tài nguyên</h3>
             <button
               aria-label="Close"
               className="close"
@@ -491,79 +433,67 @@ const Classs = () => {
             <Form>
               <div className="px-lg-2">
                 <FormGroup>
+                  <label className="form-control-label">Tên khóa học</label>
+                  <Select
+                    options={options}
+                    value={selectedCourse}
+                    onChange={handleSelect}
+                    // isSearchable={true}
+                  />
+                </FormGroup>
+                <FormGroup>
                   <label
                     className="form-control-label"
-                    htmlFor="input-class-name"
+                    htmlFor="input-resource-name"
                   >
-                    Tên lớp học
+                    Tên tài nguyên
                   </label>
                   <Input
                     className="form-control-alternative"
-                    id="input-class-name"
-                    placeholder="Tên lớp học"
+                    id="input-resource-name"
+                    placeholder="Tên tài nguyên"
                     type="text"
                     onChange={handelOnChangeInput}
-                    name="className"
-                    value={classs.className}
+                    name="resourcesName"
+                    value={resource.resourcesName}
                   />
-                  {errors.className && (
-                    <div className="text-danger mt-2">{errors.className}</div>
-                  )}
                 </FormGroup>
                 <Row>
+                  {update ? (
+                    ""
+                  ) : (
+                    <Col md={12} className={update ? "hidden" : ""}>
+                      <FormGroup>
+                        <label className="form-control-label">Link</label>
+                        <br />
+                        <a href={resource.link}>{resource.link}</a>
+                      </FormGroup>
+                    </Col>
+                  )}
                   <Col md={12}>
                     <FormGroup>
                       <label
                         className="form-control-label"
-                        htmlFor="input-maximumQuantity"
+                        htmlFor="customFile"
                       >
-                        Số lượng tối đa
+                        Chọn File
                       </label>
-                      <Input
-                        className="form-control-alternative"
-                        id="input-maximumQuantity"
-                        type="number"
-                        min={0}
-                        step={1}
-                        max={50}
-                        value={classs.maximumQuantity}
-                        name="maximumQuantity"
-                        onChange={handelOnChangeInput}
-                      />
-                      {errors.maximumQuantity && (
-                        <div className="text-danger mt-2">
-                          {errors.maximumQuantity}
-                        </div>
-                      )}
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <label
-                        className="form-control-label"
-                        htmlFor="input-username"
-                      >
-                        Trạng thái
-                      </label>
-                      <Input
-                        id="exampleSelect"
-                        name="status"
-                        type="select"
-                        onChange={handleOnChangeSelect}
-                        readOnly={update ? "readOnly" : undefined}
-                        value={classs.status}
-                      >
-                        {(classs.status === "Đang chờ" ||
-                          classs.status === "Đang diễn ra" ||
-                          classs.status === "Kết thúc") &&
-                          (update ? (
-                            <option data-value="Đang chờ" value="Đang chờ">
-                              Đang chờ
-                            </option>
-                          ) : (
-                            renderSelect(selectedStatus)
-                          ))}
-                      </Input>
+                      <div className="custom-file">
+                        <input
+                          type="file"
+                          multiple
+                          name="imageFile"
+                          className="custom-file-input form-control-alternative"
+                          id="customFile"
+                          onChange={onChangeFile}
+                        />
+                        <label
+                          className="custom-file-label"
+                          htmlFor="customFile"
+                        >
+                          Chọn tài liệu
+                        </label>
+                      </div>
                     </FormGroup>
                   </Col>
                 </Row>
@@ -582,7 +512,7 @@ const Classs = () => {
             <Button
               color="primary"
               type="button"
-              onClick={update ? createClass : updateClass}
+              onClick={update ? addResource : ""}
             >
               {update ? "Lưu" : "Cập nhật"}
             </Button>
@@ -628,4 +558,4 @@ const Classs = () => {
   );
 };
 
-export default Classs;
+export default Resource;

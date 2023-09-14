@@ -17,6 +17,7 @@ import java.util.Date;
 public class CourseHistory {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "course_history_id")
 	private Integer courseHistoryId;
 	@Column(name = "course_name")
 	private String courseName;
