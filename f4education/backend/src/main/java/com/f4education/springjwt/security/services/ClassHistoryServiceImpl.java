@@ -35,9 +35,6 @@ public class ClassHistoryServiceImpl implements ClassHistoryService {
 	@Override
 	public List<ClassHistoryDTO> findAll() {
 		List<ClassHistory> classHistories = classHistoryRepository.findAll();
-		for (ClassHistory classHistory : classHistories) {
-			System.out.println(classHistory);
-		}
 		return classHistories.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 	

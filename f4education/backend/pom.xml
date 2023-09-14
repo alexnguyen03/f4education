@@ -89,10 +89,26 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
+		<!--
+		https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
 		<dependency>
-		    <groupId>org.springframework.boot</groupId>
-		    <artifactId>spring-boot-devtools</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.25.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.apis</groupId>
+			<artifactId>google-api-services-drive</artifactId>
+			<version>v3-rev130-1.25.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.oauth-client</groupId>
+			<artifactId>google-oauth-client-jetty</artifactId>
+			<version>1.25.0</version>
 		</dependency>
 	</dependencies>
 

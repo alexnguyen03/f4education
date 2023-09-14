@@ -11,6 +11,8 @@ import lombok.ToString;
 import java.io.Serializable;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Data
 @Entity
 @Builder
@@ -40,18 +42,23 @@ public class Course implements Serializable {
 
 	private String image;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "course")
 	List<CourseHistory> courseHistories;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "course")
 	List<Question> questions;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "course")
 	List<RegisterCourse> registerCourses;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "course")
 	List<Resources> resources;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "subject_id")
 	Subject subject;
@@ -63,6 +70,7 @@ public class Course implements Serializable {
 				+ numberSession + ", image=" + image + "]";
 	}
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	Admin admin;
