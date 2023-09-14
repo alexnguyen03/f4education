@@ -167,6 +167,8 @@ const QuestionDetail = () => {
   // ************* API AREA
 
   // + API > CRUD
+  // Lúc thêm question thì sẽ thêm luôn cái answers json sẽ giống với cái QuestionVsAnswerData;
+  // Lúc cập nhật cũng giống như lúc thêm
 
   // *************** Validation area
   // Change span to input and get value
@@ -373,7 +375,7 @@ const QuestionDetail = () => {
 
               {editAnswer && question.questionId === editQuestionId ? (
                 <input
-                  className="answer-input text-dark ml--2 mb-1"
+                  className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
                   // onChange={(e) => {
                   // handleChangeAnswers(e);
                   // }}
@@ -430,7 +432,7 @@ const QuestionDetail = () => {
             {/* Action Area */}
             <CardFooter>
               {/* Select true answer */}
-              <FormGroup>
+              {/* <FormGroup>
                 <Select
                   // label="Chọn câu trả lời đúng"
                   placeholder="Chọn câu trả lời đúng"
@@ -449,12 +451,12 @@ const QuestionDetail = () => {
                     label: answerDetail.text,
                   }))}
                 />
-              </FormGroup>
+              </FormGroup> */}
+
               {/* Update button */}
               {editAnswer && qs.questionId === editQuestionId ? (
                 <Button
-                  color="warning"
-                  outline
+                  color="dark"
                   role="button"
                   className="float-left"
                   onClick={handleUpdateQuestion}
@@ -464,7 +466,7 @@ const QuestionDetail = () => {
               ) : (
                 <>
                   <Button
-                    color="warning"
+                    color="dark"
                     outline
                     disabled
                     role="button"
@@ -478,7 +480,7 @@ const QuestionDetail = () => {
 
               {/* Edit button */}
               <IconButton
-                color="secondary"
+                color="info"
                 className="float-right"
                 onClick={() => {
                   handleEditQuestionByQuestionId(qs);
@@ -488,13 +490,13 @@ const QuestionDetail = () => {
               </IconButton>
 
               {/* Delete button */}
-              {!isEditing && qs.questionId !== editQuestionId ? (
-                <IconButton className="float-right mr-2 text-danger">
+              {editAnswer && qs.questionId === editQuestionId ? (
+                <IconButton className="float-right text-danger" disabled>
                   <DeleteIcon />
                 </IconButton>
               ) : (
                 <>
-                  <IconButton className="float-right mr-2 text-danger" disabled>
+                  <IconButton className="float-right text-danger" onClick={()=>alert('deleted')}>
                     <DeleteIcon />
                   </IconButton>
                 </>
@@ -547,13 +549,10 @@ const QuestionDetail = () => {
       {/* Top tollbar and title */}
       <div className="container">
         {/* BreadCum */}
-        <Link to="/admin/questions" className="blockquote-footer my-3">
+        <Link to="/admin/questions" className="blockquote-footer mt-3 mb-5">
           Câu hỏi / Câu hỏi chi tiết
         </Link>
         {/* Header Title */}
-        <h1 className="mb-3">
-          Môn học | {questionByCourseNameRoute.subjectName}
-        </h1>
         <div className="d-flex align-items-center justify-content-between flex-wrap">
           <div className="d-flex align-items-center ">
             <div>
@@ -561,18 +560,21 @@ const QuestionDetail = () => {
                 src="https://i.pinimg.com/originals/ec/04/8f/ec048fa1e083df7aeb49c06d7b75bcfc.jpg"
                 alt=""
                 className="rounded-circle overflow-hidden"
-                width="50px"
-                height="50px"
+                width="70px"
+                height="70px"
               />
             </div>
             <div className="ml-3">
-              <h2 className="text-primary mb-0">
+              <h3 className="text-muted">
+                Môn học - {questionByCourseNameRoute.subjectName}
+              </h3>
+              <h1 className="text-dark mb-1">
                 {questionByCourseNameRoute.courseName}
-              </h2>
+              </h1>
               <div className="d-flex align-items-center flex-wrap">
                 <h6>{questionByCourseNameRoute.adminName}</h6>
-                <span className="mx-3 font-weight-400 mt--1">
-                  <i className="bx bx-x text-gray"></i>
+                <span className="mx-1 font-weight-400 mt--1">
+                  <i class="bx bx-minus"></i>
                 </span>
                 <h6>
                   {moment(questionByCourseNameRoute.createDate).format(

@@ -7,7 +7,7 @@
     font-size: 16px;
     outline: none;
     border: none;
-    border-bottom: 0.5px solid rgb(126, 126, 126) !important;  
+    border-bottom: 0.5px solid rgb(126, 126, 126) !important;
     color: #bdbdbd !important;
     transition: var(--smothAnswer);
 }
@@ -28,4 +28,20 @@
     opacity: 1;
     transform: translateX(0);
     transition: var(--smothAnswer);
+}
+
+.answer-introduce {
+    position: relative;
+}
+
+.course-content {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 25%;
+}
+
+.course-image {
+    box-shadow: 3px 2px 2px 2px 3px rgb(189, 189, 189);
+    filter: brightness(90%) contrast(110%) saturate(0%) brightness(110%);
 }
