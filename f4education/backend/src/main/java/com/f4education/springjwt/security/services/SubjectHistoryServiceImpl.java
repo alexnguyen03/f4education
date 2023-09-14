@@ -84,7 +84,7 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 //		System.out.println(str);
 		try {
 			Date modifyDate = dateFormat.parse(str);
-			System.out.println((Date) dateFormat.parse(str));
+//			System.out.println((Date) dateFormat.parse(str));
 			subjectHistoryDTO.setModifyDate(modifyDate);
 		} catch (Exception e) {
 			// TODO: handle exception

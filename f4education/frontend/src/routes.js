@@ -29,57 +29,60 @@ import Teachers from "views/admin/Teachers.js";
 import Classs from "views/admin/Classs.js';
 import ClasssRoom from 'views/admin/ClasssRoom.js";
 import Resources from 'views/admin/Resources.js'
+import Questions from "views/admin/Questions";
+import QuestionDetail from "views/admin/QuestionDetail";
+
 
 var routes = [
-	{
-		path: '/index',
-		name: 'Dashboard',
-		icon: 'ni ni-tv-2 text-primary',
-		component: <Index />,
-		layout: '/admin',
-	},
-	{
-		path: '/icons',
-		name: 'Icons',
-		icon: 'ni ni-planet text-blue',
-		component: <Icons />,
-		layout: '/admin',
-	},
-	{
-		path: '/maps',
-		name: 'Maps',
-		icon: 'ni ni-pin-3 text-orange',
-		component: <Maps />,
-		layout: '/admin',
-	},
-	{
-		path: '/user-profile',
-		name: 'User Profile',
-		icon: 'ni ni-single-02 text-yellow',
-		component: <Profile />,
-		layout: '/admin',
-	},
-	{
-		path: '/tables',
-		name: 'Tables',
-		icon: 'ni ni-bullet-list-67 text-red',
-		component: <Tables />,
-		layout: '/admin',
-	},
-	{
-		path: '/login',
-		name: 'Login',
-		icon: 'ni ni-key-25 text-info',
-		component: <Login />,
-		layout: '/auth',
-	},
-	{
-		path: '/register',
-		name: 'Register',
-		icon: 'ni ni-circle-08 text-pink',
-		component: <Register />,
-		layout: '/auth',
-	},
+  {
+    path: "/index",
+    name: "Dashboard",
+    icon: "ni ni-tv-2 text-primary",
+    component: <Index />,
+    layout: "/admin",
+  },
+  {
+    path: "/icons",
+    name: "Icons",
+    icon: "ni ni-planet text-blue",
+    component: <Icons />,
+    layout: "/admin",
+  },
+  {
+    path: "/maps",
+    name: "Maps",
+    icon: "ni ni-pin-3 text-orange",
+    component: <Maps />,
+    layout: "/admin",
+  },
+  {
+    path: "/user-profile",
+    name: "User Profile",
+    icon: "ni ni-single-02 text-yellow",
+    component: <Profile />,
+    layout: "/admin",
+  },
+  {
+    path: "/tables",
+    name: "Tables",
+    icon: "ni ni-bullet-list-67 text-red",
+    component: <Tables />,
+    layout: "/admin",
+  },
+  {
+    path: "/login",
+    name: "Login",
+    icon: "ni ni-key-25 text-info",
+    component: <Login />,
+    layout: "/auth",
+  },
+  {
+    path: "/register",
+    name: "Register",
+    icon: "ni ni-circle-08 text-pink",
+    component: <Register />,
+    layout: "/auth",
+  },
 	{
 		path: "/teachers",
 		name: "Giảng viên",
@@ -87,13 +90,13 @@ var routes = [
 		component: <Teachers />,
 		layout: "/admin",
 	},
-	{
-		path: '/subjects',
-		name: 'Môn học',
-		icon: 'ni ni-bullet-list-67 text-pink',
-		component: <Subjects />,
-		layout: '/admin',
-	},
+  {
+    path: "/subjects",
+    name: "Môn học",
+    icon: "ni ni-books text-blue",
+    component: <Subjects />,
+    layout: "/admin",
+  },
 	{
 		path: '/sessions',
 		name: 'Ca học',
@@ -101,20 +104,32 @@ var routes = [
 		component: <Sessions />,
 		layout: '/admin',
 	},
-	{
-		path: '/courses',
-		name: 'Khóa học',
-		icon: 'ni ni-single-02 text-yellow',
-		component: <Courses />,
-		layout: '/admin',
-	},
-	{
-		path: '/classs',
-		name: 'Lớp học',
-		icon: 'ni ni-single-02 text-yellow',
-		component: <Classs />,
-		layout: '/admin',
-	},
+  {
+    path: "/courses",
+    name: "Khóa học",
+    icon: "ni ni-single-02 text-yellow",
+    component: <Courses />,
+    layout: "/admin",
+  },
+  {
+    path: "/classs",
+    name: "Lớp học",
+    icon: "ni ni-single-02 text-yellow",
+    component: <Classs />,
+    layout: "/admin",
+  },
+  {
+    path: "/questions",
+    name: "Câu hỏi",
+    icon: "ni ni-ui-04 text-primary",
+    component: <Questions />,
+    layout: "/admin",
+  },
+  {
+    path: "/questionDetail/:courseName",
+    component: <QuestionDetail />,
+    layout: "/admin",
+  },
 	{
 		path: '/classsroom',
 		name: 'Phòng học',

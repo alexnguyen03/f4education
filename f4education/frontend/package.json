@@ -102,6 +102,7 @@
     "chokidar": "3.5.3"
   },
   "devDependencies": {
-    "dotenv-webpack": "^8.0.1"
+    "dotenv-webpack": "^8.0.1",
+    "react-router-dom": "^6.15.0"
   }
 }
