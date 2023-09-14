@@ -105,6 +105,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 										"/api/courses/**",
 										"/api/classroom/**",
 										"/api/sessions/**",
+										"/api/classhistory/**",
+										"/api/teachers/**",
 										"/api/sessions-history/**",
 										"/api/resource/**",
 										"/img/**")

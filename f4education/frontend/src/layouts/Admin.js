@@ -61,15 +61,15 @@ const Admin = (props) => {
 		}
 		return 'Brand';
 	};
-	// const getAdminInfo = () => {
-	// 	const uname = JSON.parse(localStorage.getItem('user')).username;
-	// 	if (uname) {
-	// 		setAdminName(uname);
-	// 	}
-	// };
-	// useEffect(() => {
-	// 	getAdminInfo();
-	// });
+	const getAdminInfo = () => {
+		const uname = JSON.parse(localStorage.getItem('user')).username;
+		if (uname) {
+			setAdminName(uname);
+		}
+	};
+	useEffect(() => {
+		getAdminInfo();
+	});
 
 	return (
 		<>

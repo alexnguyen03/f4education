@@ -15,18 +15,19 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Index from 'views/Index.js';
-import Profile from 'views/examples/Profile.js';
-import Maps from 'views/examples/Maps.js';
-import Register from 'views/examples/Register.js';
-import Login from 'views/examples/Login.js';
-import Tables from 'views/examples/Tables.js';
-import Icons from 'views/examples/Icons.js';
-import Subjects from 'views/admin/Subjects';
+import Index from "views/Index.js";
+import Profile from "views/examples/Profile.js";
+import Maps from "views/examples/Maps.js";
+import Register from "views/examples/Register.js";
+import Login from "views/examples/Login.js";
+import Tables from "views/examples/Tables.js";
+import Icons from "views/examples/Icons.js";
+import Subjects from "views/admin/Subjects";
 import Sessions from 'views/admin/Sessions';
-import Courses from 'views/admin/Courses.js';
-import Classs from 'views/admin/Classs.js';
-import ClasssRoom from 'views/admin/ClasssRoom.js';
+import Courses from "views/admin/Courses.js";
+import Teachers from "views/admin/Teachers.js";
+import Classs from "views/admin/Classs.js';
+import ClasssRoom from 'views/admin/ClasssRoom.js";
 import Resources from 'views/admin/Resources.js'
 
 var routes = [
@@ -78,6 +79,13 @@ var routes = [
 		icon: 'ni ni-circle-08 text-pink',
 		component: <Register />,
 		layout: '/auth',
+	},
+	{
+		path: "/teachers",
+		name: "Giảng viên",
+		icon: "ni ni-single-02 text-yellow",
+		component: <Teachers />,
+		layout: "/admin",
 	},
 	{
 		path: '/subjects',

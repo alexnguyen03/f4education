@@ -57,6 +57,7 @@ const Courses = () => {
 			},
 		},
 	});
+
 	const [courseRequest, setCourseRequest] = useState({
 		subjectId: 0,
 		adminId: '',
@@ -68,6 +69,8 @@ const Courses = () => {
 		numberSession: 0,
 		image: '',
 	});
+
+	// Thực hiện binding data
 	const handelOnChangeInput = (e) => {
 		validate();
 		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
@@ -139,7 +142,7 @@ const Courses = () => {
 		() => [
 			{
 				accessorKey: 'subject.subjectName',
-				header: 'Tên môn học',
+				header: 'Tên môn học nè',
 				size: 100,
 			},
 			{
@@ -170,6 +173,7 @@ const Courses = () => {
 		],
 		[],
 	);
+
 	const columnsCoursesHistory = useMemo(
 		() => [
 			{
@@ -263,6 +267,7 @@ const Courses = () => {
 		console.log(options);
 		return convertedArray;
 	};
+
 	const handleEditFrom = (row) => {
 		setShowForm(true);
 		const selectedCourse = courses.find((course) => course.courseId === row.original.courseId);
@@ -272,6 +277,7 @@ const Courses = () => {
 		setSelectedSubject({...selectedSubject, value: selectedCourse.subject.subjectId, label: selectedCourse.subject.subjectName});
 		console.log(selectedSubject);
 	};
+
 	const handleResetForm = () => {
 		// hide form
 		setMsgError({});
@@ -301,6 +307,7 @@ const Courses = () => {
 			},
 		});
 	};
+
 	const handleShowAddForm = () => {
 		setShowForm((pre) => !pre);
 		setUpdate(false);
@@ -350,6 +357,7 @@ const Courses = () => {
 			console.log('failed to fetch data', error);
 		}
 	};
+
 	const updateCourse = async () => {
 		const formData = new FormData();
 		formData.append('courseRequest', JSON.stringify(courseRequest));
@@ -363,6 +371,8 @@ const Courses = () => {
 			console.log('failed to fetch data', error);
 		}
 	};
+
+	//chọn 1 môn học trong select box
 	function handleSelect(data) {
 		setSelectedSubject(data);
 		if (selectedSubject != undefined) {
@@ -370,19 +380,23 @@ const Courses = () => {
 		}
 		// console.log(courseRequest);
 	}
+
 	useEffect(() => {
 		setListHistoryById([...listHistoryById]);
 		console.log('🚀 ~ file: Courses.js:330 ~ useEffect ~ listHistoryById:', listHistoryById);
 	}, [loadingHistoryInfo]);
+
 	useEffect(() => {
 		if (courses.length > 0) return;
 		getAllCourse();
 		getAllSubject();
-	}, []);
+	}, []); // không có ngoặc vuông thì thực hiện gọi return trước call back// thực hiện 1 lần duy nhất
+
 	useEffect(() => {
 		const convertedOptions = convertToArray();
 		setOptions(convertedOptions);
-	}, [subjects, selectedSubject]);
+	}, [subjects, selectedSubject]); // nếu có thì thực hiện khi có sử thay đổi
+
 	useEffect(() => {
 		const {courseId, courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
 		if (selectedSubject !== undefined) {
@@ -390,10 +404,10 @@ const Courses = () => {
 		}
 		validate();
 	}, [course, selectedSubject]);
-
 	return (
 		<>
 			<CoursesHeader />
+
 			<Container
 				className='mt--7'
 				fluid>
@@ -408,6 +422,7 @@ const Courses = () => {
 							{showHistoryTable ? 'Danh sách khóa học' : 'Lịch sử khóa học'}
 						</Button>
 					</CardHeader>
+
 					<CardBody>
 						{!showHistoryTable && (
 							<MaterialReactTable
@@ -465,6 +480,7 @@ const Courses = () => {
 								}}
 							/>
 						)}
+
 						{showHistoryTable && (
 							<MaterialReactTable
 								enableColumnResizing
@@ -506,6 +522,7 @@ const Courses = () => {
 								}}
 							/>
 						)}
+
 						<Modal
 							className='modal-dialog-centered  modal-lg '
 							isOpen={showForm}
@@ -696,6 +713,7 @@ const Courses = () => {
 								</div>
 							</Form>
 						</Modal>
+
 						<Modal
 							className='modal-dialog-centered  modal-lg'
 							isOpen={showHistoryInfo}
