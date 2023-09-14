@@ -310,28 +310,18 @@ const Courses = () => {
 	const handleSubmitForm = (e) => {
 		e.preventDefault();
 		validate();
-		console.log('🚀 ~ file: Courses.js:306 ~ handleSubmitForm ~ validate:', validate());
-		// if (update) {
-		// 	updateCourse();
-		// 	console.log(courseRequest);
-		// 	console.log('updated');
-		// 	// if (image) {
-		// 	// 	setCourse((preCourse) => ({
-		// 	// 		...preCourse,
-		// 	// 		image: image.name,
-		// 	// 	}));
-		// 	// }
-		// 	// console.log(courseRequest);
-		// } else {
-		// 	console.log(courseRequest);
-		// 	addCourse();
-		// 	console.log('add');
-		// 	// setCourseRequest((preCourse) => ({
-		// 	// 	...preCourse,
-		// 	// 	adminId: user.username,
-		// 	// 	numberSession: 0,
-		// 	// }));
-		// }
+		if (!validate) {
+			return;
+		}
+		if (update) {
+			updateCourse();
+			console.log(courseRequest);
+			console.log('updated');
+		} else {
+			console.log(courseRequest);
+			addCourse();
+			console.log('add');
+		}
 	};
 	const handelShowHistory = async (id) => {
 		setShowHistoryInfo(true);
