@@ -13,8 +13,6 @@ public class ResourcesDTO {
 	private Integer resourcesId;
 
 	private String resourcesName;
-	
-	private String folderName;
 
 	private String link;
 	

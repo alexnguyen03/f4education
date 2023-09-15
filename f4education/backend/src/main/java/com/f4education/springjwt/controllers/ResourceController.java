@@ -20,21 +20,26 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.interfaces.ResourceService;
+import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
 import com.f4education.springjwt.security.services.SessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/resource")
-public class ResourcesController {
-	
+public class ResourceController {
+
 	@Autowired
 	ResourceService resourceService;
-	
+
+	@Autowired
+	CoursesService coursesService;
+
 	@Autowired
 	SessionService sessionService;
 
@@ -42,26 +47,23 @@ public class ResourcesController {
 	public List<ResourcesDTO> getAll() {
 		return resourceService.findAll();
 	}
-	
-	@PostMapping(consumes = {MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces = {MediaType.APPLICATION_JSON_VALUE})
+
+	@PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResourcesDTO createResource(@RequestParam("file") MultipartFile file,
-			@RequestPart("resource") String resource) {
+			@RequestPart("resourceRequest") String resourceRequestClient) {
 		ObjectMapper mapper = new ObjectMapper();
-		ResourcesDTO resourcesDTO = new ResourcesDTO();
+		ResourceRequest resourceRequest = new ResourceRequest();
 		try {
-			resourcesDTO = mapper.readValue(resource,
-					ResourcesDTO.class);
+			resourceRequest = mapper.readValue(resourceRequestClient, ResourceRequest.class);
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
-		resourceService.uploadFile(file, resourcesDTO.getCourse().getCourseName());
-		resourcesDTO.setLink("https://drive.google.com/drive/folders/" + sessionService.get("folderId"));
-		System.out.println(resourcesDTO);
-//		return resourceService.createResource(resourcesDTO);
-		return resourcesDTO;
+		Course course = coursesService.findById(resourceRequest.getCourseId());
+		resourceService.uploadFile(file, course.getCourseName());
+		System.out.println(resourceRequest);
+		return resourceService.createResource(resourceRequest);
 	}
 }

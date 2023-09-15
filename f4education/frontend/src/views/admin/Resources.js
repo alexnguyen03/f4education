@@ -29,6 +29,7 @@ import courseApi from "api/courseApi";
 import classHistoryApi from "api/classHistoryApi";
 
 const Resource = () => {
+  const user = JSON.parse(localStorage.getItem('user') | '');
   const [resources, setResources] = useState([]);
   const [classHistories, setClassHistories] = useState([]);
   const [classHistoryByClassId, setClassHistotyByClassId] = useState([]);
@@ -45,7 +46,7 @@ const Resource = () => {
   const [options, setOptions] = useState([{ value: "0", label: "" }]);
   const [file, setFile] = useState(null);
 
-  // khởi tạo Class
+  // khởi tạo Resource
   const [resource, setResource] = useState({
     resourcesId: "",
     resourcesName: "",
@@ -54,7 +55,16 @@ const Resource = () => {
       courseId: 0,
       courseName: "",
     },
+    adminName: "",
   });
+
+  const [resourceRequest, setResourceRequest] = useState({
+		courseId: '',
+		adminId: '',
+    resourcesId: 0,
+		resourcesName: '',
+		link: '',
+	});
 
   // thay đổi giá trị của biến
   const handleChangeClassListAndHistory = () => {
@@ -122,10 +132,9 @@ const Resource = () => {
 
   function handleSelect(data) {
     setselectedCourse(data);
-    setResource((pre) => ({
-      ...pre,
-      course: { ...pre.course, courseId: parseInt(selectedCourse.value), courseName: selectedCourse.label },
-    }));
+    if (selectedCourse != undefined) {
+			setResourceRequest((pre) => ({...pre, courseId: parseInt(selectedCourse.value)}));
+		}
   }
 
   // resetModal ClassHistory
@@ -146,7 +155,7 @@ const Resource = () => {
 
   const addResource = async () => {
     const formData = new FormData();
-    formData.append("resource", JSON.stringify(resource));
+    formData.append("resourceRequest", JSON.stringify(resourceRequest));
     formData.append("file", file);
     console.log([...formData]);
     console.log({ ...resource });
@@ -297,11 +306,9 @@ const Resource = () => {
   }, [courses, selectedCourse]);
 
   useEffect(() => {
+    const {resourcesId, resourcesName, link} = {...resource};
     if (selectedCourse.value !== undefined) {
-      setResource((pre) => ({
-        ...pre,
-        course: { ...pre.course, courseId: parseInt(selectedCourse.value), courseName: selectedCourse.label },
-      }));
+      setResourceRequest({resourcesId: resourcesId, resourcesName: resourcesName, link: link, courseId: parseInt(selectedCourse.value), adminId: 'namnguyen'});
     }
   }, [resource, selectedCourse]);
 
@@ -462,11 +469,11 @@ const Resource = () => {
                   {update ? (
                     ""
                   ) : (
-                    <Col md={12} className={update ? "hidden" : ""}>
+                    <Col md={12}>
                       <FormGroup>
                         <label className="form-control-label">Link</label>
                         <br />
-                        <a href={resource.link}>{resource.link}</a>
+                        <label className="form-control-label"><a href={resource.link}>{resource.link}</a></label>
                       </FormGroup>
                     </Col>
                   )}
