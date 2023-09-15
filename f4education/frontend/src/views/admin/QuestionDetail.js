@@ -471,7 +471,6 @@ const QuestionDetail = () => {
                 <>
                   <Button
                     color="dark"
-                    outline
                     disabled
                     role="button"
                     className="float-left"
@@ -484,7 +483,7 @@ const QuestionDetail = () => {
 
               {/* Add button */}
               <Tooltip
-                label="Thêm câu trả lời"
+                label="Thêm ? Chưa làm được bạn ơi, này hơi khó!"
                 color="teal"
                 withArrow
                 arrowPosition="center"
@@ -493,6 +492,7 @@ const QuestionDetail = () => {
                   color="success"
                   className="float-right"
                   onClick={() => {
+                    setEditQuestionId(question.questionId);
                     // handleEditQuestionByQuestionId(questionDetail);
                   }}
                 >
@@ -502,13 +502,13 @@ const QuestionDetail = () => {
 
               {/* Edit button */}
               <Tooltip
-                label="Cập nhật câu hỏi"
-                color="cyan"
+                label="Chỉnh sửa câu hỏi"
+                color="grape"
                 withArrow
                 arrowPosition="center"
               >
                 <IconButton
-                  color="info"
+                  color="secondary"
                   className="float-right"
                   onClick={() => {
                     handleEditQuestionByQuestionId(questionDetail);
@@ -556,7 +556,6 @@ const QuestionDetail = () => {
   };
 
   // *************** ACTION QUESTION AND ANSWERS AREA
-
   // edit question when click
   const handleEditQuestionByQuestionId = (qs) => {
     handleEditQuestion(qs);
@@ -700,24 +699,85 @@ const QuestionDetail = () => {
   };
 
   // Render new ANSWER
-  const [groupsAnswerRender, setGroupAnswerRender] = useState(
-    answers
-      .filter((answer) => answer.questionId === editQuestionId)
-      .map((answer) => {
-        return {
-          answerId: answer.answerId,
-          text: answer.text,
-          isCorrect: answer.isCorrect,
-          questionId: answer.questionId,
-        };
-      })
-  );
+  // const [groupsAnswerRender, setGroupAnswerRender] = useState(
+  //   answers
+  //     // .filter((answer) => answer.questionId === editQuestionId)
+  //     .map((answer) => {
+  //       return {
+  //         answerId: answer.answerId,
+  //         text: answer.text,
+  //         isCorrect: answer.isCorrect,
+  //         questionId: answer.questionId,
+  //       };
+  //     })
+  // );
 
-  const handleRenderAnswerByQuestionId = (question) => {
-    return groupsAnswerRender.map((answerDetails) => <></>);
-  };
+  // const handleRenderAnswerByQuestionId = (question) => {
+  //   return groupsAnswerRender.map((answerDetail) => (
+  //     <>
+  //       {answerDetail.questionId === question.questionId ? (
+  //         <Col lg={12} xl={12} md={12} sm={12} key={answerDetail.answerId}>
+  //           <div className="d-flex">
+  //             {/* Radio button */}
+  //             {editAnswer && question.questionId === editQuestionId ? (
+  //               <div className="d-flex align-items-center mb-2 mr-4">
+  //                 <label>
+  //                   <input
+  //                     type="radio"
+  //                     name={`radio_${answerDetail.questionId}`}
+  //                     checked={answerDetail.isCorrect}
+  //                     onChange={() =>
+  //                       handleOnChangeRadioAnswerValue(answerDetail.answerId)
+  //                     }
+  //                   />
+  //                 </label>
+  //               </div>
+  //             ) : (
+  //               <>
+  //                 <div style={{ width: "40px", height: "40px" }}>
+  //                   {answerDetail.isCorrect ? (
+  //                     <i className="bx bx-check-circle text-success"></i>
+  //                   ) : (
+  //                     <i className="bx bx-x-circle text-danger"></i>
+  //                   )}
+  //                 </div>
+  //               </>
+  //             )}
 
-  const handleAddNewAnswer = () => {};
+  //             {/* Answer Input */}
+  //             {editAnswer && question.questionId === editQuestionId ? (
+  //               <input
+  //                 className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
+  //                 onChange={(e) => {
+  //                   handleOnchangeInputAnswersValue(
+  //                     e.target.value,
+  //                     answerDetail.answerId
+  //                   );
+  //                 }}
+  //                 name="text"
+  //                 value={answerDetail.text}
+  //               />
+  //             ) : (
+  //               <p
+  //                 className="text-dark
+  //                     d-flex align-items-center flex-wrap"
+  //               >
+  //                 {answerDetail.text}
+  //               </p>
+  //             )}
+  //           </div>
+  //         </Col>
+  //       ) : (
+  //         <></>
+  //       )}
+  //     </>
+  //   ));
+  // };
+
+  // const handleAddNewAnswer = () => {
+  //   const newGroup = { answerId: "", text: "", isCorrect: "", questionId: "" };
+  //   setGroupAnswerRender([...groupsAnswerRender, newGroup]);
+  // };
 
   // *************** UseEffect AREA
   useEffect(() => {
