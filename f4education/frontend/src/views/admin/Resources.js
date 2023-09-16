@@ -17,6 +17,7 @@ import courseApi from 'api/courseApi';
 import classHistoryApi from 'api/classHistoryApi';
 
 const Resource = () => {
+	const user = JSON.parse(localStorage.getItem('user') | '');
 	const [resources, setResources] = useState([]);
 	const [classHistories, setClassHistories] = useState([]);
 	const [classHistoryByClassId, setClassHistotyByClassId] = useState([]);
@@ -379,14 +380,6 @@ const Resource = () => {
 					{isClassHistoryShowing ? (
 						<CardBody>
 							<MaterialReactTable
-								muiTableBodyProps={{
-									sx: {
-										//stripe the rows, make odd rows a darker color
-										'& tr:nth-of-type(odd)': {
-											backgroundColor: '#f5f5f5',
-										},
-									},
-								}}
 								enableColumnResizing
 								enableGrouping
 								enableStickyHeader
@@ -524,14 +517,6 @@ const Resource = () => {
 					</div>
 					<div className='modal-body'>
 						<MaterialReactTable
-							muiTableBodyProps={{
-								sx: {
-									//stripe the rows, make odd rows a darker color
-									'& tr:nth-of-type(odd)': {
-										backgroundColor: '#f5f5f5',
-									},
-								},
-							}}
 							enableColumnResizing
 							enableGrouping
 							enableStickyHeader

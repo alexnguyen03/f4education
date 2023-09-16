@@ -41,9 +41,6 @@ public class Resources {
 
 	@Column(name = "resources_name")
 	private String resourcesName;
-	
-	@Column(name = "folder_name")
-	private String folderName;
 
 	private String link;
 	

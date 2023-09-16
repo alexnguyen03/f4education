@@ -14,9 +14,13 @@ import com.f4education.springjwt.interfaces.ResourceService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Resources;
+import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.AdminDTO;
+import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
 import com.f4education.springjwt.repository.AdminRepository;
+import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.ResourceRepository;
 
@@ -28,6 +32,9 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Autowired
 	private AdminRepository adminRepository;
+	
+	@Autowired
+	CourseRepository courseRepository;
 
 	@Autowired
 	GoogleDriveRepository googleDriveRepository;
@@ -42,15 +49,10 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	@Override
-	public ResourcesDTO createResource(ResourcesDTO resourcesDTO) {
+	public ResourcesDTO createResource(ResourceRequest resourceRequest) {
 		String action = "CREATE";
 		Resources resources = new Resources();
-		Admin admin = adminRepository.findById("namnguyen").get();
-		convertToEntity(resourcesDTO, resources);
-		resources.setAdmin(admin);
-		resources.setCourse(resourcesDTO.getCourse());
-		resources.setFolderName(resourcesDTO.getCourse().getCourseName());
-		resources.setLink("https://drive.google.com/drive/folders/" + sessionService.get("folderId"));
+		convertToEntity(resourceRequest, resources);
 		Resources saveResource = resourceRepository.save(resources);
 		return convertToDto(saveResource);
 	}
@@ -60,12 +62,17 @@ public class ResourceServiceImpl implements ResourceService {
 		BeanUtils.copyProperties(resources, resourcesDTO);
 		Admin admin = adminRepository.findById(resources.getAdmin().getAdminId()).get();
 		resourcesDTO.setAdminName(admin.getFullname());
-		resourcesDTO.setFolderName(resources.getCourse().getCourseName());
 		return resourcesDTO;
 	}
-
-	private void convertToEntity(ResourcesDTO resourcesDTO, Resources resources) {
-		BeanUtils.copyProperties(resourcesDTO, resources);
+	
+	private Resources convertToEntity(ResourceRequest resourceRequest, Resources resources) {
+		BeanUtils.copyProperties(resourceRequest, resources);
+		Course course = courseRepository.findById(resourceRequest.getCourseId()).get();
+		Admin admin = adminRepository.findById(resourceRequest.getAdminId()).get();
+		resources.setCourse(course);
+		resources.setAdmin(course.getAdmin());
+		resources.setLink("https://drive.google.com/drive/folders/" + sessionService.get("folderId"));
+		return resources;
 	}
 
 	@Override
