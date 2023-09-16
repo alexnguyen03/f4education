@@ -130,15 +130,18 @@ const QuestionDetail = () => {
   // ************* Main variable
   const [questions, setQuestions] = useState(QuestionVSAnswerData);
   const [answers, setAnswers] = useState(AnswerData);
-  const [courses, setCourses] = useState([]);
-  const [subjects, setSubjects] = useState([]);
   const [questionRequest, setQuestionRequest] = useState({
     questionId: "",
+    questionTitle: "",
     subjectName: "",
     courseName: "",
-    questionTitle: "",
-    // userDetail.username
     adminId: "namnguyen",
+    createDate: "",
+    answer: {
+      answerId: "",
+      text: "",
+      isCorrect: "",
+    },
   });
   const [answerRequest, setAnswerRequest] = useState([
     {
@@ -159,16 +162,12 @@ const QuestionDetail = () => {
 
   // ************* Action variable
   const [editAnswer, setEditAnswer] = useState(false);
-  // const [isEditing, setIsEditing] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editQuestionId, setEditQuestionId] = useState(null);
   const [isUpdate, setIsUpdate] = useState(false);
 
   // ************* Form variable
   // const [selectedAnswers, setSelectedAnswers] = useState({});
-  const [selectedSubjectId, setSelectedSubjectId] = useState(null);
-  const [selectedCourseId, setSelectedCourseId] = useState("Default Null");
-
   const [answer, setAnswer] = useState({
     id: "",
     answerText: "",
@@ -220,18 +219,24 @@ const QuestionDetail = () => {
     setEditAnswer(false);
     // setIsEditing(false);
 
-    const body = {
-      questionId: questionRequest.questionId,
-      subjectName: questionRequest.subjectName,
-      courseName: questionRequest.courseName,
-      questionTitle: questionRequest.questionTitle,
-      createDate: questionByCourseNameRoute.createDate,
-      adminId: "namnguyen",
-      answers: answerRequest,
-    };
-
+    questionRequest[0].answer = answerRequest;
     console.log("UPDATE REQUEST DATA");
-    console.log(body);
+    console.log(questionRequest[0]);
+
+    // question.questionId = questionRequest.questionId;
+    // question.questionTitle = questionRequest.questionTitle;
+    // question.subjectName = questionRequest.subjectName;
+    // question.courseName = questionRequest.courseName;
+    // question.adminId = questionRequest.adminId;
+    // question.createDate = questionRequest.createDate;
+    // question.answers = answerRequest;
+
+    // questionRequest[0].answer = answerRequest;
+    // const lastAnswerIndex = (questionRequest[0].answer = answerRequest);
+    // console.log(lastAnswerIndex[lastAnswerIndex.length - 1].answerId);
+    // lastAnswerIndex[lastAnswerIndex.length - 1].answerId = "";\
+
+    // console.log(question);
     // Handle Change Data
   };
 
@@ -314,27 +319,6 @@ const QuestionDetail = () => {
       ...prevQuestion,
       [e.target.name]: e.target.value,
     }));
-  };
-
-  // ************* Select Handle Logic AREA create question modal
-  const subjectSelectValues = subjects.map((item) => ({
-    value: item.subjectId,
-    label: item.subjectName,
-  }));
-
-  const handleChangeSelectSubject = (value) => {
-    setSelectedSubjectId(value);
-    question.subjectId = value;
-  };
-
-  const courseSelectValues = courses.map((item) => ({
-    value: item.courseId,
-    label: item.courseName,
-  }));
-
-  const handleChangeSelectCourse = (value) => {
-    setSelectedCourseId(value);
-    question.courseId = value;
   };
 
   // *************** Render question and answer AREA
@@ -451,7 +435,7 @@ const QuestionDetail = () => {
               >
                 <Row className="w-100">
                   {/* if answer.questionId === qs.questionId */}
-                  {renderAnswers(questionDetail)}
+                  {handleRenderAnswerByQuestionId(questionDetail)}
                 </Row>
               </div>
             </CardBody>
@@ -492,7 +476,7 @@ const QuestionDetail = () => {
                   color="success"
                   className="float-right"
                   onClick={() => {
-                    setEditQuestionId(question.questionId);
+                    handleAddNewAnswerForEachQuestion(questionDetail);
                     // handleEditQuestionByQuestionId(questionDetail);
                   }}
                 >
@@ -580,14 +564,14 @@ const QuestionDetail = () => {
 
   // ++++++++++++++ ANSWER AREA ++++++++++++++++
   // Create a Group Answer base on answers State
-  const [groupAnswers, setGroupAnswers] = useState(
-    answers.map((answer) => ({
-      answerId: answer.answerId,
-      text: answer.text,
-      isCorrect: answer.isCorrect,
-      questionId: answer.questionId,
-    }))
-  );
+  // const [groupAnswers, setGroupAnswers] = useState(
+  //   answers.map((answer) => ({
+  //     answerId: answer.answerId,
+  //     text: answer.text,
+  //     isCorrect: answer.isCorrect,
+  //     questionId: answer.questionId,
+  //   }))
+  // );
 
   // Filter Answer variable
   const [filterGroupAnswerByQuestionId, setFilterGroupAnswerByQuestionId] =
@@ -596,13 +580,15 @@ const QuestionDetail = () => {
   // Filter Answer base on Question ID for display UI
   const handleFilterByQuestionIdAnswer = () => {
     setFilterGroupAnswerByQuestionId(
-      groupAnswers.filter((answer) => answer.questionId === editQuestionId)
+      groupsAnswerRender.filter(
+        (answer) => answer.questionId === editQuestionId
+      )
     );
   };
 
   // get value onchange Answer Input for update
   const handleOnchangeInputAnswersValue = (value, answerIdValue) => {
-    const updatedGroupAnswer = groupAnswers.map((answer) => {
+    const updatedGroupAnswer = groupsAnswerRender.map((answer) => {
       if (answer.answerId === answerIdValue) {
         const newAnswer = {
           ...answer,
@@ -614,10 +600,12 @@ const QuestionDetail = () => {
       return answer;
     });
 
+    // *Notes: why using groupanswers instead use answers
     // use group answer have advantage which can be restore when use click edit second time;
     // Set Answer For render UI
-    setGroupAnswers(updatedGroupAnswer);
+    // setGroupAnswers(updatedGroupAnswer);
     setAnswers(updatedGroupAnswer);
+    setGroupAnswerRender(updatedGroupAnswer);
 
     // Set Answer for Update Request
     setAnswerRequest(
@@ -629,7 +617,7 @@ const QuestionDetail = () => {
 
   // get value onchange Answer radio for update
   const handleOnChangeRadioAnswerValue = (answerIdValue) => {
-    const updatedGroupAnswer = groupAnswers.map((answer) => {
+    const updatedGroupAnswer = groupsAnswerRender.map((answer) => {
       if (answer.answerId === answerIdValue) {
         const newAnswer = {
           ...answer,
@@ -647,8 +635,9 @@ const QuestionDetail = () => {
     });
 
     // Set Answer For render UI
-    setGroupAnswers(updatedGroupAnswer);
+    // setGroupAnswers(updatedGroupAnswer);
     setAnswers(updatedGroupAnswer);
+    setGroupAnswerRender(updatedGroupAnswer);
 
     // Set Answer for Update Request
     setAnswerRequest(
@@ -676,11 +665,11 @@ const QuestionDetail = () => {
   const handleOnchangeInputQuestionTitle = (value, questionIdValue) => {
     const updatedGroupQuestions = groupQuestions.map((question) => {
       if (question.questionId === questionIdValue) {
-        const recentQuestion = {
+        const newQuestion = {
           ...question,
           questionTitle: value,
         };
-        return recentQuestion;
+        return newQuestion;
       }
       return question;
     });
@@ -690,99 +679,126 @@ const QuestionDetail = () => {
     setGroupQuestions(updatedGroupQuestions);
     setQuestions(updatedGroupQuestions);
 
-    // Set Answer for Update Request
+    // Set Question for Update Request
+    // setQuestionRequest(
+    //   updatedGroupQuestions.filter(
+    //     (question) => question.questionId === editQuestionId
+    //   )
+    // );
+
     setQuestionRequest(
-      ...updatedGroupQuestions.filter(
+      updatedGroupQuestions.filter(
         (question) => question.questionId === editQuestionId
       )
     );
   };
 
   // Render new ANSWER
-  // const [groupsAnswerRender, setGroupAnswerRender] = useState(
-  //   answers
-  //     // .filter((answer) => answer.questionId === editQuestionId)
-  //     .map((answer) => {
-  //       return {
-  //         answerId: answer.answerId,
-  //         text: answer.text,
-  //         isCorrect: answer.isCorrect,
-  //         questionId: answer.questionId,
-  //       };
-  //     })
-  // );
+  const [groupsAnswerRender, setGroupAnswerRender] = useState(
+    answers
+      // .filter((answer) => answer.questionId === editQuestionId)
+      .map((answer) => {
+        return {
+          answerId: answer.answerId,
+          text: answer.text,
+          isCorrect: answer.isCorrect,
+          questionId: answer.questionId,
+        };
+      })
+  );
 
-  // const handleRenderAnswerByQuestionId = (question) => {
-  //   return groupsAnswerRender.map((answerDetail) => (
-  //     <>
-  //       {answerDetail.questionId === question.questionId ? (
-  //         <Col lg={12} xl={12} md={12} sm={12} key={answerDetail.answerId}>
-  //           <div className="d-flex">
-  //             {/* Radio button */}
-  //             {editAnswer && question.questionId === editQuestionId ? (
-  //               <div className="d-flex align-items-center mb-2 mr-4">
-  //                 <label>
-  //                   <input
-  //                     type="radio"
-  //                     name={`radio_${answerDetail.questionId}`}
-  //                     checked={answerDetail.isCorrect}
-  //                     onChange={() =>
-  //                       handleOnChangeRadioAnswerValue(answerDetail.answerId)
-  //                     }
-  //                   />
-  //                 </label>
-  //               </div>
-  //             ) : (
-  //               <>
-  //                 <div style={{ width: "40px", height: "40px" }}>
-  //                   {answerDetail.isCorrect ? (
-  //                     <i className="bx bx-check-circle text-success"></i>
-  //                   ) : (
-  //                     <i className="bx bx-x-circle text-danger"></i>
-  //                   )}
-  //                 </div>
-  //               </>
-  //             )}
+  const handleRenderAnswerByQuestionId = (question) => {
+    return groupsAnswerRender.map((answerDetail) => (
+      <>
+        {answerDetail.questionId === question.questionId ? (
+          <Col lg={12} xl={12} md={12} sm={12} key={answerDetail.answerId}>
+            <div className="d-flex">
+              {/* Radio button */}
+              {editAnswer && question.questionId === editQuestionId ? (
+                <div className="d-flex align-items-center mb-2 mr-4">
+                  <label>
+                    <input
+                      type="radio"
+                      name={`radio_${answerDetail.questionId}`}
+                      checked={answerDetail.isCorrect}
+                      onChange={() =>
+                        handleOnChangeRadioAnswerValue(answerDetail.answerId)
+                      }
+                    />
+                  </label>
+                </div>
+              ) : (
+                <>
+                  <div style={{ width: "40px", height: "40px" }}>
+                    {answerDetail.isCorrect ? (
+                      <i className="bx bx-check-circle text-success"></i>
+                    ) : (
+                      <i className="bx bx-x-circle text-danger"></i>
+                    )}
+                  </div>
+                </>
+              )}
 
-  //             {/* Answer Input */}
-  //             {editAnswer && question.questionId === editQuestionId ? (
-  //               <input
-  //                 className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
-  //                 onChange={(e) => {
-  //                   handleOnchangeInputAnswersValue(
-  //                     e.target.value,
-  //                     answerDetail.answerId
-  //                   );
-  //                 }}
-  //                 name="text"
-  //                 value={answerDetail.text}
-  //               />
-  //             ) : (
-  //               <p
-  //                 className="text-dark
-  //                     d-flex align-items-center flex-wrap"
-  //               >
-  //                 {answerDetail.text}
-  //               </p>
-  //             )}
-  //           </div>
-  //         </Col>
-  //       ) : (
-  //         <></>
-  //       )}
-  //     </>
-  //   ));
-  // };
+              {/* Answer Input */}
+              {editAnswer && question.questionId === editQuestionId ? (
+                <input
+                  className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
+                  onChange={(e) => {
+                    handleOnchangeInputAnswersValue(
+                      e.target.value,
+                      answerDetail.answerId
+                    );
+                  }}
+                  name="text"
+                  value={answerDetail.text}
+                />
+              ) : (
+                <p
+                  className="text-dark
+                      d-flex align-items-center flex-wrap"
+                >
+                  {answerDetail.text}
+                </p>
+              )}
+            </div>
+          </Col>
+        ) : (
+          <></>
+        )}
+      </>
+    ));
+  };
 
-  // const handleAddNewAnswer = () => {
-  //   const newGroup = { answerId: "", text: "", isCorrect: "", questionId: "" };
-  //   setGroupAnswerRender([...groupsAnswerRender, newGroup]);
-  // };
+  const handleAddNewAnswer = (question) => {
+    const newAnswerId =
+      Math.max(...groupsAnswerRender.map((answer) => answer.answerId)) + 1;
+
+    if (question.questionId === editQuestionId) {
+      const newGroup = {
+        answerId: newAnswerId,
+        text: "new answer",
+        isCorrect: false,
+        questionId: question.questionId,
+      };
+
+      setGroupAnswerRender([...groupsAnswerRender, newGroup]);
+      console.log(groupsAnswerRender);
+    }
+  };
+
+  const handleAddNewAnswerForEachQuestion = (questionDetail) => {
+    setEditQuestionId(questionDetail.questionId);
+    handleAddNewAnswer(questionDetail);
+  };
 
   // *************** UseEffect AREA
   useEffect(() => {
     handleFilterByQuestionIdAnswer();
   }, [editQuestionId]);
+
+  useEffect(() => {
+    setAnswer(groupsAnswerRender);
+  }, [groupsAnswerRender]);
 
   return (
     <>
