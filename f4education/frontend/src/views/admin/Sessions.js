@@ -23,7 +23,7 @@ const Sessions = () => {
 	// Main variable
 	const [sessions, setSessions] = useState([]);
 	const [sessionsHistories, setSessionsHistories] = useState([]);
-	const user = JSON.parse(localStorage.getItem('user') ?? '');
+	const user = JSON.parse(localStorage.getItem('user') | '');
 	const [showHistoryTable, setShowHistoryTable] = useState(false);
 	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
 	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
@@ -324,6 +324,14 @@ const Sessions = () => {
 						{/* Table view */}
 						{!showHistoryTable && (
 							<MaterialReactTable
+								muiTableBodyProps={{
+									sx: {
+										//stripe the rows, make odd rows a darker color
+										'& tr:nth-of-type(odd)': {
+											backgroundColor: '#f5f5f5',
+										},
+									},
+								}}
 								displayColumnDefOptions={
 									!showSessionsHistory && {
 										'mrt-row-actions': {
@@ -381,6 +389,14 @@ const Sessions = () => {
 
 						{showHistoryTable && (
 							<MaterialReactTable
+								muiTableBodyProps={{
+									sx: {
+										//stripe the rows, make odd rows a darker color
+										'& tr:nth-of-type(odd)': {
+											backgroundColor: '#f5f5f5',
+										},
+									},
+								}}
 								columns={columnSessionsHistory}
 								data={sessionsHistories}
 								initialState={{columnVisibility: {subjectId: false}}}

@@ -299,101 +299,110 @@ const Teachers = () => {
   // }, [course, selectedSubject]);
 
   return (
-    <>
-      <TeacherHeader />
-      <Container className="mt--7" fluid>
-        <Card className="bg-secondary shadow">
-          {/* Header */}
-          <CardHeader className="bg-white border-0 d-flex justify-content-between">
-            <h3 className="mb-0">BẢNG GIẢNG VIÊN</h3>
-            <Button color="default" type="button">
-              Lịch sử giáo viên
-            </Button>
-          </CardHeader>
+		<>
+			<TeacherHeader />
+			<Container
+				className='mt--7'
+				fluid>
+				<Card className='bg-secondary shadow'>
+					{/* Header */}
+					<CardHeader className='bg-white border-0 d-flex justify-content-between'>
+						<h3 className='mb-0'>BẢNG GIẢNG VIÊN</h3>
+						<Button
+							color='default'
+							type='button'>
+							Lịch sử giáo viên
+						</Button>
+					</CardHeader>
 
-          <CardBody>
-            <MaterialReactTable
-              enableColumnResizing
-              enableGrouping
-              enableStickyHeader
-              enableStickyFooter
-              enableRowNumbers
-              state={{ isLoading: loadingTeachers }}
-              displayColumnDefOptions={{
-                "mrt-row-actions": {
-                  header: "Thao tác",
-                  size: 20,
-                  // Something else here
-                },
-                "mrt-row-numbers": {
-                  size: 5,
-                },
-              }}
-              positionActionsColumn="last"
-              columns={columns}
-              data={teachers}
-              renderTopToolbarCustomActions={() => (
-                <Button
-                  // onClick={handleShowAddForm}
-                  color="primary"
-                  variant="contained"
-                >
-                  <i className="bx bx-layer-plus"></i>
-                  Thêm giảng viên
-                </Button>
-              )}
-              enableRowActions
-              renderRowActions={({ row, table }) => (
-                <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => {
-                      handleEditFrom(row);
-                    }}
-                  >
-                    <EditIcon />
-                  </IconButton>
-                  <IconButton
-                    color="error"
-                    onClick={() => {
-                      teachers.splice(row.index, 1);
-                    }}
-                  >
-                    <RemoveCircleOutlineIcon />
-                  </IconButton>
-                </Box>
-              )}
-              muiTablePaginationProps={{
-                rowsPerPageOptions: [10, 20, 50, 100],
-                showFirstButton: true,
-                showLastButton: true,
-              }}
-            />
+					<CardBody>
+						<MaterialReactTable
+							muiTableBodyProps={{
+								sx: {
+									//stripe the rows, make odd rows a darker color
+									'& tr:nth-of-type(odd)': {
+										backgroundColor: '#f5f5f5',
+									},
+								},
+							}}
+							enableColumnResizing
+							enableGrouping
+							enableStickyHeader
+							enableStickyFooter
+							enableRowNumbers
+							state={{isLoading: loadingTeachers}}
+							displayColumnDefOptions={{
+								'mrt-row-actions': {
+									header: 'Thao tác',
+									size: 20,
+									// Something else here
+								},
+								'mrt-row-numbers': {
+									size: 5,
+								},
+							}}
+							positionActionsColumn='last'
+							columns={columns}
+							data={teachers}
+							renderTopToolbarCustomActions={() => (
+								<Button
+									// onClick={handleShowAddForm}
+									color='primary'
+									variant='contained'>
+									<i className='bx bx-layer-plus'></i>
+									Thêm giảng viên
+								</Button>
+							)}
+							enableRowActions
+							renderRowActions={({row, table}) => (
+								<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
+									<IconButton
+										color='secondary'
+										onClick={() => {
+											handleEditFrom(row);
+										}}>
+										<EditIcon />
+									</IconButton>
+									<IconButton
+										color='error'
+										onClick={() => {
+											teachers.splice(row.index, 1);
+										}}>
+										<RemoveCircleOutlineIcon />
+									</IconButton>
+								</Box>
+							)}
+							muiTablePaginationProps={{
+								rowsPerPageOptions: [10, 20, 50, 100],
+								showFirstButton: true,
+								showLastButton: true,
+							}}
+						/>
 
-            <Modal
-              className="modal-dialog-centered  modal-lg "
-              isOpen={showForm}
-              backdrop="static"
-              toggle={() => setShowForm((pre) => !pre)}
-            >
-              <Form onSubmit={handleSubmitForm} encType="multipart/form-data">
-                <div className="modal-header">
-                  <h3 className="mb-0">Thông tin giảng viên</h3>
-                  <button
-                    aria-label="Close"
-                    className="close"
-                    data-dismiss="modal"
-                    type="button"
-                    onClick={handleResetForm}
-                  >
-                    <span aria-hidden={true}>×</span>
-                  </button>
-                </div>
-                <div className="modal-body">
-                  <div className="px-lg-2">
-                    <Row>
-                      <Col sm={6}>
-                        {/* <FormGroup>
+						<Modal
+							className='modal-dialog-centered  modal-lg '
+							isOpen={showForm}
+							backdrop='static'
+							toggle={() => setShowForm((pre) => !pre)}>
+							<Form
+								onSubmit={handleSubmitForm}
+								encType='multipart/form-data'>
+								<div className='modal-header'>
+									<h3 className='mb-0'>Thông tin giảng viên</h3>
+									<button
+										aria-label='Close'
+										className='close'
+										data-dismiss='modal'
+										type='button'
+										onClick={handleResetForm}>
+										<span aria-hidden={true}>×</span>
+									</button>
+								</div>
+								<div className='modal-body'>
+									<div className='px-lg-2'>
+										<Row>
+											<Col sm={6}>
+												{/* <FormGroup>
                           <label
                             className="form-control-label"
                             htmlFor="input-username"
@@ -408,27 +417,26 @@ const Teachers = () => {
                             isSearchable={true}
                           />
                         </FormGroup> */}
-                        <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-email"
-                          >
-                            Tên giảng viên
-                          </label>
+												<FormGroup>
+													<label
+														className='form-control-label'
+														htmlFor='input-email'>
+														Tên giảng viên
+													</label>
 
-                          <Input
-                            className="form-control-alternative"
-                            id="input-course-name"
-                            placeholder="Tên giảng viên"
-                            type="text"
-                            onChange={handelOnChangeInput}
-                            name="fullname"
-                            value={teacher.fullname}
-                          />
-                        </FormGroup>
-                        <Row>
-                          <Col md={12}>
-                            {/* <FormGroup>
+													<Input
+														className='form-control-alternative'
+														id='input-course-name'
+														placeholder='Tên giảng viên'
+														type='text'
+														onChange={handelOnChangeInput}
+														name='fullname'
+														value={teacher.fullname}
+													/>
+												</FormGroup>
+												<Row>
+													<Col md={12}>
+														{/* <FormGroup>
                               <label
                                 className="form-control-label"
                                 htmlFor="input-first-name"
@@ -446,79 +454,72 @@ const Teachers = () => {
                               />
                             </FormGroup> */}
 
-                            <ButtonGroup>
-                              <Button
-                                color="primary"
-                                outline
-                                onClick={() => setRSelected(1)}
-                                active={rSelected === 1}
-                              >
-                                Radio 1
-                              </Button>
-                              <Button
-                                color="primary"
-                                outline
-                                onClick={() => setRSelected(2)}
-                                active={rSelected === 2}
-                              >
-                                Radio 2
-                              </Button>
-                              <Button
-                                color="primary"
-                                outline
-                                onClick={() => setRSelected(3)}
-                                active={rSelected === 3}
-                              >
-                                Radio 3
-                              </Button>
-                            </ButtonGroup>
-                          </Col>
-                          <Col md={12}>
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="input-last-name"
-                              >
-                                Ngày sinh
-                              </label>
+														<ButtonGroup>
+															<Button
+																color='primary'
+																outline
+																onClick={() => setRSelected(1)}
+																active={rSelected === 1}>
+																Radio 1
+															</Button>
+															<Button
+																color='primary'
+																outline
+																onClick={() => setRSelected(2)}
+																active={rSelected === 2}>
+																Radio 2
+															</Button>
+															<Button
+																color='primary'
+																outline
+																onClick={() => setRSelected(3)}
+																active={rSelected === 3}>
+																Radio 3
+															</Button>
+														</ButtonGroup>
+													</Col>
+													<Col md={12}>
+														<FormGroup>
+															<label
+																className='form-control-label'
+																htmlFor='input-last-name'>
+																Ngày sinh
+															</label>
 
-                              <Input
-                                className="form-control-alternative"
-                                // value={teacher.dateOfBirth}
-                                value={moment(teacher.dateOfBirth).format(
-                                  "YYYY-MM-DD"
-                                )}
-                                // pattern="yyyy-MM-dd"
-                                id="input-coursePrice"
-                                type="date"
-                                name="dateOfBirth"
-                                onChange={handelOnChangeInput}
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                      </Col>
-                      <Col sm={6}>
-                        <Row>
-                          <Col md={12}>
-                            <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="input-last-name"
-                              >
-                                Địa chỉ
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                id="input-courseDescription"
-                                name="address"
-                                value={teacher.address}
-                                type="textarea"
-                                onChange={handelOnChangeInput}
-                              />
-                            </FormGroup>
-                          </Col>
-                          {/* <Col md={12}>
+															<Input
+																className='form-control-alternative'
+																// value={teacher.dateOfBirth}
+																value={moment(teacher.dateOfBirth).format('YYYY-MM-DD')}
+																// pattern="yyyy-MM-dd"
+																id='input-coursePrice'
+																type='date'
+																name='dateOfBirth'
+																onChange={handelOnChangeInput}
+															/>
+														</FormGroup>
+													</Col>
+												</Row>
+											</Col>
+											<Col sm={6}>
+												<Row>
+													<Col md={12}>
+														<FormGroup>
+															<label
+																className='form-control-label'
+																htmlFor='input-last-name'>
+																Địa chỉ
+															</label>
+															<Input
+																className='form-control-alternative'
+																id='input-courseDescription'
+																name='address'
+																value={teacher.address}
+																type='textarea'
+																onChange={handelOnChangeInput}
+															/>
+														</FormGroup>
+													</Col>
+													{/* <Col md={12}>
                             <FormGroup>
                               <Label
                                 htmlFor="exampleFile"
@@ -553,31 +554,33 @@ const Teachers = () => {
                               src={imgData}
                             />
                           </div> */}
-                        </Row>
-                      </Col>
-                    </Row>
-                  </div>
-                  <hr className="my-4" />
-                </div>
-                <div className="modal-footer">
-                  <Button
-                    color="secondary"
-                    data-dismiss="modal"
-                    type="button"
-                    onClick={handleResetForm}
-                  >
-                    Hủy
-                  </Button>
-                  <Button color="primary" type="submit" className="px-5">
-                    Lưu
-                  </Button>
-                </div>
-              </Form>
-            </Modal>
-          </CardBody>
-        </Card>
-      </Container>
-    </>
+												</Row>
+											</Col>
+										</Row>
+									</div>
+									<hr className='my-4' />
+								</div>
+								<div className='modal-footer'>
+									<Button
+										color='secondary'
+										data-dismiss='modal'
+										type='button'
+										onClick={handleResetForm}>
+										Hủy
+									</Button>
+									<Button
+										color='primary'
+										type='submit'
+										className='px-5'>
+										Lưu
+									</Button>
+								</div>
+							</Form>
+						</Modal>
+					</CardBody>
+				</Card>
+			</Container>
+		</>
   );
 };
 export default memo(Teachers);

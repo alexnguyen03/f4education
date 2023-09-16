@@ -426,6 +426,14 @@ const Courses = () => {
 					<CardBody>
 						{!showHistoryTable && (
 							<MaterialReactTable
+								muiTableBodyProps={{
+									sx: {
+										//stripe the rows, make odd rows a darker color
+										'& tr:nth-of-type(odd)': {
+											backgroundColor: '#f5f5f5',
+										},
+									},
+								}}
 								enableColumnResizing
 								enableGrouping
 								enableStickyHeader
@@ -483,6 +491,14 @@ const Courses = () => {
 
 						{showHistoryTable && (
 							<MaterialReactTable
+								muiTableBodyProps={{
+									sx: {
+										//stripe the rows, make odd rows a darker color
+										'& tr:nth-of-type(odd)': {
+											backgroundColor: '#f5f5f5',
+										},
+									},
+								}}
 								enableColumnResizing
 								enableGrouping
 								enableStickyHeader
