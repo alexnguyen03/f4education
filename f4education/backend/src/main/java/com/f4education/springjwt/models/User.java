@@ -44,9 +44,12 @@ public class User {
 
 	@OneToMany(mappedBy = "user")
 	List<Account_role> account_role;
-	
+
 	@OneToMany(mappedBy = "user")
 	List<Teacher> teachers;
+
+	@OneToMany(mappedBy = "user")
+	List<Admin> admins;
 
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))

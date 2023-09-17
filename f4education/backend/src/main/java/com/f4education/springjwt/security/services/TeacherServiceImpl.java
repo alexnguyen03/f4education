@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.TeacherService;
+import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.models.User;
+import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.repository.TeacherRepository;
 import com.f4education.springjwt.repository.UserRepository;

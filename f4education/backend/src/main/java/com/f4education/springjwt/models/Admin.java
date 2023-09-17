@@ -58,6 +58,10 @@ public class Admin {
 	@OneToMany(mappedBy = "admin")
 	List<Resources> resources;
 
+	@ManyToOne
+	@JoinColumn(name = "account_id")
+	User user;
+
 	@Override
 	public String toString() {
 		return "Admin [adminId=" + adminId + ", fullname=" + fullname + ", gender=" + gender + ", dateOfBirth="
