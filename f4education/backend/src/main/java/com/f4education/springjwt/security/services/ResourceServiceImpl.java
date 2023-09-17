@@ -1,6 +1,5 @@
 package com.f4education.springjwt.security.services;
 
-import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -14,7 +13,6 @@ import com.f4education.springjwt.interfaces.ResourceService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Resources;
-import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.AdminDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.request.ResourceRequest;
@@ -71,6 +69,7 @@ public class ResourceServiceImpl implements ResourceService {
 		Admin admin = adminRepository.findById(resourceRequest.getAdminId()).get();
 		resources.setCourse(course);
 		resources.setAdmin(course.getAdmin());
+		resources.setCreateDate(new Date());
 		resources.setLink("https://drive.google.com/drive/folders/" + sessionService.get("folderId"));
 		return resources;
 	}

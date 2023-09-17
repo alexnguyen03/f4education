@@ -11,7 +11,7 @@ import {
   Col,
   Modal,
 } from "reactstrap";
-import ResourcesHeader from "components/Headers/ResourcesHeader";
+import ResourceDetailHeader from "components/Headers/ResourceDetailHeader";
 import { useState, useMemo, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
@@ -338,110 +338,62 @@ const Resource = () => {
   useEffect(() => {
     getDataResource();
     getAllCourse();
-    // getDataClassHistory();
-    // getDataClassHistoryByClassId();
   }, []);
 
   return (
     <>
-      <ResourcesHeader />
+      <ResourceDetailHeader />
       <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
           {/* Header */}
           <CardHeader className="bg-white border-0 d-flex justify-content-between">
-            <h3 className="mb-0">
-              {isClassHistoryShowing
-                ? "Bảng lịch sử tài nguyên"
-                : "Bảng tài nguyên"}
-            </h3>
-            <Button
-              color="default"
-              type="button"
-              onClick={() => handleChangeClassListAndHistory()}
-            >
-              {isClassHistoryShowing
-                ? "Danh sách tài nguyên"
-                : "Lịch sử tài nguyên"}
-            </Button>
+            <h3 className="mb-0">Bảng tài nguyên chi tiết</h3>
           </CardHeader>
 
-          {/* bảng tài nguyên */}
-          {isClassHistoryShowing ? null : (
-            <CardBody>
-              <MaterialReactTable
-                displayColumnDefOptions={{
-                  "mrt-row-actions": {
-                    header: "Thao tác",
-                    size: 100,
-                  },
-                }}
-                enableColumnResizing
-                enableGrouping
-                enableStickyHeader
-                enableStickyFooter
-                columns={columnClass}
-                data={resources}
-                positionActionsColumn="last"
-                renderTopToolbarCustomActions={() => (
-                  <Button
-                    onClick={() => setShowFormClass((pre) => !pre)}
-                    color="success"
+          {/* bảng tài nguyên chi tiết */}
+          <CardBody>
+            <MaterialReactTable
+              displayColumnDefOptions={{
+                "mrt-row-actions": {
+                  header: "Thao tác",
+                  size: 80,
+                },
+              }}
+              enableColumnResizing
+              enableGrouping
+              enableStickyHeader
+              enableStickyFooter
+              columns={columnClass}
+              data={resources}
+              positionActionsColumn="last"
+              renderTopToolbarCustomActions={() => (
+                <Button
+                  onClick={() => setShowFormClass((pre) => !pre)}
+                  color="success"
+                >
+                  Thêm tài nguyên
+                </Button>
+              )}
+              enableRowActions
+              renderRowActions={({ row, table }) => (
+                <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
+                  <IconButton
+                    color="secondary"
+                    onClick={() => {
+                      handleEditRow(row);
+                    }}
                   >
-                    Thêm tài nguyên
-                  </Button>
-                )}
-                enableRowActions
-                renderRowActions={({ row, table }) => (
-                  <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-                    <Link
-                      to={`/admin/resourceDetail/${row.original.resourcesId}`}
-                    >
-                      <IconButton
-                        color="secondary"
-                        onClick={() => {
-                          handleEditRow(row);
-                        }}
-                      >
-                        <EditIcon />
-                      </IconButton>
-                    </Link>
-                    <IconButton
-                      color="info"
-                      onClick={() => {
-                        handleShowClassHistory(row);
-                      }}
-                    >
-                      <i class="fa-sharp fa-solid fa-eye"></i>
-                    </IconButton>
-                  </Box>
-                )}
-                muiTablePaginationProps={{
-                  rowsPerPageOptions: [10, 20, 50, 100],
-                  showFirstButton: false,
-                  showLastButton: false,
-                }}
-              />
-            </CardBody>
-          )}
-
-          {/* bảng lịch sử tài nguyên  */}
-          {isClassHistoryShowing ? (
-            <CardBody>
-              <MaterialReactTable
-                enableColumnResizing
-                enableGrouping
-                enableStickyHeader
-                enableStickyFooter
-                columns={columnClassHistory}
-                data={classHistories}
-                muiTablePaginationProps={{
-                  rowsPerPageOptions: [10, 20, 50, 100],
-                  showFirstButton: false,
-                  showLastButton: false,
-                }}
-              />
-            </CardBody>
-          ) : null}
+                    <DeleteIcon />
+                  </IconButton>
+                </Box>
+              )}
+              muiTablePaginationProps={{
+                rowsPerPageOptions: [10, 20, 50, 100],
+                showFirstButton: false,
+                showLastButton: false,
+              }}
+            />
+          </CardBody>
         </Card>
         {/* Modal Resource */}
         <Modal

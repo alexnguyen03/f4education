@@ -39,10 +39,11 @@ public class Resources {
 	@Column(name = "resources_id")
 	private Integer resourcesId;
 
-	@Column(name = "resources_name")
-	private String resourcesName;
-
 	private String link;
+	
+	@JsonIgnore
+	@Column(name = "create_date")
+	private Date createDate;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "resources")
@@ -60,7 +61,6 @@ public class Resources {
 
 	@Override
 	public String toString() {
-		return "Resources [resourcesId=" + resourcesId + ", resourcesName=" + resourcesName + ", link=" + link + "]";
-	} 
-	
+		return "Resources [resourcesId=" + resourcesId + ", link=" + link + ", createDate=" + createDate + "]";
+	}
 }
