@@ -1,5 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
+import java.util.Date;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
@@ -19,15 +21,15 @@ public class ResourceRequest {
 	@JsonProperty("resourcesId")
 	private Integer resourcesId;
 
-	@JsonProperty("resourcesName")
-	private String resourcesName;
-
 	@JsonProperty("link")
 	private String link;
+	
+	@JsonProperty("createDate")
+	private Date createDate;
 
 	@Override
 	public String toString() {
-		return "ResourceRequest [courseId=" + courseId + ", adminId=" + adminId + ", resourcesName=" + resourcesName
-				+ ", link=" + link + "]";
+		return "ResourceRequest [courseId=" + courseId + ", adminId=" + adminId + ", resourcesId=" + resourcesId
+				+ ", link=" + link + ", createDate=" + createDate + "]";
 	}
 }

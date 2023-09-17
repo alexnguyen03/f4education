@@ -29,6 +29,7 @@ import Teachers from 'views/admin/Teachers.js';
 import Classs from 'views/admin/Classs.js';
 import ClasssRoom from 'views/admin/ClasssRoom.js';
 import Resources from 'views/admin/Resources.js';
+import ResourceDetail from 'views/admin/ResourceDetail';
 import Questions from 'views/admin/Questions';
 import QuestionDetail from 'views/admin/QuestionDetail';
 
@@ -139,8 +140,25 @@ var routes = [
 	{
 		path: '/resources',
 		name: 'Tài nguyên',
-		icon: 'ni ni-key-25 text-info',
+		icon: 'ni ni-single-02 text-yellow',
 		component: <Resources />,
+		layout: '/admin',
+	},
+	{
+		path: '/questions',
+		name: 'Câu hỏi',
+		icon: 'ni ni-ui-04 text-primary',
+		component: <Questions />,
+		layout: '/admin',
+	},
+	{
+		path: '/questionDetail/:courseName',
+		component: <QuestionDetail />,
+		layout: '/admin',
+	},
+	{
+		path: '/resourceDetail/:resourcesId',
+		component: <ResourceDetail />,
 		layout: '/admin',
 	},
 ];

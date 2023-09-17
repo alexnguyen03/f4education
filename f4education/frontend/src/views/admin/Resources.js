@@ -6,6 +6,7 @@ import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
 import {Box, IconButton} from '@mui/material';
 import moment from 'moment';
 import Select from 'react-select';
+import {Link} from 'react-router-dom';
 
 // gọi API từ resourceApi
 import resourceApi from 'api/resourceApi';
@@ -34,15 +35,24 @@ const Resource = () => {
 	const [options, setOptions] = useState([{value: '0', label: ''}]);
 	const [file, setFile] = useState(null);
 
-	// khởi tạo Class
+	// khởi tạo Resource
 	const [resource, setResource] = useState({
 		resourcesId: '',
-		resourcesName: '',
 		link: '',
+		createDate: '',
 		course: {
 			courseId: 0,
 			courseName: '',
 		},
+		adminName: '',
+	});
+
+	const [resourceRequest, setResourceRequest] = useState({
+		courseId: '',
+		adminId: '',
+		resourcesId: 0,
+		link: '',
+		createDate: '',
 	});
 
 	// thay đổi giá trị của biến
@@ -89,9 +99,8 @@ const Resource = () => {
 		setselectedCourse({});
 		setResource({
 			resourcesId: '',
-			resourcesName: '',
-			folderName: '',
 			link: '',
+			createDate: '',
 			course: {
 				courseId: 0,
 				courseName: '',
@@ -111,10 +120,23 @@ const Resource = () => {
 
 	function handleSelect(data) {
 		setselectedCourse(data);
-		setResource((pre) => ({
-			...pre,
-			course: {...pre.course, courseId: parseInt(selectedCourse.value), courseName: selectedCourse.label},
-		}));
+		if (selectedCourse != undefined) {
+			setResourceRequest((pre) => ({
+				...pre,
+				courseId: parseInt(selectedCourse.value),
+			}));
+		}
+	}
+
+	function renderCellWithLink(row) {
+		// console.log(row);
+		const link = row.link;
+		const id = row.resourcesId;
+		return (
+			<span key={id}>
+				<Link to={`${link}`}>{row.link}</Link>
+			</span>
+		);
 	}
 
 	// resetModal ClassHistory
@@ -165,19 +187,21 @@ const Resource = () => {
 				size: 80,
 			},
 			{
-				accessorKey: 'resourcesName',
-				header: 'Tên tài nguyên',
-				size: 110,
+				accessorKey: 'course.courseName',
+				header: 'Tên khóa học',
+				size: 150,
 			},
 			{
-				accessorKey: 'link',
+				accessorFn: (row) => row.link,
+				Cell: ({cell}) => renderCellWithLink(cell.row.original),
 				header: 'Link',
 				size: 200,
 			},
 			{
-				accessorKey: 'course.courseName',
-				header: 'Tên khóa học',
-				size: 120,
+				accessorKey: 'createDate',
+				accessorFn: (row) => moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A'),
+				header: 'Ngày tạo',
+				size: 150,
 			},
 			{
 				accessorKey: 'adminName',
@@ -282,11 +306,14 @@ const Resource = () => {
 	}, [courses, selectedCourse]);
 
 	useEffect(() => {
+		const {resourcesId, link} = {...resource};
 		if (selectedCourse.value !== undefined) {
-			setResource((pre) => ({
-				...pre,
-				course: {...pre.course, courseId: parseInt(selectedCourse.value), courseName: selectedCourse.label},
-			}));
+			setResourceRequest({
+				resourcesId: resourcesId,
+				link: link,
+				courseId: parseInt(selectedCourse.value),
+				adminId: 'namnguyen',
+			});
 		}
 	}, [resource, selectedCourse]);
 
@@ -320,14 +347,6 @@ const Resource = () => {
 					{isClassHistoryShowing ? null : (
 						<CardBody>
 							<MaterialReactTable
-								muiTableBodyProps={{
-									sx: {
-										//stripe the rows, make odd rows a darker color
-										'& tr:nth-of-type(odd)': {
-											backgroundColor: '#f5f5f5',
-										},
-									},
-								}}
 								displayColumnDefOptions={{
 									'mrt-row-actions': {
 										header: 'Thao tác',
@@ -351,13 +370,15 @@ const Resource = () => {
 								enableRowActions
 								renderRowActions={({row, table}) => (
 									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-										<IconButton
-											color='secondary'
-											onClick={() => {
-												handleEditRow(row);
-											}}>
-											<EditIcon />
-										</IconButton>
+										<Link to={`/admin/resourceDetail/${row.original.resourcesId}`}>
+											<IconButton
+												color='secondary'
+												onClick={() => {
+													handleEditRow(row);
+												}}>
+												<EditIcon />
+											</IconButton>
+										</Link>
 										<IconButton
 											color='info'
 											onClick={() => {
@@ -418,39 +439,23 @@ const Resource = () => {
 								<FormGroup>
 									<label className='form-control-label'>Tên khóa học</label>
 									<Select
+										placeholder='Chọn khóa học'
 										options={options}
 										value={selectedCourse}
 										onChange={handleSelect}
-										// isSearchable={true}
-									/>
-								</FormGroup>
-								<FormGroup>
-									<label
-										className='form-control-label'
-										htmlFor='input-resource-name'>
-										Tên tài nguyên
-									</label>
-									<Input
-										className='form-control-alternative'
-										id='input-resource-name'
-										placeholder='Tên tài nguyên'
-										type='text'
-										onChange={handelOnChangeInput}
-										name='resourcesName'
-										value={resource.resourcesName}
 									/>
 								</FormGroup>
 								<Row>
 									{update ? (
 										''
 									) : (
-										<Col
-											md={12}
-											className={update ? 'hidden' : ''}>
+										<Col md={12}>
 											<FormGroup>
 												<label className='form-control-label'>Link</label>
 												<br />
-												<a href={resource.link}>{resource.link}</a>
+												<label className='form-control-label'>
+													<a href={resource.link}>{resource.link}</a>
+												</label>
 											</FormGroup>
 										</Col>
 									)}
@@ -461,21 +466,14 @@ const Resource = () => {
 												htmlFor='customFile'>
 												Chọn File
 											</label>
-											<div className='custom-file'>
-												<input
-													type='file'
-													multiple
-													name='imageFile'
-													className='custom-file-input form-control-alternative'
-													id='customFile'
-													onChange={onChangeFile}
-												/>
-												<label
-													className='custom-file-label'
-													htmlFor='customFile'>
-													Chọn tài liệu
-												</label>
-											</div>
+											<br />
+											<input
+												type='file'
+												multiple
+												id='customFile'
+												className='form-control-alternative'
+												onChange={onChangeFile}
+											/>
 										</FormGroup>
 									</Col>
 								</Row>

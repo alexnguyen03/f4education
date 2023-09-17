@@ -1,5 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
+import java.util.Date;
+
 import com.f4education.springjwt.models.Course;
 
 import lombok.AllArgsConstructor;
@@ -15,6 +17,8 @@ public class ResourcesDTO {
 	private String resourcesName;
 
 	private String link;
+	
+	private Date createDate;
 	
 	private String adminName;
 	
