@@ -27,6 +27,8 @@ import Courses from 'views/admin/Courses.js';
 import Classs from 'views/admin/Classs.js';
 import ClasssRoom from 'views/admin/ClasssRoom.js';
 import Resources from 'views/admin/Resources.js'
+import Questions from "views/admin/Questions";
+import QuestionDetail from "views/admin/QuestionDetail";
 
 var routes = [
 	{
@@ -100,18 +102,16 @@ var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/classsroom',
-		name: 'Phòng học',
-		icon: 'ni ni-key-25 text-info',
-		component: <ClasssRoom />,
-		layout: '/admin',
-	},
-	{
-		path: '/resources',
-		name: 'Tài nguyên',
-		icon: 'ni ni-key-25 text-info',
-		component: <Resources />,
-		layout: '/admin',
-	},
+		path: "/questions",
+		name: "Câu hỏi",
+		icon: "ni ni-ui-04 text-primary",
+		component: <Questions />,
+		layout: "/admin",
+	  },
+	  {
+		path: "/questionDetail/:courseName",
+		component: <QuestionDetail />,
+		layout: "/admin",
+	  },
 ];
 export default routes;

@@ -1,6 +1,5 @@
 package com.f4education.springjwt.payload.request;
 
-import java.util.Date;
 import java.util.List;
 
 import com.f4education.springjwt.models.Answer;
@@ -12,18 +11,16 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDTO {
+public class QuestionDTORequest {
     private Integer questionId;
 
-    private String subjectName;
+    private Integer subjectId;
 
-    private String courseName;
+    private Integer courseId;
 
     private String questionTitle;
+
+    private String adminId;
     
-    private Date createDate;
-
-    private List<Answer> answer;
-
-    private String adminName;
+    private List<Answer> answers;
 }

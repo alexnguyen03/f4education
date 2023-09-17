@@ -216,7 +216,7 @@ const Subjects = () => {
       },
       {
         accessorFn: (row) =>
-          moment(row.createDate).format("dd-MM-yyyy, h:mm:ss a"),
+          moment(row.createDate).format("DD-MM-yyyy, h:mm:ss a"),
         header: "Ngày Tạo",
       },
     ],
@@ -243,7 +243,7 @@ const Subjects = () => {
       },
       {
         accessorFn: (row) =>
-          moment(row.modifyDate).format("dd-MM-yyyy, h:mm:ss a"),
+          moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
         header: "Ngày chỉnh sửa",
         size: 120,
       },
