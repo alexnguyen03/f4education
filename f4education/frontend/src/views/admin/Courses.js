@@ -5,7 +5,7 @@ import moment from 'moment';
 import CoursesHeader from 'components/Headers/CoursesHeader';
 import {MaterialReactTable} from 'material-react-table';
 import {memo, useEffect, useMemo, useState} from 'react';
-import {Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Row, Modal, Button, CardSubtitle, CardText, CardTitle, CardImg, CardGroup, ListGroupItem, ListGroup} from 'reactstrap';
+import {Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Row, Modal, Button, CardSubtitle, CardText, CardTitle, CardImg, CardGroup, ListGroupItem, ListGroup, Badge} from 'reactstrap';
 import subjectApi from '../../api/subjectApi';
 import Select from 'react-select';
 import {Typography} from '@material-ui/core';
@@ -23,6 +23,7 @@ const Courses = () => {
 	const [valid, setValid] = useState(false);
 	const [showHistoryTable, setShowHistoryTable] = useState(false);
 	const [update, setUpdate] = useState(false);
+	const [submitClick, setSubmitClick] = useState(false);
 	const [loadingCourses, setLoadingCourses] = useState(true);
 	const [loadingCoursesHistory, setLoadingCoursesHistory] = useState(true);
 	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
@@ -72,18 +73,13 @@ const Courses = () => {
 
 	// Thực hiện binding data
 	const handelOnChangeInput = (e) => {
-		validate();
+		console.log('🚀 ~ file: Courses.js:78 ~ handelOnChangeInput ~ e.target.name:', e.target.name);
+		if (e.target.name === 'courseName') {
+			valdateCourseName();
+		}
 		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
 	};
-	const handleOnChangeSelect = (e) => {
-		const selectedIndex = e.target.options.selectedIndex;
-		setSubjectId(e.target.options[selectedIndex].getAttribute('data-value'));
-		setCourseRequest((preCourse) => ({
-			...preCourse,
-			subjectId: parseInt(subjectId),
-		}));
-	};
-	const validate = () => {
+	const valdateCourseName = () => {
 		if (course.courseName === '') {
 			setMsgError((preErr) => ({...preErr, courseNameErr: 'Vui lòng nhập Tên khóa học'}));
 		} else if (course.courseName.length < 10) {
@@ -91,6 +87,17 @@ const Courses = () => {
 		} else {
 			setMsgError((preErr) => ({...preErr, courseNameErr: ''}));
 		}
+	};
+	const validate = () => {
+		setValid(false);
+		// if (course.courseName === '') {
+		// 	setMsgError((preErr) => ({...preErr, courseNameErr: 'Vui lòng nhập Tên khóa học'}));
+		// } else if (course.courseName.length < 10) {
+		// 	setMsgError((preErr) => ({...preErr, courseNameErr: 'Tên khóa học không hợp lệ (quá ngắn)'}));
+		// } else {
+		// 	setMsgError((preErr) => ({...preErr, courseNameErr: ''}));
+		// }
+		valdateCourseName();
 		if (course.courseDuration === '') {
 			setMsgError((preErr) => ({...preErr, courseDurationErr: 'Vui lòng nhập Thời lượng của khóa học'}));
 		} else if (course.courseDuration === '0' || parseInt(course.courseDuration) < 0) {
@@ -116,14 +123,14 @@ const Courses = () => {
 			setMsgError((preErr) => ({...preErr, courseDescriptionErr: ''}));
 		}
 		if (msgError.courseNameErr != '' || msgError.courseDescriptionErr != '' || msgError.courseDurationErr != '' || msgError.imgErr != '' || msgError.coursePriceErr != '') {
-			setValid(false);
 			return false;
+		} else {
+			setValid(true);
+			return true;
 		}
-		setValid(true);
-		return true;
 	};
 	const onChangePicture = (e) => {
-		validate();
+		// validate();
 		setImage(null);
 		if (e.target.files[0]) {
 			setImage(e.target.files[0]);
@@ -142,13 +149,13 @@ const Courses = () => {
 		() => [
 			{
 				accessorKey: 'subject.subjectName',
-				header: 'Tên môn học nè',
-				size: 100,
+				header: 'Tên môn học',
+				size: 80,
 			},
 			{
 				accessorKey: 'courseName',
 				header: 'Tên khóa học',
-				size: 150,
+				size: 130,
 			},
 			{
 				accessorKey: 'courseDuration',
@@ -167,7 +174,7 @@ const Courses = () => {
 			},
 			{
 				accessorKey: 'subject.admin.fullname',
-				header: 'Mã người tạo',
+				header: 'Người tạo',
 				size: 80,
 			},
 		],
@@ -176,14 +183,6 @@ const Courses = () => {
 
 	const columnsCoursesHistory = useMemo(
 		() => [
-			{
-				enableColumnOrdering: true,
-				enableEditing: false, //disable editing on this column
-				enableSorting: true,
-				accessorKey: 'courseId',
-				header: 'Mã khóa học',
-				size: 20,
-			},
 			{
 				accessorKey: 'subjectName',
 				header: 'Tên môn học',
@@ -198,17 +197,18 @@ const Courses = () => {
 				accessorFn: (row) => row,
 				Cell: ({cell}) => {
 					const row = cell.getValue();
-					if (row.endDate !== null) {
-						return <span>{row.action}</span>;
+
+					if (row.action === 'UPDATE') {
+						return <Badge color='primary'>Cập nhật</Badge>;
 					} else {
-						return <span>Chưa kết thúc</span>;
+						return <Badge color='success'>Tạo mới </Badge>;
 					}
 				},
 				header: 'Hành động',
 				size: 75,
 			},
 			{
-				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss a'),
+				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss A'),
 				header: 'Ngày thao tác',
 				size: 60,
 			},
@@ -309,6 +309,9 @@ const Courses = () => {
 	};
 
 	const handleShowAddForm = () => {
+		setSubmitClick(false);
+
+		setMsgError((preErr) => ({...preErr, courseNameErr: '', imgErr: '', courseDescriptionErr: ''}));
 		setShowForm((pre) => !pre);
 		setUpdate(false);
 		handleSelect(options[0]);
@@ -316,6 +319,8 @@ const Courses = () => {
 	};
 	const handleSubmitForm = (e) => {
 		e.preventDefault();
+		setSubmitClick(true);
+
 		validate();
 		if (!validate) {
 			return;
@@ -402,8 +407,12 @@ const Courses = () => {
 		if (selectedSubject !== undefined) {
 			setCourseRequest({courseId: courseId, courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
 		}
-		validate();
 	}, [course, selectedSubject]);
+	useEffect(() => {
+		if (submitClick) {
+			validate();
+		}
+	}, []);
 	return (
 		<>
 			<CoursesHeader />
@@ -439,15 +448,15 @@ const Courses = () => {
 								enableStickyHeader
 								enableStickyFooter
 								enableRowNumbers
-								// state={{isLoading: loadingCourses}}
+								state={{isLoading: loadingCourses}}
 								displayColumnDefOptions={{
 									'mrt-row-actions': {
 										header: 'Thao tác',
-										size: 20,
+										size: 40,
 										// Something else here
 									},
 									'mrt-row-numbers': {
-										size: 5,
+										size: 10,
 									},
 								}}
 								positionActionsColumn='last'
@@ -722,8 +731,7 @@ const Courses = () => {
 									<Button
 										color={update ? 'primary' : 'success'}
 										type='submit'
-										className='px-5'
-										disabled={valid ? '' : 'true'}>
+										className='px-5'>
 										Lưu
 									</Button>
 								</div>

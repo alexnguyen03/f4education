@@ -3,6 +3,8 @@ package com.f4education.springjwt.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -69,14 +71,15 @@ public class CoursesController {
 	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasRole('ADMIN')")
 	public CourseDTO updateCourse(@RequestPart("courseRequest") String courseRequestString,
-			@RequestParam("file") MultipartFile file) {
+			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
 		CourseRequest courseRequest = new CourseRequest();
+
 		try {
 			courseRequest = mapper.readValue(courseRequestString,
 					CourseRequest.class);
-			if (!file.isEmpty()) {
-				File savedFile = xfileService.save(file, "/courses");
+			if (file.isPresent()) {
+				File savedFile = xfileService.save(file.get(), "/courses");
 				courseRequest.setImage(savedFile.getName());
 			}
 
