@@ -1,14 +1,14 @@
-import { FormGroup, IconButton } from "@mui/material";
+import { Box, FormGroup, IconButton } from "@mui/material";
 import { Edit as EditIcon } from "@mui/icons-material";
 import SubjectHeader from "components/Headers/SubjectHeader";
 import MaterialReactTable from "material-react-table";
-import { MaterialReactTable as MaterialReactTableHistory } from "material-react-table";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
 import { Notification } from "@mantine/core";
 
 // reactstrap components
 import {
+  Badge,
   Button,
   Card,
   CardBody,
@@ -23,6 +23,7 @@ import {
 // Axios
 import subjectApi from "../../api/subjectApi";
 import subjectHistoryApi from "../../api/subjectHistoryApi";
+import { IconEyeSearch } from "@tabler/icons-react";
 
 const Subjects = () => {
   // Main variable
@@ -58,15 +59,7 @@ const Subjects = () => {
   });
 
   // Initial
-  function init() {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      const user = JSON.parse(storedUser);
-      setUser(user);
-      // Sử dụng giá trị user ở đây
-      console.log(user);
-    }
-  }
+  const storedUser = localStorage.getItem("user");
 
   // const admin = {
   //   admin_id: "namnguyen",
@@ -83,7 +76,7 @@ const Subjects = () => {
   // *************** Subject AREA
   const [subject, setSubject] = useState({
     subjectId: "",
-    adminId: user.username,
+    adminId: storedUser.username,
     subjectName: "",
     createDate: new Date(),
   });
@@ -101,8 +94,8 @@ const Subjects = () => {
     try {
       setSubjectLoading(true);
       const resp = await subjectApi.getAllSubject();
-      setSubjectArray(resp);
-      setSubjects(resp);
+      setSubjectArray(resp.reverse());
+      setSubjects(resp.reverse());
       console.log(resp);
       console.log("restarted application");
       setSubjectLoading(false);
@@ -117,7 +110,7 @@ const Subjects = () => {
       const resp = await subjectHistoryApi.getSubjectHistoryBySubjectId(
         row.subjectId
       );
-      setSubjectHistoryPerSubject(resp);
+      setSubjectHistoryPerSubject(resp.reverse());
       setLoadingPopupHistory(false);
       console.log(resp);
     } catch (error) {
@@ -204,6 +197,15 @@ const Subjects = () => {
     setUpdate(true);
   };
 
+  const resetForm = () => {
+    setSubject({
+      subjectId: "",
+      adminId: user.username,
+      subjectName: "",
+      createDate: new Date(),
+    });
+  };
+
   // Validation area
   const validateForm = (action) => {
     if (subject.subjectName.length === 0) {
@@ -212,18 +214,9 @@ const Subjects = () => {
           status: true,
           message: "Vui lòng nhập vào tên môn học",
         });
-      } else {
-        setErrorInputSubject({
-          status: true,
-          message: "Vui lòng nhập vào tên môn học",
-        });
+        return false;
       }
-      return false;
     } else {
-      setErrorInputSubject({
-        status: false,
-        message: "",
-      });
       setErrorInputSubject({
         status: false,
         message: "",
@@ -255,19 +248,10 @@ const Subjects = () => {
       },
       {
         accessorFn: (row) =>
-          moment(row.createDate).format("DD-MM-yyyy, h:mm:ss a"),
+          moment(row.createDate).format("DD/MM/yyyy, h:mm:ss A"),
         header: "Ngày Tạo",
         size: 120,
       },
-      // {
-      //   accessorFn: (row) => (
-      //     <div className="d-flex justify-content-start">
-
-      //     </div>
-      //   ),
-      //   header: "Lịch sử chỉnh sửa",
-      //   sỉze: "20",
-      // },
     ],
     []
   );
@@ -275,26 +259,13 @@ const Subjects = () => {
   const columnSubjectHistory = useMemo(
     () => [
       {
-        accessorKey: "subjectHistoryId",
-        header: "#",
-        enableColumnOrdering: false,
-        enableEditing: false, //disable editing on this column
-        enableSorting: false,
-        size: 20,
-      },
-      {
-        accessorFn: (row) => displayActionHistory(row.action),
-        header: "Hành động",
-        size: 40,
-      },
-      {
         accessorKey: "subjectName",
         header: "Tên Môn Học",
         size: 80,
       },
       {
         accessorFn: (row) =>
-          moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
+          moment(row.modifyDate).format("DD/MM/yyyy, h:mm:ss A"),
         header: "Ngày chỉnh sửa",
         size: 120,
       },
@@ -302,6 +273,20 @@ const Subjects = () => {
         accessorKey: "adminId",
         header: "Tên người tạo",
         size: 80,
+      },
+      {
+        accessorFn: (row) => displayActionHistory(row.action),
+        Cell: ({ cell }) => {
+          const row = cell.getValue();
+
+          if (row.action === "UPDATE") {
+            return <Badge color="primary">Cập nhật</Badge>;
+          } else {
+            return <Badge color="success">Tạo mới </Badge>;
+          }
+        },
+        header: "Hành động",
+        size: 40,
       },
     ],
     []
@@ -330,7 +315,7 @@ const Subjects = () => {
   const fetchSubjectHistory = async () => {
     try {
       const resp = await subjectHistoryApi.getAllSubjectHistory();
-      setSubjectHistories(resp);
+      setSubjectHistories(resp.reverse());
       console.log(resp);
       console.log("restarted subjectHistory application");
     } catch (error) {
@@ -356,9 +341,12 @@ const Subjects = () => {
     fetchSubjectHistory();
   };
 
+  // const = (array) => {
+  //   return array.reverse();
+  // };
+
   // *************** Use effect area
   useEffect(() => {
-    init();
     fetchSubjects();
     fetchSubjectHistory();
   }, []);
@@ -396,80 +384,53 @@ const Subjects = () => {
               {subjectHistoryShowing ? "Danh sách môn học" : "Lịch sử môn học"}
             </Button>
           </CardHeader>
+          
           <CardBody>
             {/* Table view */}
-            {subjectHistoryShowing ? (
-              // History Table
-              <MaterialReactTableHistory
-                displayColumnDefOptions={{
-                  "mrt-row-actions": {
-                    header: "Thao tác",
-                    size: 40,
-                  },
-                }}
-                positionActionsColumn="last"
-                columns={columnSubjectHistory}
-                data={subjectHistories}
-                enableColumnOrdering
-                enableEditing
-                enableStickyHeader
-                enableColumnResizing
-                muiTablePaginationProps={{
-                  rowsPerPageOptions: [10, 20, 50, 100],
-                  showFirstButton: false,
-                  showLastButton: false,
-                }}
-                renderRowActions={({ row }) => (
-                  <div className="d-flex justify-content-start">
-                    <IconButton color="info">
-                      <EditIcon />
-                    </IconButton>
-                  </div>
-                )}
-                // Top Add new Subject button
-                renderTopToolbarCustomActions={() => (
-                  <Button
-                    color="success"
-                    onClick={() => setShowModal(true)}
-                    variant="contained"
-                    disabled
-                  >
-                    <i className="bx bx-layer-plus mr-2"></i> Thêm môn học
-                  </Button>
-                )}
-              />
-            ) : (
-              // Subject Table
+            {/* Subject Table */}
+            {!subjectHistoryShowing && ( 
               <MaterialReactTable
+                muiTableBodyProps={{
+                  sx: {
+                    "& tr:nth-of-type(odd)": {
+                      backgroundColor: "#f5f5f5",
+                    },
+                  },
+                }}
                 displayColumnDefOptions={{
                   "mrt-row-actions": {
                     header: "Thao tác",
                     size: 40,
                   },
+                  "mrt-row-numbers": {
+                    size: 5,
+                  },
                 }}
-                positionActionsColumn="last"
                 columns={columnSubject}
                 data={subjectArray ?? []}
-                initialState={{
-                  columnVisibility: { subjectId: false },
-                }}
+                // initialState={{
+                //   columnVisibility: { subjectId: false },
+                // }}
                 state={{
                   isLoading: subjectLoading,
                 }}
                 // editingMode="modal" //default
                 enableColumnOrdering
-                enableEditing
+                // enableEditing
                 enableStickyHeader
                 enableColumnResizing
+                enableRowActions
+                enableRowNumbers
+                positionActionsColumn="last"
                 muiTablePaginationProps={{
                   rowsPerPageOptions: [10, 20, 50, 100],
                   showFirstButton: false,
                   showLastButton: false,
                 }}
                 renderRowActions={({ row }) => (
-                  <div className="d-flex justify-content-start gap-2">
+                  <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
                     <IconButton
-                      color="warning"
+                      color="secondary"
                       // outline
                       onClick={() => {
                         handleEditSubject(row);
@@ -483,12 +444,9 @@ const Subjects = () => {
                         fetchSubjectHistoryPerSubject(row.original);
                       }}
                     >
-                      <i
-                        className="fa fa-eye-slash text-primary"
-                        aria-hidden="true"
-                      ></i>
+                      <IconEyeSearch />
                     </IconButton>
-                  </div>
+                  </Box>
                 )}
                 // Top Add new Subject button
                 renderTopToolbarCustomActions={() => (
@@ -501,6 +459,32 @@ const Subjects = () => {
                     <i className="bx bx-layer-plus mr-2"></i> Thêm môn học
                   </Button>
                 )}
+              />
+            )}
+            
+            {/* History Table */}
+            {subjectHistoryShowing && (
+              <MaterialReactTable
+                muiTableBodyProps={{
+                  sx: {
+                    "& tr:nth-of-type(odd)": {
+                      backgroundColor: "#f5f5f5",
+                    },
+                  },
+                }}
+                enableRowNumbers
+                displayColumnDefOptions={{
+                  "mrt-row-numbers": {
+                    size: 5,
+                  },
+                }}
+                columns={columnSubjectHistory}
+                data={subjectHistories}
+                muiTablePaginationProps={{
+                  rowsPerPageOptions: [10, 20, 50, 100],
+                  showFirstButton: true,
+                  showLastButton: true,
+                }}
               />
             )}
           </CardBody>
@@ -539,9 +523,18 @@ const Subjects = () => {
               className="close"
               data-dismiss="modal"
               type="button"
-              onClick={() => setShowModal(false)}
+              onClick={() => {
+                setShowModal(false);
+                resetForm();
+              }}
             >
-              <span aria-hidden={true} onClick={() => setUpdate(false)}>
+              <span
+                aria-hidden={true}
+                onClick={() => {
+                  setUpdate(false);
+                  resetForm();
+                }}
+              >
                 ×
               </span>
             </button>
@@ -563,7 +556,7 @@ const Subjects = () => {
                   />
                 </FormGroup>
               )}
-              <FormGroup className="mb-3">
+              {/* <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="adminId">
                   Mã Admin
                 </label>
@@ -575,7 +568,7 @@ const Subjects = () => {
                   name="adminId"
                   value={subject.adminId}
                 />
-              </FormGroup>
+              </FormGroup> */}
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Tên môn học
@@ -604,6 +597,7 @@ const Subjects = () => {
               onClick={() => {
                 setShowModal(false);
                 setUpdate(false);
+                resetForm();
               }}
             >
               Trở lại
@@ -626,7 +620,6 @@ const Subjects = () => {
           className="modal-dialog-centered"
           isOpen={ModalHistory}
           toggle={ModalHistory}
-          backdrop={"static"}
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">

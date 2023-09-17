@@ -12,8 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.f4education.springjwt.payload.request.RequestSubjectDTO;
 import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.payload.request.SubjectRequest;
 import com.f4education.springjwt.security.services.SubjectServiceImpl;
 
 @CrossOrigin("*")
@@ -36,14 +36,14 @@ public class SubjectController {
 	}
 
 	@PostMapping
-	public RequestSubjectDTO createSubject(@RequestBody RequestSubjectDTO requestSubjectDTO) {
-		return subjectService.createSubject(requestSubjectDTO);
+	public SubjectRequest createSubject(@RequestBody SubjectRequest subjectRequest) {
+		return subjectService.createSubject(subjectRequest);
 	}
 
 	@PutMapping("/{id}")
 //	@PreAuthorize("hasRole('ADMIN')")
-	public SubjectDTO updateSubject(@PathVariable("id") Integer subjectId, @RequestBody SubjectDTO subjectDTO) {
-		return subjectService.updateSubject(subjectId, subjectDTO);
+	public SubjectRequest updateSubject(@PathVariable("id") Integer subjectId, @RequestBody SubjectRequest subjectRequest) {
+		return subjectService.updateSubject(subjectId, subjectRequest);
 	}
 
 }

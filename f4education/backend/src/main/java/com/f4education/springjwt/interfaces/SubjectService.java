@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
-import com.f4education.springjwt.payload.request.RequestSubjectDTO;
 import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.payload.request.SubjectRequest;
 
 @Service
 public interface SubjectService {
@@ -13,7 +13,7 @@ public interface SubjectService {
 
 	SubjectDTO getSubjectById(Integer subjectId);
 
-	RequestSubjectDTO createSubject(RequestSubjectDTO subjectDTO);
+	SubjectRequest createSubject(SubjectRequest subjectRequest);
 
-	SubjectDTO updateSubject(Integer subjectId, SubjectDTO subjectDTO);
+	SubjectRequest updateSubject(Integer subjectId, SubjectRequest subjectRequest);
 }
