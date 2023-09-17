@@ -103,7 +103,7 @@ const Questions = () => {
 	const [questionLoading, setQuestionLoading] = useState(false);
 
 	// ************* Get LocalStorage
-	const userDetail = JSON.parse(localStorage.getItem('user'));
+	const userDetail = JSON.parse(localStorage.getItem('user') | '');
 
 	// ************* Action variable
 	const [showModal, setShowModal] = useState(false);
@@ -160,7 +160,7 @@ const Questions = () => {
 	const handleStoreQuestions = async () => {
 		try {
 			console.log(question);
-			// handleDataTranferAnswers();
+			handleDataTranferAnswers();
 
 			// const body = question;
 			// const resp = await questionApi.createQuestion(body);
@@ -198,14 +198,14 @@ const Questions = () => {
 	};
 
 	// + Tranfer and fill data to ANSWERS STATE
-	// const handleDataTranferAnswers = () => {
-	//   const newAnswers = groups.map((group) => ({
-	//     isCorrect: group.radioValue,
-	//     text: group.inputValue,
-	//   }));
-	//   console.log(newAnswers);
-	//   setAnswers(newAnswers);
-	// };
+	const handleDataTranferAnswers = () => {
+		const newAnswers = groups.map((group) => ({
+			isCorrect: group.radioValue,
+			text: group.inputValue,
+		}));
+		console.log(newAnswers);
+		setAnswers(newAnswers);
+	};
 
 	// *************** React Data table area
 	function renderCellWithLink(row) {
@@ -256,88 +256,93 @@ const Questions = () => {
 	);
 
 	// *************** Render Input Answer AREA
-	// const [groups, setGroups] = useState([
-	//   { radioValue: false, inputValue: "" },
-	//   { radioValue: false, inputValue: "" },
-	// ]);
+	const [groups, setGroups] = useState([
+		{radioValue: false, inputValue: ''},
+		{radioValue: false, inputValue: ''},
+	]);
 
-	// const handleRadioChange = (index) => {
-	//   const updatedGroups = groups.map((group, i) => {
-	//     if (i === index) {
-	//       return { ...group, radioValue: true };
-	//     } else {
-	//       return { ...group, radioValue: false };
-	//     }
-	//   });
-	//   setGroups(updatedGroups);
-	// };
+	const handleRadioChange = (index) => {
+		const updatedGroups = groups.map((group, i) => {
+			if (i === index) {
+				return {...group, radioValue: true};
+			} else {
+				return {...group, radioValue: false};
+			}
+		});
+		setGroups(updatedGroups);
+	};
 
-	// const handleInputChange = (index, value) => {
-	//   const updatedGroups = [...groups];
-	//   updatedGroups[index].inputValue = value;
-	//   setGroups(updatedGroups);
-	// };
+	const handleInputChange = (index, value) => {
+		const updatedGroups = [...groups];
+		updatedGroups[index].inputValue = value;
+		setGroups(updatedGroups);
+	};
 
-	// const handleAddGroup = () => {
-	//   const newGroup = { radioValue: false, inputValue: "" };
-	//   setGroups([...groups, newGroup]);
-	// };
+	const handleAddGroup = () => {
+		const newGroup = {radioValue: false, inputValue: ''};
+		setGroups([...groups, newGroup]);
+	};
 
-	// const renderInputs = () => {
-	//   return groups.map((group, index) => (
-	//     <Col xl={6} lg={6} md={6} sm={12} key={index + 1}>
-	//       <FormGroup className="mt-3">
-	//         <label className="form-control-label">Câu trả lời {index + 1}</label>
-	//         <div className="d-flex align-items-center">
-	//           <div>
-	//             <label>
-	//               <input
-	//                 className="mt-3"
-	//                 type="radio"
-	//                 checked={group.radioValue}
-	//                 onChange={() => handleRadioChange(index)}
-	//                 style={{ width: "20px", height: "20px" }}
-	//               />
-	//             </label>
-	//           </div>
-	//           {/* <Input
-	//             className="form-control-alternative ml-2"
-	//             type="text"
-	//             value={group.inputValue}
-	//             onChange={(e) => handleInputChange(index, e.target.value)}
-	//           /> */}
-	//           {/* <InputGroup className="mb-4">
-	//             <InputGroupAddon addonType="prepend">
-	//               <InputGroupText>
-	//                 <i className="ni ni-fat-delete" />
-	//               </InputGroupText>
-	//             </InputGroupAddon>
-	//             <Input
-	//               placeholder="trả lời"
-	//               className="ml-2"
-	//               type="text"
-	//               value={group.inputValue}
-	//               onChange={(e) => handleInputChange(index, e.target.value)}
-	//             />
-	//           </InputGroup> */}
-	//           <InputGroup className="ml-2">
-	//             <InputGroupAddon addonType="prepend">
-	//               <InputGroupText>
-	//                 <i className="ni ni-fat-delete" />
-	//               </InputGroupText>
-	//             </InputGroupAddon>
-	//             <Input
-	//               placeholder="question Title"
-	//               type="text"
-	//               value={group.inputValue}
-	//               onChange={(e) => handleInputChange(index, e.target.value)}
-	//             />
-	//           </InputGroup>
-	//         </div>
-	//       </FormGroup>
-	//     </Col>
-	//   ));
-	// };
+	const renderInputs = () => {
+		return groups.map((group, index) => (
+			<Col
+				xl={6}
+				lg={6}
+				md={6}
+				sm={12}
+				key={index + 1}>
+				<FormGroup className='mt-3'>
+					<label className='form-control-label'>Câu trả lời {index + 1}</label>
+					<div className='d-flex align-items-center'>
+						<div>
+							<label>
+								<input
+									className='mt-3'
+									type='radio'
+									checked={group.radioValue}
+									onChange={() => handleRadioChange(index)}
+									style={{width: '20px', height: '20px'}}
+								/>
+							</label>
+						</div>
+						{/* <Input
+	            className="form-control-alternative ml-2"
+	            type="text"
+	            value={group.inputValue}
+	            onChange={(e) => handleInputChange(index, e.target.value)}
+	          /> */}
+						{/* <InputGroup className="mb-4">
+	            <InputGroupAddon addonType="prepend">
+	              <InputGroupText>
+	                <i className="ni ni-fat-delete" />
+	              </InputGroupText>
+	            </InputGroupAddon>
+	            <Input
+	              placeholder="trả lời"
+	              className="ml-2"
+	              type="text"
+	              value={group.inputValue}
+	              onChange={(e) => handleInputChange(index, e.target.value)}
+	            />
+	          </InputGroup> */}
+						<InputGroup className='ml-2'>
+							<InputGroupAddon addonType='prepend'>
+								<InputGroupText>
+									<i className='ni ni-fat-delete' />
+								</InputGroupText>
+							</InputGroupAddon>
+							<Input
+								placeholder='question Title'
+								type='text'
+								value={group.inputValue}
+								onChange={(e) => handleInputChange(index, e.target.value)}
+							/>
+						</InputGroup>
+					</div>
+				</FormGroup>
+			</Col>
+		));
+	};
 
 	// ************* Select Handle Logic AREA
 
