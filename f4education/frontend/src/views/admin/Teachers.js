@@ -46,6 +46,7 @@ const Teachers = () => {
   const [teacherHistories, setTeacherHistories] = useState([]);
   const [showHistoryTable, setShowHistoryTable] = useState(false);
   const [listHistoryById, setListHistoryById] = useState([]);
+  const [errors, setErrors] = useState({});
 
   //Nhận data gửi lên từ server
   const [teacher, setTeacher] = useState({
@@ -231,6 +232,7 @@ const Teachers = () => {
       image: "",
       acccountID: 0,
     });
+    setErrors({});
   };
 
   const handleSubmitForm = (e) => {
@@ -245,15 +247,67 @@ const Teachers = () => {
     }
   };
 
+  const validateForm = () => {
+    let validationErrors = {};
+    if (!teacher.fullname) {
+      validationErrors.fullname = "Vui lòng nhập tên giảng viên !!!";
+    } else {
+      validationErrors.fullname = "";
+    }
+
+    if (!teacher.citizenIdentification) {
+      validationErrors.citizenIdentification =
+        "Vui lòng nhập CCCD của giảng viên!!!";
+    } else {
+      if (teacher.citizenIdentification.length != 12) {
+        validationErrors.citizenIdentification = "Số CCCD gồm 12 số!!!";
+      } else {
+        validationErrors.citizenIdentification = "";
+      }
+    }
+
+    if (!teacher.address) {
+      validationErrors.address = "Vui lòng nhập địa chỉ của giảng viên!!!";
+    } else {
+      validationErrors.address = "";
+    }
+
+    if (!teacher.levels) {
+      validationErrors.levels =
+        "Vui lòng nhập trình độ học vấn của giảng viên!!!";
+    } else {
+      validationErrors.levels = "";
+    }
+
+    const isVNPhoneMobile =
+      /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
+
+    if (!isVNPhoneMobile.test(teacher.phone)) {
+      validationErrors.phone = "Không đúng định dạng số điện thoại!!!";
+    } else {
+      validationErrors.phone = "";
+    }
+    return validationErrors;
+  };
+
   const updateTeacher = async () => {
-    const formData = new FormData();
-    formData.append("teacherRequest", JSON.stringify(teacherRequest));
-    formData.append("file", image);
-    try {
-      const resp = await teacherApi.updateTeacher(formData);
-      setTeacher([...resp]);
-    } catch (error) {
-      console.log("🚀 ~ file: Teachers.js:257 ~ updateTeacher ~ error:", error);
+    const validationErrors = validateForm();
+
+    if (Object.keys(validationErrors).length === 0) {
+      const formData = new FormData();
+      formData.append("teacherRequest", JSON.stringify(teacherRequest));
+      formData.append("file", image);
+      try {
+        const resp = await teacherApi.updateTeacher(formData);
+        setTeacher([...resp]);
+      } catch (error) {
+        console.log(
+          "🚀 ~ file: Teachers.js:257 ~ updateTeacher ~ error:",
+          error
+        );
+      }
+    } else {
+      setErrors(validationErrors);
     }
   };
 
@@ -515,6 +569,11 @@ const Teachers = () => {
                             name="fullname"
                             value={teacher.fullname}
                           />
+                          {errors.fullname && (
+                            <div className="text-danger mt-1 font-italic font-weight-light">
+                              {errors.fullname}
+                            </div>
+                          )}
                         </FormGroup>
                         <Row>
                           <Col md={12}>
@@ -557,6 +616,11 @@ const Teachers = () => {
                                 name="levels"
                                 value={teacher.levels}
                               />
+                              {errors.levels && (
+                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                  {errors.levels}
+                                </div>
+                              )}
                               <br></br>
                               <label
                                 className="form-control-label"
@@ -574,6 +638,11 @@ const Teachers = () => {
                                 name="phone"
                                 value={teacher.phone}
                               />
+                              {errors.phone && (
+                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                  {errors.phone}
+                                </div>
+                              )}
                               <br></br>
                               <label
                                 className="form-control-label"
@@ -591,6 +660,11 @@ const Teachers = () => {
                                 name="citizenIdentification"
                                 value={teacher.citizenIdentification}
                               />
+                              {errors.citizenIdentification && (
+                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                  {errors.citizenIdentification}
+                                </div>
+                              )}
                               <br></br>
                               <label
                                 className="form-control-label"
@@ -633,6 +707,11 @@ const Teachers = () => {
                                 type="textarea"
                                 onChange={handelOnChangeInput}
                               />
+                              {errors.address && (
+                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                  {errors.address}
+                                </div>
+                              )}
                               <Label
                                 htmlFor="exampleFile"
                                 className="form-control-label"
