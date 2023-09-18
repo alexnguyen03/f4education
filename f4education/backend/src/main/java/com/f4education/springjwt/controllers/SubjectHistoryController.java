@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.payload.request.SubjectHistoryDTO;
+import com.f4education.springjwt.payload.request.SubjectHistoryRequest;
 import com.f4education.springjwt.security.services.SubjectHistoryServiceImpl;
 
 @CrossOrigin("*")
@@ -40,7 +41,7 @@ public class SubjectHistoryController {
 	}
 
 	@PostMapping
-	public SubjectHistoryDTO createSubjectHistory(@RequestBody SubjectHistoryDTO SubjectHistoryDTO) {
+	public SubjectHistoryRequest createSubjectHistory(@RequestBody SubjectHistoryRequest SubjectHistoryDTO) {
 		return subjectHistoryService.createSubjectHistory(SubjectHistoryDTO);
 	}
 

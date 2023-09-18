@@ -4,6 +4,7 @@ import SubjectHeader from "components/Headers/SubjectHeader";
 import MaterialReactTable from "material-react-table";
 import moment from "moment";
 import React, { useEffect, useMemo, useState } from "react";
+import { IconEyeSearch, IconCheck } from "@tabler/icons-react";
 import { Notification } from "@mantine/core";
 
 // reactstrap components
@@ -23,20 +24,12 @@ import {
 // Axios
 import subjectApi from "../../api/subjectApi";
 import subjectHistoryApi from "../../api/subjectHistoryApi";
-import { IconEyeSearch } from "@tabler/icons-react";
 
 const Subjects = () => {
   // Main variable
   const [subjects, setSubjects] = useState([]);
   const [subjectHistories, setSubjectHistories] = useState([]);
   const [subjectArray, setSubjectArray] = useState([]);
-  const [user, setUser] = useState({
-    id: "",
-    username: "",
-    email: "",
-    accessToken: "",
-    roles: [],
-  });
   const [subjectHistoryPerSubject, setSubjectHistoryPerSubject] = useState([]);
 
   // Action variable
@@ -49,8 +42,10 @@ const Subjects = () => {
     status: false,
     title: "",
     message: "",
+    color: "",
   });
   const [subjectLoading, setSubjectLoading] = useState(false);
+  const [subjectNameRecent, setSubjectNameRecent] = useState("");
 
   // Form variable
   const [errorInputSubject, setErrorInputSubject] = useState({
@@ -59,7 +54,7 @@ const Subjects = () => {
   });
 
   // Initial
-  const storedUser = localStorage.getItem("user");
+  // const storedUser = JSON.parse(localStorage.getItem("user"));
 
   // const admin = {
   //   admin_id: "namnguyen",
@@ -76,7 +71,7 @@ const Subjects = () => {
   // *************** Subject AREA
   const [subject, setSubject] = useState({
     subjectId: "",
-    adminId: storedUser.username,
+    adminId: "",
     subjectName: "",
     createDate: new Date(),
   });
@@ -89,14 +84,18 @@ const Subjects = () => {
     }));
   };
 
+  const reverseArray = (arr) => {
+    return arr.reverse();
+  };
+
   // API Area
   const fetchSubjects = async () => {
     try {
       setSubjectLoading(true);
       const resp = await subjectApi.getAllSubject();
-      setSubjectArray(resp.reverse());
-      setSubjects(resp.reverse());
-      console.log(resp);
+      setSubjectArray(reverseArray(resp));
+      setSubjects(reverseArray(resp));
+      console.log(reverseArray(resp));
       console.log("restarted application");
       setSubjectLoading(false);
     } catch (error) {
@@ -110,7 +109,7 @@ const Subjects = () => {
       const resp = await subjectHistoryApi.getSubjectHistoryBySubjectId(
         row.subjectId
       );
-      setSubjectHistoryPerSubject(resp.reverse());
+      setSubjectHistoryPerSubject(reverseArray(resp));
       setLoadingPopupHistory(false);
       console.log(resp);
     } catch (error) {
@@ -120,7 +119,7 @@ const Subjects = () => {
 
   // API_AREA > CRUD
   const handleCreateNewSubject = async () => {
-    subject.adminId = user.username;
+    subject.adminId = "namnguyen";
 
     const lastSubject = subjects.slice(-1)[0];
     const lastSubjectId = lastSubject.subjectId;
@@ -133,11 +132,16 @@ const Subjects = () => {
 
     subject.subjectId = "";
     const action = "add";
-    if (validateForm(action)) {
+    if (validateForm()) {
       try {
         const body = subject;
         const resp = await subjectApi.createSubject(body);
         console.log(resp);
+        notifycationAction(
+          "Thêm mới môn học",
+          "thêm mới môn học thành công!",
+          "teal"
+        );
         // Create SubjectHistory
         handleCreateNewSubjectHistory(subject, action);
       } catch (error) {
@@ -146,12 +150,11 @@ const Subjects = () => {
       console.log("Add Success");
       fetchSubjects();
       setShowModal(false);
+      resetForm();
     } else console.log("Error in validation");
   };
 
   const handleUpdateSubject = async () => {
-    subject.adminId = user.username;
-
     const newSubjects = [...subjects];
 
     const index = newSubjects.findIndex(
@@ -165,64 +168,97 @@ const Subjects = () => {
     // **
     setSubject(newSubjects[index]);
 
-    const action = "update";
-    if (validateForm(action)) {
+    if (validateForm()) {
       try {
+        subject.adminId = "namnguyen";
         const body = subject;
         const resp = await subjectApi.updateSubject(body, subject.subjectId);
         console.log(resp);
-
+        notifycationAction(
+          "Cập nhật môn học",
+          "Cập nhật môn học thành công!",
+          "indigo"
+        );
         // Add subjectHistory
-        handleCreateNewSubjectHistory(subject, action);
+        // handleCreateNewSubjectHistory(subject, action);
       } catch (error) {
         console.log(error);
       }
-    }
+    } else return "error in validate";
 
     //   console.log("Update success");
     setShowModal(false);
     setUpdate(false);
 
     fetchSubjects();
-    setSubject({
-      subjectId: "",
-      adminId: user.username,
-      subjectName: "",
-    });
+    resetForm();
   };
 
   const handleEditSubject = (row) => {
     setShowModal(true);
-    setSubject({ ...row.original, adminId: user.username });
+    setSubject({ ...row.original, adminId: row.original.adminName });
     setUpdate(true);
+    setSubjectNameRecent(row.original.adminName);
   };
 
   const resetForm = () => {
     setSubject({
       subjectId: "",
-      adminId: user.username,
+      adminId: "namnguyen",
       subjectName: "",
       createDate: new Date(),
     });
   };
 
+  const notifycationAction = (title, message, color) => {
+    setShowNotification({
+      status: true,
+      title: title,
+      message: message,
+      color: color,
+    });
+  };
+
   // Validation area
-  const validateForm = (action) => {
+  const validateForm = () => {
     if (subject.subjectName.length === 0) {
-      if (action === "add") {
-        setErrorInputSubject({
-          status: true,
-          message: "Vui lòng nhập vào tên môn học",
-        });
-        return false;
-      }
+      setErrorInputSubject({
+        status: true,
+        message: "Vui lòng nhập vào tên môn học.",
+      });
+      return false;
     } else {
       setErrorInputSubject({
         status: false,
         message: "",
       });
     }
+
+    if (subject.subjectName.trim() === subjectNameRecent.trim()) {
+      return true;
+    }
+
+    if (isSubjectNameExists(subject.subjectName)) {
+      setErrorInputSubject({
+        status: true,
+        message: "Tên môn học đã tồn tại.",
+      });
+      return false;
+    } else {
+      setErrorInputSubject({
+        status: false,
+        message: "",
+      });
+    }
+
     return true;
+  };
+
+  const isSubjectNameExists = (subjectName) => {
+    const isExists = subjects.some(
+      (subject) => subject.subjectName === subjectName
+    );
+    return isExists;
   };
 
   // React Data table area
@@ -247,6 +283,11 @@ const Subjects = () => {
         size: 120,
       },
       {
+        accessorFn: (row) => displayTotalCourse(row.totalCoursePerSubject),
+        header: "khóa học đã đăng ký",
+        size: 40,
+      },
+      {
         accessorFn: (row) =>
           moment(row.createDate).format("DD/MM/yyyy, h:mm:ss A"),
         header: "Ngày Tạo",
@@ -255,6 +296,23 @@ const Subjects = () => {
     ],
     []
   );
+
+  const displayTotalCourse = (totalCourse) => {
+    const filteredTotalCourse = totalCourse.filter((item) =>
+      subjects.some((subject) => subject.subjectName === item[0])
+    );
+
+    console.log(filteredTotalCourse);
+  
+    const formattedTotalCourse = filteredTotalCourse.map((item) => {
+      const subject = subjects.find((subject) => subject.subjectName === item[0]);
+      const subjectName = subject ? subject.subjectName : "";
+      const totalCourse = item[1];
+      return `${totalCourse} - ${subjectName}`;
+    });
+  
+    return formattedTotalCourse;
+  };
 
   const columnSubjectHistory = useMemo(
     () => [
@@ -270,7 +328,7 @@ const Subjects = () => {
         size: 120,
       },
       {
-        accessorKey: "adminId",
+        accessorKey: "adminName",
         header: "Tên người tạo",
         size: 80,
       },
@@ -278,8 +336,7 @@ const Subjects = () => {
         accessorFn: (row) => displayActionHistory(row.action),
         Cell: ({ cell }) => {
           const row = cell.getValue();
-
-          if (row.action === "UPDATE") {
+          if (row === "Cập nhật") {
             return <Badge color="primary">Cập nhật</Badge>;
           } else {
             return <Badge color="success">Tạo mới </Badge>;
@@ -315,8 +372,8 @@ const Subjects = () => {
   const fetchSubjectHistory = async () => {
     try {
       const resp = await subjectHistoryApi.getAllSubjectHistory();
-      setSubjectHistories(resp.reverse());
-      console.log(resp);
+      setSubjectHistories(reverseArray(resp));
+      console.log(reverseArray(resp));
       console.log("restarted subjectHistory application");
     } catch (error) {
       console.log(error);
@@ -340,10 +397,6 @@ const Subjects = () => {
     }
     fetchSubjectHistory();
   };
-
-  // const = (array) => {
-  //   return array.reverse();
-  // };
 
   // *************** Use effect area
   useEffect(() => {
@@ -384,11 +437,11 @@ const Subjects = () => {
               {subjectHistoryShowing ? "Danh sách môn học" : "Lịch sử môn học"}
             </Button>
           </CardHeader>
-          
+
           <CardBody>
             {/* Table view */}
             {/* Subject Table */}
-            {!subjectHistoryShowing && ( 
+            {!subjectHistoryShowing && (
               <MaterialReactTable
                 muiTableBodyProps={{
                   sx: {
@@ -396,6 +449,12 @@ const Subjects = () => {
                       backgroundColor: "#f5f5f5",
                     },
                   },
+                }}
+                enableRowActions
+                positionActionsColumn="last"
+                enableRowNumbers
+                state={{
+                  isLoading: subjectLoading,
                 }}
                 displayColumnDefOptions={{
                   "mrt-row-actions": {
@@ -411,17 +470,12 @@ const Subjects = () => {
                 // initialState={{
                 //   columnVisibility: { subjectId: false },
                 // }}
-                state={{
-                  isLoading: subjectLoading,
+                initialState={{
+                  columnVisibility: { subjectId: false },
                 }}
-                // editingMode="modal" //default
                 enableColumnOrdering
-                // enableEditing
                 enableStickyHeader
-                enableColumnResizing
-                enableRowActions
-                enableRowNumbers
-                positionActionsColumn="last"
+                enableStickyFooter
                 muiTablePaginationProps={{
                   rowsPerPageOptions: [10, 20, 50, 100],
                   showFirstButton: false,
@@ -461,7 +515,7 @@ const Subjects = () => {
                 )}
               />
             )}
-            
+
             {/* History Table */}
             {subjectHistoryShowing && (
               <MaterialReactTable
@@ -480,6 +534,9 @@ const Subjects = () => {
                 }}
                 columns={columnSubjectHistory}
                 data={subjectHistories}
+                enableColumnOrdering
+                enableStickyHeader
+                enableStickyFooter
                 muiTablePaginationProps={{
                   rowsPerPageOptions: [10, 20, 50, 100],
                   showFirstButton: true,
@@ -493,7 +550,8 @@ const Subjects = () => {
         {/* Notifycation */}
         {showNotification.status && (
           <Notification
-            color="green"
+            icon={<IconCheck size="1.1rem" />}
+            color={showNotification.color}
             title={showNotification.title}
             style={{
               position: "fixed",
@@ -556,7 +614,7 @@ const Subjects = () => {
                   />
                 </FormGroup>
               )}
-              {/* <FormGroup className="mb-3">
+              <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="adminId">
                   Mã Admin
                 </label>
@@ -568,7 +626,7 @@ const Subjects = () => {
                   name="adminId"
                   value={subject.adminId}
                 />
-              </FormGroup> */}
+              </FormGroup>
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Tên môn học

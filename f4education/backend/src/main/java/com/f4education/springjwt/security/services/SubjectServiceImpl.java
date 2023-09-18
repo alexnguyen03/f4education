@@ -40,6 +40,9 @@ public class SubjectServiceImpl implements SubjectService {
 	@Override
 	public SubjectRequest createSubject(SubjectRequest subjectRequest) {
 		Subject subject = this.convertRequestToEntity(subjectRequest);
+		
+		subject.setCreateDate(new Date());
+		
 		Subject savedSubject = subjectRepository.save(subject);
 		return convertToRequest(savedSubject);
 	}
@@ -61,8 +64,16 @@ public class SubjectServiceImpl implements SubjectService {
 	private SubjectDTO convertToDto(Subject subject) {
 		SubjectDTO subjectDTO = new SubjectDTO();
 
+		List<Object[]> totalCoursePerSubject = subjectRepository.getCourseCountBySubject();
+//		for (Object[] ob : totalCoursePerSubject) {
+//			String subjectName = (String) ob[0];
+//			Long courseCount = (Long) ob[1];
+//			System.out.println("Subject: " + subjectName + ", Course Count: " + courseCount);
+//		}
+		
 		String adminName = subject.getAdmin().getFullname();
 		subjectDTO.setAdminName(adminName);
+		subjectDTO.setTotalCoursePerSubject(totalCoursePerSubject);
 
 		BeanUtils.copyProperties(subject, subjectDTO);
 
@@ -87,7 +98,6 @@ public class SubjectServiceImpl implements SubjectService {
 		BeanUtils.copyProperties(subjectRequest, subject);
 
 		subject.setAdmin(admin);
-		subject.setCreateDate(new Date());
 
 		return subject;
 	}

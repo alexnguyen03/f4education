@@ -9,14 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SubjectHistoryDTO {
+public class SubjectHistoryRequest {
 	private Integer subjectHistoryId;
 
 	private String action;
 
 	private Date modifyDate;
 
-	private String adminName;
+	private String adminId;
 	
 	private String subjectName;
 

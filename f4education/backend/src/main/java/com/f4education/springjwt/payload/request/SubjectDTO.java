@@ -1,6 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,5 +19,5 @@ public class SubjectDTO {
 	
 	private Date createDate;
 	
-	private Integer totalCoursePerSubject;
+	private List<Object[]> totalCoursePerSubject;
 }

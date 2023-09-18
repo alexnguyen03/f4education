@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.payload.request.SubjectHistoryDTO;
+import com.f4education.springjwt.payload.request.SubjectHistoryRequest;
 
 @Service
 public interface SubjectHistoryService {
@@ -12,9 +13,9 @@ public interface SubjectHistoryService {
 
 	SubjectHistoryDTO getSubjectHistoryById(Integer subjectHistoryId);
 
-	SubjectHistoryDTO createSubjectHistory(SubjectHistoryDTO SubjectHistoryDTO);
+	SubjectHistoryRequest createSubjectHistory(SubjectHistoryRequest SubjectHistoryDTO);
 
-	SubjectHistoryDTO updateSubjectHistory(Integer subjectHistoryId, SubjectHistoryDTO SubjectHistoryDTO);
+	SubjectHistoryRequest updateSubjectHistory(Integer subjectHistoryId, SubjectHistoryRequest SubjectHistoryDTO);
 
 	List<SubjectHistoryDTO> findBySubjectId(Integer subjectId);
 }
