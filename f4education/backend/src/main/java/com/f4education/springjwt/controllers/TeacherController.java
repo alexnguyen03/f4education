@@ -37,19 +37,19 @@ public class TeacherController {
     }
 
     @GetMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TeacherDTO getTeacher(@PathVariable("id") String teacherID) {
         return teacherService.getTeacherDTOByID(teacherID);
     }
 
     @PostMapping
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TeacherDTO createSubject(@RequestBody TeacherDTO teacherDTO) {
         return teacherService.createTeacher(teacherDTO);
     }
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public TeacherDTO updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
         ObjectMapper mapper = new ObjectMapper();

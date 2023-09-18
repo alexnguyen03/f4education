@@ -43,6 +43,7 @@ const Teachers = () => {
   const [teachers, setTeachers] = useState([]);
   const [rSelected, setRSelected] = useState(null); //radio button
   const [image, setImage] = useState(null);
+  const [update, setUpdate] = useState(false);
   const [teacherHistories, setTeacherHistories] = useState([]);
   const [showHistoryTable, setShowHistoryTable] = useState(false);
   const [listHistoryById, setListHistoryById] = useState([]);
@@ -207,6 +208,7 @@ const Teachers = () => {
 
   const handleEditFrom = (row) => {
     setShowForm(true);
+    setUpdate(true);
     const selectedTeacher = teachers.find(
       (teacher) => teacher.teacherId === row.original.teacherId
     );
@@ -219,6 +221,7 @@ const Teachers = () => {
     // hide form
     setShowForm((pre) => !pre);
     setImgData(null);
+    setUpdate(false);
     setTeacher({
       // subjectName: '',
       teacherId: "",
@@ -249,8 +252,10 @@ const Teachers = () => {
 
   const validateForm = () => {
     let validationErrors = {};
+    let test = 0;
     if (!teacher.fullname) {
       validationErrors.fullname = "Vui lòng nhập tên giảng viên !!!";
+      test++;
     } else {
       validationErrors.fullname = "";
     }
@@ -258,9 +263,11 @@ const Teachers = () => {
     if (!teacher.citizenIdentification) {
       validationErrors.citizenIdentification =
         "Vui lòng nhập CCCD của giảng viên!!!";
+      test++;
     } else {
       if (teacher.citizenIdentification.length != 12) {
         validationErrors.citizenIdentification = "Số CCCD gồm 12 số!!!";
+        test++;
       } else {
         validationErrors.citizenIdentification = "";
       }
@@ -268,6 +275,7 @@ const Teachers = () => {
 
     if (!teacher.address) {
       validationErrors.address = "Vui lòng nhập địa chỉ của giảng viên!!!";
+      test++;
     } else {
       validationErrors.address = "";
     }
@@ -275,6 +283,7 @@ const Teachers = () => {
     if (!teacher.levels) {
       validationErrors.levels =
         "Vui lòng nhập trình độ học vấn của giảng viên!!!";
+      test++;
     } else {
       validationErrors.levels = "";
     }
@@ -284,22 +293,30 @@ const Teachers = () => {
 
     if (!isVNPhoneMobile.test(teacher.phone)) {
       validationErrors.phone = "Không đúng định dạng số điện thoại!!!";
+      test++;
     } else {
       validationErrors.phone = "";
+    }
+
+    if (test === 0) {
+      return {};
     }
     return validationErrors;
   };
 
   const updateTeacher = async () => {
     const validationErrors = validateForm();
+    console.log(Object.keys(validationErrors).length);
 
     if (Object.keys(validationErrors).length === 0) {
       const formData = new FormData();
       formData.append("teacherRequest", JSON.stringify(teacherRequest));
       formData.append("file", image);
+      console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
       try {
         const resp = await teacherApi.updateTeacher(formData);
-        setTeacher([...resp]);
+        handleResetForm();
+        getAllTeacher();
       } catch (error) {
         console.log(
           "🚀 ~ file: Teachers.js:257 ~ updateTeacher ~ error:",
@@ -313,12 +330,14 @@ const Teachers = () => {
 
   //gọi API lấy data
   const getAllTeacher = async () => {
-    if (teachers.length > 0) {
+    if (teachers.length > 0 && !update) {
       setLoadingTeachers(false);
+      console.log(update);
       return;
     }
 
     try {
+      console.log(update);
       setLoadingTeachers(true);
       const resp = await teacherApi.getAllTeachers();
       console.log(resp);

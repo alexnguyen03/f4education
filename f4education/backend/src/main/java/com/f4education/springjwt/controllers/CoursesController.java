@@ -34,11 +34,11 @@ import lombok.RequiredArgsConstructor;
 public class CoursesController {
 	@Autowired
 	CourseServiceImpl courseService;
+
 	@Autowired
 	XFile xfileService;
 
 	@GetMapping
-	@PreAuthorize("hasRole('ADMIN')")
 	public List<CourseDTO> getAllCourse() {
 		return courseService.findAllCourseDTO();
 	}

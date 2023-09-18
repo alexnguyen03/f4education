@@ -83,16 +83,38 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 		http.csrf(csrf -> csrf.disable())
 				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
 				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(auth -> auth
-						.requestMatchers("/api/classs/**", "/api/courses/**", "/api/auth/**")
-						.permitAll()
-						.requestMatchers("/api/test/**", "/api/subjects/**", "/api/classs/**",
-								"/api/subjectHistory/**",
-								"/api/courses-history/**",
-								"/api/classhistory/**", "/api/teachers/**", "/api/teachers-history/**",
-								"/img/**")
-						.permitAll().anyRequest()
-						.authenticated());
+				.authorizeHttpRequests(
+						auth -> auth
+								.requestMatchers(
+										"/api/auth/**",
+										"/api/subjects/**",
+										"/api/classs/**",
+										"/api/classhistory/**",
+										"/api/classroom/**",
+										"/api/classroomhistory/**",
+										"/api/sessions-history/**",
+										"/api/resource/**",
+										"/img/**")
+								.permitAll()
+								.requestMatchers(
+										"/api/test/**",
+										"/api/subjects/**",
+										"/api/classs/**",
+										"/api/courses-history/**",
+										"/api/subjectHistory/**",
+										"/api/courses/**",
+										"/api/classroom/**",
+										"/api/sessions/**",
+										"/api/classhistory/**",
+										"/api/teachers/**",
+										"/api/sessions-history/**",
+										"/api/resource/**",
+										"/api/questions/**",
+										"/api/answers/**",
+										"/api/teachers-history/**",
+										"/img/**")
+								.permitAll().anyRequest().authenticated());
+
 		http.authenticationProvider(authenticationProvider());
 
 		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
