@@ -1,6 +1,5 @@
 package com.f4education.springjwt.models;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +38,8 @@ public class Course implements Serializable {
 
 	@Column(name = "number_session")
 	private Integer numberSession;
+	@Column(name = "hour_per_session")
+	private Integer hourPerSession;
 
 	private String image;
 

@@ -24,7 +24,10 @@ public class CourseDTO {
 
     private Integer numberSession;
 
+    private Integer hourPerSession;
+
     private Subject subject;
+
     private String image;
 
     @Override

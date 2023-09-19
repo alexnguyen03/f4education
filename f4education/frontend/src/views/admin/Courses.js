@@ -4,7 +4,7 @@ import courseApi from 'api/courseApi';
 import moment from 'moment';
 import CoursesHeader from 'components/Headers/CoursesHeader';
 import {MaterialReactTable} from 'material-react-table';
-import {memo, useEffect, useMemo, useState} from 'react';
+import {memo, useEffect, useLayoutEffect, useMemo, useRef, useState} from 'react';
 import {Card, CardBody, CardHeader, Col, Container, Form, FormGroup, Input, Label, Row, Modal, Button, CardSubtitle, CardText, CardTitle, CardImg, CardGroup, ListGroupItem, ListGroup, Badge} from 'reactstrap';
 import subjectApi from '../../api/subjectApi';
 import Select from 'react-select';
@@ -18,12 +18,13 @@ const IMG_URL = '/courses/';
 const Courses = () => {
 	const user = JSON.parse(localStorage.getItem('user') | '');
 	const [image, setImage] = useState(null);
+
+	const [duration, setDuration] = useState(0);
+	const hourPerSesRef = useRef(0);
 	const [imgData, setImgData] = useState(null);
 	const [showForm, setShowForm] = useState(false);
-	const [valid, setValid] = useState(false);
 	const [showHistoryTable, setShowHistoryTable] = useState(false);
 	const [update, setUpdate] = useState(false);
-	const [submitClick, setSubmitClick] = useState(false);
 	const [loadingCourses, setLoadingCourses] = useState(true);
 	const [loadingCoursesHistory, setLoadingCoursesHistory] = useState(true);
 	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
@@ -33,15 +34,16 @@ const Courses = () => {
 	const [subjects, setSubjects] = useState([]);
 	const [selectedSubject, setSelectedSubject] = useState({value: '0', label: ''});
 	const [options, setOptions] = useState([{value: '0', label: ''}]);
-	const [subjectId, setSubjectId] = useState(0);
 	const [msgError, setMsgError] = useState({});
 	const [listHistoryById, setListHistoryById] = useState([]);
 	const [course, setCourse] = useState({
-		courseId: 0,
+		courseId: null,
 		courseName: '',
 		courseDuration: 100,
 		coursePrice: 6000000,
 		courseDescription: '',
+		numberSession: 10,
+		hourPerSession: 2,
 		image: '',
 		subject: {
 			subjectId: 0,
@@ -68,18 +70,16 @@ const Courses = () => {
 		courseDuration: '',
 		courseDescription: '',
 		numberSession: 0,
+		hourPerSession: 0,
 		image: '',
 	});
 
 	// Thực hiện binding data
 	const handelOnChangeInput = (e) => {
-		console.log('🚀 ~ file: Courses.js:78 ~ handelOnChangeInput ~ e.target.name:', e.target.name);
-		if (e.target.name === 'courseName') {
-			valdateCourseName();
-		}
-		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
+		setCourse({...course, [e.target.name]: e.target.value});
 	};
-	const valdateCourseName = () => {
+
+	const validate = () => {
 		if (course.courseName === '') {
 			setMsgError((preErr) => ({...preErr, courseNameErr: 'Vui lòng nhập Tên khóa học'}));
 		} else if (course.courseName.length < 10) {
@@ -87,17 +87,6 @@ const Courses = () => {
 		} else {
 			setMsgError((preErr) => ({...preErr, courseNameErr: ''}));
 		}
-	};
-	const validate = () => {
-		setValid(false);
-		// if (course.courseName === '') {
-		// 	setMsgError((preErr) => ({...preErr, courseNameErr: 'Vui lòng nhập Tên khóa học'}));
-		// } else if (course.courseName.length < 10) {
-		// 	setMsgError((preErr) => ({...preErr, courseNameErr: 'Tên khóa học không hợp lệ (quá ngắn)'}));
-		// } else {
-		// 	setMsgError((preErr) => ({...preErr, courseNameErr: ''}));
-		// }
-		valdateCourseName();
 		if (course.courseDuration === '') {
 			setMsgError((preErr) => ({...preErr, courseDurationErr: 'Vui lòng nhập Thời lượng của khóa học'}));
 		} else if (course.courseDuration === '0' || parseInt(course.courseDuration) < 0) {
@@ -117,6 +106,12 @@ const Courses = () => {
 		} else {
 			setMsgError((preErr) => ({...preErr, imgErr: ''}));
 		}
+		if (course.hourPerSession === '') {
+			setMsgError((preErr) => ({...preErr, hourPerSessionErr: 'Vui lòng chọn số giờ cho ca học'}));
+		} else {
+			setMsgError((preErr) => ({...preErr, hourPerSessionErr: ''}));
+		}
+
 		if (course.courseDescription === '') {
 			setMsgError((preErr) => ({...preErr, courseDescriptionErr: 'Vui lòng nhập mô tả cho khóa học'}));
 		} else {
@@ -124,13 +119,10 @@ const Courses = () => {
 		}
 		if (msgError.courseNameErr != '' || msgError.courseDescriptionErr != '' || msgError.courseDurationErr != '' || msgError.imgErr != '' || msgError.coursePriceErr != '') {
 			return false;
-		} else {
-			setValid(true);
-			return true;
 		}
+		return true;
 	};
 	const onChangePicture = (e) => {
-		// validate();
 		setImage(null);
 		if (e.target.files[0]) {
 			setImage(e.target.files[0]);
@@ -150,17 +142,27 @@ const Courses = () => {
 			{
 				accessorKey: 'subject.subjectName',
 				header: 'Tên môn học',
-				size: 80,
+				size: 100,
 			},
 			{
 				accessorKey: 'courseName',
 				header: 'Tên khóa học',
-				size: 130,
+				size: 150,
 			},
 			{
 				accessorKey: 'courseDuration',
 				header: 'Thời lượng (h)',
 				size: 75,
+			},
+			{
+				accessorKey: 'hourPerSession',
+				header: 'Giờ/Ca',
+				size: 20,
+			},
+			{
+				accessorKey: 'numberSession',
+				header: 'Số ca',
+				size: 55,
 			},
 			{
 				accessorKey: 'coursePrice',
@@ -174,7 +176,7 @@ const Courses = () => {
 			},
 			{
 				accessorKey: 'subject.admin.fullname',
-				header: 'Người tạo',
+				header: 'Tên người tạo',
 				size: 80,
 			},
 		],
@@ -183,6 +185,14 @@ const Courses = () => {
 
 	const columnsCoursesHistory = useMemo(
 		() => [
+			// {
+			// 	enableColumnOrdering: true,
+			// 	enableEditing: false, //disable editing on this column
+			// 	enableSorting: true,
+			// 	accessorKey: 'courseId',
+			// 	header: 'Mã khóa học',
+			// 	size: 20,
+			// },
 			{
 				accessorKey: 'subjectName',
 				header: 'Tên môn học',
@@ -194,7 +204,6 @@ const Courses = () => {
 				size: 150,
 			},
 			{
-				accessorFn: (row) => row,
 				Cell: ({cell}) => {
 					const row = cell.getValue();
 
@@ -209,7 +218,7 @@ const Courses = () => {
 			},
 			{
 				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss A'),
-				header: 'Ngày thao tác',
+				header: 'Ngày chỉnh sửa',
 				size: 60,
 			},
 			{
@@ -221,10 +230,6 @@ const Courses = () => {
 		[],
 	);
 	const getAllCourse = async () => {
-		if (courses.length > 0) {
-			setLoadingCourses(false);
-			return;
-		}
 		try {
 			setLoadingCourses(true);
 			const resp = await courseApi.getAll();
@@ -264,7 +269,6 @@ const Courses = () => {
 			value: item.subjectId,
 			label: item.subjectName,
 		}));
-		console.log(options);
 		return convertedArray;
 	};
 
@@ -279,11 +283,10 @@ const Courses = () => {
 	};
 
 	const handleResetForm = () => {
-		// hide form
 		setMsgError({});
+		setUpdate((pre) => !pre);
 		setShowForm((pre) => !pre);
 		setImgData(null);
-		// set course == null
 		setCourse({
 			// subjectName: '',
 			courseName: '',
@@ -309,9 +312,6 @@ const Courses = () => {
 	};
 
 	const handleShowAddForm = () => {
-		setSubmitClick(false);
-
-		setMsgError((preErr) => ({...preErr, courseNameErr: '', imgErr: '', courseDescriptionErr: ''}));
 		setShowForm((pre) => !pre);
 		setUpdate(false);
 		handleSelect(options[0]);
@@ -319,15 +319,12 @@ const Courses = () => {
 	};
 	const handleSubmitForm = (e) => {
 		e.preventDefault();
-		setSubmitClick(true);
-
 		validate();
 		if (!validate) {
 			return;
 		}
 		if (update) {
 			updateCourse();
-			console.log(courseRequest);
 			console.log('updated');
 		} else {
 			console.log(courseRequest);
@@ -353,8 +350,9 @@ const Courses = () => {
 		const formData = new FormData();
 		formData.append('courseRequest', JSON.stringify(courseRequest));
 		formData.append('file', image);
-		console.log([...formData]);
-		console.log({...courseRequest});
+		if (!validate()) {
+			return;
+		}
 		try {
 			const resp = await courseApi.addCourse(formData);
 			getAllCourse();
@@ -367,11 +365,12 @@ const Courses = () => {
 		const formData = new FormData();
 		formData.append('courseRequest', JSON.stringify(courseRequest));
 		formData.append('file', image);
-		console.log([...formData]);
-		console.log({...courseRequest});
+
 		try {
 			const resp = await courseApi.updateCourse(formData);
+			handleResetForm();
 			getAllCourse();
+			console.log('get all');
 		} catch (error) {
 			console.log('failed to fetch data', error);
 		}
@@ -385,6 +384,10 @@ const Courses = () => {
 		}
 		// console.log(courseRequest);
 	}
+
+	useLayoutEffect(() => {
+		setCourse({...course, courseDuration: course.hourPerSession * course.numberSession});
+	}, [course.hourPerSession, course.numberSession]);
 
 	useEffect(() => {
 		setListHistoryById([...listHistoryById]);
@@ -403,16 +406,11 @@ const Courses = () => {
 	}, [subjects, selectedSubject]); // nếu có thì thực hiện khi có sử thay đổi
 
 	useEffect(() => {
-		const {courseId, courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
+		const {courseId, courseName, coursePrice, courseDuration, courseDescription, numberSession, image, hourPerSession} = {...course};
 		if (selectedSubject !== undefined) {
-			setCourseRequest({courseId: courseId, courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
+			setCourseRequest({courseId: courseId, courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: parseInt(numberSession), image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username, hourPerSession: parseInt(hourPerSession)});
 		}
 	}, [course, selectedSubject]);
-	useEffect(() => {
-		if (submitClick) {
-			validate();
-		}
-	}, []);
 	return (
 		<>
 			<CoursesHeader />
@@ -452,11 +450,11 @@ const Courses = () => {
 								displayColumnDefOptions={{
 									'mrt-row-actions': {
 										header: 'Thao tác',
-										size: 40,
+										size: 20,
 										// Something else here
 									},
 									'mrt-row-numbers': {
-										size: 10,
+										size: 5,
 									},
 								}}
 								positionActionsColumn='last'
@@ -569,154 +567,172 @@ const Courses = () => {
 								</div>
 								<div className='modal-body'>
 									<div className='px-lg-2'>
-										<Row>
-											<Col sm={6}>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-username'>
-														Tên môn học
-													</label>
-													<Select
-														options={options}
-														placeholder='Chọn môn học'
-														value={selectedSubject}
-														onChange={handleSelect}
-														isSearchable={true}
-														className='form-control-alternative '
-														styles={{outline: 'none'}}
-													/>
-												</FormGroup>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-email'>
-														Tên khóa học
-													</label>
-													<Input
-														className='form-control-alternative'
-														// defaultValue='Java cơ bản cho người mới'
-														id='input-course-name'
-														placeholder='Tên khóa học'
-														type='text'
-														onChange={handelOnChangeInput}
-														name='courseName'
-														value={course.courseName}
-													/>
-													{msgError.courseNameErr && <p className='text-danger mt-1'>{msgError.courseNameErr}</p>}
-												</FormGroup>
-												<Row>
-													<Col md={12}>
-														<FormGroup>
-															<label
-																className='form-control-label'
-																htmlFor='input-first-name'>
-																Thời lượng (giờ)
-															</label>
-															<Input
-																className='form-control-alternative'
-																id='input-courseDuration'
-																placeholder='Thời lượng'
-																type='number'
-																// min={120}
-																step={30}
-																value={course.courseDuration}
-																name='courseDuration'
-																onChange={handelOnChangeInput}
-															/>
-															{msgError.courseDurationErr && <p className='text-danger mt-1'>{msgError.courseDurationErr}</p>}
-														</FormGroup>
-													</Col>
-													<Col md={12}>
-														<FormGroup>
-															<label
-																className='form-control-label'
-																htmlFor='input-last-name'>
-																Học phí (đồng)
-															</label>
-															<Input
-																className='form-control-alternative'
-																value={course.coursePrice}
-																id='input-coursePrice'
-																type='number'
-																min={1000000}
-																name='coursePrice'
-																placeholder='Học phí'
-																onChange={handelOnChangeInput}
-															/>
-															{msgError.coursePriceErr && <p className='text-danger mt-1'>{msgError.coursePriceErr}</p>}
-														</FormGroup>
-													</Col>
-												</Row>
-											</Col>
-											<Col sm={6}>
-												<Row>
-													<Col md={12}>
-														<FormGroup>
-															<label
-																className='form-control-label'
-																htmlFor='input-last-name'>
-																Mô tả khóa học
-															</label>
-															<Input
-																className='form-control-alternative'
-																id='input-courseDescription'
-																name='courseDescription'
-																value={course.courseDescription}
-																type='textarea'
-																placeholder='Mô tả khóa học'
-																onChange={handelOnChangeInput}
-															/>
-															{msgError.courseDescriptionErr && <p className='text-danger mt-1'>{msgError.courseDescriptionErr}</p>}
-														</FormGroup>
-													</Col>
-													<Col md={12}>
-														<FormGroup>
-															<Label
-																htmlFor='exampleFile'
-																className='form-control-label'>
-																Hình ảnh khóa học
-															</Label>
-															<div className='custom-file'>
-																<input
-																	type='file'
-																	name='imageFile'
-																	accept='image/*'
-																	className='custom-file-input form-control-alternative'
-																	id='customFile'
-																	onChange={onChangePicture}
-																	// multiple={true}
-																/>
-																<label
-																	className='custom-file-label'
-																	htmlFor='customFile'>
-																	{imgData ? 'Chọn một ảnh khác' : 'Chọn hình ảnh'}
-																</label>
-															</div>
-															{msgError.imgErr && <p className='text-danger mt-1'>{msgError.imgErr}</p>}
-														</FormGroup>
-													</Col>
-													<div className='previewProfilePic px-3'>
-														{imgData && (
-															<img
-																alt=''
-																width={120}
-																className='playerProfilePic_home_tile'
-																src={imgData}
-															/>
-														)}
-														{update && !imgData && (
-															<img
-																alt=''
-																width={120}
-																className=''
-																src={process.env.REACT_APP_IMAGE_URL + IMG_URL + course.image}
-															/>
-														)}
-													</div>
-												</Row>
-											</Col>
-										</Row>
+										<div
+											className='previewProfilePic px-3 border d-flex justify-content-center'
+											style={{height: '200px', overflow: 'hidden'}}>
+											{imgData && (
+												<img
+													alt=''
+													// width={120}
+													className='playerProfilePic_home_tile'
+													src={imgData}
+												/>
+											)}
+											{update && !imgData && (
+												<img
+													alt=''
+													className=''
+													src={process.env.REACT_APP_IMAGE_URL + IMG_URL + course.image}
+												/>
+											)}
+										</div>
+										<FormGroup>
+											<Label
+												htmlFor='exampleFile'
+												className='form-control-label'>
+												Hình ảnh khóa học
+											</Label>
+											<div className='custom-file'>
+												<input
+													type='file'
+													name='imageFile'
+													accept='image/*'
+													className='custom-file-input form-control-alternative'
+													id='customFile'
+													onChange={onChangePicture}
+													// multiple={true}
+												/>
+												<label
+													className='custom-file-label'
+													htmlFor='customFile'>
+													{imgData ? 'Chọn một ảnh khác' : 'Chọn hình ảnh'}
+												</label>
+											</div>
+											{msgError.imgErr && <p className='text-danger mt-1'>{msgError.imgErr}</p>}
+										</FormGroup>
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-username'>
+												Tên môn học
+											</label>
+											<Select
+												options={options}
+												placeholder='Chọn môn học'
+												value={selectedSubject}
+												onChange={handleSelect}
+												isSearchable={true}
+												className='form-control-alternative '
+												styles={{outline: 'none'}}
+											/>
+										</FormGroup>
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-email'>
+												Tên khóa học
+											</label>
+											<Input
+												className='form-control-alternative text-dark'
+												id='input-course-name'
+												placeholder='Tên khóa học'
+												type='text'
+												onChange={handelOnChangeInput}
+												name='courseName'
+												value={course.courseName}
+											/>
+											{msgError.courseNameErr && <p className='text-danger mt-1'>{msgError.courseNameErr}</p>}
+										</FormGroup>
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-last-name'>
+												Mô tả khóa học
+											</label>
+											<Input
+												className='form-control-alternative'
+												id='input-courseDescription'
+												name='courseDescription'
+												value={course.courseDescription}
+												type='textarea'
+												rows={5}
+												placeholder='Mô tả khóa học'
+												onChange={handelOnChangeInput}
+											/>
+											{msgError.courseDescriptionErr && <p className='text-danger mt-1'>{msgError.courseDescriptionErr}</p>}
+										</FormGroup>
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-last-name'>
+												Số ca học
+											</label>
+											<Input
+												className='form-control-alternative'
+												value={course.numberSession}
+												id='input-numberSession'
+												type='number'
+												name='numberSession'
+												placeholder='Số ca học'
+												onChange={handelOnChangeInput}
+											/>
+											{msgError.coursePriceErr && <p className='text-danger mt-1'>{msgError.coursePriceErr}</p>}
+										</FormGroup>
+
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-last-name'>
+												Số giờ/ca
+											</label>
+											<select
+												value={String(course.hourPerSession)}
+												name='hourPerSession'
+												onChange={handelOnChangeInput}
+												className='custom-select custom-select-lg mb-3 form-control-alternative'>
+												<option value=''>Chọn số giờ / ca học</option>
+												<option value='1.5'>1,5 giờ/ca</option>
+												<option value='2'>2 giờ/ca</option>
+												<option value='2.5'>2,5 giờ/ca</option>
+											</select>
+											{msgError.hourPerSessionErr && <p className='text-danger mt-1'>{msgError.hourPerSessionErr}</p>}
+										</FormGroup>
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-first-name'>
+												Thời lượng (giờ)
+											</label>
+											<Input
+												className='form-control-alternative'
+												id='input-courseDuration'
+												placeholder='Thời lượng'
+												type='number'
+												readOnly
+												value={course.courseDuration}
+												name='courseDuration'
+												onChange={handelOnChangeInput}
+											/>
+											{msgError.courseDurationErr && <p className='text-danger mt-1'>{msgError.courseDurationErr}</p>}
+										</FormGroup>
+										<FormGroup>
+											<label
+												className='form-control-label'
+												htmlFor='input-last-name'>
+												Học phí (đồng)
+											</label>
+											<Input
+												className='form-control-alternative'
+												value={course.coursePrice}
+												id='input-coursePrice'
+												type='number'
+												min={1000000}
+												name='coursePrice'
+												placeholder='Học phí'
+												onChange={handelOnChangeInput}
+											/>
+											{msgError.coursePriceErr && <p className='text-danger mt-1'>{msgError.coursePriceErr}</p>}
+										</FormGroup>
 									</div>
 									<hr className='my-4' />
 								</div>
@@ -804,7 +820,7 @@ const Courses = () => {
 								)}
 								{listHistoryById.length === 0 && !loadingHistoryInfo && (
 									<div className='text-warning text-center my-5 py-5'>
-										<Warning /> Không tìm thấy lịch sử{' '}
+										<Warning /> Không tìm thấy lịch sử
 									</div>
 								)}
 								<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>

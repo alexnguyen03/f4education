@@ -34,6 +34,9 @@ public class CourseRequest {
 	@JsonProperty("numberSession")
 	private Integer numberSession;
 
+	@JsonProperty("hourPerSession")
+	private Integer hourPerSession;
+
 	@JsonProperty("image")
 	private String image;
 
