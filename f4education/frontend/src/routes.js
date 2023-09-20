@@ -97,6 +97,13 @@ var routes = [
 	},
 	{
 		path: '/classs',
+		name: 'Phòng học',
+		icon: 'ni ni-single-02 text-yellow',
+		component: <ClasssRoom />,
+		layout: '/admin',
+	},
+	{
+		path: '/classs',
 		name: 'Lớp học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <Classs />,

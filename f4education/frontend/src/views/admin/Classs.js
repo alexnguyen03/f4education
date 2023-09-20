@@ -217,11 +217,6 @@ const Classs = () => {
   const columnClass = useMemo(
     () => [
       {
-        accessorKey: "classId",
-        header: "Mã lớp học",
-        size: 100,
-      },
-      {
         accessorKey: "className",
         header: "Tên lớp học",
         size: 100,
@@ -229,7 +224,7 @@ const Classs = () => {
       {
         accessorKey: "startDate",
         accessorFn: (row) =>
-          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss a"),
+          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss A"),
         header: "Ngày bắt đầu",
         size: 90,
       },
@@ -240,7 +235,7 @@ const Classs = () => {
           const row = cell.getValue();
           if (row.endDate !== null) {
             return (
-              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a")}</span>
+              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss A")}</span>
             );
           } else {
             return <span>Chưa kết thúc</span>;
@@ -289,7 +284,7 @@ const Classs = () => {
       {
         accessorKey: "startDate",
         accessorFn: (row) =>
-          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss a"),
+          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss A"),
         header: "Ngày bắt đầu",
         size: 105,
       },
@@ -300,7 +295,7 @@ const Classs = () => {
           const row = cell.getValue();
           if (row.endDate !== null) {
             return (
-              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a")}</span>
+              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss A")}</span>
             );
           } else {
             return <span>Chưa kết thúc</span>;
