@@ -1,12 +1,24 @@
-import {Button, Card, CardBody, CardHeader, FormGroup, Form, Input, Container, Row, Col, Modal} from 'reactstrap';
-import ResourcesHeader from 'components/Headers/ResourcesHeader';
-import {useState, useMemo, useEffect} from 'react';
-import {MaterialReactTable} from 'material-react-table';
-import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
-import {Box, IconButton} from '@mui/material';
-import moment from 'moment';
-import Select from 'react-select';
-import {Link} from 'react-router-dom';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  FormGroup,
+  Form,
+  Input,
+  Container,
+  Row,
+  Col,
+  Modal,
+} from "reactstrap";
+import ResourcesHeader from "components/Headers/ResourcesHeader";
+import { useState, useMemo, useEffect } from "react";
+import { MaterialReactTable } from "material-react-table";
+import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { Box, IconButton } from "@mui/material";
+import moment from "moment";
+import Select from "react-select";
+import { Routes, Route, useParams, Link } from "react-router-dom";
 
 // gọi API từ resourceApi
 import resourceApi from 'api/resourceApi';
@@ -27,13 +39,13 @@ const Resource = () => {
 	const [update, setUpdate] = useState(true);
 	const [isClassHistoryShowing, setIsClassHistoryShowing] = useState(false);
 
-	const [courses, setCourses] = useState([]);
-	const [selectedCourse, setselectedCourse] = useState({
-		value: '0',
-		label: '',
-	});
-	const [options, setOptions] = useState([{value: '0', label: ''}]);
-	const [file, setFile] = useState(null);
+  const [courses, setCourses] = useState([]);
+  const [selectedCourse, setselectedCourse] = useState({
+    value: "0",
+    label: "",
+  });
+  const [options, setOptions] = useState([{ value: "0", label: "" }]);
+  const [file, setFile] = useState([null]);
 
 	// khởi tạo Resource
 	const [resource, setResource] = useState({
@@ -86,12 +98,13 @@ const Resource = () => {
 		});
 	};
 
-	const onChangeFile = (e) => {
-		setFile(null);
-		if (e.target.files[0]) {
-			setFile(e.target.files[0]);
-		}
-	};
+  const onChangeFile = (e) => {
+    setFile([]);
+    if (e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      setFile(selectedFiles);
+    }
+  };
 
 	// xóa trắng form
 	const handleResetForm = () => {
@@ -128,16 +141,22 @@ const Resource = () => {
 		}
 	}
 
-	function renderCellWithLink(row) {
-		// console.log(row);
-		const link = row.link;
-		const id = row.resourcesId;
-		return (
-			<span key={id}>
-				<Link to={`${link}`}>{row.link}</Link>
-			</span>
-		);
-	}
+  function renderCellWithLink(row) {
+    // console.log(row);
+    const link = row.link;
+    const id = row.resourcesId;
+    return (
+      <span key={id}>
+        <Link to={`${link}`}>Đường dẫn đi đến thư mục</Link>
+      </span>
+    );
+  }
+
+  function getFolderId(url) {
+    const startIndex = url.lastIndexOf("/") + 1; // Tìm vị trí bắt đầu của folderId
+    const folderId = url.substring(startIndex); // Lấy phần tử từ startIndex đến hết chuỗi
+    return folderId;
+  }
 
 	// resetModal ClassHistory
 	const handleResetClassHistory = () => {
@@ -155,19 +174,23 @@ const Resource = () => {
 		}
 	};
 
-	const addResource = async () => {
-		const formData = new FormData();
-		formData.append('resource', JSON.stringify(resource));
-		formData.append('file', file);
-		console.log([...formData]);
-		console.log({...resource});
-		try {
-			const resp = await resourceApi.createResource(formData);
-			handleResetForm();
-		} catch (error) {
-			console.log('Thêm thất bại', error);
-		}
-	};
+  const addResource = async () => {
+    const formData = new FormData();
+    formData.append("resourceRequest", JSON.stringify(resourceRequest));
+    var files = []; // Mảng chứa các đối tượng file
+    // Lặp qua mảng file và thêm từng đối tượng file vào formData
+    for (var i = 0; i < file.length; i++) {
+      formData.append("file", file[i]);
+    }
+    console.log([...formData]);
+    console.log({ ...resource });
+    try {
+      const resp = await resourceApi.createResource(formData);
+      handleResetForm();
+    } catch (error) {
+      console.log("Thêm thất bại", error);
+    }
+  };
 
 	const getAllCourse = async () => {
 		try {
@@ -178,39 +201,40 @@ const Resource = () => {
 		}
 	};
 
-	// bảng tài nguyên
-	const columnClass = useMemo(
-		() => [
-			{
-				accessorKey: 'resourcesId',
-				header: 'ID',
-				size: 80,
-			},
-			{
-				accessorKey: 'course.courseName',
-				header: 'Tên khóa học',
-				size: 150,
-			},
-			{
-				accessorFn: (row) => row.link,
-				Cell: ({cell}) => renderCellWithLink(cell.row.original),
-				header: 'Link',
-				size: 200,
-			},
-			{
-				accessorKey: 'createDate',
-				accessorFn: (row) => moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A'),
-				header: 'Ngày tạo',
-				size: 150,
-			},
-			{
-				accessorKey: 'adminName',
-				header: 'Người tạo',
-				size: 110,
-			},
-		],
-		[],
-	);
+  // bảng tài nguyên
+  const columnClass = useMemo(
+    () => [
+      {
+        accessorKey: "resourcesId",
+        header: "ID",
+        size: 80,
+      },
+      {
+        accessorKey: "course.courseName",
+        header: "Tên khóa học",
+        size: 180,
+      },
+      {
+        accessorFn: (row) => row.link,
+        Cell: ({ cell }) => renderCellWithLink(cell.row.original),
+        header: "Link",
+        size: 150,
+      },
+      {
+        accessorKey: "createDate",
+        accessorFn: (row) =>
+          moment(row.createDate).format("DD/MM/yyyy, h:mm:ss A"),
+        header: "Ngày tạo",
+        size: 150,
+      },
+      {
+        accessorKey: "adminName",
+        header: "Người tạo",
+        size: 110,
+      },
+    ],
+    []
+  );
 
 	// hiển thị tiếng việt
 	const displayActionHistory = (action) => {
@@ -343,59 +367,66 @@ const Resource = () => {
 						</Button>
 					</CardHeader>
 
-					{/* bảng tài nguyên */}
-					{isClassHistoryShowing ? null : (
-						<CardBody>
-							<MaterialReactTable
-								displayColumnDefOptions={{
-									'mrt-row-actions': {
-										header: 'Thao tác',
-										size: 100,
-									},
-								}}
-								enableColumnResizing
-								enableGrouping
-								enableStickyHeader
-								enableStickyFooter
-								columns={columnClass}
-								data={resources}
-								positionActionsColumn='last'
-								renderTopToolbarCustomActions={() => (
-									<Button
-										onClick={() => setShowFormClass((pre) => !pre)}
-										color='success'>
-										Thêm tài nguyên
-									</Button>
-								)}
-								enableRowActions
-								renderRowActions={({row, table}) => (
-									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-										<Link to={`/admin/resourceDetail/${row.original.resourcesId}`}>
-											<IconButton
-												color='secondary'
-												onClick={() => {
-													handleEditRow(row);
-												}}>
-												<EditIcon />
-											</IconButton>
-										</Link>
-										<IconButton
-											color='info'
-											onClick={() => {
-												handleShowClassHistory(row);
-											}}>
-											<i class='fa-sharp fa-solid fa-eye'></i>
-										</IconButton>
-									</Box>
-								)}
-								muiTablePaginationProps={{
-									rowsPerPageOptions: [10, 20, 50, 100],
-									showFirstButton: false,
-									showLastButton: false,
-								}}
-							/>
-						</CardBody>
-					)}
+          {/* bảng tài nguyên */}
+          {isClassHistoryShowing ? null : (
+            <CardBody>
+              <MaterialReactTable
+                displayColumnDefOptions={{
+                  "mrt-row-actions": {
+                    header: "Thao tác",
+                    size: 100,
+                  },
+                }}
+                enableColumnResizing
+                enableGrouping
+                enableStickyHeader
+                enableStickyFooter
+                columns={columnClass}
+                data={resources}
+                positionActionsColumn="last"
+                renderTopToolbarCustomActions={() => (
+                  <Button
+                    onClick={() => setShowFormClass((pre) => !pre)}
+                    color="success"
+                  >
+                    Thêm tài nguyên
+                  </Button>
+                )}
+                enableRowActions
+                renderRowActions={({ row, table }) => (
+                  <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
+                    <Link
+                      to={`/admin/resourceDetail/${
+                        row.original.course.courseName
+                      }/${getFolderId(row.original.link)}`}
+                    >
+                      <IconButton
+                        color="secondary"
+                        onClick={() => {
+                          handleEditRow(row);
+                        }}
+                      >
+                        <EditIcon />
+                      </IconButton>
+                    </Link>
+                    <IconButton
+                      color="info"
+                      onClick={() => {
+                        handleShowClassHistory(row);
+                      }}
+                    >
+                      <i class="fa-sharp fa-solid fa-eye"></i>
+                    </IconButton>
+                  </Box>
+                )}
+                muiTablePaginationProps={{
+                  rowsPerPageOptions: [10, 20, 50, 100],
+                  showFirstButton: false,
+                  showLastButton: false,
+                }}
+              />
+            </CardBody>
+          )}
 
 					{/* bảng lịch sử tài nguyên  */}
 					{isClassHistoryShowing ? (

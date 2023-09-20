@@ -14,11 +14,10 @@ import {
 import ResourceDetailHeader from "components/Headers/ResourceDetailHeader";
 import { useState, useMemo, useEffect } from "react";
 import { MaterialReactTable } from "material-react-table";
-import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
+import { Delete as DeleteIcon } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
-import moment from "moment";
 import Select from "react-select";
-import { Link } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 
 // gọi API từ resourceApi
 import resourceApi from "api/resourceApi";
@@ -31,21 +30,16 @@ import classHistoryApi from "api/classHistoryApi";
 
 const Resource = () => {
   const user = JSON.parse(localStorage.getItem("user") | "");
-  const [resources, setResources] = useState([]);
-  const [classHistories, setClassHistories] = useState([]);
-  const [classHistoryByClassId, setClassHistotyByClassId] = useState([]);
+  const [allFileByFolderId, setAllFileByFolderId] = useState([]);
   const [showFormClass, setShowFormClass] = useState(false);
-  const [showFormClassHistory, setShowFormClassHistory] = useState(false);
   const [update, setUpdate] = useState(true);
-  const [isClassHistoryShowing, setIsClassHistoryShowing] = useState(false);
-
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setselectedCourse] = useState({
     value: "0",
     label: "",
   });
   const [options, setOptions] = useState([{ value: "0", label: "" }]);
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState([]);
 
   // khởi tạo Resource
   const [resource, setResource] = useState({
@@ -67,41 +61,25 @@ const Resource = () => {
     createDate: "",
   });
 
-  // thay đổi giá trị của biến
-  const handleChangeClassListAndHistory = () => {
-    setIsClassHistoryShowing(!isClassHistoryShowing);
-  };
-
-  // edit row class
-  const handleEditRow = (row) => {
-    setShowFormClass(true);
-    setUpdate(false);
-    setResource({ ...row.original });
-    setselectedCourse({
-      ...selectedCourse,
-      value: row.original.course.courseId,
-      label: row.original.course.courseName,
-    });
-  };
-
-  // show modal classhistory
-  const handleShowClassHistory = (row) => {
-    setShowFormClassHistory(true);
-    getDataClassHistoryByClassId(row.original.classId);
-  };
-
-  // lấy dữ liệu từ form
-  const handelOnChangeInput = (e) => {
-    setResource({
-      ...resource,
-      [e.target.name]: e.target.value,
-    });
+  // delete file
+  const handleDeleteRow = async (row) => {
+    try {
+      let fileId = row.original.id;
+      const confirmed = window.confirm("Bạn có chắc chắn muốn xóa?");
+      if (confirmed) {
+        const resp = await resourceApi.deleteFileById(fileId);
+        alert("Xóa file thành công !!!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onChangeFile = (e) => {
-    setFile(null);
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
+    setFile([]);
+    if (e.target.files.length > 0) {
+      const selectedFiles = Array.from(e.target.files);
+      setFile(selectedFiles);
     }
   };
 
@@ -141,36 +119,23 @@ const Resource = () => {
   }
 
   function renderCellWithLink(row) {
-    // console.log(row);
     const link = row.link;
     const id = row.resourcesId;
     return (
       <span key={id}>
-        <Link to={`${link}`}>{row.link}</Link>
+        <Link to={`${link}`}>Đường dẫn đi đến file</Link>
       </span>
     );
   }
 
-  // resetModal ClassHistory
-  const handleResetClassHistory = () => {
-    setShowFormClassHistory((pre) => !pre);
-  };
-
-  // lấy tấc cả dữ liệu Resource từ database (gọi api)
-  const getDataResource = async () => {
-    try {
-      const resp = await resourceApi.getAllResource();
-      setResources(resp);
-      console.log(resp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const addResource = async () => {
     const formData = new FormData();
     formData.append("resourceRequest", JSON.stringify(resourceRequest));
-    formData.append("file", file);
+    var files = []; // Mảng chứa các đối tượng file
+    // Lặp qua mảng file và thêm từng đối tượng file vào formData
+    for (var i = 0; i < file.length; i++) {
+      formData.append("file", file[i]);
+    }
     console.log([...formData]);
     console.log({ ...resource });
     try {
@@ -194,124 +159,36 @@ const Resource = () => {
   const columnClass = useMemo(
     () => [
       {
-        accessorKey: "resourcesId",
-        header: "ID",
-        size: 80,
+        accessorKey: "id",
+        header: "ID File",
+        size: 150,
       },
       {
-        accessorKey: "course.courseName",
-        header: "Tên khóa học",
+        accessorKey: "name",
+        header: "Tên File",
         size: 150,
       },
       {
         accessorFn: (row) => row.link,
         Cell: ({ cell }) => renderCellWithLink(cell.row.original),
         header: "Link",
-        size: 200,
-      },
-      {
-        accessorKey: "createDate",
-        accessorFn: (row) =>
-          moment(row.createDate).format("DD/MM/yyyy, h:mm:ss A"),
-        header: "Ngày tạo",
-        size: 150,
-      },
-      {
-        accessorKey: "adminName",
-        header: "Người tạo",
-        size: 110,
-      },
-    ],
-    []
-  );
-
-  // hiển thị tiếng việt
-  const displayActionHistory = (action) => {
-    return action === "CREATE" ? "Thêm mới" : "Cập nhật";
-  };
-
-  // bảng lịch sử lớp học
-  const columnClassHistory = useMemo(
-    () => [
-      {
-        accessorKey: "classId",
-        header: "Mã lớp học",
-        size: 90,
-      },
-      {
-        accessorKey: "className",
-        header: "Tên lớp học",
-        size: 100,
-      },
-      {
-        accessorKey: "startDate",
-        accessorFn: (row) =>
-          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss a"),
-        header: "Ngày bắt đầu",
-        size: 105,
-      },
-      {
-        accessorKey: "endDate",
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          if (row.endDate !== null) {
-            return (
-              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss a")}</span>
-            );
-          } else {
-            return <span>Chưa kết thúc</span>;
-          }
-        },
-        header: "Ngày kết thúc",
-        size: 105,
-      },
-      {
-        accessorKey: "maximumQuantity",
-        header: "Số lượng tối đa",
-        size: 95,
-      },
-      {
-        accessorKey: "admin.fullname",
-        header: "Người chỉnh sửa",
-        size: 100,
-      },
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        size: 95,
-      },
-      {
-        accessorFn: (row) =>
-          moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
-        header: "Ngày Chỉnh Sửa",
         size: 120,
       },
       {
-        accessorKey: "action",
-        accessorFn: (row) => displayActionHistory(row.action),
-        header: "Hành động",
-        size: 100,
+        accessorKey: "size",
+        header: "Size",
+        size: 80,
       },
     ],
     []
   );
 
-  // lấy tấc cả dữ liệu ClassHistory từ database (gọi api)
-  const getDataClassHistory = async () => {
+  // lấy dữ liệu GoogleDriveAllFile theo folderId từ database (gọi api)
+  const getAllFileByFolderId = async (folderId) => {
     try {
-      const resp = await classHistoryApi.getAllClassHistory();
-      setClassHistories(resp);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
-  // lấy dữ liệu ClassHistory theo ClassId từ database (gọi api)
-  const getDataClassHistoryByClassId = async (classId) => {
-    try {
-      const resp = await classHistoryApi.getClassHistoryByClassId(classId);
-      setClassHistotyByClassId(resp);
+      const resp = await resourceApi.getAllFileByFolderId(folderId);
+      setAllFileByFolderId(resp);
+      console.log("resp" + resp);
     } catch (error) {
       console.log(error);
     }
@@ -334,9 +211,11 @@ const Resource = () => {
     }
   }, [resource, selectedCourse]);
 
+  const data = useParams();
+
   // Use effect
   useEffect(() => {
-    getDataResource();
+    getAllFileByFolderId(data.folderId);
     getAllCourse();
   }, []);
 
@@ -345,9 +224,15 @@ const Resource = () => {
       <ResourceDetailHeader />
       <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
+          <h2 className="mt-2 ml-4">
+            <Link to={`/admin/resources`}>Tài nguyên</Link> / Tài nguyên chi
+            tiết
+          </h2>
           {/* Header */}
           <CardHeader className="bg-white border-0 d-flex justify-content-between">
-            <h3 className="mb-0">Bảng tài nguyên chi tiết</h3>
+            <h3 className="mb-0">
+              Bảng tài nguyên chi tiết của khóa học <b>{data.courseName}</b>{" "}
+            </h3>
           </CardHeader>
 
           {/* bảng tài nguyên chi tiết */}
@@ -355,7 +240,7 @@ const Resource = () => {
             <MaterialReactTable
               displayColumnDefOptions={{
                 "mrt-row-actions": {
-                  header: "Thao tác",
+                  header: "Xóa",
                   size: 80,
                 },
               }}
@@ -363,8 +248,10 @@ const Resource = () => {
               enableGrouping
               enableStickyHeader
               enableStickyFooter
+              enableRowNumbers
               columns={columnClass}
-              data={resources}
+              data={allFileByFolderId}
+              initialState={{ columnVisibility: { id: false } }}
               positionActionsColumn="last"
               renderTopToolbarCustomActions={() => (
                 <Button
@@ -380,7 +267,7 @@ const Resource = () => {
                   <IconButton
                     color="secondary"
                     onClick={() => {
-                      handleEditRow(row);
+                      handleDeleteRow(row);
                     }}
                   >
                     <DeleteIcon />
@@ -478,41 +365,6 @@ const Resource = () => {
             >
               {update ? "Lưu" : "Cập nhật"}
             </Button>
-          </div>
-        </Modal>
-        {/* Modal ClassHistory */}
-        <Modal
-          backdrop="static"
-          className="modal-dialog-centered modal-xl"
-          isOpen={showFormClassHistory}
-          toggle={() => setShowFormClassHistory((pre) => !pre)}
-        >
-          <div className="modal-header">
-            <h3 className="mb-0">Lịch sử chi tiết</h3>
-            <button
-              aria-label="Close"
-              className="close"
-              data-dismiss="modal"
-              type="button"
-              onClick={handleResetClassHistory}
-            >
-              <span aria-hidden={true}>×</span>
-            </button>
-          </div>
-          <div className="modal-body">
-            <MaterialReactTable
-              enableColumnResizing
-              enableGrouping
-              enableStickyHeader
-              enableStickyFooter
-              columns={columnClassHistory}
-              data={classHistoryByClassId}
-              muiTablePaginationProps={{
-                rowsPerPageOptions: [10, 20, 50, 100],
-                showFirstButton: false,
-                showLastButton: false,
-              }}
-            />
           </div>
         </Modal>
       </Container>

@@ -1,7 +1,11 @@
 package com.f4education.springjwt.repository;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.security.services.SessionService;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -23,6 +28,20 @@ public class GoogleDriveRepository {
 	@Autowired
 	SessionService sessionService;
 
+	public List<File> getAllFilesInFolder(String folderId) throws IOException, GeneralSecurityException {
+		List<File> allFiles = new ArrayList<>();
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		FileList result = driveQuickstart.getInstance().files().list().setQ("'" + folderId + "' in parents")
+				.setSpaces("drive").setFields("files(id, name, size)").execute();
+
+		List<File> files = result.getFiles();
+		if (files != null && !files.isEmpty()) {
+			allFiles.addAll(files);
+		}
+
+		return allFiles;
+	}
+
 	// Set permission drive file
 	private Permission setPermission(String type, String role) {
 		Permission permission = new Permission();
@@ -30,12 +49,27 @@ public class GoogleDriveRepository {
 		permission.setRole(role);
 		return permission;
 	}
+	
+	private boolean fileExists(String filename, String folderId) throws IOException, GeneralSecurityException {
+		FileList fileList = driveQuickstart.getInstance().files().list()
+				.setQ("name = '" + filename + "' and '" + folderId + "' in parents")
+				.setSpaces("drive")
+				.execute();
+
+		List<File> files = fileList.getFiles();
+		return files != null && !files.isEmpty();
+	}
 
 	// Upload file
 	public String uploadFile(MultipartFile file, String folderName) {
 		try {
 			String folderId = getFolderId(folderName);
 			sessionService.set("folderId", folderId);
+			// Kiểm tra xem file đã tồn tại trên Google Drive chưa
+			if (fileExists(file.getOriginalFilename(), folderId)) {
+				System.out.println("File already exists on Google Drive.");
+				return null;
+			}
 			if (null != file) {
 				File fileMetadata = new File();
 				fileMetadata.setParents(Collections.singletonList(folderId));
@@ -116,5 +150,10 @@ public class GoogleDriveRepository {
 		} while (pageToken != null && folderId == null);
 
 		return folderId;
+	}
+
+	public void deleteFile(String fileId) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		driveQuickstart.getInstance().files().delete(fileId).execute();
 	}
 }

@@ -113,6 +113,13 @@ var routes = [
 	},
 	{
 		path: '/classs',
+		name: 'Phòng học',
+		icon: 'ni ni-single-02 text-yellow',
+		component: <ClasssRoom />,
+		layout: '/admin',
+	},
+	{
+		path: '/classs',
 		name: 'Lớp học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <Classs />,
@@ -154,10 +161,10 @@ var routes = [
 	{
 		path: '/questionDetail/:courseName',
 		component: <QuestionDetail />,
-		layout: '/admin',
-	},
-	{
-		path: '/resourceDetail/:resourcesId',
+		layout: "/admin",
+	  },
+	  {
+		path: "/resourceDetail/:courseName/:folderId",
 		component: <ResourceDetail />,
 		layout: '/admin',
 	},
