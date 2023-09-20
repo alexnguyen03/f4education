@@ -13,7 +13,9 @@ import {
   Button,
   Card,
   CardBody,
+  CardFooter,
   CardHeader,
+  CardImg,
   Col,
   Container,
   Input,
@@ -117,7 +119,6 @@ const Subjects = () => {
       console.log(resp);
       setCoursePerSubjectName(resp);
       setLoadingPopupHistory(false);
-
     } catch (error) {
       console.log(error);
     }
@@ -202,9 +203,13 @@ const Subjects = () => {
 
   const handleEditSubject = (row) => {
     setShowModal(true);
-    setSubject({ ...row.original, adminId: row.original.adminName });
+    setSubject({
+      ...row.original,
+      adminId: row.original.adminName,
+      createDate: row.original.createDate,
+    });
     setUpdate(true);
-    setSubjectNameRecent(row.original.adminName);
+    setSubjectNameRecent(row.original.subjectName);
   };
 
   const resetForm = () => {
@@ -241,6 +246,10 @@ const Subjects = () => {
     }
 
     if (subject.subjectName.trim() === subjectNameRecent.trim()) {
+      setErrorInputSubject({
+        status: false,
+        message: "",
+      });
       return true;
     }
 
@@ -312,6 +321,7 @@ const Subjects = () => {
           fetchCourseBySubjectName(row.subjectName);
         }}
         className="text-dark font-weight-600"
+        style={{ cursor: "pointer" }}
       >
         {row.subjectName}
       </div>
@@ -603,33 +613,35 @@ const Subjects = () => {
           <div className="modal-body">
             <form method="post">
               {update && (
-                <FormGroup className="mb-3">
-                  <label className="form-control-label" htmlFor="id">
-                    Mã môn học
-                  </label>
-                  <Input
-                    className="form-control-alternative"
-                    id="id"
-                    onChange={handleChangeInput}
-                    disabled
-                    name="subjectId"
-                    value={subject.subjectId}
-                  />
-                </FormGroup>
+                <>
+                  <FormGroup className="mb-3">
+                    <label className="form-control-label" htmlFor="id">
+                      Mã môn học
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      id="id"
+                      onChange={handleChangeInput}
+                      disabled
+                      name="subjectId"
+                      value={subject.subjectId}
+                    />
+                  </FormGroup>
+                  <FormGroup className="mb-3">
+                    <label className="form-control-label" htmlFor="adminId">
+                      {update ? "Tên admin" : "Mã admin"}
+                    </label>
+                    <Input
+                      className="form-control-alternative"
+                      disabled
+                      id="adminId"
+                      onChange={handleChangeInput}
+                      name="adminId"
+                      value={subject.adminId}
+                    />
+                  </FormGroup>
+                </>
               )}
-              <FormGroup className="mb-3">
-                <label className="form-control-label" htmlFor="adminId">
-                  {update ? "Tên admin" : "Mã admin"}
-                </label>
-                <Input
-                  className="form-control-alternative"
-                  disabled
-                  id="adminId"
-                  onChange={handleChangeInput}
-                  name="adminId"
-                  value={subject.adminId}
-                />
-              </FormGroup>
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="name">
                   Tên môn học
@@ -713,27 +725,62 @@ const Subjects = () => {
               ) : (
                 <>
                   {courseBySubject ? (
-                    <>{
-                      coursePerSubjectName.length === 0?(
+                    <>
+                      {coursePerSubjectName.length === 0 ? (
                         <h3 className="mx-auto">
                           Môn học hiện không có khóa học nào.
                         </h3>
-                      ):(<>
-                        {
-                          coursePerSubjectName.map(course=>(
+                      ) : (
+                        <>
+                          {coursePerSubjectName.map((course) => (
                             <Col
                               key={course.courseId}
                               xl="12"
                               lg="12"
                               md="12"
                               sm="12"
-                            > 
-                                {course.courseId}
+                            >
+                              <Card className="mb-2">
+                                <CardBody>
+                                  <img
+                                    src="https://images.pexels.com/photos/1671436/pexels-photo-1671436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                    className="img-fluid"
+                                    alt=""
+                                    style={{
+                                      width: "100%",
+                                      height: "400px",
+                                      objectFit: "cover",
+                                    }}
+                                  />
+                                  <h3 className="font-weight-600 mt-2">
+                                    {course.courseName}
+                                  </h3>
+                                  <div className="d-flex justify-content-start">
+                                    <h4 className="text-muted">
+                                      <span className="mr-2">Thời lượng:</span>
+                                      <strong className="font-weight-500">
+                                        {course.courseDuration}H
+                                      </strong>
+                                    </h4>
+                                    <span className="font-weight-600 mx-3 mt--1">
+                                      |
+                                    </span>
+                                    <h4 className="text-muted">
+                                      <span className="mr-2">
+                                        Giá khóa học:
+                                      </span>
+                                      <strong className="text-danger font-weight-500">
+                                        {course.coursePrice}đ
+                                      </strong>
+                                    </h4>
+                                  </div>
+                                  <hr className="text-muted" />
+                                </CardBody>
+                              </Card>
                             </Col>
-                          ))
-                        }
-                      </>)
-                      }
+                          ))}
+                        </>
+                      )}
                     </>
                   ) : (
                     <>

@@ -11,12 +11,10 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.SubjectService;
 import com.f4education.springjwt.models.Admin;
-import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.SubjectDTO;
 import com.f4education.springjwt.payload.request.SubjectRequest;
 import com.f4education.springjwt.repository.AdminRepository;
-import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
 @Service
@@ -92,7 +90,8 @@ public class SubjectServiceImpl implements SubjectService {
 		BeanUtils.copyProperties(subjectRequest, subject);
 
 		subject.setAdmin(admin);
-
+		subject.setCreateDate(subjectRequest.getCreateDate());
+		;
 		return subject;
 	}
 }
