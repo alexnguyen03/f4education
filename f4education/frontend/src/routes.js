@@ -122,7 +122,7 @@ var routes = [
 		layout: "/admin",
 	  },
 	  {
-		path: "/resourceDetail/:resourcesId",
+		path: "/resourceDetail/:courseName/:folderId",
 		component: <ResourceDetail />,
 		layout: "/admin",
 	  },

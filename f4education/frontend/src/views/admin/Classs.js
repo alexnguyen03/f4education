@@ -326,7 +326,7 @@ const Classs = () => {
       },
       {
         accessorFn: (row) =>
-          moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
+        moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
         header: "Ngày Chỉnh Sửa",
         size: 120,
       },

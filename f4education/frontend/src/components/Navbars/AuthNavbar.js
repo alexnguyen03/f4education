@@ -105,7 +105,7 @@ const AdminNavbar = () => {
                   <span className="nav-link-inner--text">Courses</span>
                 </NavLink>
               </NavItem>
-			  <NavItem>
+              <NavItem>
                 <NavLink
                   className="nav-link-icon"
                   to="/admin/classsroom"
