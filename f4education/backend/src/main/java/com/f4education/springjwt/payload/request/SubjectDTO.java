@@ -18,6 +18,4 @@ public class SubjectDTO {
 	private String adminName;
 	
 	private Date createDate;
-	
-	private List<Object[]> totalCoursePerSubject;
 }

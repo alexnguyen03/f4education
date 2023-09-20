@@ -11,10 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.SubjectService;
 import com.f4education.springjwt.models.Admin;
+import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.SubjectDTO;
 import com.f4education.springjwt.payload.request.SubjectRequest;
 import com.f4education.springjwt.repository.AdminRepository;
+import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
 @Service
@@ -63,17 +65,9 @@ public class SubjectServiceImpl implements SubjectService {
 
 	private SubjectDTO convertToDto(Subject subject) {
 		SubjectDTO subjectDTO = new SubjectDTO();
-
-		List<Object[]> totalCoursePerSubject = subjectRepository.getCourseCountBySubject();
-//		for (Object[] ob : totalCoursePerSubject) {
-//			String subjectName = (String) ob[0];
-//			Long courseCount = (Long) ob[1];
-//			System.out.println("Subject: " + subjectName + ", Course Count: " + courseCount);
-//		}
 		
 		String adminName = subject.getAdmin().getFullname();
 		subjectDTO.setAdminName(adminName);
-		subjectDTO.setTotalCoursePerSubject(totalCoursePerSubject);
 
 		BeanUtils.copyProperties(subject, subjectDTO);
 

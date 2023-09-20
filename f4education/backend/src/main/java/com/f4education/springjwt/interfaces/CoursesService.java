@@ -14,4 +14,6 @@ public interface CoursesService {
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
 	List<CourseDTO> findAllByAdminId(String adminId);
+	
+	List<CourseDTO> getCourseBySubjectName(String subjectName);
 }

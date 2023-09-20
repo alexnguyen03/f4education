@@ -47,8 +47,8 @@ public class SubjectHistoryController {
 
 	@PutMapping("/{id}")
 //	@PreAuthorize("hasRole('ADMIN')")
-	public SubjectHistoryDTO updateSubjectHistory(@PathVariable("id") Integer subjectHistoryId,
-			@RequestBody SubjectHistoryDTO SubjectHistoryDTO) {
+	public SubjectHistoryRequest updateSubjectHistory(@PathVariable("id") Integer subjectHistoryId,
+			@RequestBody SubjectHistoryRequest SubjectHistoryDTO) {
 		return subjectHistoryService.updateSubjectHistory(subjectHistoryId, SubjectHistoryDTO);
 	}
 }

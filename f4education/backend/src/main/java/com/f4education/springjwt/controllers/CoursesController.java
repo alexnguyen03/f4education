@@ -42,5 +42,10 @@ public class CoursesController {
 	public List<CourseDTO> findAllByAdminId(@PathVariable("adminId") String adminId) {
 		return courseService.findAllByAdminId(adminId);
 	}
+	
+	@GetMapping("/{subjectName}")
+	public List<CourseDTO> getCourseBySubjectName(@PathVariable("subjectName") String subjectName){
+		return courseService.getCourseBySubjectName(subjectName);
+	}
 
 }

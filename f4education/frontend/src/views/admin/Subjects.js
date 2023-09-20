@@ -24,6 +24,7 @@ import {
 // Axios
 import subjectApi from "../../api/subjectApi";
 import subjectHistoryApi from "../../api/subjectHistoryApi";
+import courseApi from "../../api/courseApi";
 
 const Subjects = () => {
   // Main variable
@@ -31,6 +32,7 @@ const Subjects = () => {
   const [subjectHistories, setSubjectHistories] = useState([]);
   const [subjectArray, setSubjectArray] = useState([]);
   const [subjectHistoryPerSubject, setSubjectHistoryPerSubject] = useState([]);
+  const [coursePerSubjectName, setCoursePerSubjectName] = useState([]);
 
   // Action variable
   const [showModal, setShowModal] = useState(false);
@@ -38,6 +40,7 @@ const Subjects = () => {
   const [subjectHistoryShowing, setSubjectHistoryShowing] = useState(false);
   const [ModalHistory, setModalHistory] = useState(false);
   const [loadingPopupHistory, setLoadingPopupHistory] = useState(false);
+  const [courseBySubject, setCourseBySubject] = useState(false);
   const [showNotification, setShowNotification] = useState({
     status: false,
     title: "",
@@ -55,18 +58,6 @@ const Subjects = () => {
 
   // Initial
   // const storedUser = JSON.parse(localStorage.getItem("user"));
-
-  // const admin = {
-  //   admin_id: "namnguyen",
-  //   fullname: "Nguyễn Hoài Nam",
-  //   gender: true,
-  //   date_of_birth: "2003-01-01",
-  //   citizen_identification: "930475892189",
-  //   levels: "Admin",
-  //   address: "Can Tho",
-  //   phone: "1234567890",
-  //   image: "image1.png",
-  // };
 
   // *************** Subject AREA
   const [subject, setSubject] = useState({
@@ -104,14 +95,29 @@ const Subjects = () => {
   };
 
   const fetchSubjectHistoryPerSubject = async (row) => {
-    setLoadingPopupHistory(true);
     try {
+      setLoadingPopupHistory(true);
       const resp = await subjectHistoryApi.getSubjectHistoryBySubjectId(
         row.subjectId
       );
       setSubjectHistoryPerSubject(reverseArray(resp));
       setLoadingPopupHistory(false);
+
       console.log(resp);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCourseBySubjectName = async (subjectName) => {
+    try {
+      console.log(subjectName.trim());
+      setLoadingPopupHistory(true);
+      const resp = await courseApi.getCourseBySubjectName(subjectName.trim());
+      console.log(resp);
+      setCoursePerSubjectName(resp);
+      setLoadingPopupHistory(false);
+
     } catch (error) {
       console.log(error);
     }
@@ -278,15 +284,15 @@ const Subjects = () => {
         size: 80,
       },
       {
-        accessorKey: "subjectName",
+        accessorFn: (row) => displaySubjectName(row),
         header: "Tên Môn Học",
-        size: 120,
+        size: 180,
       },
-      {
-        accessorFn: (row) => displayTotalCourse(row.totalCoursePerSubject),
-        header: "khóa học đã đăng ký",
-        size: 40,
-      },
+      // {
+      //   accessorFn: (row) => displayTotalCourse(row.totalCoursePerSubject),
+      //   header: "khóa học đã đăng ký",
+      //   size: 40,
+      // },
       {
         accessorFn: (row) =>
           moment(row.createDate).format("DD/MM/yyyy, h:mm:ss A"),
@@ -297,21 +303,19 @@ const Subjects = () => {
     []
   );
 
-  const displayTotalCourse = (totalCourse) => {
-    const filteredTotalCourse = totalCourse.filter((item) =>
-      subjects.some((subject) => subject.subjectName === item[0])
+  const displaySubjectName = (row) => {
+    return (
+      <div
+        onClick={() => {
+          setCourseBySubject(true);
+          setModalHistory(true);
+          fetchCourseBySubjectName(row.subjectName);
+        }}
+        className="text-dark font-weight-600"
+      >
+        {row.subjectName}
+      </div>
     );
-
-    console.log(filteredTotalCourse);
-  
-    const formattedTotalCourse = filteredTotalCourse.map((item) => {
-      const subject = subjects.find((subject) => subject.subjectName === item[0]);
-      const subjectName = subject ? subject.subjectName : "";
-      const totalCourse = item[1];
-      return `${totalCourse} - ${subjectName}`;
-    });
-  
-    return formattedTotalCourse;
   };
 
   const columnSubjectHistory = useMemo(
@@ -373,7 +377,6 @@ const Subjects = () => {
     try {
       const resp = await subjectHistoryApi.getAllSubjectHistory();
       setSubjectHistories(reverseArray(resp));
-      console.log(reverseArray(resp));
       console.log("restarted subjectHistory application");
     } catch (error) {
       console.log(error);
@@ -616,7 +619,7 @@ const Subjects = () => {
               )}
               <FormGroup className="mb-3">
                 <label className="form-control-label" htmlFor="adminId">
-                  Mã Admin
+                  {update ? "Tên admin" : "Mã admin"}
                 </label>
                 <Input
                   className="form-control-alternative"
@@ -681,7 +684,9 @@ const Subjects = () => {
         >
           <div className="modal-header">
             <h3 className="modal-title" id="modal-title-default">
-              Lịch sử chỉnh sửa
+              {courseBySubject
+                ? "Danh sách khóa học theo tên môn học"
+                : "Lịch sử chỉnh sửa"}
             </h3>
             <button
               aria-label="Close"
@@ -690,7 +695,13 @@ const Subjects = () => {
               type="button"
               onClick={() => setModalHistory(false)}
             >
-              <span aria-hidden={true} onClick={() => setUpdate(false)}>
+              <span
+                aria-hidden={true}
+                onClick={() => {
+                  setUpdate(false);
+                  setCourseBySubject(false);
+                }}
+              >
                 ×
               </span>
             </button>
@@ -701,55 +712,94 @@ const Subjects = () => {
                 <h3 className="mx-auto">Vui lòng chờ trong giây lát...</h3>
               ) : (
                 <>
-                  {subjectHistoryPerSubject.length === 0 ? (
-                    <h3 className="mx-auto">
-                      Môn học hiện không có lịch sử chỉnh sửa nào.
-                    </h3>
+                  {courseBySubject ? (
+                    <>{
+                      coursePerSubjectName.length === 0?(
+                        <h3 className="mx-auto">
+                          Môn học hiện không có khóa học nào.
+                        </h3>
+                      ):(<>
+                        {
+                          coursePerSubjectName.map(course=>(
+                            <Col
+                              key={course.courseId}
+                              xl="12"
+                              lg="12"
+                              md="12"
+                              sm="12"
+                            > 
+                                {course.courseId}
+                            </Col>
+                          ))
+                        }
+                      </>)
+                      }
+                    </>
                   ) : (
                     <>
-                      {subjectHistoryPerSubject.map((sb) => (
-                        <Col
-                          key={sb.subjectHistoryId}
-                          xl="12"
-                          lg="12"
-                          md="12"
-                          sm="12"
-                        >
-                          <h4>ID: {sb.subjectHistoryId}</h4>
-                          <div>
-                            <span className="text-muted">Ngày chỉnh sửa:</span>
-                            <strong className="ml-2">
-                              {moment(sb.modifyDate).format(
-                                "DD-MM-yyyy, h:mm:ss a"
-                              )}
-                            </strong>
-                            .
-                          </div>
-                          <Row>
-                            <Col xl="12" lg="12" md="12" sm="12">
-                              <span className="text-muted">Tên môn học:</span>
-                              <strong className="ml-2">{sb.subjectName}</strong>
+                      {subjectHistoryPerSubject.length === 0 ? (
+                        <h3 className="mx-auto">
+                          Môn học hiện không có lịch sử chỉnh sửa nào.
+                        </h3>
+                      ) : (
+                        <>
+                          {subjectHistoryPerSubject.map((sb) => (
+                            <Col
+                              key={sb.subjectHistoryId}
+                              xl="12"
+                              lg="12"
+                              md="12"
+                              sm="12"
+                            >
+                              <h4>ID: {sb.subjectHistoryId}</h4>
+                              <div>
+                                <span className="text-muted">
+                                  Ngày chỉnh sửa:
+                                </span>
+                                <strong className="ml-2">
+                                  {moment(sb.modifyDate).format(
+                                    "DD-MM-yyyy, h:mm:ss a"
+                                  )}
+                                </strong>
+                                .
+                              </div>
+                              <Row>
+                                <Col xl="12" lg="12" md="12" sm="12">
+                                  <span className="text-muted">
+                                    Tên môn học:
+                                  </span>
+                                  <strong className="ml-2">
+                                    {sb.subjectName}
+                                  </strong>
+                                </Col>
+                                <Col xl="12" lg="12" md="12" sm="12">
+                                  <span className="text-muted">
+                                    Mã môn học:
+                                  </span>
+                                  <strong className="ml-2">
+                                    {sb.subjectId}
+                                  </strong>
+                                </Col>
+                                <Col xl="12" lg="12" md="12" sm="12">
+                                  <span className="text-muted">Hành động:</span>
+                                  <strong className="ml-2">
+                                    {sb.action === "CREATE"
+                                      ? "thêm mới"
+                                      : "cập nhật"}
+                                  </strong>
+                                </Col>
+                                <Col xl="12" lg="12" md="12" sm="12">
+                                  <span className="text-muted">
+                                    Mã người tạo:
+                                  </span>
+                                  <strong className="ml-2">{sb.adminId}</strong>
+                                </Col>
+                              </Row>
+                              <hr style={{ color: "#c6c6c6" }} />
                             </Col>
-                            <Col xl="12" lg="12" md="12" sm="12">
-                              <span className="text-muted">Mã môn học:</span>
-                              <strong className="ml-2">{sb.subjectId}</strong>
-                            </Col>
-                            <Col xl="12" lg="12" md="12" sm="12">
-                              <span className="text-muted">Hành động:</span>
-                              <strong className="ml-2">
-                                {sb.action === "CREATE"
-                                  ? "thêm mới"
-                                  : "cập nhật"}
-                              </strong>
-                            </Col>
-                            <Col xl="12" lg="12" md="12" sm="12">
-                              <span className="text-muted">Mã người tạo:</span>
-                              <strong className="ml-2">{sb.adminId}</strong>
-                            </Col>
-                          </Row>
-                          <hr style={{ color: "#c6c6c6" }} />
-                        </Col>
-                      ))}
+                          ))}
+                        </>
+                      )}
                     </>
                   )}
                 </>
@@ -763,6 +813,7 @@ const Subjects = () => {
               type="button"
               onClick={() => {
                 setModalHistory(false);
+                setCourseBySubject(false);
               }}
             >
               Trở lại

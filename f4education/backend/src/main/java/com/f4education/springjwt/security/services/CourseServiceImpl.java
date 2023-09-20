@@ -31,15 +31,18 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll()
-				.stream()
-				.map(this::convertEntityToDTO)
-				.collect(Collectors.toList());
+		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
 	}
 
 	@Override
 	public Course findById(Integer id) {
 		return courseRepository.findById(id).get();
+	}
+
+	@Override
+	public List<CourseDTO> getCourseBySubjectName(String subjectName) {
+		List<Course> course = courseRepository.getCourseBySubjectName(subjectName);
+		return course.stream().map(this::convertEntityToDTO).collect(Collectors.toList());
 	}
 
 	@Override
@@ -60,8 +63,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseDTO> findAllByAdminId(String adminId) {
-		return courseRepository.findAllByAdmin_AdminId(adminId).stream()
-				.map(this::convertEntityToDTO)
+		return courseRepository.findAllByAdmin_AdminId(adminId).stream().map(this::convertEntityToDTO)
 				.collect(Collectors.toList());
 	}
 
