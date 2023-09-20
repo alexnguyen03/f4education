@@ -1,4 +1,4 @@
-import {Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon, InputGroupText, InputGroup, Row, Col} from 'reactstrap';
+import {Button, Card, CardHeader, CardBody, FormGroup, Form, Input, InputGroupAddon, InputGroupText, InputGroup, Row, Col, CardFooter} from 'reactstrap';
 import userApi from 'api/userApi';
 import {react, useState, useEffect, useRef} from 'react';
 const Login = () => {
@@ -9,25 +9,38 @@ const Login = () => {
 		accessToken: '',
 		roles: [],
 	});
+	const [account, setAccount] = useState({
+		username: '',
+		password: '',
+	});
 	const handleLogin = () => {
-		localStorage.setItem('accessToken', JSON.stringify(user.accessToken));
-		localStorage.setItem('user', JSON.stringify(user));
-		console.log('user' + user);
+		console.log('🚀 ~ file: Login.js:18 ~ handleLogin ~ account:', account);
+		// localStorage.setItem('accessToken', JSON.stringify(user.accessToken));
+		// localStorage.setItem('user', JSON.stringify(user));
+		// console.log('user' + user);
 	};
+	const handeleOnChangeInput = (e) => {
+		validate();
+		setAccount({...account, [e.target.name]: e.target.value});
+	};
+	const handleKeyDown = (e) => {
+		if (e.code === 'Enter') handleLogin();
+	};
+	const validate = () => {};
 	useEffect(() => {
-		const fetchData = async () => {
-			try {
-				const body = {
-					username: 'namnguyen',
-					password: '123456789',
-				};
-				const resp = await userApi.signin(body);
-				setUser(resp);
-			} catch (error) {
-				console.log('failed to fetch data', error);
-			}
-		};
-		fetchData();
+		// const fetchData = async () => {
+		// 	try {
+		// 		const body = {
+		// 			username: 'namnguyen',
+		// 			password: '123456789',
+		// 		};
+		// 		const resp = await userApi.signin(body);
+		// 		setUser(resp);
+		// 	} catch (error) {
+		// 		console.log('failed to fetch data', error);
+		// 	}
+		// };
+		// fetchData();
 	}, []);
 	return (
 		<>
@@ -35,10 +48,9 @@ const Login = () => {
 				lg='5'
 				md='7'>
 				<Card className='bg-secondary shadow border-0'>
-					<CardHeader className='bg-transparent pb-5'>
+					<CardHeader className='bg-transparent pb-4'>
 						<div className='text-muted text-center mt-2 mb-3'>
-							<small>Sign in with</small>
-							{user.id != null && <span> loged</span>}
+							<small>Đăng nhập bằng</small>
 						</div>
 						<div className='btn-wrapper text-center'>
 							<Button
@@ -69,12 +81,17 @@ const Login = () => {
 							</Button>
 						</div>
 					</CardHeader>
-					<CardBody className='px-lg-5 py-lg-5'>
-						<div className='text-center text-muted mb-4'>
-							<small>Or sign in with credentials</small>
+					<CardBody className='px-lg-5 '>
+						<div className='text-center text-muted mb-2'>
+							<small>hoặc</small>
 						</div>
 						<Form role='form'>
 							<FormGroup className='mb-3'>
+								<label
+									className='form-control-label'
+									htmlFor='input-username'>
+									Email hoặc Username
+								</label>
 								<InputGroup className='input-group-alternative'>
 									<InputGroupAddon addonType='prepend'>
 										<InputGroupText>
@@ -82,13 +99,20 @@ const Login = () => {
 										</InputGroupText>
 									</InputGroupAddon>
 									<Input
-										placeholder='Email'
-										type='email'
+										placeholder='Email hoặc Username'
+										type='text'
 										autoComplete='new-email'
+										name='username'
+										onChange={handeleOnChangeInput}
 									/>
 								</InputGroup>
 							</FormGroup>
 							<FormGroup>
+								<label
+									className='form-control-label'
+									htmlFor='input-username'>
+									Mật khẩu
+								</label>
 								<InputGroup className='input-group-alternative'>
 									<InputGroupAddon addonType='prepend'>
 										<InputGroupText>
@@ -96,9 +120,12 @@ const Login = () => {
 										</InputGroupText>
 									</InputGroupAddon>
 									<Input
-										placeholder='Password'
+										placeholder='Mật khẩu'
 										type='password'
+										name='password'
+										onChange={handeleOnChangeInput}
 										autoComplete='new-password'
+										onKeyDown={handleKeyDown}
 									/>
 								</InputGroup>
 							</FormGroup>
@@ -111,7 +138,7 @@ const Login = () => {
 								<label
 									className='custom-control-label'
 									htmlFor=' customCheckLogin'>
-									<span className='text-muted'>Remember me</span>
+									<span className='text-muted'>Ghi nhớ tài khoản</span>
 								</label>
 							</div>
 							<div className='text-center'>
@@ -120,32 +147,21 @@ const Login = () => {
 									color='primary'
 									type='button'
 									onClick={handleLogin}>
-									Sign in
+									Đăng nhập
 								</Button>
 							</div>
 						</Form>
+						<div className='text-center'>
+							{' '}
+							<a
+								className='text-light'
+								href='#pablo'
+								onClick={(e) => e.preventDefault()}>
+								<small>Quên mật khẩu ?</small>
+							</a>
+						</div>
 					</CardBody>
 				</Card>
-				<Row className='mt-3'>
-					<Col xs='6'>
-						<a
-							className='text-light'
-							href='#pablo'
-							onClick={(e) => e.preventDefault()}>
-							<small>Forgot password?</small>
-						</a>
-					</Col>
-					<Col
-						className='text-right'
-						xs='6'>
-						<a
-							className='text-light'
-							href='#pablo'
-							onClick={(e) => e.preventDefault()}>
-							<small>Create new account</small>
-						</a>
-					</Col>
-				</Row>
 			</Col>
 		</>
 	);

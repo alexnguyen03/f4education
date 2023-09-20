@@ -32,8 +32,10 @@ import Resources from 'views/admin/Resources.js';
 import ResourceDetail from 'views/admin/ResourceDetail';
 import Questions from 'views/admin/Questions';
 import QuestionDetail from 'views/admin/QuestionDetail';
+import Home from 'views/client/visitor/Home';
+import CourseClient from 'views/client/visitor/CourseClient';
 
-var routes = [
+export var routes = [
 	{
 		path: '/index',
 		name: 'Dashboard',
@@ -161,12 +163,28 @@ var routes = [
 	{
 		path: '/questionDetail/:courseName',
 		component: <QuestionDetail />,
-		layout: "/admin",
-	  },
-	  {
-		path: "/resourceDetail/:courseName/:folderId",
+		layout: '/admin',
+	},
+	{
+		path: '/resourceDetail/:courseName/:folderId',
 		component: <ResourceDetail />,
 		layout: '/admin',
 	},
 ];
-export default routes;
+
+export var routesClient = [
+	{
+		path: '/',
+		name: 'Trang chủ',
+		icon: 'ni ni-tv-2 text-primary',
+		component: <Home />,
+		layout: '/client',
+	},
+	{
+		path: '/course',
+		name: 'Khóa học',
+		icon: 'ni ni-planet text-blue',
+		component: <CourseClient />,
+		layout: '/client',
+	},
+];
