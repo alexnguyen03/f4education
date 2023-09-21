@@ -112,7 +112,7 @@ var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/classs',
+		path: '/classsroom',
 		name: 'Phòng học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <ClasssRoom />,

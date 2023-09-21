@@ -5,6 +5,7 @@ import {MaterialReactTable} from 'material-react-table';
 import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
 import {Box, IconButton} from '@mui/material';
 import moment from 'moment';
+import ReactLoading from 'react-loading';
 import {notifications} from '@mantine/notifications';
 
 // gọi API từ classApi
@@ -20,6 +21,7 @@ const Classs = () => {
 	const [showFormClass, setShowFormClass] = useState(false);
 	const [showFormClassHistory, setShowFormClassHistory] = useState(false);
 	const [update, setUpdate] = useState(true);
+	const [loadingClasss, setLoadingClasss] = useState(true);
 	const [isClassHistoryShowing, setIsClassHistoryShowing] = useState(false);
 	const [selectedStatus, setSelectedStatus] = useState('');
 	const [errors, setErrors] = useState({});
@@ -165,8 +167,10 @@ const Classs = () => {
 	// lấy tấc cả dữ liệu Class từ database (gọi api)
 	const getDataClass = async () => {
 		try {
+			setLoadingClasss(true);
 			const resp = await classApi.getAllClass();
 			setClassses(resp);
+			setLoadingClasss(false);
 		} catch (error) {
 			console.log(error);
 		}
@@ -403,6 +407,8 @@ const Classs = () => {
 								enableGrouping
 								enableStickyHeader
 								enableStickyFooter
+								enableRowNumbers
+								state={{isLoading: loadingClasss}}
 								columns={columnClass}
 								data={classses}
 								positionActionsColumn='last'
