@@ -11,8 +11,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.payload.request.TeacherDTO;
-import com.f4education.springjwt.security.services.TeacherServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TeacherController {
     @Autowired
-    TeacherServiceImpl teacherService;
+    TeacherService teacherService;
 
     @Autowired
     XFile xfileService;
@@ -63,7 +63,6 @@ public class TeacherController {
                     teacherRequest.setImage(savedFile.getName());
                 }
             }
-
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         } catch (IOException e) {

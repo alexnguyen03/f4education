@@ -4,6 +4,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -15,13 +17,9 @@ import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @Entity
@@ -42,15 +40,23 @@ public class User {
 
 	private String token;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	List<Account_role> account_role;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	List<Teacher> teachers;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	List<Admin> admins;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "user")
+	List<Student> students;
+
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
