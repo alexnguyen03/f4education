@@ -1,9 +1,10 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function Cart() {
   return (
     <>
-      <div className="container-fluid  mt-7 ">Cart</div>
+      <h1 className="mx-auto my-5">Giỏ hàng của tôi</h1>
     </>
   );
 }
