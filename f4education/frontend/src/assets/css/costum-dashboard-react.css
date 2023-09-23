@@ -36,9 +36,10 @@
 }
 
 
-/* CUSTOM MEGA NAVBAR */
-.nav-link {
+/* CUSTOM Navbar and header footer */
+.custom-nav-link {
     color: #555555 !important;
+    font-size: 18px;
     font-weight: 600 !important;
     transition: var(--smoothTransition);
 }

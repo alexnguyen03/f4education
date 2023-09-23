@@ -42,22 +42,22 @@ const ClientNavbar = () => {
             justify-content-md-center justify-content-sm-center"
         >
           <li className="nav-item">
-            <Link to={"/"} className="nav-link" href="#">
+            <Link to={"/"} className="nav-link custom-nav-link" href="#">
               Trang chủ
             </Link>
           </li>
           <li className="nav-item">
-            <Link to={"/course"} className="nav-link " href="#">
+            <Link to={"/course"} className="nav-link custom-nav-link " href="#">
               Khóa học
             </Link>
           </li>
           <li className="nav-item">
-            <Link to={"#"} className="nav-link">
+            <Link to={"#"} className="nav-link custom-nav-link">
               Liên hệ
             </Link>
           </li>
           <li className="nav-item">
-            <Link to={"#"} className="nav-link">
+            <Link to={"/cart"} className="nav-link custom-nav-link">
               Giỏ hàng
             </Link>
           </li>

@@ -46,18 +46,13 @@ const Client = (props) => {
         <ClientNavbar />
 
         {/* Page content */}
-        <Container className=" pb-5">
-          <Row className="justify-content-center">
-            <Routes>
-              {getRoutes(routesClient)}
-              <Route
-                path="*"
-                element={<Navigate to="/admin/index" replace />}
-              />
-            </Routes>
-          </Row>
-          <ClientFooter />
+        <Container className="pb-5">
+          <Routes>
+            {getRoutes(routesClient)}
+            <Route path="*" element={<Navigate to="/admin/index" replace />} />
+          </Routes>
         </Container>
+        <ClientFooter />
       </div>
     </>
   );
