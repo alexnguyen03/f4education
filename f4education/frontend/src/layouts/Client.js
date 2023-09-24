@@ -39,14 +39,15 @@ const Client = (props) => {
   return (
     <>
       <div
-        className="main-content"
+        className="main-content mt--5"
         style={{ backgroundColor: "#fff", minHeight: "100vh" }}
         ref={mainContent}
       >
+        {/* Client header */}
         <ClientNavbar />
 
         {/* Page content */}
-        <Container className="pb-5">
+        <Container className="pb-5 pt-8">
           <Routes>
             {getRoutes(routesClient)}
             <Route path="*" element={<Navigate to="/admin/index" replace />} />

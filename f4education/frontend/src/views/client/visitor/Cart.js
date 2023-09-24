@@ -41,7 +41,7 @@ const cartItem = [
     coursePrice: 839.0,
   },
 ];
-
+// zalopay vnpay
 function Cart() {
   const [totalCartItem, setTotalCartItem] = useState(cartItem);
   const [totalPrice, setTotalPrice] = useState(0);
@@ -50,7 +50,7 @@ function Cart() {
   const handleCheckOut = (checkOutMethod) => {
     if (checkOutMethod === "") {
       alert("Choose checkout method bro!");
-    } 
+    }
   };
 
   useEffect(() => {
@@ -91,7 +91,8 @@ function Cart() {
                         <img
                           src={item.courseImage}
                           alt="cart img"
-                          className="img-fluid"
+                          className="img-fluid rounded"
+                          // style={{ borderRadius: "3px" }}
                         />
                       </Col>
                       <Col lg="5" xl="5" md="5" sm="5">

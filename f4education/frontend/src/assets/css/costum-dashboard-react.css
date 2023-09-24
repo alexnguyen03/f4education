@@ -37,6 +37,17 @@
 
 
 /* CUSTOM Navbar and header footer */
+#navbar {
+    clear: both;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    z-index: 1000;
+    transition: var(--smoothTransition);
+}
+
 .custom-nav-link {
     color: #555555 !important;
     font-size: 18px;
@@ -56,14 +67,21 @@
     right: 0;
     width: 400px;
     height: auto;
-    max-height: 80vh;
+    max-height: 85vh;
     border-radius: 5px;
     background-color: #fff;
-    box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+    box-shadow: rgba(99, 99, 99, 0.2) 2px 2px 8px 0px;
     display: none;
     z-index: 100;
     overflow-y: auto;
     transition: var(--smoothTransition);
+}
+
+.cart-content-overflow {
+    height: auto;
+    max-height: 500px;
+    padding-bottom: 110px;
+    overflow-y: auto;
 }
 
 .cart-detail::after {
@@ -74,6 +92,15 @@
     right: 0;
     height: 15px;
     opacity: 0;
+}
+
+.cart-footer {
+    position: absolute;
+    bottom: 0;
+    background: #fff;
+    box-shadow: rgba(99, 99, 99, 0.2) 8px 8px 8px 8px;
+    z-index: 200;
+    transition: var(--smoothTransition);
 }
 
 .cart:hover .cart-detail {
