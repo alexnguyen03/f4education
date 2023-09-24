@@ -4,6 +4,7 @@ import { Button, Col, Row } from "reactstrap";
 import logoPayPal from "../../../assets/img/logo-paypal.png";
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
 import { Breadcrumbs, Anchor, Text } from "@mantine/core";
+// import notifications from "@mantine/notifications";
 
 const itemsBreadcum = [
   { title: "Trang chủ", href: "/" },
@@ -42,19 +43,30 @@ const cartItem = [
 ];
 
 function Cart() {
-  const [totalItem, setTotalItem] = useState(cartItem);
+  const [totalCartItem, setTotalCartItem] = useState(cartItem);
   const [totalPrice, setTotalPrice] = useState(0);
   const [checkOutMethod, setCheckOutMethod] = useState("");
 
   const handleCheckOut = (checkOutMethod) => {
     if (checkOutMethod === "") {
       alert("Choose checkout method bro!");
-    }
+    } 
   };
 
   useEffect(() => {
     setCheckOutMethod(checkOutMethod);
   }, [checkOutMethod]);
+
+  useEffect(() => {
+    // get Total Price from list totalCartItem
+    let newTotalPrice = 0;
+    totalCartItem.map((item) => (newTotalPrice += item.coursePrice));
+    setTotalPrice(newTotalPrice);
+  }, [totalCartItem]);
+
+  useEffect(() => {
+    console.log(totalPrice);
+  }, [totalPrice]);
 
   return (
     <>
@@ -65,13 +77,13 @@ function Cart() {
       <Row>
         <Col xl="8" lg="8" md="7" sm="12">
           <h2 className="font-weight-600 text-dark">
-            {totalItem.length} khóa học trong giỏ hàng
+            {totalCartItem.length} khóa học trong giỏ hàng
           </h2>
           <hr className="text-muted mt-0 pt-0" />
           <Row className="cart-item">
             <Col lg="12" xl="12" md="12" sm="12">
               {/* item */}
-              {totalItem.map((item, index) => (
+              {totalCartItem.map((item, index) => (
                 <>
                   <Link to={"/course"} key={index}>
                     <Row>
@@ -113,9 +125,12 @@ function Cart() {
                         </div>
                       </Col>
                       <Col lg="2" xl="2" md="2" sm="2">
-                        <span className="text-primary font-weight-700">
+                        <Link
+                          to="/cart/delete/2"
+                          className="text-primary font-weight-700"
+                        >
                           Remove
-                        </span>
+                        </Link>
                       </Col>
                       <Col lg="2" xl="2" md="2" sm="2">
                         <span className="text-primary font-weight-700">
@@ -133,7 +148,12 @@ function Cart() {
         <Col xl="4" lg="4" md="5" sm="12" className="mt-2">
           <h2 className="font-weight-600">
             Tổng thanh toán:
-            <span className="font-weight-600 display-4 ml-2">1.259.000đ</span>
+            <span className="font-weight-700 ml-2">
+              {totalPrice.toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })}
+            </span>
           </h2>
           <h4 className="text-muted">Vui lòng chọn hình thức thanh toán:</h4>
           <div className="d-flex justify-content-between">

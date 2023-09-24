@@ -33,28 +33,28 @@ public class Student {
 
 	@Column(name = "address")
 	private String address;
-	
+
 	@Column(name = "phone")
 	private String phone;
-	
+
 	@Column(name = "image")
 	private String image;
-	
+
 	@OneToMany(mappedBy = "student")
 	List<Attendance> attendances;
-	
+
 	@OneToMany(mappedBy = "student")
 	List<Bill> bills;
-	
+
 	@OneToMany(mappedBy = "student")
 	List<Evaluate> evaluates;
-	
+
 	@OneToMany(mappedBy = "student")
 	List<Point> points;
-	
+
 	@OneToMany(mappedBy = "student")
 	List<RegisterCourse> registerCourses;
-	
+
 	@OneToMany(mappedBy = "student")
 	List<Schedule> schedules;
 
@@ -62,5 +62,15 @@ public class Student {
 	public String toString() {
 		return "Student [studentId=" + studentId + ", fullname=" + fullname + ", gender=" + gender + ", address="
 				+ address + ", phone=" + phone + ", image=" + image + "]";
+	}
+
+	public Student(Integer studentId, String fullname, Boolean gender, String address, String phone, String image) {
+		super();
+		this.studentId = studentId;
+		this.fullname = fullname;
+		this.gender = gender;
+		this.address = address;
+		this.phone = phone;
+		this.image = image;
 	}
 }
