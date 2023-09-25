@@ -1,5 +1,5 @@
 :root {
-    --smoothTransition: all 0.3s ease;
+    --smoothTransition: all 0.3s linear;
 }
 
 .answer-input {
@@ -44,15 +44,65 @@
     left: 0;
     right: 0;
     background: #fff;
+    box-shadow: #63636333 2px 2px 8px 0px;
     z-index: 1000;
     transition: var(--smoothTransition);
 }
 
 .custom-nav-link {
+    position: relative;
     color: #555555 !important;
     font-size: 18px;
     font-weight: 600 !important;
     transition: var(--smoothTransition);
+}
+
+@media (max-width:991px) {
+    .custom-nav-link {
+        position: relative;
+        color: #555555 !important;
+        font-size: 18px;
+        margin-bottom: 10px;
+        font-weight: 600 !important;
+        transition: var(--smoothTransition);
+    }
+}
+
+.custom-nav-link.active.custom-nav-link::after {
+    display: block;
+}
+
+.custom-nav-link::after {
+    position: absolute;
+    content: '';
+    left: 0;
+    bottom: -58%;
+    background: #333;
+    height: 5px;
+    width: 100%;
+    display: none;
+    transition: var(--smoothTransition);
+}
+
+.custom-nav-link:hover.custom-nav-link::after {
+    display: block;
+    transition: var(--smoothTransition);
+}
+
+@media (max-width:991px) {
+    .custom-nav-link::after {
+        position: absolute;
+        content: '';
+        left: 50%;
+        transform: translateX(-50%);
+        right: 0;
+        bottom: 0;
+        background: #333;
+        height: 5px;
+        width: 100px;
+        text-align: center;
+        transition: var(--smoothTransition);
+    }
 }
 
 .cart {

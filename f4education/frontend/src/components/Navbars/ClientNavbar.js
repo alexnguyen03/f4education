@@ -1,14 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { Badge, Button, Col, Row } from "reactstrap";
 import logo from "../../assets/img/brand/f4.png";
 import cartEmptyimage from "../../assets/img/cart-empty.png";
 // reactstrap components
 
+// API
+import cartApi from "../../api/cartApi";
+const PUBLIC_IMAGE = "http://localhost:8080/img";
+
 const ClientNavbar = () => {
   const [login, setLogin] = useState(false);
   const [cartEmpty, setCartEmpty] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
+  const [activeItems, setActiveItems] = useState([true, false, false]);
+
+  // *************** CART VARIABLE - AREA START
+  const [carts, setCarts] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
+
+  const fetchCart = async () => {
+    try {
+      const resp = await cartApi.getAllCart();
+      setCarts(resp);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    // get Total Price from list totalCartItem
+    let newTotalPrice = 0;
+    carts.map((item) => (newTotalPrice += item.course.coursePrice));
+    setTotalPrice(newTotalPrice);
+  }, [carts]);
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
+  // *************** CART VARIABLE - AREA END
+
+  const handleItemClick = (index) => {
+    const newActiveItems = [...activeItems];
+    newActiveItems[index] = true; // toggle clicked item to active
+    for (let i = 0; i < newActiveItems.length; i++) {
+      if (i !== index) {
+        newActiveItems[i] = false; // remove active class from other items
+      }
+    }
+    setActiveItems(newActiveItems); // update state
+  };
 
   const handleLogin = (prev) => {
     setLogin(!prev);
@@ -21,6 +63,9 @@ const ClientNavbar = () => {
   window.addEventListener("scroll", function () {
     const navbar = this.document.querySelector("#navbar");
     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    if (scrollTop === 0) {
+      navbar.style.top = "0";
+    }
     if (scrollTop > lastScrollTop) {
       navbar.style.top = "-80px";
     } else {
@@ -52,33 +97,49 @@ const ClientNavbar = () => {
         >
           <ul
             className="navbar-nav mx-auto text-center d-md-flex d-sm-flex 
-            justify-content-md-center justify-content-sm-center"
+                        justify-content-md-center justify-content-sm-center"
           >
             <li className="nav-item">
-              <Link to={"/"} className="nav-link custom-nav-link" href="#">
+              <Link
+                to={"/"}
+                className={
+                  activeItems[0]
+                    ? "nav-link custom-nav-link active"
+                    : "nav-link custom-nav-link"
+                }
+                onClick={() => handleItemClick(0)}
+              >
                 Trang chủ
               </Link>
             </li>
             <li className="nav-item">
               <Link
                 to={"/course"}
-                className="nav-link custom-nav-link "
-                href="#"
+                className={
+                  activeItems[1]
+                    ? "nav-link custom-nav-link active"
+                    : "nav-link custom-nav-link"
+                }
+                onClick={() => handleItemClick(1)}
               >
                 Khóa học
               </Link>
             </li>
             <li className="nav-item">
-              <Link to={"#"} className="nav-link custom-nav-link">
-                Liên hệ
-              </Link>
-            </li>
-            <li className="nav-item">
-              <Link to={"/cart"} className="nav-link custom-nav-link">
+              <Link
+                to={"/cart"}
+                className={
+                  activeItems[2]
+                    ? "nav-link custom-nav-link active"
+                    : "nav-link custom-nav-link"
+                }
+                onClick={() => handleItemClick(2)}
+              >
                 Giỏ hàng
               </Link>
             </li>
           </ul>
+
           <div
             className="d-flex justify-content-between 
               justify-content-md-center justify-content-sm-center text-center text-dark"
@@ -91,7 +152,7 @@ const ClientNavbar = () => {
                     style={{ fontSize: "25px" }}
                   ></i>
                 </span>
-                <Link to="/cart" className="cart mx-5 mt-2">
+                <Link to="/cart" className="cart mx-4 mt-2">
                   <i
                     className="bx bx-cart font-weight-500 text-dark"
                     style={{
@@ -102,7 +163,7 @@ const ClientNavbar = () => {
                     1
                   </Badge>
                   <div className="cart-detail">
-                    {cartEmpty ? (
+                    {carts.length === 0 ? (
                       <>
                         <img
                           src={cartEmptyimage}
@@ -122,135 +183,45 @@ const ClientNavbar = () => {
                         <div className="container cart-content-overflow my-2">
                           <Row>
                             <Col xl="12" lg="12" md="12" sm="12">
-                              {/* Item */}
-                              <Row>
-                                <Col xl="4" lg="4" md="4" sm="4">
-                                  <img
-                                    src="https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60"
-                                    alt="cart item img"
-                                    className="img-fluid"
-                                  />
-                                </Col>
-                                <Col
-                                  xl="8"
-                                  lg="8"
-                                  md="8"
-                                  sm="8"
-                                  className="d-flex flex-wrap flex-column text-left"
-                                >
-                                  <span className="font-weight-900 text-dark align-items-start">
-                                    Khóa học lập trình với ReactJS && Spring
-                                    boot
-                                  </span>
-                                  <span className="text-muted">270.000đ</span>
-                                </Col>
-                              </Row>
-                              <hr className="m-3 p-0 text-muted" />
-                              {/* Item */}
-                              <Row>
-                                <Col xl="4" lg="4" md="4" sm="4">
-                                  <img
-                                    src="https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60"
-                                    alt="cart item img"
-                                    className="img-fluid"
-                                  />
-                                </Col>
-                                <Col
-                                  xl="8"
-                                  lg="8"
-                                  md="8"
-                                  sm="8"
-                                  className="d-flex flex-wrap flex-column text-left"
-                                >
-                                  <span className="font-weight-900 text-dark align-items-start">
-                                    Khóa học lập trình với ReactJS && Spring
-                                    boot
-                                  </span>
-                                  <span className="text-muted">270.000đ</span>
-                                </Col>
-                              </Row>
-                              <hr className="m-3 p-0 text-muted" />
-                              {/* Item */}
-                              <Row>
-                                <Col xl="4" lg="4" md="4" sm="4">
-                                  <img
-                                    src="https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60"
-                                    alt="cart item img"
-                                    className="img-fluid"
-                                  />
-                                </Col>
-                                <Col
-                                  xl="8"
-                                  lg="8"
-                                  md="8"
-                                  sm="8"
-                                  className="d-flex flex-wrap flex-column text-left"
-                                >
-                                  <span className="font-weight-900 text-dark align-items-start">
-                                    Khóa học lập trình với ReactJS && Spring
-                                    boot
-                                  </span>
-                                  <span className="text-muted">270.000đ</span>
-                                </Col>
-                              </Row>
-                              <hr className="m-3 p-0 text-muted" />
-                              {/* Item */}
-                              <Row>
-                                <Col xl="4" lg="4" md="4" sm="4">
-                                  <img
-                                    src="https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60"
-                                    alt="cart item img"
-                                    className="img-fluid"
-                                  />
-                                </Col>
-                                <Col
-                                  xl="8"
-                                  lg="8"
-                                  md="8"
-                                  sm="8"
-                                  className="d-flex flex-wrap flex-column text-left"
-                                >
-                                  <span className="font-weight-900 text-dark align-items-start">
-                                    Khóa học lập trình với ReactJS && Spring
-                                    boot
-                                  </span>
-                                  <span className="text-muted">270.000đ</span>
-                                </Col>
-                              </Row>
-                              <hr className="m-3 p-0 text-muted" />
-                              {/* Item */}
-                              <Row>
-                                <Col xl="4" lg="4" md="4" sm="4">
-                                  <img
-                                    src="https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHw3fHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60"
-                                    alt="cart item img"
-                                    className="img-fluid"
-                                  />
-                                </Col>
-                                <Col
-                                  xl="8"
-                                  lg="8"
-                                  md="8"
-                                  sm="8"
-                                  className="d-flex flex-wrap flex-column text-left"
-                                >
-                                  <span className="font-weight-900 text-dark align-items-start">
-                                    Khóa học lập trình với ReactJS && Spring
-                                    boot
-                                  </span>
-                                  <span className="text-muted">270.000đ</span>
-                                </Col>
-                              </Row>
-                              <hr className="m-3 p-0 text-muted" />
-                            </Col>
-                            <Col xl="12" lg="12" md="12" sm="12">
-                              <Link
-                                to="#"
-                                className="mx-auto font-weight-900 text-danger"
-                                onClick={() => handleCartEmpty(cartEmpty)}
-                              >
-                                Clear Cart
-                              </Link>
+                              {carts.map((cart) => (
+                                <>
+                                  <Row className="mt-2">
+                                    <Col xl="4" lg="4" md="4" sm="4">
+                                      <img
+                                        src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                        alt="cart item img"
+                                        className="img-fluid"
+                                        style={{
+                                          maxHeight: "70px",
+                                          width: "100%",
+                                          objectFit: "cover",
+                                        }}
+                                      />
+                                    </Col>
+                                    <Col
+                                      xl="8"
+                                      lg="8"
+                                      md="8"
+                                      sm="8"
+                                      className="d-flex flex-wrap flex-column text-left"
+                                    >
+                                      <span className="font-weight-900 text-dark align-items-start">
+                                        {cart.course.courseName}
+                                      </span>
+                                      <span className="text-muted">
+                                        {cart.course.coursePrice.toLocaleString(
+                                          "it-IT",
+                                          {
+                                            style: "currency",
+                                            currency: "VND",
+                                          }
+                                        )}
+                                      </span>
+                                    </Col>
+                                  </Row>
+                                  <hr className="m-3 p-0 text-muted" />
+                                </>
+                              ))}
                             </Col>
                           </Row>
                         </div>
@@ -259,14 +230,28 @@ const ClientNavbar = () => {
                             className="m-2 p-0 text-dark font-weight-700 text-left"
                             style={{ fontSize: "20px" }}
                           >
-                            <span className="font-weight-500 mr-2 text-muted">
+                            <span
+                              className="font-weight-500 mr-2 text-muted"
+                              style={{ fontSize: "17px" }}
+                            >
                               THANH TOÁN:
                             </span>
-                            <span>1.2000.000d</span>
+                            <span>
+                              {totalPrice.toLocaleString("it-IT", {
+                                style: "currency",
+                                currency: "VND",
+                              })}
+                            </span>
                           </p>
-                          <Button color="dark" className="w-100 mb-3">
-                            Tới giỏ hàng
-                          </Button>
+                          <Link to={"/cart"} className="w-100">
+                            <Button
+                              color="dark"
+                              className="w-100 mb-3 font-weight-700"
+                              style={{ borderRadius: "3px" }}
+                            >
+                              Tới giỏ hàng
+                            </Button>
+                          </Link>
                         </div>
                       </>
                     )}
@@ -283,6 +268,8 @@ const ClientNavbar = () => {
               <>
                 <Button
                   color="dark"
+                  outline
+                  className="font-weight-800"
                   onClick={() => handleLogin(login)}
                   style={{ borderRadius: "2px" }}
                 >
