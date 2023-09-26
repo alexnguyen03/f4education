@@ -62,10 +62,10 @@ const Admin = (props) => {
 		return 'Brand';
 	};
 	const getAdminInfo = () => {
-		const user = JSON.parse(localStorage.getItem('user'));
+		const user = JSON.parse(localStorage.getItem('user') | '');
 		if (user) {
-			setAdminName(user.username);
-			console.log('🚀 ~ file: Admin.js:69 ~ getAdminInfo ~ user.username:', user.username);
+			setAdminName(user.fullName);
+			console.log('🚀 ~ file: Admin.js:69 ~ getAdminInfo ~ user.username:', user);
 		}
 	};
 	useEffect(() => {

@@ -39,6 +39,7 @@ public class CoursesController {
 	XFile xfileService;
 
 	@GetMapping
+	// @PreAuthorize("hasRole('ADMIN')")
 	public List<CourseDTO> getAllCourse() {
 		return courseService.findAllCourseDTO();
 	}

@@ -27,7 +27,7 @@ public class JwtUtils {
   private String jwtSecret;
 
   @Value("${f4education.app.jwtExpirationMs}")
-  private int jwtExpirationMs ;
+  private int jwtExpirationMs;
 
   public String generateJwtToken(Authentication authentication) {
 
@@ -67,30 +67,16 @@ public class JwtUtils {
     return false;
   }
 
-  // private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+  public String generateJwtToken(UserDetailsImpl userPrincipal) {
+    return generateTokenFromUsername(userPrincipal.getUsername());
+  }
 
-  // byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
-  // @Value("${f4education.app.jwtSecret}")
-  // private String jwtSecret;
-
-  // @Value("${f4education.app.jwtExpirationMs}")
-  // private int jwtExpirationMs;
-
-  // public String generateJwtToken(UserDetailsImpl userPrincipal) {
-  // return generateTokenFromUsername(userPrincipal.getUsername());
-  // }
-
-  // public String generateTokenFromUsername(String username) {
-  // return Jwts.builder()
-  // .setSubject("example")
-  // .signWith(SignatureAlgorithm.HS512, keyBytes)
-  // .compact();
-  // }
-
-  // public String getUserNameFromJwtToken(String token) {
-  // return
-  // Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-  // }
+  public String generateTokenFromUsername(String username) {
+    return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(Keys.secretKeyFor(
+            SignatureAlgorithm.HS512))
+        .compact();
+  }
 
   // public boolean validateJwtToken(String authToken) {
   // try {

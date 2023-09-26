@@ -23,7 +23,6 @@ const Client = (props) => {
 
 	const getRoutes = (routesClient) => {
 		return routesClient.map((prop, key) => {
-			console.log('🚀 ~ file: Client.js:28 ~ returnroutesClient.map ~ prop.layout:', prop.component);
 			if (prop.layout === '/client') {
 				return (
 					<Route

@@ -2,6 +2,7 @@ package com.f4education.springjwt.controllers;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,16 +22,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.models.ERole;
+import com.f4education.springjwt.models.RefreshToken;
 import com.f4education.springjwt.models.Role;
 import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.payload.request.LoginRequest;
 import com.f4education.springjwt.payload.request.SignupRequest;
+import com.f4education.springjwt.payload.request.TokenRefreshRequest;
 import com.f4education.springjwt.payload.response.JwtResponse;
 import com.f4education.springjwt.payload.response.MessageResponse;
+import com.f4education.springjwt.payload.response.TokenRefreshResponse;
 import com.f4education.springjwt.repository.RoleRepository;
 import com.f4education.springjwt.repository.UserRepository;
+import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
 import com.f4education.springjwt.security.jwt.JwtUtils;
+import com.f4education.springjwt.security.jwt.exception.TokenRefreshException;
+import com.f4education.springjwt.security.services.RefreshTokenServiceImpl;
 import com.f4education.springjwt.security.services.UserDetailsImpl;
+
+import io.jsonwebtoken.JwtException;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -50,6 +59,8 @@ public class AuthController {
 
   @Autowired
   JwtUtils jwtUtils;
+  @Autowired
+  RefreshTokenServiceImpl refreshTokenService;
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -65,11 +76,17 @@ public class AuthController {
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
 
+    RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);
+    if (refreshToken == null) {
+      refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+    }
     return ResponseEntity.ok(new JwtResponse(jwt,
         userDetails.getId(),
         userDetails.getUsername(),
+        userDetails.getFullName(),
         userDetails.getEmail(),
-        roles));
+        roles,
+        refreshToken.getToken()));
   }
 
   @PostMapping("/signup")
@@ -126,5 +143,28 @@ public class AuthController {
     userRepository.save(user);
 
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+  }
+
+  @PostMapping("/refresh-token")
+  public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    String requestRefreshToken = request.getRefreshToken();
+
+    return refreshTokenService.findByToken(requestRefreshToken)
+        .map(refreshTokenService::verifyExpiration)
+        .map(RefreshToken::getUser)
+        .map(user -> {
+          String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+          return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+        }).orElse(null);
+
+  }
+
+  @PostMapping("/signout")
+  public ResponseEntity<?> logoutUser() {
+    UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
+        .getPrincipal();
+    Long userId = userDetails.getId();
+    refreshTokenService.deleteByUserId(userId);
+    return ResponseEntity.ok(new MessageResponse("Log out successful!"));
   }
 }

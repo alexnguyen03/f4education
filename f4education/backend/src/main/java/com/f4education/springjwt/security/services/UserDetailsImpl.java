@@ -5,46 +5,75 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import com.f4education.springjwt.models.Role;
+import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class UserDetailsImpl implements UserDetails {
   private static final long serialVersionUID = 1L;
-
+  @Autowired
+  private static AdminServiceImpl adminService;
+  @Autowired
+  private static TeacherServiceImpl teacherService;
+  @Autowired
+  private static StudentServiceImpl studentService;
   private Long id;
 
   private String username;
 
   private String email;
 
+  private String fullName;
+
   @JsonIgnore
   private String password;
 
   private Collection<? extends GrantedAuthority> authorities;
 
-  public UserDetailsImpl(Long id, String username, String email, String password,
+  public UserDetailsImpl(Long id, String username, String email, String password, String fullName,
       Collection<? extends GrantedAuthority> authorities) {
     this.id = id;
     this.username = username;
     this.email = email;
     this.password = password;
+    this.fullName = fullName;
     this.authorities = authorities;
   }
 
   public static UserDetailsImpl build(User user) {
     List<GrantedAuthority> authorities = user.getRoles().stream()
-        .map(role -> new SimpleGrantedAuthority(role.getName().name()))
+        .map(role -> {
+
+          return new SimpleGrantedAuthority(role.getName().name());
+        })
         .collect(Collectors.toList());
+    // String r = authorities.get(0).getAuthority(); // role
+
+    String fullName = "Tên demo nhé";
+
+    // cho doi lai type admin_id roi them phan nay vao
+    /*
+     * if (r.equals("ROLE_ADMIN")) {
+     * fullName = adminService.getAdminById(user.getUsername()).getFullname();
+     * } else if (r == "ROLE_TEACHER") {
+     * fullName = teacherService.findByUserId(user.getUsername()).getFullname();
+     * } else {
+     * fullName = studentService.findByUserId(user.getUsername()).getFullname();
+     * }
+     */
 
     return new UserDetailsImpl(
         user.getId(),
         user.getUsername(),
         user.getEmail(),
         user.getPassword(),
+        fullName,
         authorities);
   }
 
@@ -61,6 +90,10 @@ public class UserDetailsImpl implements UserDetails {
     return email;
   }
 
+  public String getFullName() {
+    return fullName;
+  }
+
   @Override
   public String getPassword() {
     return password;
@@ -68,8 +101,8 @@ public class UserDetailsImpl implements UserDetails {
 
   @Override
   public String getUsername() {
-//    return email;// nếu lấy email làm username để đăng nhập
-     return username;//nếu nhập username để đăng nhập
+    // return email;// nếu lấy email làm username để đăng nhập
+    return username;// nếu nhập username để đăng nhập
   }
 
   @Override
