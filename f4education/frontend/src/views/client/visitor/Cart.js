@@ -9,6 +9,7 @@ import cartEmptyimage from "../../../assets/img/cart-empty.png";
 
 // API
 import cartApi from "../../../api/cartApi";
+import paymentApi from "../../../api/paymentApi";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
@@ -55,12 +56,19 @@ function Cart() {
   // *************** Action Variable
   const [loading, setLoading] = useState(false);
 
+  // *************** FORM Variable
+  const [bill, setBill] = useState({
+    totalPrice: 0,
+    status: "",
+    checkoutMethod: "",
+  });
+
   // *************** Logic UI Variable
   // const [totalCartItem, setTotalCartItem] = useState(cartItem);
   const [totalPrice, setTotalPrice] = useState(0);
   const [checkOutMethod, setCheckOutMethod] = useState("");
 
-  // *************** Fetch Are
+  // *************** Fetch Area
   const fetchCart = async () => {
     try {
       setLoading(true);
@@ -86,11 +94,37 @@ function Cart() {
   };
 
   // *************** Action && Logic UI
-  const handleCheckOut = (checkOutMethod) => {
+  const handleCheckOut = async (checkOutMethod) => {
     if (checkOutMethod === "") {
       alert("Choose checkout method bro!");
+      return;
+    } else {
+      setBill({
+        totalPrice: totalPrice,
+        checkoutMethod: checkOutMethod,
+        status: "Chờ thanh toán",
+      });
+      console.log(bill);
+
+      try {
+        const resp = await paymentApi.createPayment(bill);
+        console.log(resp);
+        const url = resp.url;
+        console.log(url);
+        window.location.href = url;
+      } catch (error) {
+        console.log(error);
+      }
     }
   };
+
+  useEffect(() => {
+    setBill({
+      totalPrice: totalPrice,
+      checkoutMethod: checkOutMethod,
+      status: "Chờ thanh toán",
+    });
+  }, [totalPrice, checkOutMethod]);
 
   useEffect(() => {
     setCheckOutMethod(checkOutMethod);
@@ -122,7 +156,7 @@ function Cart() {
       {/* Loading */}
       {loading ? (
         <h1 className="display-1 text-center mt-5">
-          <Loader color="rgba(46, 46, 46, 1)" size={70} />
+          <Loader color="rgba(46, 46, 46, 1)" size={50} />
         </h1>
       ) : (
         <>
@@ -165,7 +199,7 @@ function Cart() {
                             key={index}
                           >
                             <Row>
-                              <Col lg="3" xl="3" md="3" sm="3">
+                              <Col lg="3" xl="3" md="4" sm="4">
                                 <img
                                   src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
                                   alt={`${cart.course.courseName}`}
@@ -178,7 +212,7 @@ function Cart() {
                                   // style={{ borderRadius: "3px" }}
                                 />
                               </Col>
-                              <Col lg="5" xl="5" md="5" sm="5">
+                              <Col lg="5" xl="5" md="8" sm="8">
                                 <p className="font-weight-700 text-dark m-0 p-0">
                                   {cart.course.courseName}
                                 </p>
@@ -208,7 +242,13 @@ function Cart() {
                                   </span>
                                 </div>
                               </Col>
-                              <Col lg="2" xl="2" md="2" sm="2">
+                              <Col
+                                lg="2"
+                                xl="2"
+                                md="6"
+                                sm="6"
+                                className="mt-md-2 mt-sm-2"
+                              >
                                 <Link
                                   to={`/cart/${cart.cartId}`}
                                   className="text-primary font-weight-700"
@@ -220,7 +260,13 @@ function Cart() {
                                   Remove
                                 </Link>
                               </Col>
-                              <Col lg="2" xl="2" md="2" sm="2">
+                              <Col
+                                lg="2"
+                                xl="2"
+                                md="6"
+                                sm="6"
+                                className="mt-md-2 mt-sm-2"
+                              >
                                 <span className="text-primary font-weight-700">
                                   {cart.course.coursePrice.toLocaleString(
                                     "it-IT",
@@ -259,6 +305,7 @@ function Cart() {
                           color="secondary"
                           outline
                           active
+                          className="shadow-lg"
                           onClick={() => setCheckOutMethod("")}
                         >
                           <img
@@ -293,6 +340,7 @@ function Cart() {
                           color="secondary"
                           outline
                           active
+                          className="shadow-lg"
                           onClick={() => setCheckOutMethod("")}
                         >
                           <img
@@ -335,8 +383,6 @@ function Cart() {
           )}
         </>
       )}
-      {/* <Skeleton visible={loading}> */}
-      {/* </Skeleton> */}
     </>
   );
 }

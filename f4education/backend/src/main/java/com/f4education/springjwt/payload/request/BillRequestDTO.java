@@ -8,6 +8,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillRequestDTO {
-	private Integer courseId;
-	private Integer studentId;
+	private Float totalPrice;
+
+	private String checkoutMethod;
+
+	private String status;
 }
