@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,20 +24,14 @@ import org.springframework.web.bind.annotation.RestController;
 import com.f4education.springjwt.config.VNPayConfig;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
 import com.f4education.springjwt.payload.request.PaymentRequestDTO;
-import com.f4education.springjwt.repository.PaymentRepository;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/payment")
 public class PaymentController {
-	@Autowired
-	PaymentRepository paymentRepository;
 	
 	@PostMapping("/create_payment")
 	public ResponseEntity<?> createPayment(@RequestBody BillRequestDTO billDTO) throws UnsupportedEncodingException {
-		System.out.println(billDTO);
-		
-		
 
 		String vnp_Version = "2.1.0";
 		String vnp_Command = "pay";

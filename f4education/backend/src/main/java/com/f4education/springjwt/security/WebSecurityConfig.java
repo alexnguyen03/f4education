@@ -115,6 +115,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 										"/api/answers/**",
 										"/api/cart/**",
 										"/api/payment/**",
+										"/api/bills",
 										"/img/**")
 								.permitAll().anyRequest().authenticated());
 

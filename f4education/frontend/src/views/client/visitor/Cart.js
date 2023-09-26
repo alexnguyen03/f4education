@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Link, redirect } from "react-router-dom";
+import { Link, redirect, useSearchParams } from "react-router-dom";
 import { Button, Card, CardBody, Col, Row } from "reactstrap";
 import logoPayPal from "../../../assets/img/logo-paypal.png";
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
-import { Breadcrumbs, Anchor, Text, Skeleton, Loader } from "@mantine/core";
+import { Breadcrumbs, Anchor, Text, Loader } from "@mantine/core";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
 // import notifications from "@mantine/notifications";
 
@@ -55,6 +55,13 @@ function Cart() {
 
   // *************** Action Variable
   const [loading, setLoading] = useState(false);
+  const [searchParams] = useSearchParams();
+  const [responseCode, setResponseCode] = useState("");
+
+  useEffect(() => {
+    searchParams.get("vnp_ResponseCode");
+    setResponseCode(responseCode);
+  }, [responseCode, searchParams]);
 
   // *************** FORM Variable
   const [bill, setBill] = useState({
@@ -118,6 +125,13 @@ function Cart() {
     }
   };
 
+  const handleUpdateCartAndCreateBill = () => {
+    if (responseCode === 24) {
+      return;
+    } else {
+    }
+  };
+
   useEffect(() => {
     setBill({
       totalPrice: totalPrice,
@@ -142,6 +156,10 @@ function Cart() {
   useEffect(() => {
     fetchCart();
   }, []);
+
+  // Checkout -> save data to localStorage(List cartID, billResDTO Data) -> create_payment (VNPAY) -> payment...
+  // After payment -> redirect prev page -> check responseCode
+  // If response code === 00 ? update cart , add bill : dont do anything stupid
 
   return (
     <>
@@ -251,7 +269,7 @@ function Cart() {
                               >
                                 <Link
                                   to={`/cart/${cart.cartId}`}
-                                  className="text-primary font-weight-700"
+                                  className="text-danger font-weight-700"
                                   onClick={(e) => {
                                     handleRemoveCart(cart.cartId, e);
                                     redirect(`/course`);

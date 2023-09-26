@@ -2,6 +2,7 @@ package com.f4education.springjwt.security.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,11 +13,9 @@ import org.springframework.stereotype.Service;
 import com.f4education.springjwt.interfaces.BillService;
 import com.f4education.springjwt.models.Bill;
 import com.f4education.springjwt.models.Cart;
-import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.PaymentMethod;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
-import com.f4education.springjwt.payload.request.CartRequestDTO;
 import com.f4education.springjwt.payload.response.BillResponseDTO;
 import com.f4education.springjwt.repository.BillRepository;
 import com.f4education.springjwt.repository.PaymentMethodRepository;
@@ -30,13 +29,13 @@ public class BillServiceImp implements BillService {
 	private PaymentMethodRepository paymentMethodRepository;
 
 	@Override
-	public List<Bill> getAllBill() {
-		// TODO Auto-generated method stub
-		return null;
+	public List<BillResponseDTO> getAllBill() {
+		List<Bill> bills = billRepository.findAll();
+		return bills.stream().map(this::convertToReponseDTO).collect(Collectors.toList());
 	}
 
 	@Override
-	public BillResponseDTO getCartById(Integer billId) {
+	public BillResponseDTO getBillById(Integer billId) {
 		Bill bill = billRepository.findById(billId).get();
 
 		if (bill != null) {
@@ -46,10 +45,12 @@ public class BillServiceImp implements BillService {
 	}
 
 	@Override
-	public BillResponseDTO createCart(BillRequestDTO billRequestDTO) {
+	public BillResponseDTO createBill(BillRequestDTO billRequestDTO) {
 		Bill bill = this.convertRequestToEntity(billRequestDTO);
 
 		bill.setCreateDate(new Date());
+		bill.setNote("");
+		bill.setStatus("Đã thanh toán");
 
 		Bill newBill = billRepository.save(bill);
 		return convertToReponseDTO(newBill);
@@ -77,7 +78,6 @@ public class BillServiceImp implements BillService {
 
 		BeanUtils.copyProperties(billRequestDTO, bill);
 
-		bill.setNote("");
 		bill.setPaymentMethod(paymentMethod);
 		bill.setStudent(student);
 

@@ -16,9 +16,9 @@ import java.util.List;
 @NoArgsConstructor
 @Table(name = "Admin")
 public class Admin implements Serializable {
-	@OneToMany(mappedBy = "admin")
-	@JsonIgnore
-	private List<Bill> bill;
+//	@OneToMany(mappedBy = "admin")
+//	@JsonIgnore
+//	private List<Bill> bill;
 	@OneToMany(mappedBy = "admin")
 	@JsonIgnore
 	private List<Schedule> schedules;

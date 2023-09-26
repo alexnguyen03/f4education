@@ -11,10 +11,10 @@ const cartApi = {
     const url = "/cart";
     return axiosClient.post(url, body);
   },
-  // updateSubject: (body, subjectId) => {
-  //   const url = `/cart/${subjectId}`;
-  //   return axiosClient.put(url, body);
-  // },
+  updateCart: (body, cartId) => {
+    const url = `/cart/${cartId}`;
+    return axiosClient.put(url, body);
+  },
   removeCart: (cartId) => {
     const url = `/cart/${cartId}`;
     return axiosClient.delete(url);

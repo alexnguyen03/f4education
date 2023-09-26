@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.CartService;
+import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.Cart;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Student;
@@ -52,10 +53,18 @@ public class CartServiceImp implements CartService {
 	}
 
 	@Override
-	public CartResponseDTO updateCart(Integer cartId, CartRequestDTO CartRequestDTO) {
-		Cart cart = cartRepository.findById(cartId).get();
-		// TODO Auto-generated method stub
-		return convertToReponseDTO(cart);
+	public CartResponseDTO updateCart(Integer cartId, CartRequestDTO cartRequestDTO) {
+		Optional<Cart> exitCart = cartRepository.findById(cartId);
+
+		if (!exitCart.isPresent()) {
+			return null;
+		}
+
+		Cart cart = this.convertRequestToEntity(cartRequestDTO);
+		cart.setStatus(true);
+
+		Cart updateCart = cartRepository.save(cart);
+		return convertToReponseDTO(updateCart);
 	}
 
 	@Override
@@ -63,8 +72,7 @@ public class CartServiceImp implements CartService {
 		Optional<Cart> cart = cartRepository.findById(id);
 
 		if (!cart.isPresent())
-			return ResponseEntity.badRequest()
-					.body(new MessageResponse("Message: Cart can not be found"));
+			return ResponseEntity.badRequest().body(new MessageResponse("Message: Cart can not be found"));
 
 		cartRepository.deleteById(id);
 		return ResponseEntity.ok(new MessageResponse("Message: Cart delete successfully"));

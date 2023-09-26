@@ -42,9 +42,9 @@ public class Bill {
 	@OneToMany(mappedBy = "bill")
 	List<DetailInvoice> detailInvoice;
 
-	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	Admin admin;
+//	@ManyToOne
+//	@JoinColumn(name = "admin_id")
+//	Admin admin;
 
 	@ManyToOne
 	@JoinColumn(name = "student_id")
