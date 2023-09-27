@@ -13,7 +13,7 @@ public class BillResponseDTO {
 	private Integer billId;
 	private Date createDate;
 	private Float totalPrice;
-	private Boolean status;
+	private String status;
 	private String notes;
 	private String paymentMethod;
 }

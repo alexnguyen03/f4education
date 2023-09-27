@@ -96,6 +96,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 										"/api/resource/**",
 										"/api/cart/**",
 										"/api/payment/**",
+										"/api/bills/**",
 										"/img/**")
 								.permitAll()
 								.requestMatchers(

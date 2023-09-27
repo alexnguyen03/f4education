@@ -54,16 +54,17 @@ public class CartServiceImp implements CartService {
 
 	@Override
 	public CartResponseDTO updateCart(Integer cartId, CartRequestDTO cartRequestDTO) {
-		Optional<Cart> exitCart = cartRepository.findById(cartId);
+		Cart exitCart = cartRepository.findById(cartId).get();
 
-		if (!exitCart.isPresent()) {
+		if (exitCart == null) {
 			return null;
 		}
 
-		Cart cart = this.convertRequestToEntity(cartRequestDTO);
-		cart.setStatus(true);
+		exitCart.setStatus(true);
+		convertRequestToEntity(cartRequestDTO, exitCart);
 
-		Cart updateCart = cartRepository.save(cart);
+		Cart updateCart = cartRepository.save(exitCart);
+
 		return convertToReponseDTO(updateCart);
 	}
 
@@ -100,6 +101,18 @@ public class CartServiceImp implements CartService {
 		Cart.setStudent(student);
 
 		return Cart;
+	}
+
+	private void convertRequestToEntity(CartRequestDTO cartDTO, Cart cart) {
+		Cart Cart = new Cart();
+
+		Course course = courseRepository.findById(cartDTO.getCourseId()).get();
+
+		Student student = new Student(1, "Nguyễn Văn An", true, "Cần Thơ, California", "0839475920", "img.png");
+
+		BeanUtils.copyProperties(cartDTO, Cart);
+		Cart.setCourse(course);
+		Cart.setStudent(student);
 	}
 
 }

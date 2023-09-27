@@ -123,14 +123,18 @@ function Cart() {
     }
   };
 
-  const handleUpdateCartAndCreateBill = () => {
+  const handleUpdateCartAndCreateBill = async () => {
     if (responseCode === null) {
       return;
     }
     if (responseCode === 24) {
       return;
     } else {
-      
+      try {
+        const resp = await cartApi.updateCart(bill);
+      } catch (error) {
+        
+      }
     }
   };
 
@@ -160,6 +164,7 @@ function Cart() {
   }, []);
 
   // Checkout -> save data to localStorage(List cartID, billResDTO Data) -> create_payment (VNPAY) -> payment...
+  // save data to localStorage (listCartID)
   // After payment -> redirect prev page -> check responseCode
   // If response code === 00 ? update cart , add bill : dont do anything stupid
 

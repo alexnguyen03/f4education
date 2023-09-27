@@ -14,4 +14,6 @@ public interface BillService {
 	BillResponseDTO getBillById(Integer billId);
 
 	BillResponseDTO createBill(BillRequestDTO billRequestDTO);
+
+	BillResponseDTO updateBill(Integer billId, BillRequestDTO billRequestDTO);
 }

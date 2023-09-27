@@ -1,5 +1,6 @@
 package com.f4education.springjwt.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,11 +40,10 @@ public class CartController {
 	public ResponseEntity<?> deleteCart(@PathVariable("id") Integer id) {
 		return cartService.deleteCartItem(id);
 	}
-//
-//	@PutMapping("/{answerId}")
-////	@PreAuthorize("hasRole('ADMIN')")
-//	public AnswerDTO updateAnswer(@PathVariable("answerId") Integer answerId, @RequestBody AnswerDTO answerDTO) {
-//		return cartService.updateAnswer(answerId, answerDTO);
-//	}
+
+	@PutMapping("/{cartId}")
+	public CartResponseDTO updateCart(@PathVariable("cartId") Integer cartId, @RequestBody CartRequestDTO cartDTO) {
+		return cartService.updateCart(cartId, cartDTO);
+	}
 
 }

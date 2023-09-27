@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.BillService;
 import com.f4education.springjwt.models.Bill;
-import com.f4education.springjwt.models.Cart;
 import com.f4education.springjwt.models.PaymentMethod;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
@@ -50,10 +49,20 @@ public class BillServiceImp implements BillService {
 
 		bill.setCreateDate(new Date());
 		bill.setNote("");
-		bill.setStatus("Đã thanh toán");
 
 		Bill newBill = billRepository.save(bill);
+
 		return convertToReponseDTO(newBill);
+	}
+
+	@Override
+	public BillResponseDTO updateBill(Integer billId, BillRequestDTO billRequestDTO) {
+		Bill exitBill = billRepository.findById(billId).get();
+
+		convertRequestToEntity(billRequestDTO, exitBill);
+
+		Bill updateBill = billRepository.save(exitBill);
+		return convertToReponseDTO(updateBill);
 	}
 
 	private BillResponseDTO convertToReponseDTO(Bill bill) {
@@ -65,6 +74,7 @@ public class BillServiceImp implements BillService {
 		BeanUtils.copyProperties(bill, billRespDTO);
 
 		billRespDTO.setPaymentMethod(paymentMethod.getPaymentMethodName());
+		billRespDTO.setStatus(bill.getStatus());
 
 		return billRespDTO;
 	}
@@ -80,8 +90,20 @@ public class BillServiceImp implements BillService {
 
 		bill.setPaymentMethod(paymentMethod);
 		bill.setStudent(student);
+		bill.setStatus(billRequestDTO.getStatus());
 
 		return bill;
 	}
 
+	private void convertRequestToEntity(BillRequestDTO billRequestDTO, Bill bill) {
+		PaymentMethod paymentMethod = paymentMethodRepository
+				.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
+		Student student = new Student(1, "Nguyễn Văn An", true, "Cần Thơ, California", "0839475920", "img.png");
+
+		BeanUtils.copyProperties(billRequestDTO, bill);
+
+		bill.setPaymentMethod(paymentMethod);
+		bill.setStudent(student);
+		bill.setStatus(billRequestDTO.getStatus());
+	}
 }
