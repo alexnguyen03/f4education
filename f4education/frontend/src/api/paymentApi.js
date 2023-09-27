@@ -10,10 +10,6 @@ const paymentApi = {
     const url = "/payment/create_payment";
     return axiosClient.post(url, body);
   },
-  // updateSubject: (body, subjectId) => {
-  //   const url = `/cart/${subjectId}`;
-  //   return axiosClient.put(url, body);
-  // },
 };
 
 export default paymentApi;

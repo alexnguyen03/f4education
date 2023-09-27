@@ -111,13 +111,11 @@ function Cart() {
         checkoutMethod: checkOutMethod,
         status: "Chờ thanh toán",
       });
-      console.log(bill);
 
+      // API direct to VNPay checkout 
       try {
         const resp = await paymentApi.createPayment(bill);
-        console.log(resp);
         const url = resp.url;
-        console.log(url);
         window.location.href = url;
       } catch (error) {
         console.log(error);
@@ -126,9 +124,13 @@ function Cart() {
   };
 
   const handleUpdateCartAndCreateBill = () => {
+    if (responseCode === null) {
+      return;
+    }
     if (responseCode === 24) {
       return;
     } else {
+      
     }
   };
 
