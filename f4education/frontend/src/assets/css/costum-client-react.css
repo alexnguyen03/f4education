@@ -78,7 +78,7 @@
     left: 0;
     bottom: -58%;
     background: #333;
-    height: 5px;
+    height: 4px;
     width: 100%;
     display: none;
     transition: var(--smoothTransition);
@@ -180,4 +180,38 @@
     width: 40px;
     height: 4px;
     background: #000;
+}
+
+/* Payment - checkout */
+.checkout-summery {
+    display: block;
+}
+
+.checkout-sum-total {
+    display: none;
+    opacity: 0;
+}
+
+@media screen and (max-width: 980px) {
+    .checkout-summery {
+        background: #fff;
+    }
+
+    .check-summery-floating-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 20px;
+        background: #fff;
+        box-shadow: rgba(99, 99, 99, 0.2) 8px 8px 8px 8px;
+        transition: var(--smoothTransition);
+    }
+
+    .checkout-sum-total {
+        display: block;
+        opacity: 1;
+    }
+
 }

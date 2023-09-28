@@ -50,7 +50,7 @@ const Client = (props) => {
         <Container className="pb-5 pt-8">
           <Routes>
             {getRoutes(routesClient)}
-            <Route path="*" element={<Navigate to="/admin/index" replace />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </Container>
         <ClientFooter />

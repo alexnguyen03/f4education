@@ -9,7 +9,6 @@ import cartEmptyimage from "../../../assets/img/cart-empty.png";
 
 // API
 import cartApi from "../../../api/cartApi";
-import paymentApi from "../../../api/paymentApi";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
@@ -21,71 +20,72 @@ const itemsBreadcum = [
   </Anchor>
 ));
 
-// const cartItem = [
-//   {
-//     id: "1",
-//     courseName: "Khóa học ReactJS cho người mới từ 10 năm exp.",
-//     courseImage:
-//       "https://images.unsplash.com/photo-1695309534427-12bdf0afdd0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-//     subjectName: "ReactJS",
-//     ratings: 4.6,
-//     reviews: 100.0,
-//     courseDuration: "35h",
-//     courseLecture: "10 bài học",
-//     coursePrice: 359.135,
-//   },
-//   {
-//     id: "1",
-//     courseName: " Khóa học Java Spring boot cho người mới từ 10 năm exp.",
-//     courseImage:
-//       "https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxOHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-//     subjectName: "Java Spring boot",
-//     ratings: 3.5,
-//     reviews: 70.0,
-//     courseDuration: "14h",
-//     courseLecture: "4 bài học",
-//     coursePrice: 839.284,
-//   },
-// ];
+const cartItem = [
+  {
+    courseId: "1",
+    courseName: "Khóa học ReactJS cho người mới từ 10 năm exp.",
+    courseImage:
+      "https://images.unsplash.com/photo-1695309534427-12bdf0afdd0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    subjectName: "ReactJS",
+    ratings: 4.6,
+    reviews: 100.345,
+    courseDuration: "35h",
+    courseLecture: "10 bài học",
+    coursePrice: 359.135,
+  },
+  {
+    courseId: "2",
+    courseName: " Khóa học Java Spring boot cho người mới từ 10 năm exp.",
+    courseImage:
+      "https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxOHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
+    subjectName: "Java Spring boot",
+    ratings: 3.5,
+    reviews: 70.395,
+    courseDuration: "14h",
+    courseLecture: "4 bài học",
+    coursePrice: 839.284,
+  },
+];
 
 // zalopay vnpay
 function Cart() {
   // *************** Main Variable
-  const [carts, setCarts] = useState([]);
+  const [carts, setCarts] = useState(cartItem);
 
   // *************** Action Variable
   const [loading, setLoading] = useState(false);
-  const [searchParams] = useSearchParams();
-  const [responseCode, setResponseCode] = useState("");
+  // const [searchParams] = useSearchParams();
+  // const [responseCode, setResponseCode] = useState("");
 
-  useEffect(() => {
-    searchParams.get("vnp_ResponseCode");
-    setResponseCode(responseCode);
-  }, [responseCode, searchParams]);
+  // useEffect(() => {
+  //   searchParams.get("vnp_ResponseCode");
+  //   setResponseCode(searchParams.get("vnp_ResponseCode"));
+  // }, [responseCode, searchParams]);
+  // console.log(responseCode);
 
   // *************** FORM Variable
-  const [bill, setBill] = useState({
-    totalPrice: 0,
-    status: "",
-    checkoutMethod: "",
-  });
+  // const [bill, setBill] = useState({
+  //   totalPrice: 0,
+  //   status: "",
+  //   checkoutMethod: "",
+  // });
 
   // *************** Logic UI Variable
   // const [totalCartItem, setTotalCartItem] = useState(cartItem);
   const [totalPrice, setTotalPrice] = useState(0);
-  const [checkOutMethod, setCheckOutMethod] = useState("");
+  // const [checkOutMethod, setCheckOutMethod] = useState("");
 
   // *************** Fetch Area
-  const fetchCart = async () => {
-    try {
-      setLoading(true);
-      const resp = await cartApi.getAllCart();
-      setCarts(resp);
-      setLoading(false);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  // const fetchCart = async () => {
+  //   try {
+  //     setLoading(true);
+  //     const resp = await cartApi.getAllCart();
+  //     setCarts(resp);
+  //     setLoading(false);
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   // *************** Fetch Area > CRUD
   const handleRemoveCart = async (cartId, e) => {
@@ -94,74 +94,102 @@ function Cart() {
       const resp = await cartApi.removeCart(cartId);
       setCarts(resp);
       console.log("remove successfully");
-      fetchCart();
     } catch (error) {
       console.log(error);
     }
   };
 
   // *************** Action && Logic UI
-  const handleCheckOut = async (checkOutMethod) => {
-    if (checkOutMethod === "") {
-      alert("Choose checkout method bro!");
-      return;
-    } else {
-      setBill({
-        totalPrice: totalPrice,
-        checkoutMethod: checkOutMethod,
-        status: "Chờ thanh toán",
-      });
+  // const handleCheckOut = async (checkOutMethod) => {
+  //   if (checkOutMethod === "") {
+  //     alert("Choose checkout method bro!");
+  //     return;
+  //   } else {
+  //     setBill({
+  //       totalPrice: totalPrice,
+  //       checkoutMethod: checkOutMethod,
+  //       status: "",
+  //     });
 
-      // API direct to VNPay checkout 
-      try {
-        const resp = await paymentApi.createPayment(bill);
-        const url = resp.url;
-        window.location.href = url;
-      } catch (error) {
-        console.log(error);
-      }
-    }
-  };
+  //     // API direct to VNPay checkout
+  //     try {
+  //       const resp = await paymentApi.createPayment(bill);
+  //       const url = resp.url;
+  //       window.location.href = url;
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
 
-  const handleUpdateCartAndCreateBill = async () => {
-    if (responseCode === null) {
-      return;
-    }
-    if (responseCode === 24) {
-      return;
-    } else {
-      try {
-        const resp = await cartApi.updateCart(bill);
-      } catch (error) {
-        
-      }
-    }
-  };
+  //     // store cart to localstorage
+  //     localStorage.setItem("cartCheckout", JSON.stringify(carts));
+  //   }
+  // };
 
-  useEffect(() => {
-    setBill({
-      totalPrice: totalPrice,
-      checkoutMethod: checkOutMethod,
-      status: "Chờ thanh toán",
-    });
-  }, [totalPrice, checkOutMethod]);
+  // console.log(JSON.parse(localStorage.getItem("cartCheckout")));
+  // useEffect(() => {
+  //   setBill({
+  //     totalPrice: totalPrice,
+  //     checkoutMethod: checkOutMethod,
+  //     status: "Chờ thanh toán",
+  //   });
+  // }, [totalPrice, checkOutMethod]);
 
-  useEffect(() => {
-    setCheckOutMethod(checkOutMethod);
-  }, [checkOutMethod]);
+  // useEffect(() => {
+  //   setCheckOutMethod(checkOutMethod);
+  // }, [checkOutMethod]);
 
   useEffect(() => {
     // get Total Price from list totalCartItem
     let newTotalPrice = 0;
     carts.length > 0 &&
-      carts.map((item) => (newTotalPrice += item.course.coursePrice));
+      carts.map((item) => (newTotalPrice += item.coursePrice));
     setTotalPrice(newTotalPrice);
   }, [carts, loading]);
 
+  // useEffect(() => {
+  //   console.log(cartRequest);
+  // }, [cartRequest]);
+
+  // useEffect(() => {
+  //   console.log(localStorage.getItem('cartCheckout'));
+  // }, [cartRequest]);
+
   // *************** Use Effect AREA
-  useEffect(() => {
-    fetchCart();
-  }, []);
+  // useEffect(() => {
+  //   fetchCart();
+  // }, []);
+
+  // useEffect(() => {
+  //   if (responseCode !== null) {
+  //     const handleUpdateCartAndCreateBill = () => {
+  //       if (responseCode === "24") {
+  //         return console.log("Check out fail, cancle progress");
+  //       } else {
+  //         const listCart = JSON.parse(localStorage.getItem("cartCheckout"));
+  //         if (listCart !== null) {
+  //           const updateCartRequest = listCart.map((cart) => ({
+  //             cartId: cart.cartId,
+  //             courseId: cart.course.courseId,
+  //             createDate: cart.createDate,
+  //           }));
+  //           setCartRequest(updateCartRequest);
+  //           updateCartRequest.map(async (request) => {
+  //             try {
+  //               const resp = await cartApi.updateCart(request, request.cartId);
+  //             } catch (error) {
+  //               console.log(error);
+  //             }
+  //             localStorage.removeItem("cartCheckout");
+  //           });
+  //         }
+  //       }
+  //     };
+  //     return handleUpdateCartAndCreateBill();
+  //   } else {
+  //     console.log(null);
+  //     return;
+  //   }
+  // }, [cartRequest, responseCode]);
 
   // Checkout -> save data to localStorage(List cartID, billResDTO Data) -> create_payment (VNPAY) -> payment...
   // save data to localStorage (listCartID)
@@ -219,15 +247,13 @@ function Cart() {
                       {/* item */}
                       {carts.map((cart, index) => (
                         <>
-                          <Link
-                            to={`/course/${cart.course.courseId}`}
-                            key={index}
-                          >
+                          <Link to={`/course/${cart.courseId}`} key={index}>
                             <Row>
                               <Col lg="3" xl="3" md="4" sm="4">
                                 <img
-                                  src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                  alt={`${cart.course.courseName}`}
+                                  // src={`${PUBLIC_IMAGE}/courses/${cart.image}`}
+                                  src={cart.courseImage}
+                                  alt={`${cart.courseName}`}
                                   className="img-fluid"
                                   style={{
                                     maxHeight: "100px",
@@ -239,32 +265,36 @@ function Cart() {
                               </Col>
                               <Col lg="5" xl="5" md="8" sm="8">
                                 <p className="font-weight-700 text-dark m-0 p-0">
-                                  {cart.course.courseName}
+                                  {cart.courseName}
                                 </p>
                                 <span className="text-muted">
                                   {/* Môn học: <strong>{cart.subjectName}</strong> */}
                                 </span>
                                 <div className="d-flex text-dark">
-                                  {/* <span className="font-weight-600">
-                            {cart.ratings}
-                          </span> */}
-                                  {/* <div className="mx-2">
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bxs-star text-warning"></i>
-                            <i className="bx bx-star"></i>
-                          </div> */}
-                                  {/* <span className="text-muted">({cart.reviews})</span> */}
+                                  <span className="font-weight-600">
+                                    {cart.ratings}
+                                  </span>
+                                  <div className="mx-2">
+                                    <i className="bx bxs-star text-warning"></i>
+                                    <i className="bx bxs-star text-warning"></i>
+                                    <i className="bx bxs-star text-warning"></i>
+                                    <i className="bx bxs-star text-warning"></i>
+                                    <i className="bx bx-star"></i>
+                                  </div>
+                                  <span className="text-muted">
+                                    ({cart.reviews})
+                                  </span>
                                 </div>
                                 <div className="d-flex justify-content-start">
                                   <span className="text-muted">
-                                    {cart.course.courseDuration}h
+                                    {cart.courseDuration}
                                   </span>
                                   <span className="mx-2">-</span>
                                   <span className="text-muted">
-                                    {cart.course.numberSession} bài giảng
+                                    {cart.numberSession} bài giảng
                                   </span>
+                                  <span className="mx-2">-</span>
+                                  <span className="text-muted">All Levels</span>
                                 </div>
                               </Col>
                               <Col
@@ -293,13 +323,10 @@ function Cart() {
                                 className="mt-md-2 mt-sm-2"
                               >
                                 <span className="text-primary font-weight-700">
-                                  {cart.course.coursePrice.toLocaleString(
-                                    "it-IT",
-                                    {
-                                      style: "currency",
-                                      currency: "VND",
-                                    }
-                                  )}
+                                  {cart.coursePrice.toLocaleString("it-IT", {
+                                    style: "currency",
+                                    currency: "VND",
+                                  })}
                                 </span>
                               </Col>
                             </Row>
@@ -311,19 +338,20 @@ function Cart() {
                   </Row>
                 </Col>
                 <Col xl="4" lg="4" md="5" sm="12" className="mt-2">
-                  <h2 className="font-weight-600">
+                  <h4 className="font-weight-600">
                     Tổng thanh toán:
-                    <span className="font-weight-700 ml-2">
+                    <br />
+                    <h1 className="font-weight-700">
                       {totalPrice.toLocaleString("it-IT", {
                         style: "currency",
                         currency: "VND",
                       })}
-                    </span>
-                  </h2>
-                  <h4 className="text-muted">
-                    Vui lòng chọn hình thức thanh toán:
+                    </h1>
                   </h4>
-                  <div className="d-flex justify-content-between">
+                  {/* <h4 className="text-muted">
+                    Vui lòng chọn hình thức thanh toán:
+                  </h4> */}
+                  {/* <div className="d-flex justify-content-between">
                     {checkOutMethod === "paypal" ? (
                       <>
                         <Button
@@ -393,15 +421,20 @@ function Cart() {
                           />
                         </Button>
                       </>
-                    )}
-                  </div>
-                  <Button
-                    color="primary"
-                    className="w-100 mt-5"
-                    onClick={() => handleCheckOut(checkOutMethod)}
-                  >
-                    Thanh toán
-                  </Button>
+                    )} */}
+                  {/* </div> */}
+                  <Link to={"/payment/checkout"}>
+                    <Button
+                      color="primary"
+                      className="w-100 mt-2"
+                      style={{ borderRadius: "2px" }}
+                      // onClick={() => {
+                      //   handleCheckOut(checkOutMethod);
+                      // }}
+                    >
+                      Thanh toán
+                    </Button>
+                  </Link>
                 </Col>
               </Row>
             </>

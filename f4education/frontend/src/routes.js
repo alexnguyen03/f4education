@@ -18,6 +18,7 @@ import QuestionDetail from 'views/admin/QuestionDetail';
 import Home from 'views/client/visitor/Home';
 import CourseClient from 'views/client/visitor/CourseClient';
 import Cart from 'views/client/visitor/Cart';
+import Checkout from 'views/client/visitor/Checkout';
 
 export var routes = [
 	{
@@ -176,6 +177,11 @@ export var routesClient = [
 		name: 'Giỏ hàng',
 		icon: 'ni ni-planet text-blue',
 		component: <Cart/>,
+		layout: '/client',
+	},
+	{
+		path: '/payment/checkout',
+		component: <Checkout/>,
 		layout: '/client',
 	},
 ];
