@@ -97,6 +97,7 @@ const Subjects = () => {
 		if (validateForm(action)) {
 			try {
 				const body = subject;
+				// create subject
 				const resp = await subjectApi.createSubject(body);
 				console.log(resp);
 

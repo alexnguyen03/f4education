@@ -14,18 +14,24 @@ import "assets/css/costum-client-react.css";
 import AdminLayout from "layouts/Admin.js";
 import AuthLayout from "layouts/Auth.js";
 import ClientLayout from "layouts/Client.js";
+import { MantineProvider } from "@mantine/core";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="/admin" element={<Navigate to="/admin/index" replace />} />
-      <Route path="/*" element={<ClientLayout />} />
-      <Route path="/admin/*/:courseName" element={<AdminLayout />} />
-      <Route path="/admin/*/:courseName/:folderId" element={<AdminLayout />} />
-    </Routes>
-  </BrowserRouter>
+  <MantineProvider>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/admin/*" element={<AdminLayout />} />
+        <Route path="/auth/*" element={<AuthLayout />} />
+        <Route path="/admin" element={<Navigate to="/admin/index" replace />} />
+        <Route path="/*" element={<ClientLayout />} />
+        <Route path="/admin/*/:courseName" element={<AdminLayout />} />
+        <Route
+          path="/admin/*/:courseName/:folderId"
+          element={<AdminLayout />}
+        />
+      </Routes>
+    </BrowserRouter>
+  </MantineProvider>
 );

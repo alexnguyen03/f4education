@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, redirect, useSearchParams } from "react-router-dom";
 import { Button, Card, CardBody, Col, Row } from "reactstrap";
-import logoPayPal from "../../../assets/img/logo-paypal.png";
-import logoVnPay from "../../../assets/img/logo-vnpay.png";
+// import logoPayPal from "../../../assets/img/logo-paypal.png";
+// import logoVnPay from "../../../assets/img/logo-vnpay.png";
 import { Breadcrumbs, Anchor, Text, Loader } from "@mantine/core";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
 // import notifications from "@mantine/notifications";

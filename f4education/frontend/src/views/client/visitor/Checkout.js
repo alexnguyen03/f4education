@@ -2,7 +2,8 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Button, Col, Row } from "reactstrap";
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
-
+import logoMomo from "../../../assets/img/logo-momo.png";
+ 
 const Checkout = () => {
   return (
     <>
@@ -52,7 +53,7 @@ const Checkout = () => {
 
                   <div
                     id="collapseOne"
-                    class="collapse show"
+                    class="collapse"
                     aria-labelledby="headingOne"
                     data-parent="#accordionExample"
                   >
@@ -81,7 +82,7 @@ const Checkout = () => {
                         />
                         <label htmlFor="momo">
                           <img
-                            src={logoVnPay}
+                            src={logoMomo}
                             width="50px"
                             height="50px"
                             className="img-fluid"
@@ -108,15 +109,15 @@ const Checkout = () => {
             <div className="order-details mt-5">
               <h2 className="font-weight-800 text-dark">Chi tiết hóa đơn</h2>
               <Row>
-                <Col lg="1" xl="1" md="1" sm="1">
+                <Col lg="2" xl="2" md="2" sm="2">
                   <img
                     src="https://images.unsplash.com/photo-1695309534427-12bdf0afdd0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60"
-                    width={"45px"}
-                    height={"45px"}
+                    width={"100%"}
+                    height={"100%"}
                     alt=""
                   />
                 </Col>
-                <Col lg="9" xl="9" md="9" sm="9">
+                <Col lg="8" xl="8" md="8" sm="8">
                   <h4 className="font-weight-800 text-dark">
                     The completed ReactJS programing course: Beginer to advance
                   </h4>
@@ -132,8 +133,8 @@ const Checkout = () => {
             lg={4}
             md={12}
             sm={12}
-            className="checkout-summery p-5"
-            style={{ background: "#f7f9fa" }}
+            className="checkout-summery p-5 shadow"
+            style={{ background: "#f7f7f7" }}
           >
             <div>
               <div className="checkout-sumery-header">

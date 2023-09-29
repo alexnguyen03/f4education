@@ -96,7 +96,7 @@ const ClientNavbar = () => {
           id="navbarSupportedContent"
         >
           <ul
-            className="navbar-nav mx-auto text-center d-md-flex d-sm-flex 
+            className="navbar-nav mx-auto text-center d-md-flex d-sm-flex
                         justify-content-md-center justify-content-sm-center"
           >
             <li className="nav-item">
@@ -141,7 +141,7 @@ const ClientNavbar = () => {
           </ul>
 
           <div
-            className="d-flex justify-content-between 
+            className="d-flex justify-content-between
               justify-content-md-center justify-content-sm-center text-center text-dark"
           >
             {login ? (
