@@ -3,9 +3,10 @@ import userApi from 'api/userApi';
 import {react, useState, useEffect, useRef} from 'react';
 import {Box, LoadingOverlay} from '@mantine/core';
 import {useNavigate} from 'react-router-dom';
+import {GoogleLogin} from 'react-google-login';
+import {gapi} from 'gapi-script';
+import {GoogleOAuthProvider} from '@react-oauth/google';
 const Login = () => {
-	const userLoged = JSON.parse(localStorage.getItem('user') | '');
-
 	const [user, setUser] = useState({
 		id: '',
 		username: '',
@@ -14,6 +15,7 @@ const Login = () => {
 		accessToken: '',
 		roles: [],
 		refreshToken: '',
+		imageName: '',
 	});
 	const navigate = useNavigate();
 	const [loading, setLoading] = useState(false);
@@ -30,6 +32,12 @@ const Login = () => {
 		try {
 			setLoading(true);
 			const resp = await userApi.signin(account);
+			console.log('🚀 ~ file: Login.js:35 ~ handleLogin ~ resp:', resp);
+			if ((resp.status === 401 && resp.status) || resp.status === 404) {
+				setMsgError({...msgError, allErr: 'Tên đăng nhập hoặc mật khẩu không chính xác! Vui lòng kiểm tra lại.'});
+			} else {
+				setMsgError({...msgError, allErr: ''});
+			}
 
 			if (resp.status === 200 && resp.status) {
 				setUser(resp.data);
@@ -41,19 +49,55 @@ const Login = () => {
 					navigate('/teacher');
 				} else navigate('/');
 			}
+			setLoading(false);
 		} catch (error) {
 			setLoading(false);
 			console.log('🚀 ~ file: Login.js:49 ~ handleLogin ~ error:', error);
 
-			if (error.response.status === 401 && error.response.status) {
-				setMsgError({...msgError, allErr: 'Tên đăng nhập hoặc mật khẩu không chính xác! Vui lòng kiểm tra lại.'});
+			// if (error.response.status === 401 || error.response.status === 404) {
+			// 	setMsgError({...msgError, allErr: 'Tên đăng nhập hoặc mật khẩu không chính xác! Vui lòng kiểm tra lại.'});
+			// } else {
+			// 	setMsgError({...msgError, allErr: ''});
+			// }
+		}
+	};
+
+	const responseGoogleSuccess = async (resp) => {
+		const {email, givenName, imageUrl} = resp.profileObj;
+		setLoading(true);
+		console.log('🚀 ~ file: Login.js:63 ~ responseGoogleSuccess ~ givenName:', givenName);
+		// console.log('🚀 ~ file: Login.js:62 ~ responseGoogleSuccess ~ resp.profileObj:', resp);
+
+		try {
+			const response = await userApi.getRole(email);
+			console.log('🚀 ~ file: Login.js:66 ~ responseGoogleSuccess ~ response:', response.data.fullName);
+
+			if (response.status === 200 && response.status) {
+				setLoading(false);
+				const {email, accessToken, id, username, refreshToken} = response.data;
+				// setUser({email: email, accessToken: accessToken, id: id, username: username, refreshToken: refreshToken, fullName: givenName, imageName: imageUrl});
+				storeUserInfo({email: email, accessToken: accessToken, id: id, username: username, refreshToken: refreshToken, fullName: givenName, imageName: imageUrl});
+
+				const role = response.data.roles[0];
+				if (role === 'ROLE_ADMIN') {
+					navigate('/admin');
+				} else if (role === 'ROLE_TEACHER') {
+					navigate('/teacher');
+				} else navigate('/');
+			}
+		} catch (error) {
+			setLoading(false);
+			console.log('🚀 ~ file: Login.js:49 ~ handleLogin ~ error:', error);
+
+			if (error.response.status === 404 && error.response.status) {
+				setMsgError({...msgError, allErr: 'Tài khoản chưa đăng ký. Vui lòng đăng ký tài khoản để thực hiện tính năng này.'});
 			} else {
 				setMsgError({...msgError, allErr: ''});
 			}
 		}
 		setLoading(false);
 	};
-
+	const responseGoogleError = (resp) => {};
 	const storeUserInfo = (data) => {
 		localStorage.setItem('user', JSON.stringify(data));
 		localStorage.setItem('accessToken', JSON.stringify(data.accessToken));
@@ -81,7 +125,11 @@ const Login = () => {
 		}
 		return true;
 	};
-	useEffect(() => {}, []);
+	useEffect(() => {
+		gapi.load('client:auth2', () => {
+			gapi.auth2.init({clientId: process.env.REACT_APP_CLIENTID});
+		});
+	}, []);
 	return (
 		<>
 			<Col
@@ -115,19 +163,14 @@ const Login = () => {
 									</span>
 									<span className='btn-inner--text'>Github</span>
 								</Button>
-								<Button
-									className='btn-neutral btn-icon'
-									color='default'
-									href='#pablo'
-									onClick={(e) => e.preventDefault()}>
-									<span className='btn-inner--icon'>
-										<img
-											alt='...'
-											src={require('../../assets/img/icons/common/google.svg').default}
-										/>
-									</span>
-									<span className='btn-inner--text'>Google</span>
-								</Button>
+
+								<GoogleLogin
+									clientId='477164526232-padd6dn43ofdo07ie2uad6avblrp9n9r.apps.googleusercontent.com'
+									buttonText='Đăng nhập bằng Google'
+									onSuccess={responseGoogleSuccess}
+									onFailure={responseGoogleError}
+									cookiePolicy={'single_host_origin'}
+								/>
 							</div>
 						</CardHeader>
 						<CardBody className='px-lg-5 '>

@@ -16,6 +16,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,7 +73,7 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    String jwt = jwtUtils.generateJwtToken(authentication);
+    String jwt = jwtUtils.generateJwtToken(userDetails);
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
@@ -80,13 +82,16 @@ public class AuthController {
     if (refreshToken == null) {
       refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
     }
-    return ResponseEntity.ok(new JwtResponse(jwt,
+
+    return ResponseEntity.ok(new JwtResponse(
+        jwt,
         userDetails.getId(),
         userDetails.getUsername(),
         userDetails.getFullName(),
         userDetails.getEmail(),
         roles,
-        refreshToken.getToken()));
+        refreshToken.getToken(),
+        userDetails.getImageName()));
   }
 
   @PostMapping("/signup")
@@ -147,6 +152,9 @@ public class AuthController {
 
   @PostMapping("/refresh-token")
   public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    if (request.equals("")) {
+      return ResponseEntity.badRequest().body("Refresh token is not valid");
+    }
     String requestRefreshToken = request.getRefreshToken();
 
     return refreshTokenService.findByToken(requestRefreshToken)
@@ -155,16 +163,44 @@ public class AuthController {
         .map(user -> {
           String token = jwtUtils.generateTokenFromUsername(user.getUsername());
           return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
-        }).orElse(null);
+        }).orElse(ResponseEntity.notFound().build());
 
   }
 
-  @PostMapping("/signout")
-  public ResponseEntity<?> logoutUser() {
-    UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication()
-        .getPrincipal();
-    Long userId = userDetails.getId();
-    refreshTokenService.deleteByUserId(userId);
+  @PostMapping("/signout/{id}")
+  public ResponseEntity<?> logoutUser(@PathVariable Long id) {
+    // UserDetailsImpl userDetails = (UserDetailsImpl)
+    // SecurityContextHolder.getContext().getAuthentication()
+    // .getPrincipal();
+    // Long userId = userDetails.getId();
+    refreshTokenService.deleteByUserId(id);
     return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+  }
+
+  @GetMapping("/{email}")
+  public ResponseEntity<?> getRoleByEmail(@PathVariable("email") String email) {
+
+    User foundUser = userRepository.findByEmail(email);
+    if (foundUser == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    String jwt = jwtUtils.generateJwtToken(foundUser);
+    List<String> roles = foundUser.getRoles().stream()
+        .map(item -> item.getName().name())
+        .collect(Collectors.toList());
+    UserDetailsImpl userDetails = UserDetailsImpl.build(foundUser);
+    RefreshToken refreshToken = refreshTokenService.findByUserId(foundUser.getId()).orElse(null);
+    if (refreshToken == null) {
+      refreshToken = refreshTokenService.createRefreshToken(foundUser.getId());
+    }
+    return ResponseEntity.ok(new JwtResponse(jwt,
+        foundUser.getId(),
+        foundUser.getUsername(),
+        foundUser.getEmail(),
+        jwt, roles,
+        refreshToken.getToken(),
+        userDetails.getImageName()));
+
   }
 }

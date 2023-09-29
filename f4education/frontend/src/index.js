@@ -28,41 +28,48 @@ import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
 import ClientLayout from 'layouts/Client.js';
 import ResourceDetail from 'views/admin/ResourceDetail';
-
+import {GoogleOAuthProvider} from '@react-oauth/google';
+import {MantineProvider} from '@mantine/core';
+import {ModalsProvider} from '@mantine/modals';
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
 	<BrowserRouter>
-		<Routes>
-			<Route
-				path='/admin/*'
-				element={<AdminLayout />}
-			/>
-			<Route
-				path='/auth/*'
-				element={<AuthLayout />}
-			/>
-			<Route
-				path='/admin'
-				element={
-					<Navigate
-						to='/admin/index'
-						replace
+		<MantineProvider>
+			<ModalsProvider>
+				<Routes>
+					<Route
+						path='/admin/*'
+						element={<AdminLayout />}
 					/>
-				}
-			/>
-			<Route
-				path='/*'
-				element={<ClientLayout />}
-			/>
-			<Route
-				path='/admin/*/:courseName'
-				element={<AdminLayout />}
-			/>
-			<Route
-				path='/admin/*/:courseName/:folderId'
-				element={<AdminLayout />}
-			/>
-		</Routes>
+					<Route
+						path='/auth/*'
+						element={<AuthLayout />}
+					/>
+					<Route
+						path='/admin'
+						element={
+							<Navigate
+								to='/admin/index'
+								replace
+							/>
+						}
+					/>
+					<Route
+						path='/*'
+						element={<ClientLayout />}
+					/>
+					<Route
+						path='/admin/*/:courseName'
+						element={<AdminLayout />}
+					/>
+					<Route
+						path='/admin/*/:courseName/:folderId'
+						element={<AdminLayout />}
+					/>
+				</Routes>
+			</ModalsProvider>
+		</MantineProvider>
+		,
 	</BrowserRouter>,
 );

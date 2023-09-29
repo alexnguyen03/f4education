@@ -2,7 +2,7 @@
 import axios from 'axios';
 import queryString from 'query-string';
 import {useNavigate} from 'react-router-dom';
-const accessToken = JSON.parse(localStorage.getItem('accessToken') | '');
+const accessToken = JSON.parse(localStorage.getItem('accessToken') | null);
 const axiosClient = axios.create({
 	baseURL: process.env.REACT_APP_API_URL,
 	headers: {
@@ -11,12 +11,10 @@ const axiosClient = axios.create({
 	paramsSerializer: (params) => queryString.stringify(params),
 });
 axiosClient.interceptors.request.use(async (config) => {
-	console.log(accessToken);
 	if (accessToken) {
 		config.headers.Authorization = `Bearer ${accessToken}`;
 	}
 
-	console.log('🚀 ~ file: axiosClient.js:20 ~ axiosClient.interceptors.request.use ~ config:', config);
 	return config;
 });
 axiosClient.interceptors.response.use(
@@ -26,14 +24,12 @@ axiosClient.interceptors.response.use(
 	async (err) => {
 		const originalConfig = err.config;
 
-		console.log('🚀 ~ file: axiosClient.js:30 ~ err.response:', err.response);
 		if (err.response) {
 			const refreshToken = JSON.parse(localStorage.getItem('refreshToken') ?? '');
 
 			// Access Token was expired
 			if (err.response.status === 401 && !originalConfig._retry) {
 				originalConfig._retry = true;
-				console.log('🚀 ~ file: axiosClient.js:38 ~ refreshToken:', refreshToken);
 
 				try {
 					const rs = await axiosClient.post('/auth/refresh-token', refreshToken);
@@ -43,19 +39,19 @@ axiosClient.interceptors.response.use(
 					return axiosClient(originalConfig);
 				} catch (_error) {
 					if (_error.response && _error.response.data) {
-						return err;
+						return err.response;
 					}
 
-					return err;
+					return err.response;
 				}
 			}
 
 			if (err.response.status === 403 && err.response.data) {
-				return err;
+				return err.response;
 			}
 		}
 
-		return err;
+		return err.response;
 		// return;
 	},
 );

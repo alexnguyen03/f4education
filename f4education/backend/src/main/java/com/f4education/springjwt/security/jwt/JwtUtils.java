@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.security.services.UserDetailsImpl;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -29,12 +30,14 @@ public class JwtUtils {
   @Value("${f4education.app.jwtExpirationMs}")
   private int jwtExpirationMs;
 
-  public String generateJwtToken(Authentication authentication) {
+  // public String generateJwtToken(Authentication authentication) {
+  public String generateJwtToken(User user) {
 
-    UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    // UserDetailsImpl userPrincipal = (UserDetailsImpl)
+    // authentication.getPrincipal();
 
     return Jwts.builder()
-        .setSubject((userPrincipal.getUsername()))
+        .setSubject((user.getUsername()))
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
         .signWith(key(), SignatureAlgorithm.HS256)
