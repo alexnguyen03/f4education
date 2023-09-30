@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Button, Col, Row } from "reactstrap";
+import { Button, Col, Modal, ModalBody, Row } from "reactstrap";
 // import Notification from "@mantine/core";
-import IconCheck from "@tabler/icons-react";
+// import IconCheck from "@tabler/icons-react";
 
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
 import logoMomo from "../../../assets/img/logo-momo.png";
@@ -22,12 +22,19 @@ const Checkout = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [searchParams] = useSearchParams();
   const [responseCode, setResponseCode] = useState("");
-  const [showNotification, setShowNotification] = useState({
-    status: false,
-    title: "",
-    message: "",
-    color: "",
+  const [checkoutComplete, setCheckoutComplete] = useState({
+    status: "",
+    infor: "",
+    time: new Date(),
   });
+  const [showModal, setShowModal] = useState(false);
+  const [count, setCount] = useState(10);
+  // const [showNotification, setShowNotification] = useState({
+  //   status: false,
+  //   title: "",
+  //   message: "",
+  //   color: "",
+  // });
 
   // *************** FORM Variable
   const [bill, setBill] = useState({
@@ -105,14 +112,22 @@ const Checkout = () => {
     if (responseCode !== null) {
       const handleUpdateCartAndCreateBill = () => {
         if (responseCode === "24") {
-          // notifycationAction(
-          //   "F4 Education thông báo",
-          //   "Thanh toán đã được hủy!",
-          //   "teal"
-          // );
+          setShowModal(true);
+          setCheckoutComplete({
+            status: "cancle",
+            infor: "Hóa đơn đã được hủy!",
+            time: "",
+          });
           return console.log("Check out fail, cancle progress");
         }
         if (responseCode === "00") {
+          setShowModal(true);
+          setCheckoutComplete({
+            status: "success",
+            infor: "Thanh toán thành công!",
+            time: "",
+          });
+
           const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
           if (listCar !== null) {
             const updateCartRequest = listCar.map((cart) => ({
@@ -132,7 +147,6 @@ const Checkout = () => {
             });
             // redirect to cart
             // redirect("/cart");
-            window.location.href = "/cart";
           }
         } else {
           return console.log("Other Error");
@@ -146,16 +160,32 @@ const Checkout = () => {
     }
   }, [responseCode]);
 
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     setShowNotification({
-  //       status: false,
-  //       title: "",
-  //       message: "",
-  //     });
-  //   }, 4000);
-  //   return () => clearTimeout(timeout);
-  // }, [showNotification]);
+  useEffect(() => {
+    if (count === 0) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setCount((prevCount) => prevCount - 1);
+    }, 1000);
+
+    const timeout = setTimeout(() => {
+      setCheckoutComplete({
+        status: "",
+        infor: "",
+        time: "",
+      });
+      setShowModal(false);
+      if ((checkoutComplete.status = "success")) {
+        const timeoutRedirect = setTimeout(() => {
+          const url = "http://localhost:3000/cart";
+          window.location.href = url;
+        }, 9000);
+      }
+    }, 10000);
+
+    return () => clearTimeout(timeout, timer);
+  }, [checkoutComplete, count, showModal]);
 
   return (
     <>
@@ -373,6 +403,96 @@ const Checkout = () => {
           )}
         </Row>
       </div>
+
+      <Modal
+        className="modal-dialog-centered"
+        isOpen={showModal}
+        toggle={showModal}
+      >
+        <ModalBody>
+          {checkoutComplete.status !== "" && (
+            <>
+              <div
+                className="checkout-popup text-center d-flex flex-column 
+                    justify-content-center align-items-center p-2"
+              >
+                <div>
+                  <h3
+                    className={`${
+                      checkoutComplete.status === "success"
+                        ? "text-success"
+                        : "text-danger"
+                    } font-weight-600`}
+                  >
+                    <span
+                      style={{
+                        background: "#f1f1f1",
+                        borderRadius: "50%",
+                      }}
+                    >
+                      {checkoutComplete.status === "success" ? (
+                        <>
+                          <i
+                            className="bx bx-check-circle m-2 text-success"
+                            style={{ fontSize: "35px" }}
+                          ></i>
+                        </>
+                      ) : (
+                        <>
+                          <i
+                            className="bx bx-x-circle m-2 text-danger"
+                            style={{ fontSize: "35px" }}
+                          ></i>
+                        </>
+                      )}
+                    </span>
+                    <br />
+                    <span>{checkoutComplete.infor}</span>
+                  </h3>
+                </div>
+                {checkoutComplete.status === "success" && (
+                  <div
+                    style={{ background: "#f1f1f1", borderRadius: "5px" }}
+                    className="p-2 w-100 mt-5"
+                  >
+                    <>
+                      <div className="d-flex justify-content-between">
+                        <div className="text-muted">Tổng tiền:</div>
+                        <div className="font-weight-600">{totalPrice}</div>
+                      </div>
+                      <hr />
+                      <div className="d-flex justify-content-between">
+                        <div className="text-muted">Hình thức thanh toán:</div>
+                        <div className="font-weight-600">{checkOutMethod}</div>
+                      </div>
+                    </>
+
+                    <div className="d-flex justify-content-between">
+                      <div className="text-muted">Thời gian thanh toán:</div>
+                      <div className="font-weight-600">
+                        {checkoutComplete.time}
+                      </div>
+                    </div>
+                  </div>
+                )}
+                <div className="mx-auto mt-5">
+                  <p className="mx-auto text-muted my-3">
+                    {checkoutComplete.status === "success"
+                      ? "Tự động trở về sau:"
+                      : "Tự động đóng sau:"}
+                    <strong>{count}</strong>
+                  </p>
+                  <Button color="primary">
+                    {checkoutComplete.status === "success"
+                      ? "Trở về giỏ hàng"
+                      : "Trở về thanh toán"}
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </ModalBody>
+      </Modal>
 
       {/* Notifycation */}
       {/* {showNotification.status && (
