@@ -64,7 +64,7 @@ const Courses = () => {
 		courseId: '',
 		courseName: '',
 		coursePrice: 0,
-		courseDuration: '',
+		courseDuration: 0,
 		courseDescription: '',
 		numberSession: 0,
 		image: '',

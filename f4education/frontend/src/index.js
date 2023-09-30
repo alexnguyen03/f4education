@@ -27,7 +27,6 @@ import 'assets/css/costum-answer.css';
 import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
 import ClientLayout from 'layouts/Client.js';
-import ResourceDetail from 'views/admin/ResourceDetail';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
@@ -53,6 +52,10 @@ root.render(
 			/>
 			<Route
 				path='/*'
+				element={<ClientLayout />}
+			/>
+			<Route
+				path='/course/course-detail-client/:courseId'
 				element={<ClientLayout />}
 			/>
 			<Route

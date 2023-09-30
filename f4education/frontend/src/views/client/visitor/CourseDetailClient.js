@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ExpandMore, ExpandLess } from "@material-ui/icons";
 import StarIcon from "@mui/icons-material/Star";
-import {Link} from 'react-router-dom';
 import classnames from "classnames";
 import {
   TabContent,
@@ -22,7 +21,7 @@ import subjectApi from "api/subjectApi";
 import { duration } from "moment";
 const IMG_URL = "/courses/";
 
-function CourseClient() {
+function CourseDetailClient() {
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [expandedRating, setExpandedRating] = useState(false);
@@ -553,25 +552,21 @@ function CourseClient() {
                     >
                       Thời lượng: {course.courseDuration} (giờ)
                     </Badge>
-                    <Link
-                      to={`/course/course-detail-client/${course.courseId}`}
+                    <button
+                      type="button"
+                      class="btn"
+                      style={{
+                        backgroundColor: "#a435f0",
+                        color: "white",
+                        fontWeight: "bold",
+                        borderRadius: 0,
+                        float: "right",
+                        marginTop: 10,
+                      }}
+                      onClick={() => handleRegistration(course)}
                     >
-                      <button
-                        type="button"
-                        class="btn"
-                        style={{
-                          backgroundColor: "#a435f0",
-                          color: "white",
-                          fontWeight: "bold",
-                          borderRadius: 0,
-                          float: "right",
-                          marginTop: 10,
-                        }}
-                        onClick={() => handleRegistration(course)}
-                      >
-                        Thêm vào giỏ hàng
-                      </button>
-                    </Link>
+                      Thêm vào giỏ hàng
+                    </button>
                   </div>
                   <div
                     className="col-lg-2 mb-3 p-0"
@@ -612,4 +607,4 @@ function CourseClient() {
   );
 }
 
-export default CourseClient;
+export default CourseDetailClient;

@@ -5,8 +5,6 @@ import {react, useState, useEffect, useRef} from 'react';
 // core components
 import ClientFooter from 'components/Footers/ClientFooter.js';
 import ClientNavbar from 'components/Navbars/ClientNavbar.js';
-
-import userApi from 'api/userApi';
 import {routesClient} from 'routes.js';
 
 const Client = (props) => {
@@ -47,8 +45,8 @@ const Client = (props) => {
 				<ClientNavbar />
 
 				{/* Page content */}
-				<Container className=' pb-5'>
-					<Row className='justify-content-center'>
+				<Container fluid={true}>
+					<Row>
 						<Routes>
 							{getRoutes(routesClient)}
 							<Route
