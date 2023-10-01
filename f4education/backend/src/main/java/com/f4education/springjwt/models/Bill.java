@@ -31,7 +31,7 @@ public class Bill {
 	private Date createDate;
 
 	@Column(name = "total_price")
-	private Float totalPrice;
+	private Double totalPrice;
 
 	@Column(name = "status")
 	private String status;
@@ -40,7 +40,7 @@ public class Bill {
 	private String note;
 
 	@OneToMany(mappedBy = "bill")
-	List<DetailInvoice> detailInvoice;
+	List<BillDetail> detailBills;
 
 //	@ManyToOne
 //	@JoinColumn(name = "admin_id")

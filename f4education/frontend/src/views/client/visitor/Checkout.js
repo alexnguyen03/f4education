@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, redirect, useSearchParams } from "react-router-dom";
 import { Button, Col, Modal, ModalBody, Row } from "reactstrap";
 // import Notification from "@mantine/core";
 // import IconCheck from "@tabler/icons-react";
@@ -11,6 +11,7 @@ import cartEmptyimage from "../../../assets/img/cart-empty.png";
 // API
 import paymentApi from "../../../api/paymentApi";
 import cartApi from "../../../api/cartApi";
+import billApi from "../../../api/billApi";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const Checkout = () => {
@@ -25,22 +26,16 @@ const Checkout = () => {
   const [checkoutComplete, setCheckoutComplete] = useState({
     status: "",
     infor: "",
-    time: new Date(),
+    time: (new Date()).toLocaleDateString(),
   });
   const [showModal, setShowModal] = useState(false);
   const [count, setCount] = useState(10);
-  // const [showNotification, setShowNotification] = useState({
-  //   status: false,
-  //   title: "",
-  //   message: "",
-  //   color: "",
-  // });
 
   // *************** FORM Variable
   const [bill, setBill] = useState({
-    totalPrice: 0,
-    status: "",
-    checkoutMethod: "",
+    totalPrice: totalPrice,
+    checkoutMethod: checkOutMethod,
+    studentId: 1,
   });
 
   //  *************** Action && Logic UI AREA
@@ -55,6 +50,8 @@ const Checkout = () => {
   };
 
   const handleCreatePayment = async (checkOutMethod) => {
+    localStorage.setItem("billCheckout", JSON.stringify(bill));
+    
     if (checkOutMethod === "") {
       alert("Choose checkout method bro!");
       return;
@@ -70,22 +67,13 @@ const Checkout = () => {
     }
   };
 
-  // const notifycationAction = (title, message, color) => {
-  //   setShowNotification({
-  //     status: true,
-  //     title: title,
-  //     message: message,
-  //     color: color,
-  //   });
-  // };
-
   // *************** use Effect AREA
   // set Bill for create payment
   useEffect(() => {
     setBill({
       totalPrice: totalPrice,
       checkoutMethod: checkOutMethod,
-      status: "",
+      studentId: 1,
     });
   }, [totalPrice, checkOutMethod]);
 
@@ -128,26 +116,35 @@ const Checkout = () => {
             time: "",
           });
 
-          const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
-          if (listCar !== null) {
-            const updateCartRequest = listCar.map((cart) => ({
-              cartId: cart.cartId,
-              courseId: cart.course.courseId,
-              createDate: cart.createDate,
-            }));
+          // const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
+          const billRequest = JSON.parse(localStorage.getItem("billCheckout"));
 
-            updateCartRequest.map(async (request) => {
-              try {
-                const resp = await cartApi.updateCart(request, request.cartId);
-                console.log(resp);
-              } catch (error) {
-                console.log(error);
-              }
-              localStorage.removeItem("cartCheckout");
-            });
-            // redirect to cart
-            // redirect("/cart");
+          // if (listCar !== null) {
+          //   const updateCartRequest = listCar.map((cart) => ({
+          //     cartId: cart.cartId,
+          //     courseId: cart.course.courseId,
+          //     createDate: cart.createDate,
+          //   }));
+
+          console.log(billRequest);
+          try {
+            const resp = billApi.createBill(bill);
+            console.log(resp);
+          } catch (error) {
+            console.log(error);
           }
+          localStorage.removeItem("billCheckout");
+
+          //   updateCartRequest.map(async (request) => {
+          //     try {
+          //       const resp = await cartApi.updateCart(request, request.cartId);
+          //       console.log(resp);
+          //     } catch (error) {
+          //       console.log(error);
+          //     }
+          //     localStorage.removeItem("cartCheckout");
+          //   });
+          // }
         } else {
           return console.log("Other Error");
         }
@@ -168,7 +165,21 @@ const Checkout = () => {
     const timer = setInterval(() => {
       setCount((prevCount) => prevCount - 1);
     }, 1000);
+    return () => clearTimeout(timer);
+  }, [count]);
 
+  useEffect(() => {
+    const timeoutRedirect = setTimeout(() => {
+      if (checkoutComplete.status === "success") {
+        const url = "http://localhost:3000/cart";
+        // window.location.href = url;
+        // redirect(url);
+      }
+    }, 9000);
+    return () => clearTimeout(timeoutRedirect);
+  }, [checkoutComplete]);
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
       setCheckoutComplete({
         status: "",
@@ -176,21 +187,22 @@ const Checkout = () => {
         time: "",
       });
       setShowModal(false);
-      if ((checkoutComplete.status = "success")) {
-        const timeoutRedirect = setTimeout(() => {
-          const url = "http://localhost:3000/cart";
-          window.location.href = url;
-        }, 9000);
-      }
     }, 10000);
 
-    return () => clearTimeout(timeout, timer);
-  }, [checkoutComplete, count, showModal]);
+    return () => clearTimeout(timeout);
+  }, [checkoutComplete, showModal]);
 
   return (
     <>
       {/* Title */}
-      <h1 className="font-weight-800 text-dark my-5 display-2">Thanh toán</h1>
+      <div>
+        <h1 className="font-weight-800 text-dark my-5 display-2">Thanh toán</h1>
+        <Link to="/cart" className="mt--5">
+          <h3 className="text-muted">
+            <i className="bx bx-chevrons-left mr-2"></i>trở về
+          </h3>
+        </Link>
+      </div>
 
       {/* content */}
       <div className="mt-5">
@@ -222,7 +234,7 @@ const Checkout = () => {
                               name="checkoutMethod"
                               checked
                               className="mr-3"
-                              onClick={(e) =>
+                              onChange={(e) =>
                                 handleChangeCheckoutMethod(e.target)
                               }
                             />
@@ -267,7 +279,7 @@ const Checkout = () => {
                               type="radio"
                               name="checkoutMethod"
                               className="mr-3"
-                              onClick={(e) =>
+                              onChange={(e) =>
                                 handleChangeCheckoutMethod(e.target)
                               }
                             />
@@ -344,7 +356,12 @@ const Checkout = () => {
                     </h2>
                     <div className="d-flex justify-content-between">
                       <span className="text-muted">Giá gốc:</span>
-                      <span className="text-muted">359.999đ</span>
+                      <span className="text-muted">
+                        {totalPrice.toLocaleString("it-IT", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </span>
                     </div>
                     <div className="d-flex justify-content-between">
                       <span className="text-muted">Giảm giá:</span>
@@ -354,14 +371,24 @@ const Checkout = () => {
                     <div className="checkout-sum-total">
                       <div className="d-flex justify-content-between">
                         <h3 className="font-weight-700 text-dark">Tổng:</h3>
-                        <h3 className="font-weight-700 text-dark">359.999đ</h3>
+                        <h3 className="font-weight-700 text-dark">
+                          {totalPrice.toLocaleString("it-IT", {
+                            style: "currency",
+                            currency: "VND",
+                          })}
+                        </h3>
                       </div>
                     </div>
                   </div>
                   <div className="check-summery-floating-bottom">
                     <div className="d-flex justify-content-between">
                       <h3 className="font-weight-700 text-dark">Tổng:</h3>
-                      <h3 className="font-weight-700 text-dark">359.999đ</h3>
+                      <h3 className="font-weight-700 text-dark">
+                        {totalPrice.toLocaleString("it-IT", {
+                          style: "currency",
+                          currency: "VND",
+                        })}
+                      </h3>
                     </div>
 
                     <div className="mt-3 text-muted">
@@ -493,24 +520,6 @@ const Checkout = () => {
           )}
         </ModalBody>
       </Modal>
-
-      {/* Notifycation */}
-      {/* {showNotification.status && (
-        <Notification
-          icon={<IconCheck size="1.1rem" />}
-          color={showNotification.color}
-          title={showNotification.title}
-          style={{
-            position: "fixed",
-            top: "20px",
-            right: "20px",
-            zIndex: "2023",
-            maxWidth: "400px",
-          }}
-        >
-          {showNotification.message}
-        </Notification>
-      )} */}
     </>
   );
 };
