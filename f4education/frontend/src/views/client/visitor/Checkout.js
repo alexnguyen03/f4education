@@ -23,10 +23,13 @@ const Checkout = () => {
   const [totalPrice, setTotalPrice] = useState(0);
   const [searchParams] = useSearchParams();
   const [responseCode, setResponseCode] = useState("");
+  const [transactionNo, setTransactionNo] = useState("");
+  const [paymentType, setPaymentType] = useState("");
+
   const [checkoutComplete, setCheckoutComplete] = useState({
     status: "",
     infor: "",
-    time: (new Date()).toLocaleDateString(),
+    time: new Date().getTime().toLocaleString(),
   });
   const [showModal, setShowModal] = useState(false);
   const [count, setCount] = useState(10);
@@ -51,7 +54,7 @@ const Checkout = () => {
 
   const handleCreatePayment = async (checkOutMethod) => {
     localStorage.setItem("billCheckout", JSON.stringify(bill));
-    
+
     if (checkOutMethod === "") {
       alert("Choose checkout method bro!");
       return;
@@ -94,6 +97,8 @@ const Checkout = () => {
   useEffect(() => {
     searchParams.get("vnp_ResponseCode");
     setResponseCode(searchParams.get("vnp_ResponseCode"));
+    setTransactionNo(searchParams.get("vnp_TransactionNo"));
+    setPaymentType(searchParams.get("vnp_CardType"));
   }, [responseCode, searchParams]);
 
   useEffect(() => {
@@ -116,35 +121,48 @@ const Checkout = () => {
             time: "",
           });
 
-          // const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
+          const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
           const billRequest = JSON.parse(localStorage.getItem("billCheckout"));
 
-          // if (listCar !== null) {
-          //   const updateCartRequest = listCar.map((cart) => ({
-          //     cartId: cart.cartId,
-          //     courseId: cart.course.courseId,
-          //     createDate: cart.createDate,
-          //   }));
+          if (listCar !== null) {
+            const updateCartRequest = listCar.map((cart) => ({
+              cartId: cart.cartId,
+              courseId: cart.course.courseId,
+              createDate: cart.createDate,
+            }));
 
-          console.log(billRequest);
-          try {
-            const resp = billApi.createBill(bill);
-            console.log(resp);
-          } catch (error) {
-            console.log(error);
+            const billDetailRequest = updateCartRequest.map((detail) => ({
+              totalPrice: totalPrice,
+              courseId: detail.courseId,
+            }));
+
+            console.log(billDetailRequest);
+
+            try {
+              const resp = billApi.createBill(bill);
+              console.log(resp);
+            } catch (error) {
+              console.log("Bill: " + error);
+            }
+            localStorage.removeItem("billCheckout");
+
+            try {
+              const respDetail = billApi.createBillDetail(billDetailRequest);
+              console.log(respDetail);
+            } catch (error) {
+              console.log("BillDetail: " + error);
+            }
+
+            updateCartRequest.map(async (request) => {
+              try {
+                const resp = await cartApi.updateCart(request, request.cartId);
+                console.log(resp);
+              } catch (error) {
+                console.log("Cart: " + error);
+              }
+              localStorage.removeItem("cartCheckout");
+            });
           }
-          localStorage.removeItem("billCheckout");
-
-          //   updateCartRequest.map(async (request) => {
-          //     try {
-          //       const resp = await cartApi.updateCart(request, request.cartId);
-          //       console.log(resp);
-          //     } catch (error) {
-          //       console.log(error);
-          //     }
-          //     localStorage.removeItem("cartCheckout");
-          //   });
-          // }
         } else {
           return console.log("Other Error");
         }
@@ -172,8 +190,8 @@ const Checkout = () => {
     const timeoutRedirect = setTimeout(() => {
       if (checkoutComplete.status === "success") {
         const url = "http://localhost:3000/cart";
-        // window.location.href = url;
-        // redirect(url);
+        window.location.href = url;
+        // return redirect(url);
       }
     }, 9000);
     return () => clearTimeout(timeoutRedirect);
@@ -314,8 +332,8 @@ const Checkout = () => {
                     Chi tiết hóa đơn
                   </h2>
                   {listCart.map((cart) => (
-                    <Row>
-                      <Col lg="2" xl="2" md="6" sm="6">
+                    <Row className="mb-2">
+                      <Col lg="2" xl="2" md="2" sm="2">
                         <img
                           src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
                           width={"100%"}
@@ -324,12 +342,12 @@ const Checkout = () => {
                           alt={cart.course.courseName}
                         />
                       </Col>
-                      <Col lg="8" xl="8" md="12" sm="12">
+                      <Col lg="8" xl="8" md="8" sm="8">
                         <h4 className="font-weight-800 text-dark">
                           {cart.course.courseName}
                         </h4>
                       </Col>
-                      <Col lg="2" xl="2" md="6" sm="6">
+                      <Col lg="2" xl="2" md="2" sm="2">
                         <h4 className="text-muted">
                           {cart.course.coursePrice.toLocaleString("it-IT", {
                             style: "currency",
@@ -484,20 +502,28 @@ const Checkout = () => {
                   >
                     <>
                       <div className="d-flex justify-content-between">
-                        <div className="text-muted">Tổng tiền:</div>
+                        <div className="text-muted">Tổng thanh toán:</div>
                         <div className="font-weight-600">{totalPrice}</div>
                       </div>
                       <hr />
                       <div className="d-flex justify-content-between">
+                        <div className="text-muted">Mã đơn hàng:</div>
+                        <div className="font-weight-600">{transactionNo}</div>
+                      </div>
+                      <div className="d-flex justify-content-between">
                         <div className="text-muted">Hình thức thanh toán:</div>
                         <div className="font-weight-600">{checkOutMethod}</div>
+                      </div>
+                      <div className="d-flex justify-content-between">
+                        <div className="text-muted">Thanh toán bằng:</div>
+                        <div className="font-weight-600">{paymentType}</div>
                       </div>
                     </>
 
                     <div className="d-flex justify-content-between">
                       <div className="text-muted">Thời gian thanh toán:</div>
                       <div className="font-weight-600">
-                        {checkoutComplete.time}
+                        {new Date().toLocaleString()}
                       </div>
                     </div>
                   </div>
@@ -509,11 +535,17 @@ const Checkout = () => {
                       : "Tự động đóng sau:"}
                     <strong>{count}</strong>
                   </p>
-                  <Button color="primary">
-                    {checkoutComplete.status === "success"
-                      ? "Trở về giỏ hàng"
-                      : "Trở về thanh toán"}
-                  </Button>
+                  <Link
+                    to={`${
+                      checkoutComplete.status === "success" ? "/cart" : "#"
+                    }`}
+                  >
+                    <Button color="primary" onClick={() => setShowModal(false)}>
+                      {checkoutComplete.status === "success"
+                        ? "Trở về giỏ hàng"
+                        : "Trở về thanh toán"}
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </>
