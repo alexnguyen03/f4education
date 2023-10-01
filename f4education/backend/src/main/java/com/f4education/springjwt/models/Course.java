@@ -6,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.io.Serializable;
 import java.util.List;
@@ -44,7 +43,7 @@ public class Course implements Serializable {
 	List<CourseHistory> courseHistories;
 
 	@OneToMany(mappedBy = "course")
-	List<Question> questions;
+	List<QuestionDetail> questions;
 
 	@OneToMany(mappedBy = "course")
 	List<RegisterCourse> registerCourses;

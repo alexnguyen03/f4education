@@ -1,19 +1,18 @@
 package com.f4education.springjwt.interfaces;
 
-import java.util.List;
-
-import com.f4education.springjwt.payload.request.QuestionDTORequest;
+import com.f4education.springjwt.payload.request.QuestionDetailRequestDTO;
+import com.f4education.springjwt.payload.request.QuestionRequestDTO;
+import com.f4education.springjwt.payload.response.QuestionDetailResponseDTO;
+import com.f4education.springjwt.payload.response.QuestionResponseDTO;
 import org.springframework.stereotype.Service;
 
-import com.f4education.springjwt.payload.request.QuestionDTO;
+import java.util.List;
 
 @Service
 public interface QuestionService {
-	List<QuestionDTO> getAllQuestion();
+    List<QuestionResponseDTO> getAllQuestion();
 
-	QuestionDTO getQuestionById(Integer questionId);
+    QuestionResponseDTO createQuestion(QuestionRequestDTO questionDTO);
 
-	QuestionDTORequest createQuestion(QuestionDTORequest questionDTO);
-
-	QuestionDTORequest updateQuestion(Integer questionId, QuestionDTORequest questionDTO);
+    QuestionResponseDTO updateQuestion(Integer questionId, QuestionRequestDTO questionDTO);
 }

@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Entity
 @AllArgsConstructor
@@ -26,9 +24,9 @@ public class Answer {
     private Boolean isCorrect;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
+    @JoinColumn(name = "question_detail_id")
     @JsonIgnore
-    Question question;
+    QuestionDetail questionDetail;
 
     @Override
     public String toString() {
