@@ -71,6 +71,10 @@ public class GoogleDriveRepository {
 				return null;
 			}
 			if (null != file) {
+				// Tạo hai thư mục con
+	            String subFolderLessonId = findOrCreateFolder(folderId, "Bài Học", driveQuickstart.getInstance());
+	            String subFolderResourceId = findOrCreateFolder(folderId, "Tài Nguyên", driveQuickstart.getInstance());
+	            
 				File fileMetadata = new File();
 				fileMetadata.setParents(Collections.singletonList(folderId));
 				fileMetadata.setName(file.getOriginalFilename());
