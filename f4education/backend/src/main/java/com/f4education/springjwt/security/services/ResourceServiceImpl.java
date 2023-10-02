@@ -1,7 +1,5 @@
 package com.f4education.springjwt.security.services;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -94,14 +92,14 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	@Override
-	public void uploadFile(MultipartFile file, String folderName) {
-		googleDriveRepository.uploadFile(file, folderName);
+	public void uploadFile(MultipartFile file, String folderName, String type) {
+		googleDriveRepository.uploadFile(file, folderName, type);
 	}
 
 	@Override
-	public List<GoogleDriveFileDTO> getAllFilesByFolder(String folderId) throws IOException, GeneralSecurityException {
+	public List<GoogleDriveFileDTO> getAllFilesByFolderLesson(String folderId) throws Exception {
 		GoogleDriveRepository googleDriveRepository = new GoogleDriveRepository();
-		List<File> files = googleDriveRepository.getAllFilesInFolder(folderId);
+		List<File> files = googleDriveRepository.getAllFilesInFolderLesson(folderId);
 		List<GoogleDriveFileDTO> googleDriveFileDTOs = new ArrayList<>();
 
 		if (files != null) {
@@ -112,6 +110,29 @@ public class ResourceServiceImpl implements ResourceService {
 					googleDriveFileDTO.setName(f.getName());
 					googleDriveFileDTO.setSize(ConvertByteToMB.getSize(f.getSize()));
 					googleDriveFileDTO.setLink("https://drive.google.com/file/d/" + f.getId() + "/view?usp=sharing");
+					googleDriveFileDTO.setType("lesson");
+					googleDriveFileDTOs.add(googleDriveFileDTO);
+				}
+			}
+		}
+		return googleDriveFileDTOs;
+	}
+	
+	@Override
+	public List<GoogleDriveFileDTO> getAllFilesByFolderResource(String folderId) throws Exception {
+		GoogleDriveRepository googleDriveRepository = new GoogleDriveRepository();
+		List<File> files = googleDriveRepository.getAllFilesInFolderResource(folderId);
+		List<GoogleDriveFileDTO> googleDriveFileDTOs = new ArrayList<>();
+
+		if (files != null) {
+			for (File f : files) {
+				if (f.getSize() != null) {
+					GoogleDriveFileDTO googleDriveFileDTO = new GoogleDriveFileDTO();
+					googleDriveFileDTO.setId(f.getId());
+					googleDriveFileDTO.setName(f.getName());
+					googleDriveFileDTO.setSize(ConvertByteToMB.getSize(f.getSize()));
+					googleDriveFileDTO.setLink("https://drive.google.com/file/d/" + f.getId() + "/view?usp=sharing");
+					googleDriveFileDTO.setType("resource");
 					googleDriveFileDTOs.add(googleDriveFileDTO);
 				}
 			}

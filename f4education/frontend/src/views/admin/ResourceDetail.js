@@ -5,11 +5,15 @@ import {
   CardHeader,
   FormGroup,
   Form,
-  Input,
   Container,
   Row,
   Col,
   Modal,
+  NavItem,
+  NavLink,
+  Nav,
+  TabContent,
+  TabPane,
 } from "reactstrap";
 import ResourceDetailHeader from "components/Headers/ResourceDetailHeader";
 import { useState, useMemo, useEffect } from "react";
@@ -18,6 +22,7 @@ import { Delete as DeleteIcon } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
 import Select from "react-select";
 import { useParams, Link } from "react-router-dom";
+import classnames from "classnames";
 
 // gọi API từ resourceApi
 import resourceApi from "api/resourceApi";
@@ -30,8 +35,12 @@ import classHistoryApi from "api/classHistoryApi";
 
 const Resource = () => {
   const user = JSON.parse(localStorage.getItem("user") | "");
-  const [allFileByFolderId, setAllFileByFolderId] = useState([]);
-  const [showFormClass, setShowFormClass] = useState(false);
+  const [allFileByFolderLessonId, setAllFileByFolderLessonId] = useState([]);
+  const [allFileByFolderResourceId, setAllFileByFolderResourceId] = useState(
+    []
+  );
+  const [showFormResourceLesson, setShowFormResourceLesson] = useState(false);
+  const [showFormResource, setShowFormResource] = useState(false);
   const [update, setUpdate] = useState(true);
   const [courses, setCourses] = useState([]);
   const [selectedCourse, setselectedCourse] = useState({
@@ -40,6 +49,8 @@ const Resource = () => {
   });
   const [options, setOptions] = useState([{ value: "0", label: "" }]);
   const [file, setFile] = useState([]);
+  const [tabs, setTabs] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
 
   // khởi tạo Resource
   const [resource, setResource] = useState({
@@ -83,9 +94,26 @@ const Resource = () => {
     }
   };
 
-  // xóa trắng form
-  const handleResetForm = () => {
-    setShowFormClass((pre) => !pre);
+  // xóa trắng form bài học
+  const handleResetFormResourceLesson = () => {
+    setShowFormResourceLesson((pre) => !pre);
+    setselectedCourse({});
+    setResource({
+      resourcesId: "",
+      link: "",
+      createDate: "",
+      course: {
+        courseId: 0,
+        courseName: "",
+      },
+      adminName: "",
+    });
+    setUpdate(true);
+  };
+
+  // xóa trắng form tài nguyên
+  const handleResetFormResource = () => {
+    setShowFormResource((pre) => !pre);
     setselectedCourse({});
     setResource({
       resourcesId: "",
@@ -131,16 +159,23 @@ const Resource = () => {
   const addResource = async () => {
     const formData = new FormData();
     formData.append("resourceRequest", JSON.stringify(resourceRequest));
-    var files = []; // Mảng chứa các đối tượng file
     // Lặp qua mảng file và thêm từng đối tượng file vào formData
     for (var i = 0; i < file.length; i++) {
       formData.append("file", file[i]);
     }
+    if (tabs === 1) {
+      formData.append("type", "BÀI HỌC");
+    } else if (tabs === 2) {
+      formData.append("type", "TÀI NGUYÊN");
+    }
     console.log([...formData]);
-    console.log({ ...resource });
     try {
       const resp = await resourceApi.createResource(formData);
-      handleResetForm();
+      if (tabs === 1) {
+        handleResetFormResourceLesson();
+      } else if (tabs === 2) {
+        handleResetFormResource();
+      }
     } catch (error) {
       console.log("Thêm thất bại", error);
     }
@@ -156,7 +191,35 @@ const Resource = () => {
   };
 
   // bảng tài nguyên
-  const columnClass = useMemo(
+  const columnResource = useMemo(
+    () => [
+      {
+        accessorKey: "id",
+        header: "ID File",
+        size: 150,
+      },
+      {
+        accessorKey: "name",
+        header: "Tên File",
+        size: 150,
+      },
+      {
+        accessorFn: (row) => row.link,
+        Cell: ({ cell }) => renderCellWithLink(cell.row.original),
+        header: "Link",
+        size: 120,
+      },
+      {
+        accessorKey: "size",
+        header: "Size",
+        size: 80,
+      },
+    ],
+    []
+  );
+
+  // bảng bài học
+  const columnLesson = useMemo(
     () => [
       {
         accessorKey: "id",
@@ -186,12 +249,22 @@ const Resource = () => {
   // lấy dữ liệu GoogleDriveAllFile theo folderId từ database (gọi api)
   const getAllFileByFolderId = async (folderId) => {
     try {
+      setIsLoading(true); // Bắt đầu quá trình tải dữ liệu
       const resp = await resourceApi.getAllFileByFolderId(folderId);
-      setAllFileByFolderId(resp);
-      console.log("resp" + resp);
+      const lessonFiles = resp.filter((file) => file.type === "lesson");
+      const resourceFiles = resp.filter((file) => file.type === "resource");
+      setAllFileByFolderLessonId(lessonFiles);
+      setAllFileByFolderResourceId(resourceFiles);
+      setIsLoading(false); // Hoàn thành quá trình tải dữ liệu
     } catch (error) {
       console.log(error);
+      setIsLoading(false); // Hoàn thành quá trình tải dữ liệu với lỗi
     }
+  };
+
+  const toggleNavs = (e, index) => {
+    e.preventDefault();
+    setTabs(index);
   };
 
   useEffect(() => {
@@ -235,59 +308,156 @@ const Resource = () => {
             </h3>
           </CardHeader>
 
+          <div className="nav-wrapper px-4 pb-0 mt-2">
+            <Nav
+              className="nav-fill flex-column flex-md-row"
+              id="tabs-icons-text"
+              pills
+              role="tablist"
+            >
+              <NavItem>
+                <NavLink
+                  aria-selected={tabs === 1}
+                  className={classnames("mb-sm-3 mb-md-0", {
+                    active: tabs === 1,
+                  })}
+                  onClick={(e) => toggleNavs(e, 1)}
+                  href="#pablo"
+                  role="tab"
+                >
+                  <i className="ni ni-cloud-upload-96 mr-2" />
+                  Bài học
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink
+                  aria-selected={tabs === 2}
+                  className={classnames("mb-sm-3 mb-md-0", {
+                    active: tabs === 2,
+                  })}
+                  onClick={(e) => toggleNavs(e, 2)}
+                  href="#pablo"
+                  role="tab"
+                >
+                  <i className="ni ni-bell-55 mr-2" />
+                  Tài nguyên
+                </NavLink>
+              </NavItem>
+            </Nav>
+          </div>
+
           {/* bảng tài nguyên chi tiết */}
           <CardBody>
-            <MaterialReactTable
-              displayColumnDefOptions={{
-                "mrt-row-actions": {
-                  header: "Xóa",
-                  size: 80,
-                },
-              }}
-              enableColumnResizing
-              enableGrouping
-              enableStickyHeader
-              enableStickyFooter
-              enableRowNumbers
-              columns={columnClass}
-              data={allFileByFolderId}
-              initialState={{ columnVisibility: { id: false } }}
-              positionActionsColumn="last"
-              renderTopToolbarCustomActions={() => (
-                <Button
-                  onClick={() => setShowFormClass((pre) => !pre)}
-                  color="success"
-                >
-                  Thêm tài nguyên
-                </Button>
-              )}
-              enableRowActions
-              renderRowActions={({ row, table }) => (
-                <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-                  <IconButton
-                    color="secondary"
-                    onClick={() => {
-                      handleDeleteRow(row);
+            <TabContent activeTab={"tabs" + tabs}>
+              <TabPane tabId="tabs1">
+                <p className="description">
+                  <MaterialReactTable
+                    displayColumnDefOptions={{
+                      "mrt-row-actions": {
+                        header: "Xóa",
+                        size: 80,
+                      },
                     }}
-                  >
-                    <DeleteIcon />
-                  </IconButton>
-                </Box>
-              )}
-              muiTablePaginationProps={{
-                rowsPerPageOptions: [10, 20, 50, 100],
-                showFirstButton: false,
-                showLastButton: false,
-              }}
-            />
+                    enableColumnResizing
+                    enableGrouping
+                    enableStickyHeader
+                    enableStickyFooter
+                    enableRowNumbers
+                    columns={columnLesson}
+                    data={allFileByFolderLessonId}
+                    state={{ isLoading: isLoading }}
+                    initialState={{ columnVisibility: { id: false } }}
+                    positionActionsColumn="last"
+                    renderTopToolbarCustomActions={() => (
+                      <Button
+                        onClick={() => setShowFormResourceLesson((pre) => !pre)}
+                        color="success"
+                      >
+                        Thêm bài học
+                      </Button>
+                    )}
+                    enableRowActions
+                    renderRowActions={({ row, table }) => (
+                      <Box
+                        sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}
+                      >
+                        <IconButton
+                          color="secondary"
+                          onClick={() => {
+                            handleDeleteRow(row);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    )}
+                    muiTablePaginationProps={{
+                      rowsPerPageOptions: [10, 20, 50, 100],
+                      showFirstButton: false,
+                      showLastButton: false,
+                    }}
+                  />
+                </p>
+              </TabPane>
+              <TabPane tabId="tabs2">
+                <p className="description">
+                  <MaterialReactTable
+                    displayColumnDefOptions={{
+                      "mrt-row-actions": {
+                        header: "Xóa",
+                        size: 80,
+                      },
+                    }}
+                    enableColumnResizing
+                    enableGrouping
+                    enableStickyHeader
+                    enableStickyFooter
+                    enableRowNumbers
+                    columns={columnResource}
+                    data={allFileByFolderResourceId}
+                    state={{ isLoading: isLoading }}
+                    initialState={{ columnVisibility: { id: false } }}
+                    positionActionsColumn="last"
+                    renderTopToolbarCustomActions={() => (
+                      <Button
+                        onClick={() => setShowFormResource((pre) => !pre)}
+                        color="success"
+                      >
+                        Thêm tài nguyên
+                      </Button>
+                    )}
+                    enableRowActions
+                    renderRowActions={({ row, table }) => (
+                      <Box
+                        sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}
+                      >
+                        <IconButton
+                          color="secondary"
+                          onClick={() => {
+                            handleDeleteRow(row);
+                          }}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
+                    )}
+                    muiTablePaginationProps={{
+                      rowsPerPageOptions: [10, 20, 50, 100],
+                      showFirstButton: false,
+                      showLastButton: false,
+                    }}
+                  />
+                </p>
+              </TabPane>
+            </TabContent>
           </CardBody>
         </Card>
-        {/* Modal Resource */}
+        {/* Modal Lesson */}
         <Modal
           backdrop="static"
           className="modal-dialog-centered"
-          isOpen={showFormClass}
-          toggle={() => setShowFormClass((pre) => !pre)}
+          isOpen={showFormResourceLesson}
+          toggle={() => setShowFormResourceLesson((pre) => !pre)}
         >
           <div className="modal-header">
             <h3 className="mb-0">Thông tin tài nguyên</h3>
@@ -296,7 +466,7 @@ const Resource = () => {
               className="close"
               data-dismiss="modal"
               type="button"
-              onClick={handleResetForm}
+              onClick={handleResetFormResourceLesson}
             >
               <span aria-hidden={true}>×</span>
             </button>
@@ -354,7 +524,7 @@ const Resource = () => {
               color="secondary"
               data-dismiss="modal"
               type="button"
-              onClick={handleResetForm}
+              onClick={handleResetFormResourceLesson}
             >
               Đóng
             </Button>
@@ -363,7 +533,92 @@ const Resource = () => {
               type="button"
               onClick={update ? addResource : ""}
             >
-              {update ? "Lưu" : "Cập nhật"}
+              {update ? "Lưu" : ""}
+            </Button>
+          </div>
+        </Modal>
+        {/* Modal Resource */}
+        <Modal
+          backdrop="static"
+          className="modal-dialog-centered"
+          isOpen={showFormResource}
+          toggle={() => setShowFormResource((pre) => !pre)}
+        >
+          <div className="modal-header">
+            <h3 className="mb-0">Thông tin tài nguyên</h3>
+            <button
+              aria-label="Close"
+              className="close"
+              data-dismiss="modal"
+              type="button"
+              onClick={handleResetFormResource}
+            >
+              <span aria-hidden={true}>×</span>
+            </button>
+          </div>
+          <div className="modal-body">
+            <Form>
+              <div className="px-lg-2">
+                <FormGroup>
+                  <label className="form-control-label">Tên khóa học</label>
+                  <Select
+                    placeholder="Chọn khóa học"
+                    options={options}
+                    value={selectedCourse}
+                    onChange={handleSelect}
+                  />
+                </FormGroup>
+                <Row>
+                  {update ? (
+                    ""
+                  ) : (
+                    <Col md={12}>
+                      <FormGroup>
+                        <label className="form-control-label">Link</label>
+                        <br />
+                        <label className="form-control-label">
+                          <a href={resource.link}>{resource.link}</a>
+                        </label>
+                      </FormGroup>
+                    </Col>
+                  )}
+                  <Col md={12}>
+                    <FormGroup>
+                      <label
+                        className="form-control-label"
+                        htmlFor="customFile"
+                      >
+                        Chọn File
+                      </label>
+                      <br />
+                      <input
+                        type="file"
+                        multiple
+                        id="customFile"
+                        className="form-control-alternative"
+                        onChange={onChangeFile}
+                      />
+                    </FormGroup>
+                  </Col>
+                </Row>
+              </div>
+            </Form>
+          </div>
+          <div className="modal-footer">
+            <Button
+              color="secondary"
+              data-dismiss="modal"
+              type="button"
+              onClick={handleResetFormResource}
+            >
+              Đóng
+            </Button>
+            <Button
+              color="primary"
+              type="button"
+              onClick={update ? addResource : ""}
+            >
+              {update ? "Lưu" : ""}
             </Button>
           </div>
         </Modal>

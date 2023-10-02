@@ -10,6 +10,7 @@ import {
   Row,
   Col,
   Modal,
+  ButtonGroup,
 } from "reactstrap";
 import ResourcesHeader from "components/Headers/ResourcesHeader";
 import { useState, useMemo, useEffect } from "react";
@@ -46,6 +47,7 @@ const Resource = () => {
   });
   const [options, setOptions] = useState([{ value: "0", label: "" }]);
   const [file, setFile] = useState([null]);
+  const [rSelected, setRSelected] = useState(null);
 
   // khởi tạo Resource
   const [resource, setResource] = useState({
@@ -182,8 +184,12 @@ const Resource = () => {
     for (var i = 0; i < file.length; i++) {
       formData.append("file", file[i]);
     }
+    if (rSelected === 1) {
+      formData.append("type", "BÀI HỌC");
+    } else if (rSelected === 2) {
+      formData.append("type", "TÀI NGUYÊN");
+    }
     console.log([...formData]);
-    console.log({ ...resource });
     try {
       const resp = await resourceApi.createResource(formData);
       handleResetForm();
@@ -501,6 +507,32 @@ const Resource = () => {
                       </FormGroup>
                     </Col>
                   )}
+                  <Col md={12}>
+                    <FormGroup>
+                      <label className="form-control-label">
+                        Loại tài nguyên
+                      </label>
+                      <br />
+                      <ButtonGroup>
+                        <Button
+                          color="primary"
+                          outline
+                          onClick={() => setRSelected(1)}
+                          active={rSelected === 1}
+                        >
+                          Bài học
+                        </Button>
+                        <Button
+                          color="primary"
+                          outline
+                          onClick={() => setRSelected(2)}
+                          active={rSelected === 2}
+                        >
+                         Tài nguyên
+                        </Button>
+                      </ButtonGroup>
+                    </FormGroup>
+                  </Col>
                   <Col md={12}>
                     <FormGroup>
                       <label
