@@ -1,25 +1,41 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import {Link} from 'react-router-dom';
-// reactstrap components
+import {Modal} from '@mantine/core';
+import {useDisclosure} from '@mantine/hooks';
+import userApi from 'api/userApi';
+import {Link, useNavigate} from 'react-router-dom';
+import {Button, Text} from '@mantine/core';
+import {modals} from '@mantine/modals';
 import {DropdownMenu, DropdownItem, UncontrolledDropdown, DropdownToggle, Form, FormGroup, InputGroupAddon, InputGroupText, Input, InputGroup, Navbar, Nav, Container, Media} from 'reactstrap';
 
 const AdminNavbar = (props) => {
+	const [opened, {open, close}] = useDisclosure(false);
+	const navigate = useNavigate();
+	console.log('🚀 ~ file: AdminNavbar.js:23 ~ AdminNavbar ~ props.adminName:', props.adminName);
+	const handleLogout = async () => {
+		const user = JSON.parse(localStorage.getItem('user'));
+		console.log('🚀 ~ file: AdminNavbar.js:10 ~ handleLogout ~ user:', user.id);
+
+		try {
+			const resp = await userApi.signout(user.id);
+			console.log('🚀 ~ file: AdminNavbar.js:11 ~ handleLogout ~ resp:', resp);
+			if (resp.status === 200) {
+				localStorage.removeItem('user');
+				navigate('/');
+			}
+		} catch (error) {
+			console.log('🚀 ~ file: AdminNavbar.js:17 ~ handleLogout ~ error:', error);
+		}
+	};
+	const openModal = () =>
+		modals.openConfirmModal({
+			title: 'Xác nhận đăng xuất ',
+			centered: true,
+			children: <Text size='sm'>Bạn có chắc chắc muốn đăng xuất ? </Text>,
+			labels: {confirm: 'Có, Đăng xuất ngay', cancel: 'Không, Trở lại'},
+			confirmProps: {color: 'red'},
+			onCancel: () => console.log('Cancel'),
+			onConfirm: () => handleLogout(),
+		});
+
 	return (
 		<>
 			<Navbar
@@ -69,48 +85,44 @@ const AdminNavbar = (props) => {
 							<DropdownMenu
 								className='dropdown-menu-arrow'
 								right>
-								<DropdownItem
+								{/* <DropdownItem
 									className='noti-title'
 									header
 									tag='div'>
 									<h6 className='text-overflow m-0'>Welcome!</h6>
-								</DropdownItem>
+								</DropdownItem> */}
 								<DropdownItem
 									to='/admin/user-profile'
 									tag={Link}>
 									<i className='ni ni-single-02' />
-									<span>My profile</span>
+									<span>Tài khoản</span>
 								</DropdownItem>
 								<DropdownItem
 									to='/admin/user-profile'
 									tag={Link}>
 									<i className='ni ni-settings-gear-65' />
-									<span>Settings</span>
+									<span>Đổi mật khẩu</span>
 								</DropdownItem>
-								<DropdownItem
-									to='/admin/user-profile'
-									tag={Link}>
-									<i className='ni ni-calendar-grid-58' />
-									<span>Activity</span>
-								</DropdownItem>
-								<DropdownItem
-									to='/admin/user-profile'
-									tag={Link}>
-									<i className='ni ni-support-16' />
-									<span>Support</span>
-								</DropdownItem>
+
 								<DropdownItem divider />
 								<DropdownItem
 									href='#pablo'
-									onClick={(e) => e.preventDefault()}>
-									<i className='ni ni-user-run' />
-									<span>Logout</span>
+									onClick={openModal}>
+									<i className='ni ni-user-run text-danger' />
+									<span>Đăng xuất</span>
 								</DropdownItem>
 							</DropdownMenu>
 						</UncontrolledDropdown>
 					</Nav>
 				</Container>
 			</Navbar>
+			<Modal
+				opened={opened}
+				onClose={close}
+				title='Authentication'
+				centered>
+				{/* Modal content */}
+			</Modal>
 		</>
 	);
 };

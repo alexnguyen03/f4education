@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.security.services.UserDetailsImpl;
 
 import io.jsonwebtoken.ExpiredJwtException;
@@ -27,14 +28,16 @@ public class JwtUtils {
   private String jwtSecret;
 
   @Value("${f4education.app.jwtExpirationMs}")
-  private int jwtExpirationMs ;
+  private int jwtExpirationMs;
 
-  public String generateJwtToken(Authentication authentication) {
+  // public String generateJwtToken(Authentication authentication) {
+  public String generateJwtToken(User user) {
 
-    UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+    // UserDetailsImpl userPrincipal = (UserDetailsImpl)
+    // authentication.getPrincipal();
 
     return Jwts.builder()
-        .setSubject((userPrincipal.getUsername()))
+        .setSubject((user.getUsername()))
         .setIssuedAt(new Date())
         .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
         .signWith(key(), SignatureAlgorithm.HS256)
@@ -67,30 +70,16 @@ public class JwtUtils {
     return false;
   }
 
-  // private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+  public String generateJwtToken(UserDetailsImpl userPrincipal) {
+    return generateTokenFromUsername(userPrincipal.getUsername());
+  }
 
-  // byte[] keyBytes = Keys.secretKeyFor(SignatureAlgorithm.HS512).getEncoded();
-  // @Value("${f4education.app.jwtSecret}")
-  // private String jwtSecret;
-
-  // @Value("${f4education.app.jwtExpirationMs}")
-  // private int jwtExpirationMs;
-
-  // public String generateJwtToken(UserDetailsImpl userPrincipal) {
-  // return generateTokenFromUsername(userPrincipal.getUsername());
-  // }
-
-  // public String generateTokenFromUsername(String username) {
-  // return Jwts.builder()
-  // .setSubject("example")
-  // .signWith(SignatureAlgorithm.HS512, keyBytes)
-  // .compact();
-  // }
-
-  // public String getUserNameFromJwtToken(String token) {
-  // return
-  // Jwts.parser().setSigningKey(jwtSecret).parseClaimsJws(token).getBody().getSubject();
-  // }
+  public String generateTokenFromUsername(String username) {
+    return Jwts.builder().setSubject(username).setIssuedAt(new Date())
+        .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs)).signWith(Keys.secretKeyFor(
+            SignatureAlgorithm.HS512))
+        .compact();
+  }
 
   // public boolean validateJwtToken(String authToken) {
   // try {
