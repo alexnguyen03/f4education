@@ -26,7 +26,7 @@ public class CourseRequest {
 	private Float coursePrice;
 
 	@JsonProperty("courseDuration")
-	private String courseDuration;
+	private Integer courseDuration;
 
 	@JsonProperty("courseDescription")
 	private String courseDescription;

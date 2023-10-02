@@ -2,6 +2,8 @@ package com.f4education.springjwt.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -18,8 +20,11 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
 
 import com.f4education.springjwt.ultils.XFile;
@@ -52,8 +57,7 @@ public class CoursesController {
 		// String newFile = "";
 		CourseRequest courseRequest = new CourseRequest();
 		try {
-			courseRequest = mapper.readValue(courseRequestString,
-					CourseRequest.class);
+			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
 				File savedFile = xfileService.save(file, "/courses");
 				courseRequest.setImage(savedFile.getName());
@@ -73,8 +77,7 @@ public class CoursesController {
 		ObjectMapper mapper = new ObjectMapper();
 		CourseRequest courseRequest = new CourseRequest();
 		try {
-			courseRequest = mapper.readValue(courseRequestString,
-					CourseRequest.class);
+			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
 				File savedFile = xfileService.save(file, "/courses");
 				courseRequest.setImage(savedFile.getName());
@@ -92,5 +95,16 @@ public class CoursesController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public List<CourseDTO> findAllByAdminId(@PathVariable("adminId") String adminId) {
 		return courseService.findAllByAdminId(adminId);
+	}
+
+	@GetMapping("/topic/{checkedSubjects}")
+	public List<CourseDTO> findCoursesByCheckedSubjects(@PathVariable("checkedSubjects") List<String> checkedSubjects) {
+		System.out.println(checkedSubjects);
+		return courseService.findBySubjectNames(checkedSubjects);
+	}
+	
+	@GetMapping("/duration/{checkedDurations}")
+	public List<CourseDTO> findCoursesByCheckedDurations(@PathVariable("checkedDurations") List<String> checkedDurations) {
+		return courseService.findByThoiLuongInRange(checkedDurations);
 	}
 }

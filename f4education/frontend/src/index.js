@@ -46,6 +46,10 @@ root.render(
 						element={<ClientLayout />}
 					/>
 					<Route
+						path='/course/course-detail-client/:courseId'
+						element={<ClientLayout />}
+					/>
+					<Route
 						path='/admin/*/:courseName'
 						element={<AdminLayout />}
 					/>
