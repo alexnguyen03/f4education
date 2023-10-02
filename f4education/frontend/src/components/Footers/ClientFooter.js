@@ -61,7 +61,7 @@ const ClientFooter = () => {
                   </span>
                 </p>
               </div>
-              <div className="d-flex justify-content-start ">
+              <div className="d-flex justify-content-start mt-2">
                 <Link to={"/"} className="navbar-brand font-weight-700">
                   <img
                     src={logo}
@@ -118,6 +118,49 @@ const ClientFooter = () => {
                     className="text-decoration-none text-dark font-weight-700"
                   >
                     linkedIn
+                  </a>
+                </li>
+              </ul>
+            </div>
+            <div className="d-flex flex-column mx-5">
+              <div className="flex flex-column font-weight-700 mb-3">
+                <span
+                  className="text-dark font-weight-700"
+                  style={{ fontSize: "25px" }}
+                >
+                  Tổng quan
+                </span>
+                <br />
+                <span
+                  className="text-dark font-weight-700 text-line-end"
+                  style={{ fontSize: "25px" }}
+                >
+                  trang web
+                </span>
+              </div>
+              <ul className="list-unstyled">
+                <li>
+                  <a
+                    href="/"
+                    className="text-decoration-none text-dark font-weight-700"
+                  >
+                    Trang chủ
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/course"
+                    className="text-decoration-none text-dark font-weight-700"
+                  >
+                    Khóa học
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/#"
+                    className="text-decoration-none text-dark font-weight-700"
+                  >
+                    Liên hệ
                   </a>
                 </li>
               </ul>

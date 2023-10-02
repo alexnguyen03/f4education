@@ -9,6 +9,8 @@ import java.util.List;
 public interface CoursesService {
 	List<CourseDTO> findAllCourseDTO();
 
+	List<CourseDTO> findNewestCourse();
+
 	Course findById(Integer id);
 
 	CourseDTO saveCourse(CourseRequest courseRequest);

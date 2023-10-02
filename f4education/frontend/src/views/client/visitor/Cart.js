@@ -1,12 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Button, Card, CardBody, Col, Row } from "reactstrap";
-import { Breadcrumbs, Anchor, Text, Loader } from "@mantine/core";
+import { Button, Col, Row } from "reactstrap";
+import {
+  Breadcrumbs,
+  Anchor,
+  Text,
+  Loader,
+  Image,
+  Card,
+  Box,
+  Flex,
+  Group,
+  Rating,
+  Skeleton,
+} from "@mantine/core";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
-// import notifications from "@mantine/notifications";
+import { Carousel } from "@mantine/carousel";
 
 // API
 import cartApi from "../../../api/cartApi";
+import courseApi from "../../../api/courseApi";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
@@ -46,9 +59,11 @@ const itemsBreadcum = [
 // ];
 
 // zalopay vnpay
+
 function Cart() {
   // *************** Main Variable
   const [carts, setCarts] = useState([]);
+  const [newestCourse, setNewestCourse] = useState([]);
 
   // *************** Action Variable
   const [loading, setLoading] = useState(false);
@@ -62,6 +77,17 @@ function Cart() {
       setLoading(true);
       const resp = await cartApi.getAllCart();
       setCarts(resp);
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchNewsetCourse = async () => {
+    try {
+      setLoading(true);
+      const resp = await courseApi.getNewestCourse();
+      setNewestCourse(resp.reverse());
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -97,12 +123,91 @@ function Cart() {
   // *************** Use Effect AREA
   useEffect(() => {
     fetchCart();
+    fetchNewsetCourse();
   }, []);
 
-  // Checkout -> save data to localStorage(List cartID, billResDTO Data) -> create_payment (VNPAY) -> payment...
-  // save data to localStorage (listCartID)
-  // After payment -> redirect prev page -> check responseCode
-  // If response code === 00 ? update cart , add bill : dont do anything stupid
+  const images = [
+    {
+      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
+      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
+      price: "139.349",
+      rating: "4.7",
+      review: "368",
+    },
+    {
+      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
+      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
+      price: "139.349",
+      rating: "4.7",
+      review: "368",
+    },
+    {
+      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
+      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
+      price: "139.349",
+      rating: "4.7",
+      review: "368",
+    },
+    {
+      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
+      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
+      price: "139.349",
+      rating: "4.7",
+      review: "368",
+    },
+    {
+      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
+      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
+      price: "139.349",
+      rating: "4.7",
+      review: "368",
+    },
+  ];
+
+  const slides = newestCourse.map((course) => (
+    <Carousel.Slide key={course.courseId}>
+      <Card>
+        <Card.Section component="a" href={`/course/${course.courseId}`}>
+          <Image
+            src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+            fit="cover"
+            width={"100%"}
+            height={200}
+            radius="sm"
+            alt={`${course.courseName}`}
+            withPlaceholder
+          />
+        </Card.Section>
+        <Box>
+          <Text
+            fw={500}
+            lineClamp={2}
+            component="a"
+            href={`/course/${course.courseId}`}
+          >
+            {course.courseName}
+          </Text>
+          <Box>
+            <Flex justify="flex-start" gap="md">
+              <Text>3.6</Text>
+              <Group position="center">
+                <Rating value={3.56} fractions={2} readOnly />
+              </Group>
+              <Text c="dimmed">(389.208)</Text>
+            </Flex>
+          </Box>
+          <Box>
+            <Text fw={500}>
+              {course.coursePrice.toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })}
+            </Text>
+          </Box>
+        </Box>
+      </Card>
+    </Carousel.Slide>
+  ));
 
   return (
     <>
@@ -112,7 +217,7 @@ function Cart() {
       </Breadcrumbs>
 
       {/* Title */}
-      <h1 className="font-weight-800 text-dark my-3 display-2">Giỏ hàng</h1>
+      <h1 className="font-weight-700 text-dark my-5 display-2">Giỏ hàng</h1>
 
       {/* Loading */}
       {loading ? (
@@ -124,7 +229,7 @@ function Cart() {
           {carts.length === 0 ? (
             <>
               <Card className="w-100 shadow-lg">
-                <CardBody className="text-center">
+                <Card.Section className="text-center">
                   <img
                     src={cartEmptyimage}
                     width="40%"
@@ -145,13 +250,13 @@ function Cart() {
                       Tìm Khóa học
                     </Button>
                   </Link>
-                </CardBody>
+                </Card.Section>
               </Card>
             </>
           ) : (
             <>
               <Row>
-                <Col xl="8" lg="8" md="7" sm="12">
+                <Col xl="9" lg="9" md="12" sm="12">
                   <h3 className="font-weight-600 text-dark">
                     {carts.length} khóa học trong giỏ hàng
                   </h3>
@@ -165,8 +270,8 @@ function Cart() {
                             to={`/course/${cart.course.courseId}`}
                             key={index}
                           >
-                            <Row>
-                              <Col lg="3" xl="3" md="4" sm="4">
+                            <div className="d-flex justify-content-between flex-wrap">
+                              <div>
                                 <img
                                   src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
                                   // src={cart.course.courseImage}
@@ -175,12 +280,11 @@ function Cart() {
                                   style={{
                                     maxHeight: "100px",
                                     width: "100%",
-                                    objectFit: "contain",
+                                    objectFit: "cover",
                                   }}
-                                  // style={{ borderRadius: "3px" }}
                                 />
-                              </Col>
-                              <Col lg="5" xl="5" md="8" sm="8">
+                              </div>
+                              <div>
                                 <p className="font-weight-700 text-dark m-0 p-0">
                                   {cart.course.courseName}
                                 </p>
@@ -213,14 +317,8 @@ function Cart() {
                                   <span className="mx-2">-</span>
                                   <span className="text-muted">All Levels</span>
                                 </div>
-                              </Col>
-                              <Col
-                                lg="2"
-                                xl="2"
-                                md="6"
-                                sm="6"
-                                className="mt-md-2 mt-sm-2"
-                              >
+                              </div>
+                              <div>
                                 <Link
                                   to={`/cart/${cart.cartId}`}
                                   className="text-danger font-weight-700"
@@ -230,14 +328,8 @@ function Cart() {
                                 >
                                   Remove
                                 </Link>
-                              </Col>
-                              <Col
-                                lg="2"
-                                xl="2"
-                                md="6"
-                                sm="6"
-                                className="mt-md-2 mt-sm-2"
-                              >
+                              </div>
+                              <div className="ml-sm-0 ml-auto">
                                 <span className="text-primary font-weight-700">
                                   {cart.course.coursePrice.toLocaleString(
                                     "it-IT",
@@ -247,8 +339,8 @@ function Cart() {
                                     }
                                   )}
                                 </span>
-                              </Col>
-                            </Row>
+                              </div>
+                            </div>
                             <hr className="text-muted" />
                           </Link>
                         </>
@@ -256,8 +348,14 @@ function Cart() {
                     </Col>
                   </Row>
                 </Col>
-                <Col xl="4" lg="4" md="5" sm="12" className="mt-2">
-                  <span className="font-weight-600">
+                <Col
+                  xl="3"
+                  lg="3"
+                  md="12"
+                  sm="12"
+                  className="mt-2 cart-summery-floating-bottom w-100"
+                >
+                  <span className="font-weight-600 text-muted">
                     Tổng thanh toán:
                     <br />
                     <h1 className="font-weight-700">
@@ -267,81 +365,6 @@ function Cart() {
                       })}
                     </h1>
                   </span>
-                  {/* <h4 className="text-muted">
-                    Vui lòng chọn hình thức thanh toán:
-                  </h4> */}
-                  {/* <div className="d-flex justify-content-between">
-                    {checkOutMethod === "paypal" ? (
-                      <>
-                        <Button
-                          color="secondary"
-                          outline
-                          active
-                          className="shadow-lg"
-                          onClick={() => setCheckOutMethod("")}
-                        >
-                          <img
-                            src={logoPayPal}
-                            width="200px"
-                            height="50px"
-                            className="img-fluid"
-                            alt="logo paypal"
-                          />
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          color="secondary"
-                          outline
-                          onClick={() => setCheckOutMethod("paypal")}
-                        >
-                          <img
-                            src={logoPayPal}
-                            width="200px"
-                            height="50px"
-                            className="img-fluid"
-                            alt="logo paypal"
-                          />
-                        </Button>
-                      </>
-                    )}
-                    {checkOutMethod === "vnpay" ? (
-                      <>
-                        <Button
-                          color="secondary"
-                          outline
-                          active
-                          className="shadow-lg"
-                          onClick={() => setCheckOutMethod("")}
-                        >
-                          <img
-                            src={logoVnPay}
-                            width="200px"
-                            height="50px"
-                            className="img-fluid"
-                            alt="logo vnpay"
-                          />
-                        </Button>
-                      </>
-                    ) : (
-                      <>
-                        <Button
-                          color="secondary"
-                          outline
-                          onClick={() => setCheckOutMethod("vnpay")}
-                        >
-                          <img
-                            src={logoVnPay}
-                            width="200px"
-                            height="50px"
-                            className="img-fluid"
-                            alt="logo vnpay"
-                          />
-                        </Button>
-                      </>
-                    )} */}
-                  {/* </div> */}
                   <Link to={"/payment/checkout"}>
                     <Button
                       color="primary"
@@ -358,6 +381,29 @@ function Cart() {
           )}
         </>
       )}
+
+      <h3 className="font-weight-700 text-dark my-5 display-3">
+        Những khóa học mới nhất
+      </h3>
+
+      <Carousel
+        slideSize="25%"
+        height="300px"
+        slideGap="lg"
+        controlsOffset="xs"
+        align="start"
+        loop
+        dragFree
+        slidesToScroll={2}
+        styles={{
+          control: {
+            background: "#212121",
+            color: "#fff",
+          },
+        }}
+      >
+        {slides}
+      </Carousel>
     </>
   );
 }

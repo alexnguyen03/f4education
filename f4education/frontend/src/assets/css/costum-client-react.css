@@ -160,15 +160,15 @@
 
 .header-cart {
     position: absolute;
-    top: -40%;
-    right: -65%;
+    top: -25%;
+    right: -25%;
     border-radius: 50%;
     color: #fff;
     background-color: #333;
 }
 
 /* Footer */
-.text-line-end {
+/* .text-line-end {
     position: relative;
 }
 
@@ -180,7 +180,7 @@
     width: 40px;
     height: 4px;
     background: #000;
-}
+} */
 
 /* Payment - checkout */
 .checkout-summery {
@@ -204,6 +204,19 @@
         right: 0;
         z-index: 999;
         padding: 20px;
+        background: #fff;
+        box-shadow: rgba(99, 99, 99, 0.2) 8px 8px 8px 8px;
+        transition: var(--smoothTransition);
+    }
+
+    .cart-summery-floating-bottom {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 999;
+        padding: 20px;
+        width: 100%;
         background: #fff;
         box-shadow: rgba(99, 99, 99, 0.2) 8px 8px 8px 8px;
         transition: var(--smoothTransition);

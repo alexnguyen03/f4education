@@ -1,19 +1,32 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Badge, Button, Col, Row } from "reactstrap";
+import { Badge, Col, Row } from "reactstrap";
 import logo from "../../assets/img/brand/f4.png";
 import cartEmptyimage from "../../assets/img/cart-empty.png";
 // reactstrap components
 
 // API
 import cartApi from "../../api/cartApi";
+import { Autocomplete, Avatar, Burger, Button, Menu, rem } from "@mantine/core";
+import {
+  IconLayoutDashboard,
+  IconLogout,
+  IconLogout2,
+  IconSchoolBell,
+  IconSearch,
+  IconUserBolt,
+} from "@tabler/icons-react";
+import { useDisclosure, useElementSize } from "@mantine/hooks";
+
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const ClientNavbar = () => {
+  const ref = useElementSize();
   const [login, setLogin] = useState(false);
   const [cartEmpty, setCartEmpty] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [activeItems, setActiveItems] = useState([true, false, false]);
+  const [opened, { toggle }] = useDisclosure(false);
 
   // *************** CART VARIABLE - AREA START
   const [carts, setCarts] = useState([]);
@@ -39,17 +52,17 @@ const ClientNavbar = () => {
     fetchCart();
   }, []);
 
+  
   // *************** CART VARIABLE - AREA END
-
   const handleItemClick = (index) => {
     const newActiveItems = [...activeItems];
-    newActiveItems[index] = true; // toggle clicked item to active
+    newActiveItems[index] = true;
     for (let i = 0; i < newActiveItems.length; i++) {
       if (i !== index) {
-        newActiveItems[i] = false; // remove active class from other items
+        newActiveItems[i] = false;
       }
     }
-    setActiveItems(newActiveItems); // update state
+    setActiveItems(newActiveItems);
   };
 
   const handleLogin = (prev) => {
@@ -88,15 +101,16 @@ const ClientNavbar = () => {
           aria-controls="navbarSupportedContent"
           aria-expanded="false"
           aria-label="Toggle navigation"
+          style={{ zIndex: "99999" }}
         >
-          <i className="bx bx-menu-alt-right"></i>
+          <Burger opened={opened} onClick={toggle} />
         </button>
         <div
           className="collapse navbar-collapse text-dark font-weight-600"
           id="navbarSupportedContent"
         >
           <ul
-            className="navbar-nav mx-auto text-center d-md-flex d-sm-flex
+            className="navbar-nav mr-auto text-center d-md-flex d-sm-flex
                         justify-content-md-center justify-content-sm-center"
           >
             <li className="nav-item">
@@ -144,23 +158,31 @@ const ClientNavbar = () => {
             className="d-flex justify-content-between
               justify-content-md-center justify-content-sm-center text-center text-dark"
           >
+            <Autocomplete
+              placeholder="Tìm khóa học.."
+              className="mt-1"
+              ref={ref}
+              style={{ width: rem(300) }}
+              icon={<IconSearch />}
+              data={["NextJS", "ReactJS", "PHP, Laravel", "Spring boot"]}
+            />
             {login ? (
               <>
-                <span className="mt-2">
-                  <i
-                    className="bx bx-search bx-rotate-90 font-weight-500"
-                    style={{ fontSize: "25px" }}
-                  ></i>
-                </span>
                 <Link to="/cart" className="cart mx-4 mt-2">
                   <i
                     className="bx bx-cart font-weight-500 text-dark"
                     style={{
-                      fontSize: "25px",
+                      fontSize: "32px",
                     }}
                   ></i>
-                  <Badge color="rgba(0, 0, 0, 1)" className="header-cart">
-                    1
+                  {/* <ActionIcon variant="transparent">
+                    <IconShoppingCart size="2rem" />
+                  </ActionIcon> */}
+                  <Badge
+                    color="rgba(0, 0, 0, 1)"
+                    className="header-cart font-weight-700"
+                  >
+                    {carts.length}
                   </Badge>
                   <div className="cart-detail">
                     {carts.length === 0 ? (
@@ -205,7 +227,7 @@ const ClientNavbar = () => {
                                       sm="8"
                                       className="d-flex flex-wrap flex-column text-left"
                                     >
-                                      <span className="font-weight-900 text-dark align-items-start">
+                                      <span className="font-weight-700 text-dark align-items-start">
                                         {cart.course.courseName}
                                       </span>
                                       <span className="text-muted">
@@ -257,27 +279,75 @@ const ClientNavbar = () => {
                     )}
                   </div>
                 </Link>
-                <span className="mt-2">
-                  <i
-                    className="bx bx-user font-weight-500"
-                    style={{ fontSize: "25px" }}
-                  ></i>
-                </span>
+
+                {/* User menu hover */}
+                <Menu
+                  shadow="md"
+                  withArrow
+                  className="mt-1"
+                  width={200}
+                  trigger="hover"
+                  openDelay={100}
+                  closeDelay={400}
+                >
+                  <Menu.Target>
+                    <Avatar
+                      component="a"
+                      href="/"
+                      target="_blank"
+                      src="https://images.unsplash.com/photo-1695754189990-da05b9433ac4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60"
+                      alt="it's me"
+                      radius={50}
+                    />
+                  </Menu.Target>
+
+                  <Menu.Dropdown>
+                    <Menu.Label>DASHBOARD</Menu.Label>
+                    <Menu.Item
+                      icon={<IconLayoutDashboard size={14} />}
+                      component="a"
+                      href="/"
+                      target="_blank"
+                    >
+                      Hệ thống học tập
+                    </Menu.Item>
+                    <Menu.Item
+                      icon={<IconUserBolt size={14} />}
+                      component="a"
+                      href="/"
+                      target="_blank"
+                    >
+                      Tài khoản
+                    </Menu.Item>
+                    <Menu.Item
+                      icon={<IconSchoolBell size={14} />}
+                      component="a"
+                      href="/"
+                      target="_blank"
+                    >
+                      Lịch học
+                    </Menu.Item>
+
+                    <Menu.Divider />
+
+                    <Menu.Label>Hệ thống</Menu.Label>
+                    <Menu.Item color="red" icon={<IconLogout2 size={14} />}>
+                      Đăng xuất
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
               </>
             ) : (
               <>
                 <Button
                   color="dark"
-                  outline
-                  className="font-weight-800"
+                  uppercase
+                  className="mt-1 ml-2 font-weight-700"
                   onClick={() => handleLogin(login)}
                   style={{ borderRadius: "2px" }}
                 >
                   Đăng nhập
                 </Button>
-                {/* <Button color="dark" onClick={() => handleLogin(login)}>
-                Đăng ký
-              </Button> */}
               </>
             )}
           </div>

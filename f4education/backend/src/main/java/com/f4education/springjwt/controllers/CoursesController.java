@@ -3,6 +3,8 @@ package com.f4education.springjwt.controllers;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import com.f4education.springjwt.models.Course;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -42,6 +44,9 @@ public class CoursesController {
 	public List<CourseDTO> getAllCourse() {
 		return courseService.findAllCourseDTO();
 	}
+
+	@GetMapping("/newest-courses")
+	public List<CourseDTO> getTop10NewsetCourse (){return courseService.findNewestCourse();}
 
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
