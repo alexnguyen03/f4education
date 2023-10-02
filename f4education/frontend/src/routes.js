@@ -19,6 +19,7 @@ import Home from 'views/client/visitor/Home';
 import CourseClient from 'views/client/visitor/CourseClient';
 import Cart from 'views/client/visitor/Cart';
 import Checkout from 'views/client/visitor/Checkout';
+import ClassDetail from 'views/admin/ClassDetail';
 
 export var routes = [
 	{
@@ -125,6 +126,14 @@ export var routes = [
 		layout: '/admin',
 	},
 	{
+		path: '/class-detail/:courseName',
+		name: 'Chi tiết lớp học',
+		icon: 'ni ni-key-25 text-info',
+		component: <ClassDetail />,
+		layout: '/admin',
+	},
+
+	{
 		path: '/classsroom',
 		name: 'Phòng học',
 		icon: 'ni ni-key-25 text-info',
@@ -176,12 +185,12 @@ export var routesClient = [
 		path: '/cart',
 		name: 'Giỏ hàng',
 		icon: 'ni ni-planet text-blue',
-		component: <Cart/>,
+		component: <Cart />,
 		layout: '/client',
 	},
 	{
 		path: '/payment/checkout',
-		component: <Checkout/>,
+		component: <Checkout />,
 		layout: '/client',
 	},
 ];
