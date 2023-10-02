@@ -14,12 +14,12 @@ import {
   Rating,
   Skeleton,
 } from "@mantine/core";
-import cartEmptyimage from "../../../assets/img/cart-empty.png";
 import { Carousel } from "@mantine/carousel";
 
-// API
+// API - declare variable
 import cartApi from "../../../api/cartApi";
 import courseApi from "../../../api/courseApi";
+import cartEmptyimage from "../../../assets/img/cart-empty.png";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
@@ -107,7 +107,7 @@ function Cart() {
   };
 
   // *************** Action && Logic UI
-  const handleCheckOut = async (checkOutMethod) => {
+  const handleCheckOut = async () => {
     // store cart to localstorage
     localStorage.setItem("cartCheckout", JSON.stringify(carts));
   };
@@ -126,85 +126,66 @@ function Cart() {
     fetchNewsetCourse();
   }, []);
 
-  const images = [
-    {
-      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
-      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
-      price: "139.349",
-      rating: "4.7",
-      review: "368",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
-      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
-      price: "139.349",
-      rating: "4.7",
-      review: "368",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
-      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
-      price: "139.349",
-      rating: "4.7",
-      review: "368",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
-      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
-      price: "139.349",
-      rating: "4.7",
-      review: "368",
-    },
-    {
-      url: "https://images.unsplash.com/photo-1508193638397-1c4234db14d8?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=400&q=80",
-      courseName: "NextJS cho người mới bắt đầu từ 10 năm kinh nghiệm.",
-      price: "139.349",
-      rating: "4.7",
-      review: "368",
-    },
-  ];
-
   const slides = newestCourse.map((course) => (
     <Carousel.Slide key={course.courseId}>
       <Card>
-        <Card.Section component="a" href={`/course/${course.courseId}`}>
-          <Image
-            src={`${PUBLIC_IMAGE}/courses/${course.image}`}
-            fit="cover"
-            width={"100%"}
-            height={200}
-            radius="sm"
-            alt={`${course.courseName}`}
-            withPlaceholder
-          />
-        </Card.Section>
-        <Box>
-          <Text
-            fw={500}
-            lineClamp={2}
-            component="a"
-            href={`/course/${course.courseId}`}
-          >
-            {course.courseName}
-          </Text>
-          <Box>
-            <Flex justify="flex-start" gap="md">
-              <Text>3.6</Text>
-              <Group position="center">
-                <Rating value={3.56} fractions={2} readOnly />
-              </Group>
-              <Text c="dimmed">(389.208)</Text>
-            </Flex>
-          </Box>
-          <Box>
-            <Text fw={500}>
-              {course.coursePrice.toLocaleString("it-IT", {
-                style: "currency",
-                currency: "VND",
-              })}
-            </Text>
-          </Box>
-        </Box>
+        {loading ? (
+          <>
+            <Skeleton height={200} radius="sm" mb="sm" />
+          </>
+        ) : (
+          <>
+            <Card.Section component="a" href={`/course/${course.courseId}`}>
+              <Image
+                src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                fit="cover"
+                width={"100%"}
+                height={200}
+                radius="sm"
+                alt={`${course.courseName}`}
+                withPlaceholder
+              />
+            </Card.Section>
+          </>
+        )}
+
+        {loading ? (
+          <>
+            <Skeleton height={8} radius="xl" />
+            <Skeleton height={8} radius="xl" />
+            <Skeleton height={8} radius="xl" />
+          </>
+        ) : (
+          <>
+            <Box>
+              <Text
+                fw={500}
+                lineClamp={2}
+                component="a"
+                href={`/course/${course.courseId}`}
+              >
+                {course.courseName}
+              </Text>
+              <Box>
+                <Flex justify="flex-start" gap="md">
+                  <Text>3.6</Text>
+                  <Group position="center">
+                    <Rating value={3.56} fractions={2} readOnly />
+                  </Group>
+                  <Text c="dimmed">(389.208)</Text>
+                </Flex>
+              </Box>
+              <Box>
+                <Text fw={500}>
+                  {course.coursePrice.toLocaleString("it-IT", {
+                    style: "currency",
+                    currency: "VND",
+                  })}
+                </Text>
+              </Box>
+            </Box>
+          </>
+        )}
       </Card>
     </Carousel.Slide>
   ));
