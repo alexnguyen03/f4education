@@ -214,7 +214,7 @@ const Questions = () => {
 		const id = row.questionId;
 		return (
 			<span key={id}>
-				<Link to={`/admin/questionDetail/${courseName}`}>{row.courseName}</Link>
+				<Link to={`/admin/question-detail/${courseName}`}>{row.courseName}</Link>
 			</span>
 		);
 	}
@@ -431,7 +431,7 @@ const Questions = () => {
 							}}
 							renderRowActions={({row}) => (
 								<div className='d-flex justify-content-start py-1'>
-									<Link to={`/admin/questionDetail/${row.original.courseName}`}>
+									<Link to={`/admin/question-detail/${row.original.courseName}`}>
 										<IconButton color='secondary'>
 											<EditIcon />
 										</IconButton>

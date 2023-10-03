@@ -2,6 +2,7 @@ package com.f4education.springjwt.models;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,19 +21,20 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table(name = "paymentmethod")
 public class PaymentMethod {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "payment_method_id")
-	private Integer paymentMethodId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "payment_method_id")
+    private Integer paymentMethodId;
 
-	@Column(name = "payment_method_name")
-	private String paymentMethodName;
+    @Column(name = "payment_method_name")
+    private String paymentMethodName;
 
-	@OneToMany(mappedBy = "paymentMethod")
-	List<Bill> bills;
+    @OneToMany(mappedBy = "paymentMethod")
+    @JsonIgnore
+    List<Bill> bills;
 
-	@Override
-	public String toString() {
-		return "PaymentMethod [paymentMethodId=" + paymentMethodId + ", paymentMethodName=" + paymentMethodName + "]";
-	}
+    @Override
+    public String toString() {
+        return "PaymentMethod [paymentMethodId=" + paymentMethodId + ", paymentMethodName=" + paymentMethodName + "]";
+    }
 }

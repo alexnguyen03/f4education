@@ -9,22 +9,14 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterCourseDTO {
+public class RegisterCourseRequestDTO {
 	private Integer registerCourseId;
 
-	private Float coursePrice;
+	private Integer courseId;
 
-	private String courseDuration;
-	
-	private Date registrationDate;
-	
-	private Date startDate;
-	
-	private Date endDate;
-	
 	private Integer numberSession;
 	
 	private String status;
-	
-	private String image;
+
+	private Integer studentId;
 }

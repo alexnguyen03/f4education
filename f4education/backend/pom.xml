@@ -110,6 +110,13 @@
 			<artifactId>google-oauth-client-jetty</artifactId>
 			<version>1.25.0</version>
 		</dependency>
+
+		<!--PayPal-->
+		<dependency>
+			<groupId>com.paypal.sdk</groupId>
+			<artifactId>rest-api-sdk</artifactId>
+			<version>1.3.0</version>
+		</dependency>
 	</dependencies>
 
 	<build>

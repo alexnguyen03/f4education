@@ -13,6 +13,8 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import Checkbox from '@material-ui/core/Checkbox';
 import Divider from '@material-ui/core/Divider';
 import {Avatar, Group, Text, TransferList} from '@mantine/core';
+
+import courseApi from '../../api/courseApi';
 const ClassDetail = () => {
 	const [selectedInClass, setSelectedInClass] = useState([]);
 
@@ -62,7 +64,18 @@ const ClassDetail = () => {
 		setStudentInClass([data[1]]);
 	};
 
-	useEffect(() => {}, []);
+	//! CALL APIS
+	const getRegisterCourse = () => {
+		try {
+			const resp = courseApi.getRegisterCourse();
+			console.log('🚀 ~ file: ClassDetail.js:71 ~ getRegisterCourse ~ resp:', resp.data);
+		} catch (error) {
+			console.log('🚀 ~ file: ClassDetail.js:74 ~ getRegisterCourse ~ error:', error);
+		}
+	};
+	useEffect(() => {
+		getRegisterCourse();
+	}, []);
 
 	return (
 		<>
@@ -105,7 +118,7 @@ const ClassDetail = () => {
 									color='primary'
 									type='button'
 									onClick={handleSave}>
-									<i class='fa-solid fa-floppy-disk'></i>
+									<i className='fa-solid fa-floppy-disk'></i>
 									<span className='btn-inner--text'>Lưu thay đổi</span>
 								</Button>
 							</Col>

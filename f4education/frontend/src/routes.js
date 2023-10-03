@@ -129,7 +129,7 @@ export var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/questionDetail/:courseName',
+		path: '/question-detail/:courseName',
 		component: <QuestionDetail />,
 		layout: '/admin',
 	},
@@ -163,7 +163,7 @@ export var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/questionDetail/:courseName',
+		path: '/question-detail/:courseName',
 		component: <QuestionDetail />,
 		layout: '/admin',
 	},

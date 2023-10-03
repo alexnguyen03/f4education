@@ -22,6 +22,15 @@ const courseApi = {
 		const url = '/courses';
 		return axiosClient.put(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
 	},
+	getNewestCourse: () => {
+		const url = '/courses/newest-courses';
+		return axiosClient.get(url);
+	},
+
+	getRegisterCourse: () => {
+		const url = '/register-course';
+		return axiosClient.get(url);
+	},
 };
 
 export default courseApi;
