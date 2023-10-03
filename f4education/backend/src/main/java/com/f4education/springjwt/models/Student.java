@@ -41,9 +41,6 @@ public class Student {
 	private String image;
 
 	@OneToMany(mappedBy = "student")
-	List<Attendance> attendances;
-
-	@OneToMany(mappedBy = "student")
 	List<Bill> bills;
 
 	@OneToMany(mappedBy = "student")
@@ -54,9 +51,6 @@ public class Student {
 
 	@OneToMany(mappedBy = "student")
 	List<RegisterCourse> registerCourses;
-
-	@OneToMany(mappedBy = "student")
-	List<Schedule> schedules;
 
 	@Override
 	public String toString() {

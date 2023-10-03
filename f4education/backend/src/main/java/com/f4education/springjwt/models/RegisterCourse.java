@@ -41,7 +41,7 @@ public class RegisterCourse {
     private Float coursePrice;
 
     @Column(name = "course_duration")
-    private String courseDuration;
+    private Integer courseDuration;
 
     @Column(name = "course_description")
     private String courseDescription;

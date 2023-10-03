@@ -21,41 +21,46 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
 	<BrowserRouter>
-		{/* <MantineProvider withGlobalStyles> */}
-		<ModalsProvider>
-			<Routes>
-				<Route
-					path='/admin/*'
-					element={<AdminLayout />}
-				/>
-				<Route
-					path='/auth/*'
-					element={<AuthLayout />}
-				/>
-				<Route
-					path='/admin'
-					element={
-						<Navigate
-							to='/admin/index'
-							replace
-						/>
-					}
-				/>
-				<Route
-					path='/*'
-					element={<ClientLayout />}
-				/>
-				<Route
-					path='/admin/*/:courseName'
-					element={<AdminLayout />}
-				/>
-				<Route
-					path='/admin/*/:courseName/:folderId'
-					element={<AdminLayout />}
-				/>
-			</Routes>
-			,
-		</ModalsProvider>
-		{/* </MantineProvider> */},
+		<MantineProvider>
+			<ModalsProvider>
+				<Routes>
+					<Route
+						path='/admin/*'
+						element={<AdminLayout />}
+					/>
+					<Route
+						path='/auth/*'
+						element={<AuthLayout />}
+					/>
+					<Route
+						path='/admin'
+						element={
+							<Navigate
+								to='/admin/index'
+								replace
+							/>
+						}
+					/>
+					<Route
+						path='/*'
+						element={<ClientLayout />}
+					/>
+					<Route
+						path='/course/course-detail-client/:courseId'
+						element={<ClientLayout />}
+					/>
+					<Route
+						path='/admin/*/:courseName'
+						element={<AdminLayout />}
+					/>
+					<Route
+						path='/admin/*/:courseName/:folderId'
+						element={<AdminLayout />}
+					/>
+				</Routes>
+				,
+			</ModalsProvider>
+		</MantineProvider>
+		,
 	</BrowserRouter>,
 );

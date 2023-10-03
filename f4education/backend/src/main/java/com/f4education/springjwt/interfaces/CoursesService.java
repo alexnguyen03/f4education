@@ -6,6 +6,8 @@ import com.f4education.springjwt.payload.request.CourseRequest;
 
 import java.util.List;
 
+import org.springframework.data.repository.query.Param;
+
 public interface CoursesService {
 	List<CourseDTO> findAllCourseDTO();
 
@@ -16,4 +18,8 @@ public interface CoursesService {
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
 	List<CourseDTO> findAllByAdminId(String adminId);
+	
+	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
+	
+	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
 }

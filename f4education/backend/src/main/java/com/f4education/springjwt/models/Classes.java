@@ -53,9 +53,6 @@ public class Classes implements Serializable{
 	private String status;
 	
 	@OneToMany(mappedBy = "classes")
-	List<Attendance> attendances;
-	
-	@OneToMany(mappedBy = "classes")
 	List<ClassHistory> classHistories;
 	
 	@OneToMany(mappedBy = "classes")
@@ -73,4 +70,8 @@ public class Classes implements Serializable{
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	Admin admin;
+	
+	@ManyToOne
+	@JoinColumn(name = "teacher_id")
+	Teacher teacher;
 }

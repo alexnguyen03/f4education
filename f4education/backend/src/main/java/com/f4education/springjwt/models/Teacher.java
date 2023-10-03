@@ -57,6 +57,9 @@ public class Teacher {
 	private String phone;
 
 	private String image;
+	
+	@OneToMany(mappedBy = "teacher")
+	List<Classes> classes;
 
 	@ManyToOne
 	@JoinColumn(name = "account_id")

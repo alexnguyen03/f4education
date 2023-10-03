@@ -18,32 +18,8 @@ import courseApi from '../../api/courseApi';
 const ClassDetail = () => {
 	const [selectedInClass, setSelectedInClass] = useState([]);
 
-	const [listCourse, setListCourse] = useState([
-		{value: '0', label: 'R', image: 'https://cdn.leonardo.ai/users/0a033464-33e0-433a-84b6-ae3fc6213990/generations/4a0668b5-acb7-435d-a8e6-795050575a31/variations/Default_neon_light_art_in_the_dark_of_night_moonlit_seas_clou_0_4a0668b5-acb7-435d-a8e6-795050575a31_1.jpg?w=512'},
-		{value: '1', label: 'python', image: 'https://cdn.leonardo.ai/users/0a033464-33e0-433a-84b6-ae3fc6213990/generations/4a0668b5-acb7-435d-a8e6-795050575a31/variations/Default_neon_light_art_in_the_dark_of_night_moonlit_seas_clou_0_4a0668b5-acb7-435d-a8e6-795050575a31_1.jpg?w=512'},
-		{value: '2', label: 'ruby', image: 'https://cdn.leonardo.ai/users/0a033464-33e0-433a-84b6-ae3fc6213990/generations/4a0668b5-acb7-435d-a8e6-795050575a31/variations/Default_neon_light_art_in_the_dark_of_night_moonlit_seas_clou_0_4a0668b5-acb7-435d-a8e6-795050575a31_1.jpg?w=512'},
-		{value: '3', label: 'javascript', image: 'https://cdn.leonardo.ai/users/0a033464-33e0-433a-84b6-ae3fc6213990/generations/4a0668b5-acb7-435d-a8e6-795050575a31/variations/Default_neon_light_art_in_the_dark_of_night_moonlit_seas_clou_0_4a0668b5-acb7-435d-a8e6-795050575a31_1.jpg?w=512'},
-		{value: '4', label: 'java', image: 'https://cdn.leonardo.ai/users/0a033464-33e0-433a-84b6-ae3fc6213990/generations/4a0668b5-acb7-435d-a8e6-795050575a31/variations/Default_neon_light_art_in_the_dark_of_night_moonlit_seas_clou_0_4a0668b5-acb7-435d-a8e6-795050575a31_1.jpg?w=512'},
-	]);
-	const [studentInCourse, setStudentInCourse] = useState([
-		{
-			value: 'react',
-			label: 'React',
-		},
-		{value: 'ng', label: 'Angular'},
-		{value: 'next', label: 'Next.js'},
-		{value: 'blitz', label: 'Blitz.js'},
-		{value: 'gatsby', label: 'Gatsby.js'},
-		{value: 'vue', label: 'Vue'},
-		{value: 'jq', label: 'jQuery'},
-		{value: 'reactf', label: 'React'},
-		{value: 'ngf', label: 'Angular'},
-		{value: 'nextf', label: 'Next.js'},
-		{value: 'blitzf', label: 'Blitz.js'},
-		{value: 'gatsbyf', label: 'Gatsby.js'},
-		{value: 'vuef', label: 'Vue'},
-		{value: 'jqf', label: 'jQuery'},
-	]);
+	const [listCourse, setListCourse] = useState([]);
+	const [studentInCourse, setStudentInCourse] = useState([]);
 	const [studentInClass, setStudentInClass] = useState([
 		{value: 'sv', label: 'Svelte'},
 		{value: 'rw', label: 'Redwood'},
@@ -65,10 +41,16 @@ const ClassDetail = () => {
 	};
 
 	//! CALL APIS
-	const getRegisterCourse = () => {
+	const getRegisterCourse = async () => {
 		try {
-			const resp = courseApi.getRegisterCourse();
-			console.log('🚀 ~ file: ClassDetail.js:71 ~ getRegisterCourse ~ resp:', resp.data);
+			const resp = await courseApi.getRegisterCourse();
+			setListCourse(
+				resp.data.map((item) => {
+					const {registerCourseId, courseName, image} = {...item};
+					return {value: registerCourseId, label: courseName + ' || id: ' + registerCourseId, image: image};
+				}),
+			);
+			// console.log('🚀 ~ file: ClassDetail.js:71 ~ getRegisterCourse ~ resp:', resp);
 		} catch (error) {
 			console.log('🚀 ~ file: ClassDetail.js:74 ~ getRegisterCourse ~ error:', error);
 		}

@@ -42,17 +42,17 @@ public class Attendance {
 	private Date endDate;
 	
 	@ManyToOne
-	@JoinColumn(name = "student_id")
-	Student student; 
-	
-	@ManyToOne
-	@JoinColumn(name = "class_id")
-	Classes classes; 
-	
-	@ManyToOne
 	@JoinColumn(name = "academic_id")
 	Academic academic;
-
+	
+	@ManyToOne
+	@JoinColumn(name = "register_course_id")
+	RegisterCourse registerCourse;
+	
+	@ManyToOne
+	@JoinColumn(name = "schedule_id")
+	Schedule schedule ;
+	
 	@Override
 	public String toString() {
 		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" + attendanceDate + ", endDate="

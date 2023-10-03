@@ -53,4 +53,9 @@ public class TeacherServiceImpl implements TeacherService {
     private void convertToEntity(TeacherDTO teacherDTO, Teacher teacher) {
         BeanUtils.copyProperties(teacherDTO, teacher);
     }
+
+    @Override
+    public Teacher findByUserId(String userId) {
+        return null; // vi ma hien tai la tu tang nen chua lay duoc
+    }
 }

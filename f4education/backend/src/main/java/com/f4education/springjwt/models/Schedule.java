@@ -2,8 +2,9 @@ package com.f4education.springjwt.models;
 
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import jakarta.persistence.Column;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -27,12 +28,11 @@ public class Schedule {
 	private Date studyDate;
 	private String contents;
 	private String note;
+	@OneToMany(mappedBy = "schedule")
+	List<Attendance> attendances;
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	Admin admin;
-	@ManyToOne
-	@JoinColumn(name = "academic_id")
-	Academic academic;
 	@ManyToOne
 	@JoinColumn(name = "class_id")
 	Classes classes;
@@ -40,8 +40,8 @@ public class Schedule {
 	@JoinColumn(name = "classroom_id")
 	ClassRoom classRoom;
 	@ManyToOne
-	@JoinColumn(name = "student_id")
-	Student student;
+	@JoinColumn(name = "session_id")
+	private Sessions sessions;
 
 	@Override
 	public String toString() {

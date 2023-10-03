@@ -31,7 +31,7 @@ public class Course implements Serializable {
     private Float coursePrice;
 
     @Column(name = "course_duration")
-    private String courseDuration;
+    private Integer courseDuration;
 
     @Column(name = "course_description")
     private String courseDescription;
@@ -74,8 +74,8 @@ public class Course implements Serializable {
     @JoinColumn(name = "admin_id")
     Admin admin;
 
-    public Course(String courseName, Float coursePrice, String courseDuration, String courseDescription,
-                  Integer numberSession, String image) {
+    public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
+            Integer numberSession, String image) {
         this.courseName = courseName;
         this.coursePrice = coursePrice;
         this.courseDuration = courseDuration;
@@ -83,7 +83,4 @@ public class Course implements Serializable {
         this.numberSession = numberSession;
         this.image = image;
     }
-
-    @OneToMany(mappedBy = "course")
-    List<BillDetail> billDetail;
 }

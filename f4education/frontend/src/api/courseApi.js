@@ -31,6 +31,14 @@ const courseApi = {
 		const url = '/register-course';
 		return axiosClient.get(url);
 	},
+	findCoursesByCheckedSubjects: (checkedSubjects) => {
+		const url = `/courses/topic/${checkedSubjects}`;
+		return axiosClient.get(url);
+	},
+	findCoursesByCheckedDurations: (checkedDurations) => {
+		const url = `/courses/duration/${checkedDurations}`;
+		return axiosClient.get(url);
+	},
 };
 
 export default courseApi;

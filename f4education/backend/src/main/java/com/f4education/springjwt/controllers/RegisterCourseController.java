@@ -4,7 +4,10 @@ import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
+import com.google.api.client.googleapis.auth.clientlogin.ClientLogin.Response;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,12 +30,14 @@ public class RegisterCourseController {
     }
 
     @PostMapping
-    public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(@RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
+    public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(
+            @RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
         return registerCourseService.createRegisterCourse(registerCourseRequestDTO);
     }
 
     @PutMapping("/{id}")
-    public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(@PathVariable("id") Integer id, @RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
+    public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(@PathVariable("id") Integer id,
+            @RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
         return registerCourseService.updateRegisterCourse(id, registerCourseRequestDTO);
     }
 }
