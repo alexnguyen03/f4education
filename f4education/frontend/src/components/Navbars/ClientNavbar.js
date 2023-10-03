@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { Badge, Col, Row } from "reactstrap";
 import logo from "../../assets/img/brand/f4.png";
 import cartEmptyimage from "../../assets/img/cart-empty.png";
@@ -27,10 +27,18 @@ const ClientNavbar = () => {
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [activeItems, setActiveItems] = useState([true, false, false]);
   const [opened, { toggle }] = useDisclosure(false);
+  const [homeActive, setHomeActive] = useState("");
+  const [cartActive, setCartActive] = useState("");
+  const [courseActive, setCourseActive] = useState("");
+  const [searchParams] = useSearchParams();
 
   // *************** CART VARIABLE - AREA START
   const [carts, setCarts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
+
+  // useEffect(() => {
+   
+  // }, [searchParams]);
 
   const fetchCart = async () => {
     try {
@@ -52,7 +60,6 @@ const ClientNavbar = () => {
     fetchCart();
   }, []);
 
-  
   // *************** CART VARIABLE - AREA END
   const handleItemClick = (index) => {
     const newActiveItems = [...activeItems];

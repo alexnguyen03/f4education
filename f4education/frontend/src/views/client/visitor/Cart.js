@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Row } from "reactstrap";
 import {
   Breadcrumbs,
   Anchor,
@@ -19,13 +18,14 @@ import {
   Grid,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
+import { IconShoppingCartPlus } from "@tabler/icons-react";
 
 // API - declare variable
 import cartApi from "../../../api/cartApi";
 import courseApi from "../../../api/courseApi";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
-import { IconShoppingCartPlus } from "@tabler/icons-react";
-const PUBLIC_IMAGE = "http://localhost:8080/img";
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
+// const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
   { title: "Trang chủ", href: "/" },
@@ -303,7 +303,8 @@ function Cart() {
                   </h1>
                   <Link to={"/course"}>
                     <Button
-                      color="primary"
+                      color="violet"
+                      size={"lg"}
                       className="font-weight-800 mb-5 mt-2"
                       style={{ borderRadius: "2px", fontSize: "20px" }}
                     >
@@ -414,10 +415,10 @@ function Cart() {
                               </div>
                             </Grid.Col>
                             <Grid.Col xl="2" lg="2" md="12" sm="12">
-                              <div>
+                              <div className="d-flex justify-content-sm-end justify-content-md-end">
                                 <Checkbox
                                   // label="I agree to sell my privacy"
-                                  color="grape"
+                                  color="violet"
                                   checked={selectedItem === cart.cartId}
                                   onChange={() =>
                                     handleCheckboxChange(cart.cartId)

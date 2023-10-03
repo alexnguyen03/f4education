@@ -13,6 +13,7 @@ import paymentApi from "../../../api/paymentApi";
 import cartApi from "../../../api/cartApi";
 import billApi from "../../../api/billApi";
 import registerCourseApi from "../../../api/registerCourseApi";
+import Paypal from "./PayPal";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const Checkout = () => {
@@ -26,8 +27,9 @@ const Checkout = () => {
   const [responseCode, setResponseCode] = useState("");
   const [transactionNo, setTransactionNo] = useState("");
   const [paymentType, setPaymentType] = useState("");
+  const [checkout, setCheckout] = useState(false);
   let navigate = useNavigate();
- 
+
   const [checkoutComplete, setCheckoutComplete] = useState({
     status: "",
     infor: "",
@@ -250,6 +252,18 @@ const Checkout = () => {
           </h3>
         </Link>
       </div>
+
+      {checkout ? (
+        <Paypal {...{totalPrice}}/>
+      ) : (
+        <button
+          onClick={() => {
+            setCheckout(true);
+          }}
+        >
+          Checkout
+        </button>
+      )}
 
       {/* content */}
       <div className="mt-5">
