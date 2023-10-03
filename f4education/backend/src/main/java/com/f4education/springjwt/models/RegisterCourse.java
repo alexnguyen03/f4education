@@ -68,6 +68,9 @@ public class RegisterCourse {
 	@OneToMany(mappedBy = "registerCourse")
 	List<Point> points;
 	
+	@OneToMany(mappedBy = "registerCourse")
+	List<Attendance> attendances;
+	
 	@ManyToOne
 	@JoinColumn(name = "student_id")
 	Student student; 
