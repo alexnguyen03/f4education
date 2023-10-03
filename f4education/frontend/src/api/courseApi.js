@@ -16,11 +16,15 @@ const courseApi = {
 	},
 	addCourse: (body) => {
 		const url = '/courses';
-		return axiosClient.post(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
+		return axiosClient.post(url, body, {
+			headers: {'Content-Type': 'multipart/form-data'},
+		});
 	},
 	updateCourse: (body) => {
 		const url = '/courses';
-		return axiosClient.put(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
+		return axiosClient.put(url, body, {
+			headers: {'Content-Type': 'multipart/form-data'},
+		});
 	},
 	findCoursesByCheckedSubjects: (checkedSubjects) => {
 		const url = `/courses/topic/${checkedSubjects}`;

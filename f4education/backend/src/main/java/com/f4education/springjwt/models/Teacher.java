@@ -65,6 +65,9 @@ public class Teacher {
 	@JoinColumn(name = "account_id")
 	User user;
 
+	@OneToMany(mappedBy = "teacher")
+	List<TeacherHistory> teacherHistory;
+
 	@Override
 	public String toString() {
 		return "Teacher [teacherId=" + teacherId + ", fullname=" + fullname + ", gender=" + gender + ", dateOfBirth="

@@ -21,6 +21,8 @@ import Checkout from 'views/client/visitor/Checkout';
 import Login from 'views/examples/Login';
 import CourseDetailClient from 'views/client/visitor/CourseDetailClient';
 
+import Accounts from 'views/admin/Accounts.js';
+
 export var routes = [
 	{
 		path: '/index',
@@ -70,6 +72,13 @@ export var routes = [
 		name: 'Phòng học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <ClasssRoom />,
+		layout: '/admin',
+	},
+	{
+		path: '/register',
+		name: 'Tài khoản',
+		icon: 'ni ni-circle-08 text-pink',
+		component: <Accounts />,
 		layout: '/admin',
 	},
 	{

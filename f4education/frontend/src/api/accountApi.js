@@ -2,8 +2,8 @@ import axiosClient from "./axiosClient";
 
 // api/classApi.js
 const classApi = {
-  getAllTeachers: () => {
-    const url = "/teachers";
+  getAllAccounts: () => {
+    const url = "/accounts";
     return axiosClient.get(url);
   },
   getAllTeachersHistory: () => {

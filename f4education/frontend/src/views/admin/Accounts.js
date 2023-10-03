@@ -6,7 +6,7 @@ import {
 import { Box, IconButton } from "@mui/material";
 import teacherApi from "api/teacherApi";
 import moment from "moment";
-import TeacherHeader from "components/Headers/TeacherHeader";
+import AccountHeader from "components/Headers/AccountHeader";
 import { MaterialReactTable } from "material-react-table";
 import { memo, useEffect, useMemo, useState } from "react";
 import { IconEyeSearch } from "@tabler/icons-react";
@@ -415,7 +415,7 @@ const Teachers = () => {
 
   return (
     <>
-      <TeacherHeader />
+      <AccountHeader />
       <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
           {/* Header */}
