@@ -13,5 +13,4 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
 	@Query("SELECT c FROM Course c ORDER BY c.courseId DESC")
 	List<Course> findTop10LatestCourses();
-
 }

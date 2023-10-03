@@ -43,6 +43,9 @@ public class RegisterCourse {
     @Column(name = "course_duration")
     private String courseDuration;
 
+    @Column(name = "course_description")
+    private String courseDescription;
+
     @Column(name = "registration_date")
     private Date registrationDate;
 
