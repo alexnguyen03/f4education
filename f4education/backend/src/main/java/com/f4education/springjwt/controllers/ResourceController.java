@@ -2,7 +2,7 @@ package com.f4education.springjwt.controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -48,7 +48,7 @@ public class ResourceController {
 
 	@PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResourcesDTO createResource(@RequestParam("file") MultipartFile[] file,
-			@RequestPart("resourceRequest") String resourceRequestClient) {
+			@RequestPart("resourceRequest") String resourceRequestClient, @RequestParam("type") String type) {
 
 		ObjectMapper mapper = new ObjectMapper();
 		ResourceRequest resourceRequest = new ResourceRequest();
@@ -62,15 +62,17 @@ public class ResourceController {
 
 		for (MultipartFile files : file) {
 			Course course = coursesService.findById(resourceRequest.getCourseId());
-			resourceService.uploadFile(files, course.getCourseName());
+			resourceService.uploadFile(files, course.getCourseName(), type);
 		}
 		return resourceService.createResource(resourceRequest);
 	}
 
 	@GetMapping("/file/{folderId}")
-	public List<GoogleDriveFileDTO> getAllFilesByFolder(@PathVariable("folderId") String folderId)
-			throws IOException, GeneralSecurityException {
-		return resourceService.getAllFilesByFolder(folderId);
+	public List<GoogleDriveFileDTO> getAllFilesByFolder(@PathVariable("folderId") String folderId) throws Exception {
+		List<GoogleDriveFileDTO> lists = new ArrayList<>();
+	    lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
+	    lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
+		return lists;
 	}
 
 	@GetMapping("/delete/file/{id}")
