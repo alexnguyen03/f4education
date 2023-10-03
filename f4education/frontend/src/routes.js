@@ -100,7 +100,7 @@ export var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/classs',
+		path: '/class-room',
 		name: 'Phòng học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <ClasssRoom />,
@@ -111,6 +111,14 @@ export var routes = [
 		name: 'Lớp học',
 		icon: 'ni ni-single-02 text-yellow',
 		component: <Classs />,
+		layout: '/admin',
+	},
+
+	{
+		path: '/class-detail',
+		name: 'Lớp học',
+		icon: 'ni ni-single-02 text-yellow',
+		component: <ClassDetail />,
 		layout: '/admin',
 	},
 	{
