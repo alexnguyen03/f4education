@@ -21,7 +21,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
 	<BrowserRouter>
-		<MantineProvider withGlobalStyles>
+		<MantineProvider>
 			<ModalsProvider>
 				<Routes>
 					<Route

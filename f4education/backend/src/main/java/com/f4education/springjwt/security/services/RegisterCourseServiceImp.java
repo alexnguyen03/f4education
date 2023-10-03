@@ -78,11 +78,15 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
         RegisterCourse registerCourse = convertRequestToEntity(registerCourseRequestDTO);
         registerCourse.setStatus("Đã đăng ký");
-        registerCourse.setClasses(null);
         registerCourse.setRegistrationDate(new Date());
+        registerCourse.setClasses(null);
+        registerCourse.setStartDate(null);
+        registerCourse.setEndDate(null);
 
         RegisterCourse createdRegisterCourse = registerCourseRepository.save(registerCourse);
         RegisterCourseResponseDTO responseDTO = convertToResponseDTO(createdRegisterCourse);
+
+        System.out.println(createdRegisterCourse);
 
         return new HandleResponseDTO<>(HttpStatus.CREATED.value(), "Create Success", responseDTO);
     }
@@ -124,6 +128,9 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
         registerCourseDTO.setImage(registerCourseDTO.getImage());
         registerCourseDTO.setCourseName(registerCourse.getCourse().getCourseName());
         registerCourseDTO.setStudentName(registerCourse.getStudent().getFullname());
+        registerCourseDTO.setStartDate(registerCourse.getStartDate());
+        registerCourseDTO.setStartDate(registerCourse.getEndDate());
+        registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 
         return registerCourseDTO;
     }
@@ -142,6 +149,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
             registerCourse.setCoursePrice(course.getCoursePrice());
             registerCourse.setImage(course.getImage());
             registerCourse.setCourseDescription(course.getCourseDescription());
+            registerCourse.setNumberSession(course.getNumberSession());
         }
 
         if (student != null) {
@@ -163,6 +171,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
             registerCourse.setCoursePrice(course.getCoursePrice());
             registerCourse.setImage(course.getImage());
             registerCourse.setCourseDescription(course.getCourseDescription());
+            registerCourse.setNumberSession(course.getNumberSession());
         }
 
         if (student != null) {

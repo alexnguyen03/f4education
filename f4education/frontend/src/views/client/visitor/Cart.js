@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { Button, Col, Row } from "reactstrap";
+import { Link, useNavigate } from "react-router-dom";
+import { Col, Row } from "reactstrap";
 import {
   Breadcrumbs,
   Anchor,
   Text,
   Loader,
+  Button,
   Image,
   Card,
   Box,
@@ -13,6 +14,9 @@ import {
   Group,
   Rating,
   Skeleton,
+  Checkbox,
+  HoverCard,
+  Grid,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 
@@ -20,6 +24,7 @@ import { Carousel } from "@mantine/carousel";
 import cartApi from "../../../api/cartApi";
 import courseApi from "../../../api/courseApi";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
+import { IconShoppingCartPlus } from "@tabler/icons-react";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
@@ -67,9 +72,15 @@ function Cart() {
 
   // *************** Action Variable
   const [loading, setLoading] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedCart, setSelectedCart] = useState({
+    cartId: "",
+    course: "",
+  });
 
   // *************** Logic UI Variable
   const [totalPrice, setTotalPrice] = useState(0);
+  let navigate = useNavigate();
 
   // *************** Fetch Area
   const fetchCart = async () => {
@@ -108,8 +119,29 @@ function Cart() {
 
   // *************** Action && Logic UI
   const handleCheckOut = async () => {
+    if (selectedItem === null) {
+      alert(
+        "Chon khoa hoc di ban ei, 1 khoa thoi ban ei, 2 khoa hoc ko noi dau"
+      );
+      return;
+    }
     // store cart to localstorage
-    localStorage.setItem("cartCheckout", JSON.stringify(carts));
+    else {
+      localStorage.setItem("cartCheckout", JSON.stringify(selectedCart));
+      return navigate("/payment/checkout");
+    }
+  };
+
+  const handleAddCart = async (course) => {
+    const cart = {
+      courseId: course.courseId,
+      studentId: 1,
+    };
+    try {
+      const resp = cartApi.createCart(cart);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -127,68 +159,115 @@ function Cart() {
   }, []);
 
   const slides = newestCourse.map((course) => (
-    <Carousel.Slide key={course.courseId}>
-      <Card>
-        {loading ? (
-          <>
-            <Skeleton height={200} radius="sm" mb="sm" />
-          </>
-        ) : (
-          <>
-            <Card.Section component="a" href={`/course/${course.courseId}`}>
-              <Image
-                src={`${PUBLIC_IMAGE}/courses/${course.image}`}
-                fit="cover"
-                width={"100%"}
-                height={200}
-                radius="sm"
-                alt={`${course.courseName}`}
-                withPlaceholder
-              />
-            </Card.Section>
-          </>
-        )}
+    <Carousel.Slide
+      key={course.courseId}
+      style={{
+        overflow: "visible",
+      }}
+    >
+      <HoverCard width={270} shadow="md" position="bottom">
+        {/* Target Hover */}
+        <Card className="card-hover-overlay">
+          {loading ? (
+            <>
+              <Skeleton height={200} radius="sm" mb="sm" />
+            </>
+          ) : (
+            <>
+              <HoverCard.Target>
+                <Card.Section component="a" href={`/course/${course.courseId}`}>
+                  <Image
+                    src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                    fit="cover"
+                    width={"100%"}
+                    height={200}
+                    radius="sm"
+                    alt={`${course.courseName}`}
+                    withPlaceholder
+                  />
+                </Card.Section>
+              </HoverCard.Target>
+            </>
+          )}
 
-        {loading ? (
-          <>
-            <Skeleton height={8} radius="xl" />
-            <Skeleton height={8} radius="xl" />
-            <Skeleton height={8} radius="xl" />
-          </>
-        ) : (
-          <>
-            <Box>
-              <Text
-                fw={500}
-                lineClamp={2}
-                component="a"
-                href={`/course/${course.courseId}`}
-              >
-                {course.courseName}
-              </Text>
+          {loading ? (
+            <>
+              <Skeleton height={8} radius="xl" />
+              <Skeleton height={8} radius="xl" />
+              <Skeleton height={8} radius="xl" />
+            </>
+          ) : (
+            <>
               <Box>
-                <Flex justify="flex-start" gap="md">
-                  <Text>3.6</Text>
-                  <Group position="center">
-                    <Rating value={3.56} fractions={2} readOnly />
-                  </Group>
-                  <Text c="dimmed">(389.208)</Text>
-                </Flex>
-              </Box>
-              <Box>
-                <Text fw={500}>
-                  {course.coursePrice.toLocaleString("it-IT", {
-                    style: "currency",
-                    currency: "VND",
-                  })}
+                <Text
+                  fw={500}
+                  lineClamp={2}
+                  component="a"
+                  href={`/course/${course.courseId}`}
+                >
+                  {course.courseName}
                 </Text>
+                <Box>
+                  <Flex justify="flex-start" gap="md">
+                    <Text>3.6</Text>
+                    <Group position="center">
+                      <Rating value={3.56} fractions={2} readOnly />
+                    </Group>
+                    <Text c="dimmed">(389.208)</Text>
+                  </Flex>
+                </Box>
+                <Box>
+                  <Text fw={500}>
+                    {course.coursePrice.toLocaleString("it-IT", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </Text>
+                </Box>
               </Box>
-            </Box>
-          </>
-        )}
-      </Card>
+            </>
+          )}
+        </Card>
+
+        {/* Value hover */}
+        <HoverCard.Dropdown>
+          <Button
+            color="grape"
+            variant="subtle"
+            onClick={() => handleAddCart(course)}
+            leftIcon={<IconShoppingCartPlus size="1rem" />}
+          >
+            Thêm vào giỏ hàng
+          </Button>
+        </HoverCard.Dropdown>
+      </HoverCard>
     </Carousel.Slide>
   ));
+
+  const handleCheckboxChange = (cartId) => {
+    if (selectedItem === cartId) {
+      setSelectedItem(null);
+    } else if (selectedItem !== null) {
+      alert("error choose just 1 course at time");
+      return console.log("Chỉ được chọn duy nhất 1 khóa học");
+    } else {
+      setSelectedItem(cartId);
+    }
+  };
+
+  useEffect(() => {
+    const cartCheckout = carts
+      .filter((cart) => cart.cartId === selectedItem)
+      .map((cart) => ({
+        cartId: cart.cartId,
+        course: cart.course,
+      }));
+    setSelectedCart(cartCheckout);
+  }, [selectedItem]);
+
+  useEffect(() => {
+    console.log(selectedCart);
+  }, [selectedCart]);
 
   return (
     <>
@@ -225,7 +304,7 @@ function Cart() {
                   <Link to={"/course"}>
                     <Button
                       color="primary"
-                      className="font-weight-800"
+                      className="font-weight-800 mb-5 mt-2"
                       style={{ borderRadius: "2px", fontSize: "20px" }}
                     >
                       Tìm Khóa học
@@ -236,36 +315,44 @@ function Cart() {
             </>
           ) : (
             <>
-              <Row>
-                <Col xl="9" lg="9" md="12" sm="12">
+              <Grid>
+                <Grid.Col xl="9" lg="9" md="12" sm="12">
                   <h3 className="font-weight-600 text-dark">
                     {carts.length} khóa học trong giỏ hàng
                   </h3>
                   <hr className="text-muted mt-0 pt-0" />
-                  <Row className="cart-item">
-                    <Col lg="12" xl="12" md="12" sm="12">
-                      {/* item */}
-                      {carts.map((cart, index) => (
-                        <>
+
+                  {/* item */}
+                  {carts.map((cart, index) => (
+                    <>
+                      <Grid>
+                        <Grid.Col span={2}>
                           <Link
+                            Link
                             to={`/course/${cart.course.courseId}`}
                             key={index}
                           >
-                            <div className="d-flex justify-content-between flex-wrap">
-                              <div>
-                                <img
-                                  src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                  // src={cart.course.courseImage}
-                                  alt={`${cart.course.courseName}`}
-                                  className="img-fluid"
-                                  style={{
-                                    maxHeight: "100px",
-                                    width: "100%",
-                                    objectFit: "cover",
-                                  }}
-                                />
-                              </div>
-                              <div>
+                            <img
+                              src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                              // src={cart.course.courseImage}
+                              alt={`${cart.course.courseName}`}
+                              className="img-fluid"
+                              style={{
+                                maxHeight: "100px",
+                                width: "100%",
+                                objectFit: "cover",
+                              }}
+                            />
+                          </Link>
+                        </Grid.Col>
+                        <Grid.Col span={10}>
+                          <Grid>
+                            <Grid.Col xl="6" lg="6" md="12" sm="12">
+                              <Link
+                                Link
+                                to={`/course/${cart.course.courseId}`}
+                                key={index}
+                              >
                                 <p className="font-weight-700 text-dark m-0 p-0">
                                   {cart.course.courseName}
                                 </p>
@@ -298,7 +385,9 @@ function Cart() {
                                   <span className="mx-2">-</span>
                                   <span className="text-muted">All Levels</span>
                                 </div>
-                              </div>
+                              </Link>
+                            </Grid.Col>
+                            <Grid.Col xl="2" lg="2" md="6" sm="6">
                               <div>
                                 <Link
                                   to={`/cart/${cart.cartId}`}
@@ -310,7 +399,9 @@ function Cart() {
                                   Remove
                                 </Link>
                               </div>
-                              <div className="ml-sm-0 ml-auto">
+                            </Grid.Col>
+                            <Grid.Col xl="2" lg="2" md="6" sm="6">
+                              <div>
                                 <span className="text-primary font-weight-700">
                                   {cart.course.coursePrice.toLocaleString(
                                     "it-IT",
@@ -321,15 +412,27 @@ function Cart() {
                                   )}
                                 </span>
                               </div>
-                            </div>
-                            <hr className="text-muted" />
-                          </Link>
-                        </>
-                      ))}
-                    </Col>
-                  </Row>
-                </Col>
-                <Col
+                            </Grid.Col>
+                            <Grid.Col xl="2" lg="2" md="12" sm="12">
+                              <div>
+                                <Checkbox
+                                  // label="I agree to sell my privacy"
+                                  color="grape"
+                                  checked={selectedItem === cart.cartId}
+                                  onChange={() =>
+                                    handleCheckboxChange(cart.cartId)
+                                  }
+                                />
+                              </div>
+                            </Grid.Col>
+                          </Grid>
+                          <hr className="text-muted" />
+                        </Grid.Col>
+                      </Grid>
+                    </>
+                  ))}
+                </Grid.Col>
+                <Grid.Col
                   xl="3"
                   lg="3"
                   md="12"
@@ -337,7 +440,7 @@ function Cart() {
                   className="mt-2 cart-summery-floating-bottom w-100"
                 >
                   <span className="font-weight-600 text-muted">
-                    Tổng thanh toán:
+                    Tổng tiền:
                     <br />
                     <h1 className="font-weight-700">
                       {totalPrice.toLocaleString("it-IT", {
@@ -346,18 +449,19 @@ function Cart() {
                       })}
                     </h1>
                   </span>
-                  <Link to={"/payment/checkout"}>
-                    <Button
-                      color="primary"
-                      className="w-100 mt-2"
-                      style={{ borderRadius: "2px" }}
-                      onClick={() => handleCheckOut()}
-                    >
-                      Thanh toán
-                    </Button>
-                  </Link>
-                </Col>
-              </Row>
+                  {/* <Link to={"/payment/checkout"} className="mt-2 mb-4"> */}
+                  <Button
+                    color="violet"
+                    uppercase
+                    size="md"
+                    className="w-100"
+                    style={{ borderRadius: "2px" }}
+                    onClick={() => handleCheckOut()}
+                  >
+                    Thanh toán
+                  </Button>
+                </Grid.Col>
+              </Grid>
             </>
           )}
         </>

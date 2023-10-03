@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Link, redirect, useSearchParams } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Col, Modal, ModalBody, Row } from "reactstrap";
 // import Notification from "@mantine/core";
 // import IconCheck from "@tabler/icons-react";
@@ -12,6 +12,7 @@ import cartEmptyimage from "../../../assets/img/cart-empty.png";
 import paymentApi from "../../../api/paymentApi";
 import cartApi from "../../../api/cartApi";
 import billApi from "../../../api/billApi";
+import registerCourseApi from "../../../api/registerCourseApi";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const Checkout = () => {
@@ -25,11 +26,12 @@ const Checkout = () => {
   const [responseCode, setResponseCode] = useState("");
   const [transactionNo, setTransactionNo] = useState("");
   const [paymentType, setPaymentType] = useState("");
-
+  let navigate = useNavigate();
+ 
   const [checkoutComplete, setCheckoutComplete] = useState({
     status: "",
     infor: "",
-    time: new Date().getTime().toLocaleString(),
+    time: new Date().toLocaleString(),
   });
   const [showModal, setShowModal] = useState(false);
   const [count, setCount] = useState(10);
@@ -46,8 +48,8 @@ const Checkout = () => {
     if (e.id === "vnpay") {
       setCheckOutMethod("vnpay");
       return;
-    } else if (e.id === "momo") {
-      setCheckOutMethod("momo");
+    } else if (e.id === "paypal") {
+      setCheckOutMethod("paypal");
       return;
     }
   };
@@ -122,7 +124,7 @@ const Checkout = () => {
           });
 
           const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
-          const billRequest = JSON.parse(localStorage.getItem("billCheckout"));
+          // const billRequest = JSON.parse(localStorage.getItem("billCheckout"));
 
           if (listCar !== null) {
             const updateCartRequest = listCar.map((cart) => ({
@@ -131,37 +133,15 @@ const Checkout = () => {
               createDate: cart.createDate,
             }));
 
-            const billDetailRequest = updateCartRequest.map((detail) => ({
-              totalPrice: totalPrice,
-              courseId: detail.courseId,
-            }));
+            // Create RegisterCoures
+            handleCreateRegisterCourse(updateCartRequest);
 
-            console.log(billDetailRequest);
+            // Create Bill
+            handleCreateBillAndBillDetail(updateCartRequest);
 
-            try {
-              const resp = billApi.createBill(bill);
-              console.log(resp);
-            } catch (error) {
-              console.log("Bill: " + error);
-            }
-            localStorage.removeItem("billCheckout");
-
-            try {
-              const respDetail = billApi.createBillDetail(billDetailRequest);
-              console.log(respDetail);
-            } catch (error) {
-              console.log("BillDetail: " + error);
-            }
-
-            updateCartRequest.map(async (request) => {
-              try {
-                const resp = await cartApi.updateCart(request, request.cartId);
-                console.log(resp);
-              } catch (error) {
-                console.log("Cart: " + error);
-              }
-              localStorage.removeItem("cartCheckout");
-            });
+            // Update Cart
+            handleUpdateCart(updateCartRequest);
+            localStorage.removeItem("cartCheckout");
           }
         } else {
           return console.log("Other Error");
@@ -174,6 +154,57 @@ const Checkout = () => {
       );
     }
   }, [responseCode]);
+
+  const handleCreateRegisterCourse = (updateCartRequest) => {
+    const registerCourseRequest = updateCartRequest.map((rc) => ({
+      courseId: rc.courseId,
+      studentId: 1,
+    }));
+
+    console.log(registerCourseRequest[0]);
+
+    try {
+      const resp = registerCourseApi.createRegisterCourse(
+        registerCourseRequest[0]
+      );
+    } catch (error) {
+      console.log("RegisterCourse: " + error);
+    }
+  };
+
+  const handleCreateBillAndBillDetail = (updateCartRequest) => {
+    try {
+      const resp = billApi.createBill(bill);
+    } catch (error) {
+      console.log("Bill: " + error);
+    }
+
+    localStorage.removeItem("billCheckout");
+
+    // create bill Request for add bill and bill Detail
+    const billDetailRequest = updateCartRequest.map((detail) => ({
+      totalPrice: totalPrice,
+      courseId: detail.courseId,
+    }));
+
+    // Bill detail
+    try {
+      const resp = billApi.createBillDetail(billDetailRequest);
+    } catch (error) {
+      console.log("BillDetail: " + error);
+    }
+  };
+
+  // update cart
+  const handleUpdateCart = (updateCartRequest) => {
+    updateCartRequest.map(async (request) => {
+      try {
+        const resp = await cartApi.updateCart(request, request.cartId);
+      } catch (error) {
+        console.log("Cart: " + error);
+      }
+    });
+  };
 
   useEffect(() => {
     if (count === 0) {
@@ -189,9 +220,7 @@ const Checkout = () => {
   useEffect(() => {
     const timeoutRedirect = setTimeout(() => {
       if (checkoutComplete.status === "success") {
-        const url = "http://localhost:3000/cart";
-        window.location.href = url;
-        // return redirect(url);
+        // return navigate("/cart");
       }
     }, 9000);
     return () => clearTimeout(timeoutRedirect);
@@ -215,8 +244,8 @@ const Checkout = () => {
       {/* Title */}
       <div>
         <h1 className="font-weight-800 text-dark my-5 display-2">Thanh toán</h1>
-        <Link to="/cart" className="mt--5">
-          <h3 className="text-muted">
+        <Link to="/cart">
+          <h3 className="text-muted mt--4">
             <i className="bx bx-chevrons-left mr-2"></i>trở về
           </h3>
         </Link>
@@ -293,7 +322,7 @@ const Checkout = () => {
                             aria-controls="collapseTwo"
                           >
                             <input
-                              id="momo"
+                              id="paypal"
                               type="radio"
                               name="checkoutMethod"
                               className="mr-3"
@@ -301,7 +330,7 @@ const Checkout = () => {
                                 handleChangeCheckoutMethod(e.target)
                               }
                             />
-                            <label htmlFor="momo">
+                            <label htmlFor="paypal">
                               <img
                                 src={logoMomo}
                                 width="50px"
@@ -332,7 +361,7 @@ const Checkout = () => {
                     Chi tiết hóa đơn
                   </h2>
                   {listCart.map((cart) => (
-                    <Row className="mb-2">
+                    <Row className="mb-2" key={cart.cartId}>
                       <Col lg="2" xl="2" md="2" sm="2">
                         <img
                           src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
@@ -449,11 +478,7 @@ const Checkout = () => {
         </Row>
       </div>
 
-      <Modal
-        className="modal-dialog-centered"
-        isOpen={showModal}
-        toggle={showModal}
-      >
+      <Modal className="modal-dialog-centered" isOpen={showModal}>
         <ModalBody>
           {checkoutComplete.status !== "" && (
             <>
@@ -512,18 +537,24 @@ const Checkout = () => {
                       </div>
                       <div className="d-flex justify-content-between">
                         <div className="text-muted">Hình thức thanh toán:</div>
-                        <div className="font-weight-600">{checkOutMethod}</div>
+                        <div className="font-weight-600">
+                          {checkOutMethod.toUpperCase()}
+                        </div>
                       </div>
                       <div className="d-flex justify-content-between">
                         <div className="text-muted">Thanh toán bằng:</div>
                         <div className="font-weight-600">{paymentType}</div>
+                      </div>
+                      <div className="d-flex justify-content-between">
+                        <div className="text-muted">Ngân hàng thanh toán:</div>
+                        <div className="font-weight-600">NCB</div>
                       </div>
                     </>
 
                     <div className="d-flex justify-content-between">
                       <div className="text-muted">Thời gian thanh toán:</div>
                       <div className="font-weight-600">
-                        {new Date().toLocaleString()}
+                        {checkoutComplete.time}
                       </div>
                     </div>
                   </div>

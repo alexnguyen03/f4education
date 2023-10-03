@@ -37,6 +37,12 @@ public class RegisterCourse {
     @Column(name = "register_course_id")
     private Integer registerCourseId;
 
+    @Column(name = "start_date")
+    private Date startDate;
+
+    @Column(name = "end_date")
+    private Date endDate;
+
     @Column(name = "course_price")
     private Float coursePrice;
 

@@ -99,6 +99,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/bills/**",
                                         "api/bill-detail/**",
                                         "/api/payment-method/**",
+                                        "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/img/**")
                                 .permitAll()
@@ -122,6 +123,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/bills",
                                         "/api/bill-detail/**",
                                         "/api/payment-method/**",
+                                        "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/img/**")
                                 .permitAll().anyRequest().authenticated());

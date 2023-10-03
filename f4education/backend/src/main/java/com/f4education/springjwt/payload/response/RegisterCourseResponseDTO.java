@@ -26,9 +26,12 @@ public class RegisterCourseResponseDTO {
     private String courseDuration;
 
     private Float coursePrice;
-    
+
     private String image;
 
     private String studentName;
 
+    private Date startDate;
+
+    private Date endDate;
 }
