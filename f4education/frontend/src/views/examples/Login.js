@@ -126,9 +126,11 @@ const Login = () => {
 		return true;
 	};
 	useEffect(() => {
-		gapi.load('client:auth2', () => {
-			gapi.auth2.init({clientId: process.env.REACT_APP_CLIENTID});
-		});
+		if (process.env.REACT_APP_CLIENTID) {
+			gapi.load('client:auth2', () => {
+				gapi.auth2.init({clientId: process.env.REACT_APP_CLIENTID});
+			});
+		}
 	}, []);
 	return (
 		<>

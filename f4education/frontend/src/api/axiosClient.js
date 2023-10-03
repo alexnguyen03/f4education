@@ -38,6 +38,7 @@ axiosClient.interceptors.response.use(
 					axiosClient.defaults.headers.common['x-access-token'] = accessToken;
 					return axiosClient(originalConfig);
 				} catch (_error) {
+					console.log('🚀 ~ file: axiosClient.js:41 ~ _error:', _error);
 					if (_error.response && _error.response.data) {
 						return err.response;
 					}

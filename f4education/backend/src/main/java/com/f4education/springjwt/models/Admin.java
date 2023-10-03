@@ -23,9 +23,9 @@ import java.util.List;
 @Table(name = "Admin")
 public class Admin implements Serializable {
 
-	@OneToMany(mappedBy = "admin")
-	@JsonIgnore
-	private List<Bill> bill;
+	// @OneToMany(mappedBy = "admin")
+	// @JsonIgnore
+	// private List<Bill> bill;
 
 	@OneToMany(mappedBy = "admin")
 	@JsonIgnore

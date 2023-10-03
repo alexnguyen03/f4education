@@ -43,9 +43,9 @@ public class Student {
 	@Column(name = "image")
 	private String image;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "student")
-	List<Attendance> attendances;
+	// @JsonIgnore
+	// @OneToMany(mappedBy = "student")
+	// List<Attendance> attendances;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
@@ -63,9 +63,9 @@ public class Student {
 	@OneToMany(mappedBy = "student")
 	List<RegisterCourse> registerCourses;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "student")
-	List<Schedule> schedules;
+	// @JsonIgnore
+	// @OneToMany(mappedBy = "student")
+	// List<Schedule> schedules;
 
 	@ManyToOne
 	@JsonIgnore
