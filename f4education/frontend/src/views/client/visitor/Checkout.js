@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Col, Modal, ModalBody, Row } from "reactstrap";
 // import Notification from "@mantine/core";
 // import IconCheck from "@tabler/icons-react";
 
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
-import logoMomo from "../../../assets/img/logo-momo.png";
+import logoPayPal from "../../../assets/img/logo-paypal.png";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
 
 // API
@@ -14,26 +14,33 @@ import cartApi from "../../../api/cartApi";
 import billApi from "../../../api/billApi";
 import registerCourseApi from "../../../api/registerCourseApi";
 import Paypal from "./PayPal";
+import moment from "moment";
 const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const Checkout = () => {
   // router Variable
   const [listCart] = useState(JSON.parse(localStorage.getItem("cartCheckout")));
+  let navigate = useNavigate();
 
   // *************** Action Variable
   const [checkOutMethod, setCheckOutMethod] = useState("vnpay");
   const [totalPrice, setTotalPrice] = useState(0);
-  const [searchParams] = useSearchParams();
-  const [responseCode, setResponseCode] = useState("");
+
+  //  VNPAY + PAYPAL
   const [transactionNo, setTransactionNo] = useState("");
   const [paymentType, setPaymentType] = useState("");
-  const [checkout, setCheckout] = useState(false);
-  let navigate = useNavigate();
+  const [bankCheckout,setBankCheckout] = useState("");
 
+  // VNPAY
+  const [searchParams] = useSearchParams();
+  const [responseCode, setResponseCode] = useState("");
+
+  // PayPal
+  const [checkoutPayPal, setPayPalCheckout] = useState(false);
+  const [showingPayPal, setShowingPayPal] = useState(false);
   const [checkoutComplete, setCheckoutComplete] = useState({
     status: "",
     infor: "",
-    time: new Date().toLocaleString(),
   });
   const [showModal, setShowModal] = useState(false);
   const [count, setCount] = useState(10);
@@ -58,7 +65,11 @@ const Checkout = () => {
 
   const handleCreatePayment = async (checkOutMethod) => {
     localStorage.setItem("billCheckout", JSON.stringify(bill));
-
+    if (checkOutMethod === "paypal") {
+      setPayPalCheckout(true);
+      setShowingPayPal(true);
+      return;
+    }
     if (checkOutMethod === "") {
       alert("Choose checkout method bro!");
       return;
@@ -105,6 +116,49 @@ const Checkout = () => {
     setPaymentType(searchParams.get("vnp_CardType"));
   }, [responseCode, searchParams]);
 
+  const [paypalPaymentAt, setPayPalPaymentAt] = useState("");
+
+  const handlePaymentPayPalComplete = useCallback((order) => {
+    setPayPalCheckout(true);
+    setShowModal(true);
+    setCheckoutComplete({
+      status: "success",
+      infor: "Thanh toán thành công!",
+    });
+
+    setTransactionNo(order.id);
+    setPayPalPaymentAt((new Date()).toLocaleString());
+    setPaymentType("PayPal");
+    setBankCheckout("PayPal Wallet");
+
+    const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
+
+    if (listCar !== null) {
+      const updateCartRequest = listCar.map((cart) => ({
+        cartId: cart.cartId,
+        courseId: cart.course.courseId,
+        createDate: cart.createDate,
+      }));
+
+      // Create RegisterCoures
+      handleCreateRegisterCourse(updateCartRequest);
+
+      // Create Bill
+      handleCreateBillAndBillDetail(updateCartRequest);
+
+      // Update Cart
+      handleUpdateCart(updateCartRequest);
+      localStorage.removeItem("cartCheckout");
+
+      // PayPal checkout logic
+      setShowingPayPal(false);
+      setPayPalCheckout(false);
+    } else {
+      return console.log("Other Error");
+    }
+    // Xử lý dữ liệu từ thành phần con tại đây
+  }, []);
+
   useEffect(() => {
     if (responseCode !== null) {
       const handleUpdateCartAndCreateBill = () => {
@@ -113,7 +167,6 @@ const Checkout = () => {
           setCheckoutComplete({
             status: "cancle",
             infor: "Hóa đơn đã được hủy!",
-            time: "",
           });
           return console.log("Check out fail, cancle progress");
         }
@@ -122,8 +175,9 @@ const Checkout = () => {
           setCheckoutComplete({
             status: "success",
             infor: "Thanh toán thành công!",
-            time: "",
           });
+          setPayPalPaymentAt((new Date()).toLocaleString());
+          setBankCheckout("NCB");
 
           const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
           // const billRequest = JSON.parse(localStorage.getItem("billCheckout"));
@@ -217,29 +271,32 @@ const Checkout = () => {
       setCount((prevCount) => prevCount - 1);
     }, 1000);
     return () => clearTimeout(timer);
-  }, [count]);
+  }, [count, handlePaymentPayPalComplete]);
 
   useEffect(() => {
     const timeoutRedirect = setTimeout(() => {
       if (checkoutComplete.status === "success") {
-        // return navigate("/cart");
+        return navigate("/cart");
       }
     }, 9000);
     return () => clearTimeout(timeoutRedirect);
-  }, [checkoutComplete]);
+  }, [checkoutComplete, handlePaymentPayPalComplete, navigate]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
       setCheckoutComplete({
         status: "",
         infor: "",
-        time: "",
       });
       setShowModal(false);
+      setTransactionNo("");
+      setPaymentType("");
+      setPayPalPaymentAt("");
+      setBankCheckout("");
     }, 10000);
 
     return () => clearTimeout(timeout);
-  }, [checkoutComplete, showModal]);
+  }, [checkoutComplete, showModal, handlePaymentPayPalComplete]);
 
   return (
     <>
@@ -252,18 +309,6 @@ const Checkout = () => {
           </h3>
         </Link>
       </div>
-
-      {checkout ? (
-        <Paypal {...{totalPrice}}/>
-      ) : (
-        <button
-          onClick={() => {
-            setCheckout(true);
-          }}
-        >
-          Checkout
-        </button>
-      )}
 
       {/* content */}
       <div className="mt-5">
@@ -288,6 +333,10 @@ const Checkout = () => {
                             data-target="#collapseOne"
                             aria-expanded="true"
                             aria-controls="collapseOne"
+                            onChange={(e) =>
+                              handleChangeCheckoutMethod(e.target)
+                            }
+                            htmlFor="vnpay"
                           >
                             <input
                               id="vnpay"
@@ -334,6 +383,10 @@ const Checkout = () => {
                             data-target="#collapseTwo"
                             aria-expanded="false"
                             aria-controls="collapseTwo"
+                            onChange={(e) =>
+                              handleChangeCheckoutMethod(e.target)
+                            }
+                            htmlFor="paypal"
                           >
                             <input
                               id="paypal"
@@ -346,7 +399,7 @@ const Checkout = () => {
                             />
                             <label htmlFor="paypal">
                               <img
-                                src={logoMomo}
+                                src={logoPayPal}
                                 width="50px"
                                 height="50px"
                                 className="img-fluid"
@@ -364,7 +417,7 @@ const Checkout = () => {
                       >
                         <div className="card-body">
                           Để hoàn tất giao dịch của bạn, chúng tôi sẽ chuyển bạn
-                          đến máy chủ bảo mật của <strong>Momo</strong>.
+                          đến máy chủ bảo mật của <strong>PayPal</strong>.
                         </div>
                       </div>
                     </div>
@@ -458,16 +511,32 @@ const Checkout = () => {
                         Điều khoản dịch vụ này.
                       </span>
                       <br />
-                      <Link className="w-100">
-                        <Button
-                          color="primary"
-                          className="w-100 mt-2"
-                          style={{ borderRadius: "3px" }}
-                          onClick={() => handleCreatePayment(checkOutMethod)}
-                        >
-                          Tiếp tục
-                        </Button>
-                      </Link>
+
+                      <div className="mt-2">
+                        {showingPayPal && checkoutPayPal ? (
+                          <>
+                            <Paypal
+                              totalPrice={totalPrice}
+                              handlePaymentPayPalComplete={
+                                handlePaymentPayPalComplete
+                              }
+                            />
+                          </>
+                        ) : (
+                          <>
+                            <Button
+                              color="primary"
+                              className="w-100 mt-2"
+                              style={{ borderRadius: "3px" }}
+                              onClick={() =>
+                                handleCreatePayment(checkOutMethod)
+                              }
+                            >
+                              Tiếp tục
+                            </Button>
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -559,16 +628,21 @@ const Checkout = () => {
                         <div className="text-muted">Thanh toán bằng:</div>
                         <div className="font-weight-600">{paymentType}</div>
                       </div>
+
                       <div className="d-flex justify-content-between">
                         <div className="text-muted">Ngân hàng thanh toán:</div>
-                        <div className="font-weight-600">NCB</div>
+                        <div className="font-weight-600">
+                          {bankCheckout}
+                        </div>
                       </div>
                     </>
 
                     <div className="d-flex justify-content-between">
                       <div className="text-muted">Thời gian thanh toán:</div>
                       <div className="font-weight-600">
-                        {checkoutComplete.time}
+                        {moment(paypalPaymentAt).format(
+                          "DD-MM-yyyy, h:mm:ss A"
+                        )}
                       </div>
                     </div>
                   </div>

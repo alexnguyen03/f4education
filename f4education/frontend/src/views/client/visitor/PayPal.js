@@ -1,7 +1,9 @@
 import React, { useRef, useEffect } from "react";
 
-export default function Paypal({ totalPrice }) {
+export default function Paypal({ totalPrice, handlePaymentPayPalComplete }) {
   const paypal = useRef();
+
+  const converterPrice = totalPrice * 0.000057;
 
   useEffect(() => {
     window.paypal
@@ -14,7 +16,8 @@ export default function Paypal({ totalPrice }) {
                 description: "Cool looking table",
                 amount: {
                   currency_code: "CAD",
-                  value: totalPrice,
+                  value: converterPrice,
+                  // value: 5.0,
                 },
               },
             ],
@@ -22,10 +25,15 @@ export default function Paypal({ totalPrice }) {
         },
         onApprove: async (data, actions) => {
           const order = await actions.order.capture();
-          console.log(order);
+          handlePaymentPayPalComplete(order);
+          // localStorage.setItem("paypalCheckOut", JSON.stringify(order));
         },
         onError: (err) => {
           console.log(err);
+          // window.location.href = "/your-error-page-here";
+        },
+        oncancel: (data) => {
+          console.log("cancle:" + data);
         },
       })
       .render(paypal.current);

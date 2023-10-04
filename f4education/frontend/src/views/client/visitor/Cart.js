@@ -110,7 +110,8 @@ function Cart() {
     e.preventDefault();
     try {
       const resp = await cartApi.removeCart(cartId);
-      setCarts(resp);
+      // setCarts(resp);
+      fetchCart();
       console.log("remove successfully");
     } catch (error) {
       console.log(error);
@@ -138,7 +139,8 @@ function Cart() {
       studentId: 1,
     };
     try {
-      const resp = cartApi.createCart(cart);
+      const resp = await cartApi.createCart(cart);
+      fetchCart();
     } catch (error) {
       console.log(error);
     }
@@ -233,12 +235,21 @@ function Cart() {
         <HoverCard.Dropdown>
           <Button
             color="grape"
-            variant="subtle"
+            variant="light"
             onClick={() => handleAddCart(course)}
             leftIcon={<IconShoppingCartPlus size="1rem" />}
           >
             Thêm vào giỏ hàng
           </Button>
+          <Text c="dimmed">
+            Giá khóa học:
+            <Text fw="500">
+              {course.coursePrice.toLocaleString("it-IT", {
+                style: "currency",
+                currency: "VND",
+              })}
+            </Text>
+          </Text>
         </HoverCard.Dropdown>
       </HoverCard>
     </Carousel.Slide>
@@ -324,114 +335,146 @@ function Cart() {
                   <hr className="text-muted mt-0 pt-0" />
 
                   {/* item */}
-                  {carts.map((cart, index) => (
-                    <>
-                      <Grid>
-                        <Grid.Col span={2}>
-                          <Link
-                            Link
-                            to={`/course/${cart.course.courseId}`}
-                            key={index}
-                          >
-                            <img
-                              src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                              // src={cart.course.courseImage}
-                              alt={`${cart.course.courseName}`}
-                              className="img-fluid"
-                              style={{
-                                maxHeight: "100px",
-                                width: "100%",
-                                objectFit: "cover",
-                              }}
-                            />
-                          </Link>
-                        </Grid.Col>
-                        <Grid.Col span={10}>
-                          <Grid>
-                            <Grid.Col xl="6" lg="6" md="12" sm="12">
-                              <Link
-                                Link
-                                to={`/course/${cart.course.courseId}`}
-                                key={index}
-                              >
-                                <p className="font-weight-700 text-dark m-0 p-0">
-                                  {cart.course.courseName}
-                                </p>
-                                <span className="text-muted">
-                                  {/* Môn học: <strong>{cart.subjectName}</strong> */}
-                                </span>
-                                <div className="d-flex text-dark">
-                                  <span className="font-weight-600">
-                                    {/* {cart.ratings} */}4.6
-                                  </span>
-                                  <div className="mx-2">
-                                    <i className="bx bxs-star text-warning"></i>
-                                    <i className="bx bxs-star text-warning"></i>
-                                    <i className="bx bxs-star text-warning"></i>
-                                    <i className="bx bxs-star text-warning"></i>
-                                    <i className="bx bx-star"></i>
-                                  </div>
-                                  <span className="text-muted">
-                                    {/* ({cart.reviews}) */} (39.930)
-                                  </span>
-                                </div>
-                                <div className="d-flex justify-content-start">
-                                  <span className="text-muted">
-                                    {cart.course.courseDuration}
-                                  </span>
-                                  <span className="mx-2">-</span>
-                                  <span className="text-muted">
-                                    {cart.course.numberSession} bài giảng
-                                  </span>
-                                  <span className="mx-2">-</span>
-                                  <span className="text-muted">All Levels</span>
-                                </div>
-                              </Link>
-                            </Grid.Col>
-                            <Grid.Col xl="2" lg="2" md="6" sm="6">
-                              <div>
+                  {carts.length > 0 ? (
+                    carts.map((cart, index) => (
+                      <>
+                        <Grid>
+                          <Grid.Col span={2}>
+                            <Link
+                              Link
+                              to={`/course/${cart.course.courseId}`}
+                              key={index}
+                            >
+                              <img
+                                src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                // src={cart.course.courseImage}
+                                alt={`${cart.course.courseName}`}
+                                className="img-fluid"
+                                style={{
+                                  maxHeight: "100px",
+                                  width: "100%",
+                                  objectFit: "cover",
+                                }}
+                              />
+                            </Link>
+                          </Grid.Col>
+                          <Grid.Col span={10}>
+                            <Grid>
+                              <Grid.Col xl="6" lg="6" md="12" sm="12">
                                 <Link
-                                  to={`/cart/${cart.cartId}`}
-                                  className="text-danger font-weight-700"
-                                  onClick={(e) => {
-                                    handleRemoveCart(cart.cartId, e);
-                                  }}
+                                  Link
+                                  to={`/course/${cart.course.courseId}`}
+                                  key={index}
                                 >
-                                  Remove
+                                  <p className="font-weight-700 text-dark m-0 p-0">
+                                    {cart.course.courseName}
+                                  </p>
+                                  <span className="text-muted">
+                                    {/* Môn học: <strong>{cart.subjectName}</strong> */}
+                                  </span>
+                                  <div className="d-flex text-dark">
+                                    <span className="font-weight-600">
+                                      {/* {cart.ratings} */}4.6
+                                    </span>
+                                    <div className="mx-2">
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bxs-star text-warning"></i>
+                                      <i className="bx bx-star"></i>
+                                    </div>
+                                    <span className="text-muted">
+                                      {/* ({cart.reviews}) */} (39.930)
+                                    </span>
+                                  </div>
+                                  <div className="d-flex justify-content-start">
+                                    <span className="text-muted">
+                                      {cart.course.courseDuration}
+                                    </span>
+                                    <span className="mx-2">-</span>
+                                    <span className="text-muted">
+                                      {cart.course.numberSession} bài giảng
+                                    </span>
+                                    <span className="mx-2">-</span>
+                                    <span className="text-muted">
+                                      All Levels
+                                    </span>
+                                  </div>
                                 </Link>
-                              </div>
-                            </Grid.Col>
-                            <Grid.Col xl="2" lg="2" md="6" sm="6">
-                              <div>
-                                <span className="text-primary font-weight-700">
-                                  {cart.course.coursePrice.toLocaleString(
-                                    "it-IT",
-                                    {
-                                      style: "currency",
-                                      currency: "VND",
+                              </Grid.Col>
+                              <Grid.Col xl="2" lg="2" md="4" sm="6">
+                                <div>
+                                  <Link
+                                    to={`/cart/${cart.cartId}`}
+                                    className="text-danger font-weight-700"
+                                    onClick={(e) => {
+                                      handleRemoveCart(cart.cartId, e);
+                                    }}
+                                  >
+                                    Remove
+                                  </Link>
+                                </div>
+                              </Grid.Col>
+                              <Grid.Col xl="2" lg="2" md="4" sm="6">
+                                <div>
+                                  <span className="text-primary font-weight-700">
+                                    {cart.course.coursePrice.toLocaleString(
+                                      "it-IT",
+                                      {
+                                        style: "currency",
+                                        currency: "VND",
+                                      }
+                                    )}
+                                  </span>
+                                </div>
+                              </Grid.Col>
+                              <Grid.Col xl="2" lg="2" md="4" sm="12">
+                                <div className="d-flex justify-content-sm-end justify-content-md-end">
+                                  <Checkbox
+                                    // label="I agree to sell my privacy"
+                                    color="violet"
+                                    checked={selectedItem === cart.cartId}
+                                    onChange={() =>
+                                      handleCheckboxChange(cart.cartId)
                                     }
-                                  )}
-                                </span>
-                              </div>
-                            </Grid.Col>
-                            <Grid.Col xl="2" lg="2" md="12" sm="12">
-                              <div className="d-flex justify-content-sm-end justify-content-md-end">
-                                <Checkbox
-                                  // label="I agree to sell my privacy"
-                                  color="violet"
-                                  checked={selectedItem === cart.cartId}
-                                  onChange={() =>
-                                    handleCheckboxChange(cart.cartId)
-                                  }
-                                />
-                              </div>
-                            </Grid.Col>
-                          </Grid>
-                          <hr className="text-muted" />
-                        </Grid.Col>
-                      </Grid>
+                                  />
+                                </div>
+                              </Grid.Col>
+                            </Grid>
+                            <hr className="text-muted" />
+                          </Grid.Col>
+                        </Grid>
+                      </>
+                    ))
+                  ) : (
+                    <>
+                      <Card className="w-100 shadow-lg">
+                        <Card.Section className="text-center">
+                          <img
+                            src={cartEmptyimage}
+                            width="40%"
+                            height="40%"
+                            alt=""
+                            className="img-fluid"
+                          />
+                          <h1 className="font-weight-800">
+                            Giỏ hàng của bạn trống. <br />
+                            Tiếp tục mua sắm để tìm một khóa học ưng ý!
+                          </h1>
+                          <Link to={"/course"}>
+                            <Button
+                              color="violet"
+                              size={"lg"}
+                              className="font-weight-800 mb-5 mt-2"
+                              style={{ borderRadius: "2px", fontSize: "20px" }}
+                            >
+                              Tìm Khóa học
+                            </Button>
+                          </Link>
+                        </Card.Section>
+                      </Card>
                     </>
-                  ))}
+                  )}
                 </Grid.Col>
                 <Grid.Col
                   xl="3"
@@ -457,6 +500,7 @@ function Cart() {
                     size="md"
                     className="w-100"
                     style={{ borderRadius: "2px" }}
+                    disabled={carts.length === 0}
                     onClick={() => handleCheckOut()}
                   >
                     Thanh toán
@@ -474,7 +518,7 @@ function Cart() {
 
       <Carousel
         slideSize="25%"
-        height="300px"
+        height="350px"
         slideGap="lg"
         controlsOffset="xs"
         align="start"
