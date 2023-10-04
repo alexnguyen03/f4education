@@ -88,8 +88,7 @@
     "react-select": "^5.7.4",
     "react-timeline-scribble": "^1.0.14",
     "reactstrap": "8.10.0",
-    "sass": "1.62.1",
-    "styled-components": "^6.0.8"
+    "sass": "1.62.1"
   },
   "peerDependencies": {
     "react": ">=16.0.0",
