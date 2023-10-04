@@ -63,13 +63,14 @@ const Admin = (props) => {
 	};
 	const getAdminInfo = () => {
 		const user = JSON.parse(localStorage.getItem('user'));
+		console.log('🚀 ~ file: Admin.js:66 ~ getAdminInfo ~ user:', user);
 		if (user) {
-			setAdminName(user.username);
-			console.log('🚀 ~ file: Admin.js:69 ~ getAdminInfo ~ user.username:', user.username);
+			setAdminName(user.fullName);
 		}
 	};
 	useEffect(() => {
 		getAdminInfo();
+		console.log("🚀 ~ file: Admin.js:74 ~ useEffect ~ JSON.parse(localStorage.getItem('user') | '');:", JSON.parse(localStorage.getItem('user')));
 	});
 
 	return (

@@ -28,12 +28,15 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 // const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
-  { title: "Trang chủ", href: "/" },
-  { title: "Giỏ hàng", href: "/cart" },
+	{title: 'Trang chủ', href: '/'},
+	{title: 'Giỏ hàng', href: '/cart'},
 ].map((item, index) => (
-  <Anchor href={item.href} key={index} color="dimmed">
-    <Text fs="italic">{item.title}</Text>
-  </Anchor>
+	<Anchor
+		href={item.href}
+		key={index}
+		color='dimmed'>
+		<Text fs='italic'>{item.title}</Text>
+	</Anchor>
 ));
 
 // const cartItem = [
@@ -87,7 +90,7 @@ function Cart() {
     try {
       setLoading(true);
       const resp = await cartApi.getAllCart();
-      setCarts(resp);
+      setCarts(resp.data);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -98,7 +101,7 @@ function Cart() {
     try {
       setLoading(true);
       const resp = await courseApi.getNewestCourse();
-      setNewestCourse(resp.reverse());
+      setNewestCourse(resp.data);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -276,19 +279,17 @@ function Cart() {
     setSelectedCart(cartCheckout);
   }, [selectedItem]);
 
-  useEffect(() => {
-    console.log(selectedCart);
-  }, [selectedCart]);
-
-  return (
-    <>
-      {/* BreadCums */}
-      <Breadcrumbs className="my-5 p-3" style={{ backgroundColor: "#ebebeb" }}>
-        {itemsBreadcum}
-      </Breadcrumbs>
+	return (
+		<>
+			{/* BreadCums */}
+			<Breadcrumbs
+				className='my-5 p-3'
+				style={{backgroundColor: '#ebebeb'}}>
+				{itemsBreadcum}
+			</Breadcrumbs>
 
       {/* Title */}
-      <h1 className="font-weight-700 text-dark my-5 display-2">Giỏ hàng</h1>
+      <h1 className="font-weight-700 text-dark my-5 display-4">Giỏ hàng</h1>
 
       {/* Loading */}
       {loading ? (
@@ -308,10 +309,10 @@ function Cart() {
                     alt=""
                     className="img-fluid"
                   />
-                  <h1 className="font-weight-800">
+                  <h3 className="font-weight-800">
                     Giỏ hàng của bạn trống. <br />
                     Tiếp tục mua sắm để tìm một khóa học ưng ý!
-                  </h1>
+                  </h3>
                   <Link to={"/course"}>
                     <Button
                       color="violet"
@@ -329,9 +330,9 @@ function Cart() {
             <>
               <Grid>
                 <Grid.Col xl="9" lg="9" md="12" sm="12">
-                  <h3 className="font-weight-600 text-dark">
+                  <h5 className="font-weight-600 text-dark">
                     {carts.length} khóa học trong giỏ hàng
-                  </h3>
+                  </h5>
                   <hr className="text-muted mt-0 pt-0" />
 
                   {/* item */}
@@ -486,12 +487,12 @@ function Cart() {
                   <span className="font-weight-600 text-muted">
                     Tổng tiền:
                     <br />
-                    <h1 className="font-weight-700">
+                    <h3 className="font-weight-700">
                       {totalPrice.toLocaleString("it-IT", {
                         style: "currency",
                         currency: "VND",
                       })}
-                    </h1>
+                    </h3>
                   </span>
                   {/* <Link to={"/payment/checkout"} className="mt-2 mb-4"> */}
                   <Button
@@ -507,12 +508,12 @@ function Cart() {
                   </Button>
                 </Grid.Col>
               </Grid>
-            </>
+          </>
           )}
         </>
       )}
 
-      <h3 className="font-weight-700 text-dark my-5 display-3">
+      <h3 className="font-weight-700 text-dark my-5">
         Những khóa học mới nhất
       </h3>
 

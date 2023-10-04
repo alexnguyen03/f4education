@@ -37,13 +37,13 @@ const ClientNavbar = () => {
   const [totalPrice, setTotalPrice] = useState(0);
 
   // useEffect(() => {
-   
+
   // }, [searchParams]);
 
   const fetchCart = async () => {
     try {
       const resp = await cartApi.getAllCart();
-      setCarts(resp);
+      setCarts(resp.data);
     } catch (error) {
       console.log(error);
     }
@@ -52,8 +52,10 @@ const ClientNavbar = () => {
   useEffect(() => {
     // get Total Price from list totalCartItem
     let newTotalPrice = 0;
-    carts.map((item) => (newTotalPrice += item.course.coursePrice));
-    setTotalPrice(newTotalPrice);
+    if (carts) {
+      carts.map((item) => (newTotalPrice += item.course.coursePrice));
+      setTotalPrice(newTotalPrice);
+    }
   }, [carts]);
 
   useEffect(() => {
@@ -189,7 +191,7 @@ const ClientNavbar = () => {
                     color="rgba(0, 0, 0, 1)"
                     className="header-cart font-weight-700"
                   >
-                    {carts.length}
+                    {carts.length > 0 ? carts.length : 0}
                   </Badge>
                   <div className="cart-detail">
                     {carts.length === 0 ? (

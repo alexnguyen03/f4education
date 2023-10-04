@@ -2,6 +2,7 @@ package com.f4education.springjwt.interfaces;
 
 import java.util.List;
 
+import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 
 public interface TeacherService {
@@ -12,4 +13,6 @@ public interface TeacherService {
     TeacherDTO createTeacher(TeacherDTO teacherDTO);
 
     TeacherDTO updateTeacher(TeacherDTO teacherDTO);
+
+    Teacher findByUserId(String userId);
 }

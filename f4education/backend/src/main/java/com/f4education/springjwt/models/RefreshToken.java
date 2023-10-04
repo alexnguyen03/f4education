@@ -1,6 +1,6 @@
 package com.f4education.springjwt.models;
 
-import java.time.Instant;
+import java.util.Date;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,7 +14,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @AllArgsConstructor
@@ -24,21 +23,21 @@ import lombok.ToString;
 @Table(name = "refreshtoken")
 public class RefreshToken {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "account_id")
     private User user;
 
     @Column(nullable = false, unique = true)
     private String token;
 
-    @Column(nullable = false)
-    private Instant expiryDate;
+    @Column(nullable = false, name = "expiry_date")
+    private Date expiryDate;
 
-	@Override
-	public String toString() {
-		return "RefreshToken [id=" + id + ", user=" + user + ", token=" + token + ", expiryDate=" + expiryDate + "]";
-	}
+    @Override
+    public String toString() {
+        return "RefreshToken [id=" + id + ", token=" + token + ", expiryDate=" + expiryDate + "]";
+    }
 }

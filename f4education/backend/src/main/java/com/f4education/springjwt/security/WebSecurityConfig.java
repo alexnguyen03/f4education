@@ -1,9 +1,9 @@
 package com.f4education.springjwt.security;
 
-import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
-import com.f4education.springjwt.security.jwt.AuthTokenFilter;
-import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
+import javax.sql.DataSource;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,8 +13,26 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.oauth2.client.registration.ClientRegistration;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.client.web.HttpSessionOAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestRedirectFilter;
+import org.springframework.security.oauth2.client.web.OAuth2AuthorizedClientRepository;
+import org.springframework.security.oauth2.client.web.OAuth2LoginAuthenticationFilter;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
+import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
+
+import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
+import com.f4education.springjwt.security.jwt.AuthTokenFilter;
+import com.f4education.springjwt.security.services.CustomOAuth2UserService;
+import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
 
 @Configuration
 @EnableMethodSecurity
@@ -22,22 +40,19 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 // jsr250Enabled = true,
 // prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
-    @Autowired
-    UserDetailsServiceImpl userDetailsService;
+
+	@Value("${f4education.app.jwtSecret}")
+	private String key;
+	@Autowired
+	UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
-
-    // @Override
-    // public void configure(AuthenticationManagerBuilder
-    // authenticationManagerBuilder) throws Exception {
-    // authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-    // }
+	@Bean
+	public AuthTokenFilter authenticationJwtTokenFilter() {
+		return new AuthTokenFilter();
+	}
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -46,37 +61,18 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 
-        return authProvider;
-    }
-
-    // @Bean
-    // @Override
-    // public AuthenticationManager authenticationManagerBean() throws Exception {
-    // return super.authenticationManagerBean();
-    // }
+		return authProvider;
+	}
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-    @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    // @Override
-    // protected void configure(HttpSecurity http) throws Exception {
-    // http.cors().and().csrf().disable()
-    // .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
-    // .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-    // .authorizeRequests().antMatchers("/api/auth/**").permitAll()
-    // .antMatchers("/api/test/**").permitAll()
-    // .anyRequest().authenticated();
-    //
-    // http.addFilterBefore(authenticationJwtTokenFilter(),
-    // UsernamePasswordAuthenticationFilter.class);
-    // }
+	@Bean
+	public BCryptPasswordEncoder passwordEncoder() {
+		return new BCryptPasswordEncoder();
+	}
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -122,6 +118,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/payment/**",
                                         "/api/bills",
                                         "/api/bill-detail/**",
+                                        "/api/accounts/**",
+										"/api/teachers-history/**",
                                         "/api/payment-method/**",
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",

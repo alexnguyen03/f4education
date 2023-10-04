@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Col, Modal, ModalBody, Row } from "reactstrap";
-// import Notification from "@mantine/core";
 // import IconCheck from "@tabler/icons-react";
 
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
@@ -15,7 +14,7 @@ import billApi from "../../../api/billApi";
 import registerCourseApi from "../../../api/registerCourseApi";
 import Paypal from "./PayPal";
 import moment from "moment";
-const PUBLIC_IMAGE = "http://localhost:8080/img";
+const PUBLIC_IMAGE = process.env.PUBLIC_URL;
 
 const Checkout = () => {
   // router Variable

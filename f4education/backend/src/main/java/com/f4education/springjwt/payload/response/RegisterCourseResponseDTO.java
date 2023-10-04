@@ -23,7 +23,7 @@ public class RegisterCourseResponseDTO {
 
     private String courseDescription;
 
-    private String courseDuration;
+    private Integer courseDuration;
 
     private Float coursePrice;
 

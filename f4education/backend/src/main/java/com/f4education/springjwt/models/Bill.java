@@ -44,9 +44,9 @@ public class Bill {
     @JsonIgnore
     List<BillDetail> detailBills;
 
-//	@ManyToOne
-//	@JoinColumn(name = "admin_id")
-//	Admin admin;
+	// @ManyToOne
+	// @JoinColumn(name = "admin_id")
+	// Admin admin;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
