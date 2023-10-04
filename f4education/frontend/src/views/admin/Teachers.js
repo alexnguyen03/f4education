@@ -310,7 +310,7 @@ const Teachers = () => {
 			setLoadingTeachers(true);
 			const resp = await teacherApi.getAllTeachers();
 			console.log('🚀 ~ file: Teachers.js:313 ~ getAllTeacher ~ resp:', resp);
-			// setTeachers(resp.data.reverse());
+			setTeachers(resp.data.reverse());
 			setLoadingTeachers(false);
 		} catch (error) {
 			console.log('failed to load data', error);
