@@ -747,7 +747,6 @@ const Teachers = () => {
 													<Row>
 														<Col className='text-left'>
 															<strong>
-																{' '}
 																<h4>{item.adminName}</h4>{' '}
 															</strong>
 														</Col>
