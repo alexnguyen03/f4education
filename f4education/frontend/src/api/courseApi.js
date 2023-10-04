@@ -30,6 +30,10 @@ const courseApi = {
 		const url = `/courses/duration/${checkedDurations}`;
 		return axiosClient.get(url);
 	},
+	findCoursesByAccountId: (accountId) => {
+		const url = `/courses/course-histoty/${accountId}`;
+		return axiosClient.get(url);
+	},
 };
 
 export default courseApi;

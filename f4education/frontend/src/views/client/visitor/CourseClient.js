@@ -205,7 +205,7 @@ function CourseClient() {
     <>
       <div className="col-lg-12">
         <div className="mt-7">
-          <div className="col-lg-12">
+          <div className="col-lg-12 p-0">
             <h5>
               <b>Tất cả các khóa học</b>
             </h5>

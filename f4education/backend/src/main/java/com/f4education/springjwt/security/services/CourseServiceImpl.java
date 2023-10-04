@@ -132,4 +132,11 @@ public class CourseServiceImpl implements CoursesService {
 
 	    return ketQua;
 	}
+
+	@Override
+	public List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId) {
+		List<CourseDTO> list = courseRepository.findByAccountId(accountId).stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+		System.out.println(list);
+		return list;
+	}
 }

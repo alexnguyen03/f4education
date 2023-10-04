@@ -35,6 +35,7 @@ import QuestionDetail from 'views/admin/QuestionDetail';
 import Home from 'views/client/visitor/Home';
 import CourseClient from 'views/client/visitor/CourseClient';
 import CourseDetailClient from 'views/client/visitor/CourseDetailClient';
+import CourseHistoryClient from 'views/client/visitor/CourseHistoryClient';
 
 export var routes = [
 	{
@@ -193,6 +194,13 @@ export var routesClient = [
 		name: 'Khóa học chi tiết',
 		icon: 'ni ni-planet text-blue',
 		component: <CourseDetailClient />,
+		layout: '/client',
+	},
+	{
+		path: '/course-history',
+		name: 'lịch sử Khóa học',
+		icon: 'ni ni-planet text-blue',
+		component: <CourseHistoryClient />,
 		layout: '/client',
 	},
 ];

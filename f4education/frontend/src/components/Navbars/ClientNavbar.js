@@ -61,6 +61,15 @@ const ClientNavbar = () => {
 									<span className='nav-link-inner--text'>Khóa học</span>
 								</NavLink>
 							</NavItem>
+							<NavItem>
+								<NavLink
+									className='nav-link-icon'
+									to='/course-history'
+									tag={Link}>
+									<i className='ni ni-circle-08' />
+									<span className='nav-link-inner--text'>Khóa học đăng ký</span>
+								</NavLink>
+							</NavItem>
 						</Nav>
 					</UncontrolledCollapse>
 				</Container>
