@@ -1,7 +1,3 @@
-import React from 'react';
-
-function Home() {
-	return <div className='container-fluid  mt-7 '>Home</div>;
-}
-
+const Home = () => {
+};
 export default Home;

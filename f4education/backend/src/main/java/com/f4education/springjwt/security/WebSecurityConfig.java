@@ -46,81 +46,90 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 	@Autowired
 	UserDetailsServiceImpl userDetailsService;
 
-	@Autowired
-	private AuthEntryPointJwt unauthorizedHandler;
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
 	@Bean
 	public AuthTokenFilter authenticationJwtTokenFilter() {
 		return new AuthTokenFilter();
 	}
 
-	@Bean
-	public DaoAuthenticationProvider authenticationProvider() {
-		DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
-		authProvider.setUserDetailsService(userDetailsService);
-		authProvider.setPasswordEncoder(passwordEncoder());
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
 
 		return authProvider;
 	}
 
-	@Bean
-	public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
-		return authConfig.getAuthenticationManager();
-	}
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+        return authConfig.getAuthenticationManager();
+    }
 
 	@Bean
 	public BCryptPasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
 
-	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-		http.csrf(csrf -> csrf.disable())
-				.exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-				.authorizeHttpRequests(
-						auth -> auth
-								.requestMatchers(
-										"/api/auth/**",
-										"/api/subjects/**",
-										"/api/classs/**",
-										"/api/classhistory/**",
-										"/api/classroom/**",
-										"/api/classroomhistory/**",
-										"/api/sessions-history/**",
-										"/api/resource/**",
-										"/api/cart/**",
-										"/api/payment/**",
-										"/api/bills/**",
-										"/img/**")
-								.permitAll()
-								.requestMatchers(
-										"/api/test/**",
-										"/api/subjects/**",
-										"/api/classs/**",
-										"/api/courses-history/**",
-										"/api/subjectHistory/**",
-										"/api/courses/**",
-										"/api/classroom/**",
-										"/api/sessions/**",
-										"/api/classhistory/**",
-										"/api/teachers/**",
-										"/api/sessions-history/**",
-										"/api/resource/**",
-										"/api/questions/**",
-										"/api/answers/**",
-										"/api/cart/**",
-										"/api/payment/**",
-										"/api/bills",
-										"/api/accounts/**",
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.csrf(csrf -> csrf.disable())
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(
+                        auth -> auth
+                                .requestMatchers(
+                                        "/api/auth/**",
+                                        "/api/subjects/**",
+                                        "/api/classs/**",
+                                        "/api/classhistory/**",
+                                        "/api/classroom/**",
+                                        "/api/classroomhistory/**",
+                                        "/api/sessions-history/**",
+                                        "/api/resource/**",
+                                        "/api/cart/**",
+                                        "/api/payment/**",
+                                        "/api/bills/**",
+                                        "api/bill-detail/**",
+                                        "/api/payment-method/**",
+                                        "/api/course/newest-courses",
+                                        "/api/register-course/**",
+                                        "/img/**")
+                                .permitAll()
+                                .requestMatchers(
+                                        "/api/test/**",
+                                        "/api/subjects/**",
+                                        "/api/classs/**",
+                                        "/api/courses-history/**",
+                                        "/api/subjectHistory/**",
+                                        "/api/courses/**",
+                                        "/api/classroom/**",
+                                        "/api/sessions/**",
+                                        "/api/classhistory/**",
+                                        "/api/teachers/**",
+                                        "/api/sessions-history/**",
+                                        "/api/resource/**",
+                                        "/api/questions/**",
+                                        "/api/answers/**",
+                                        "/api/cart/**",
+                                        "/api/payment/**",
+                                        "/api/bills",
+                                        "/api/bill-detail/**",
+                                        "/api/accounts/**",
 										"/api/teachers-history/**",
-										"/img/**")
-								.permitAll().anyRequest().authenticated());
-		http.authenticationProvider(authenticationProvider());
+                                        "/api/payment-method/**",
+                                        "/api/course/newest-courses",
+                                        "/api/register-course/**",
+                                        "/img/**")
+                                .permitAll().anyRequest().authenticated());
 
-		http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.authenticationProvider(authenticationProvider());
 
-		return http.build();
-	}
+        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 }

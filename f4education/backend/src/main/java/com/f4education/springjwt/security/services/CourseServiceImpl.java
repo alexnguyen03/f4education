@@ -23,63 +23,76 @@ import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CoursesService {
-	@Autowired
-	CourseRepository courseRepository;
-	@Autowired
-	AdminRepository adminRepository;
-	@Autowired
-	SubjectRepository subjectRepository;
-	@Autowired
-	CourseHistoryRepository courseHistoryRepository;
+    @Autowired
+    CourseRepository courseRepository;
+    @Autowired
+    AdminRepository adminRepository;
+    @Autowired
+    SubjectRepository subjectRepository;
+    @Autowired
+    CourseHistoryRepository courseHistoryRepository;
 
-	@Override
-	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
-	}
+    @Override
+    public List<CourseDTO> findAllCourseDTO() {
+        return courseRepository.findAll()
+                .stream()
+                .map(this::convertEntityToDTO)
+                .collect(Collectors.toList());
+    }
 
-	@Override
-	public Course findById(Integer id) {
-		return courseRepository.findById(id).get();
-	}
+    @Override
+    public List<CourseDTO> findNewestCourse() {
+        return courseRepository.findTop10LatestCourses()
+                .stream()
+                .map(this::convertEntityToDTO)
+                .collect(Collectors.toList());
+    }
 
-	@Override
-	public CourseDTO saveCourse(CourseRequest courseRequest) {
-		String action = "CREATE";
-		Course course = this.convertRequestToEntity(courseRequest);
-		Integer idCourse = courseRequest.getCourseId();
-		if (idCourse != null) {
-			action = "UPDATE";
-		}
-		Subject subject = subjectRepository.findById(courseRequest.getSubjectId()).get();
-		course.setAdmin(subject.getAdmin());
-		course.setSubject(subject);
-		Course savedCourse = courseRepository.save(course);
-		this.saveCourseHistory(savedCourse, action);
-		return this.convertEntityToDTO(savedCourse);
-	}
 
-	@Override
-	public List<CourseDTO> findAllByAdminId(String adminId) {
-		return courseRepository.findAllByAdmin_AdminId(adminId).stream().map(this::convertEntityToDTO)
-				.collect(Collectors.toList());
-	}
+    @Override
+    public Course findById(Integer id) {
+        return courseRepository.findById(id).get();
+    }
 
-	private CourseDTO convertEntityToDTO(Course course) {
-		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
-				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
-				course.getSubject(), course.getImage());
-	}
+    @Override
+    public CourseDTO saveCourse(CourseRequest courseRequest) {
+        String action = "CREATE";
+        Course course = this.convertRequestToEntity(courseRequest);
+        Integer idCourse = courseRequest.getCourseId();
+        if (idCourse != null) {
+            action = "UPDATE";
+        }
+        Subject subject = subjectRepository.findById(courseRequest.getSubjectId()).get();
+        course.setAdmin(subject.getAdmin());
+        course.setSubject(subject);
+        Course savedCourse = courseRepository.save(course);
+        this.saveCourseHistory(savedCourse, action);
+        return this.convertEntityToDTO(savedCourse);
+    }
 
-	private Course convertRequestToEntity(CourseRequest courseRequest) {
-		Course course = new Course();
-		BeanUtils.copyProperties(courseRequest, course);
-		Subject subject = subjectRepository.findById(courseRequest.getSubjectId()).get();
-		if (subject == null) {
-			throw new RuntimeException("Can not find subject with id " + courseRequest.getSubjectId());
-		}
-		course.setSubject(subject);
-		return course;
-	}
+    @Override
+    public List<CourseDTO> findAllByAdminId(String adminId) {
+        return courseRepository.findAllByAdmin_AdminId(adminId).stream()
+                .map(this::convertEntityToDTO)
+                .collect(Collectors.toList());
+    }
+
+    private CourseDTO convertEntityToDTO(Course course) {
+        return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
+                course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
+                course.getSubject(), course.getImage());
+    }
+
+    private Course convertRequestToEntity(CourseRequest courseRequest) {
+        Course course = new Course();
+        BeanUtils.copyProperties(courseRequest, course);
+        Subject subject = subjectRepository.findById(courseRequest.getSubjectId()).get();
+        if (subject == null) {
+            throw new RuntimeException("Can not find subject with id " + courseRequest.getSubjectId());
+        }
+        course.setSubject(subject);
+        return course;
+    }
 
 	private void saveCourseHistory(Course course, String action) {
 		CourseHistory courseHistory = new CourseHistory();

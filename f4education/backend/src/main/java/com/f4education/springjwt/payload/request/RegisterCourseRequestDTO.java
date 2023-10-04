@@ -9,10 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BillRequestDTO {
-    private Double totalPrice;
+public class RegisterCourseRequestDTO {
+	private Integer registerCourseId;
 
-    private String checkoutMethod;
+	private Integer courseId;
 
-    private Integer studentId;
+	private Integer studentId;
 }

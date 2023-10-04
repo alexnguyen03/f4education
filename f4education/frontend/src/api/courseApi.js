@@ -34,6 +34,10 @@ const courseApi = {
 		const url = `/courses/duration/${checkedDurations}`;
 		return axiosClient.get(url);
 	},
+	getNewestCourse: () => {
+		const url = '/courses/newest-courses';
+		return axiosClient.get(url);
+	},
 };
 
 export default courseApi;
