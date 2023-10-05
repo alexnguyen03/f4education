@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Button, Col, Modal, ModalBody, Row } from "reactstrap";
-// import IconCheck from "@tabler/icons-react";
 
 import logoVnPay from "../../../assets/img/logo-vnpay.png";
 import logoPayPal from "../../../assets/img/logo-paypal.png";
@@ -14,7 +13,11 @@ import billApi from "../../../api/billApi";
 import registerCourseApi from "../../../api/registerCourseApi";
 import Paypal from "./PayPal";
 import moment from "moment";
-const PUBLIC_IMAGE = process.env.PUBLIC_URL;
+
+// CSS Module
+import styles from "../../../assets/css/customClientCss/Payment.module.css";
+
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
 const Checkout = () => {
   // router Variable
@@ -28,7 +31,7 @@ const Checkout = () => {
   //  VNPAY + PAYPAL
   const [transactionNo, setTransactionNo] = useState("");
   const [paymentType, setPaymentType] = useState("");
-  const [bankCheckout,setBankCheckout] = useState("");
+  const [bankCheckout, setBankCheckout] = useState("");
 
   // VNPAY
   const [searchParams] = useSearchParams();
@@ -126,7 +129,7 @@ const Checkout = () => {
     });
 
     setTransactionNo(order.id);
-    setPayPalPaymentAt((new Date()).toLocaleString());
+    setPayPalPaymentAt(new Date().toLocaleString());
     setPaymentType("PayPal");
     setBankCheckout("PayPal Wallet");
 
@@ -175,7 +178,7 @@ const Checkout = () => {
             status: "success",
             infor: "Thanh toán thành công!",
           });
-          setPayPalPaymentAt((new Date()).toLocaleString());
+          setPayPalPaymentAt(new Date().toLocaleString());
           setBankCheckout("NCB");
 
           const listCar = JSON.parse(localStorage.getItem("cartCheckout"));
@@ -432,7 +435,7 @@ const Checkout = () => {
                         <img
                           src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
                           width={"100%"}
-                          height={"100%"}
+                          style={{ maxHeight: "100px" }}
                           className="img-fluid"
                           alt={cart.course.courseName}
                         />
@@ -459,11 +462,11 @@ const Checkout = () => {
                 lg={4}
                 md={12}
                 sm={12}
-                className="checkout-summery p-5 shadow"
+                className={`${styles["checkout-summery"]} p-5 shadow`}
                 style={{ background: "#f7f7f7" }}
               >
                 <div>
-                  <div className="checkout-sumery-header">
+                  <div className={styles["checkout-sumery-header"]}>
                     <h2 className="font-weight-800 text-dark ">
                       Tổng thanh toán
                     </h2>
@@ -481,7 +484,7 @@ const Checkout = () => {
                       <span className="text-muted">0đ</span>
                     </div>
                     <hr />
-                    <div className="checkout-sum-total">
+                    <div className={styles["checkout-sum-total"]}>
                       <div className="d-flex justify-content-between">
                         <h3 className="font-weight-700 text-dark">Tổng:</h3>
                         <h3 className="font-weight-700 text-dark">
@@ -493,7 +496,7 @@ const Checkout = () => {
                       </div>
                     </div>
                   </div>
-                  <div className="check-summery-floating-bottom">
+                  <div className={styles["check-summery-floating-bottom"]}>
                     <div className="d-flex justify-content-between">
                       <h3 className="font-weight-700 text-dark">Tổng:</h3>
                       <h3 className="font-weight-700 text-dark">
@@ -630,9 +633,7 @@ const Checkout = () => {
 
                       <div className="d-flex justify-content-between">
                         <div className="text-muted">Ngân hàng thanh toán:</div>
-                        <div className="font-weight-600">
-                          {bankCheckout}
-                        </div>
+                        <div className="font-weight-600">{bankCheckout}</div>
                       </div>
                     </>
 

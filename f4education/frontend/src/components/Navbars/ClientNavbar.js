@@ -10,7 +10,6 @@ import cartApi from "../../api/cartApi";
 import { Autocomplete, Avatar, Burger, Button, Menu, rem } from "@mantine/core";
 import {
   IconLayoutDashboard,
-  IconLogout,
   IconLogout2,
   IconSchoolBell,
   IconSearch,
@@ -18,19 +17,101 @@ import {
 } from "@tabler/icons-react";
 import { useDisclosure, useElementSize } from "@mantine/hooks";
 
-const PUBLIC_IMAGE = "http://localhost:8080/img";
+// css module
+import styles from "../../assets/css/customClientCss/Navbar.module.css";
+// import "../../assets/css/customClientCss/navbar-custom.css";
+
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
+
+// Styled component
+// const NavbarCustom = styled.nav`
+//   clear: both;
+//   position: fixed;
+//   top: 0;
+//   left: 0;
+//   right: 0;
+//   background: #fff;
+//   box-shadow: #63636333 2px 2px 8px 0px;
+//   z-index: 1000;
+//   transition: all 0.3s linear;
+// `;
+
+// const CustomNavLink = styled.div`
+//   position: relative;
+//   color: #555555 !important;
+//   font-size: 18px;
+//   font-weight: 600 !important;
+//   transition: all 0.3s linear;
+
+//   &:hover {
+//     color:#212121,
+//     font-weight:600,
+//   }
+
+//   &:hover {
+//     &::after {
+//       display: block;
+//       transition: all 0.3s linear;
+//     }
+//   }
+
+//   .active {
+//     &::after {
+//     display: block;
+//     }
+//   }
+
+//   &::after {
+//     position: absolute;
+//     content: "";
+//     left: 0;
+//     bottom: -58%;
+//     background: #333;
+//     height: 4px;
+//     width: 100%;
+//     display: none;
+//     transition: all 0.3s linear;
+//   }
+
+//   @media (max-width: 991px) {
+//     &::after {
+//       position: absolute;
+//       content: "";
+//       left: 50%;
+//       transform: translateX(-50%);
+//       right: 0;
+//       bottom: 0;
+//       background: #333;
+//       height: 5px;
+//       width: 100px;
+//       text-align: center;
+//       transition: all 0.3s linear;
+//     }
+//   }
+
+//   @media (max-width: 991px) {
+//     & {
+//       position: relative;
+//       color: #555555 !important;
+//       font-size: 18px;
+//       margin-bottom: 10px;
+//       font-weight: 600 !important;
+//       transition: all 0.3s linear;
+//     }
+//   }
+// `;
 
 const ClientNavbar = () => {
   const ref = useElementSize();
   const [login, setLogin] = useState(false);
   const [cartEmpty, setCartEmpty] = useState(true);
   const [lastScrollTop, setLastScrollTop] = useState(0);
-  const [activeItems, setActiveItems] = useState([true, false, false]);
+  const [activeItems, setActiveItems] = useState([false, false, false]);
   const [opened, { toggle }] = useDisclosure(false);
-  const [homeActive, setHomeActive] = useState("");
-  const [cartActive, setCartActive] = useState("");
-  const [courseActive, setCourseActive] = useState("");
-  const [searchParams] = useSearchParams();
+  // const [homeActive, setHomeActive] = useState("");
+  // const [cartActive, setCartActive] = useState("");
+  // const [courseActive, setCourseActive] = useState("");
+  // const [searchParams] = useSearchParams();
 
   // *************** CART VARIABLE - AREA START
   const [carts, setCarts] = useState([]);
@@ -83,7 +164,7 @@ const ClientNavbar = () => {
   };
 
   window.addEventListener("scroll", function () {
-    const navbar = this.document.querySelector("#navbar");
+    const navbar = this.document.querySelector("#navbarAnimate");
     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
     if (scrollTop === 0) {
       navbar.style.top = "0";
@@ -97,7 +178,10 @@ const ClientNavbar = () => {
   });
 
   return (
-    <nav className="navbar navbar-expand-lg" id="navbar">
+    <nav
+      className={`navbar navbar-expand-lg ${styles.navbarAnimate}`}
+      id="navbarAnimate"
+    >
       <div className="container-xl">
         <Link to={"/"} className="navbar-brand">
           <img src={logo} className="img-fluid" alt="" />
@@ -125,11 +209,14 @@ const ClientNavbar = () => {
             <li className="nav-item">
               <Link
                 to={"/"}
-                className={
-                  activeItems[0]
+                className={`
+                ${
+                  activeItems[0] === true
                     ? "nav-link custom-nav-link active"
                     : "nav-link custom-nav-link"
                 }
+                ${styles["custom-nav-link"]}
+                `}
                 onClick={() => handleItemClick(0)}
               >
                 Trang chủ
@@ -138,11 +225,14 @@ const ClientNavbar = () => {
             <li className="nav-item">
               <Link
                 to={"/course"}
-                className={
+                className={`
+                ${
                   activeItems[1]
                     ? "nav-link custom-nav-link active"
                     : "nav-link custom-nav-link"
                 }
+                ${styles["custom-nav-link"]}
+                `}
                 onClick={() => handleItemClick(1)}
               >
                 Khóa học
@@ -151,11 +241,14 @@ const ClientNavbar = () => {
             <li className="nav-item">
               <Link
                 to={"/cart"}
-                className={
+                className={`
+                ${
                   activeItems[2]
                     ? "nav-link custom-nav-link active"
                     : "nav-link custom-nav-link"
                 }
+                ${styles["custom-nav-link"]}
+                `}
                 onClick={() => handleItemClick(2)}
               >
                 Giỏ hàng
@@ -177,7 +270,7 @@ const ClientNavbar = () => {
             />
             {login ? (
               <>
-                <Link to="/cart" className="cart mx-4 mt-2">
+                <Link to="/cart" className={`${styles.cart} mx-4 mt-2`}>
                   <i
                     className="bx bx-cart font-weight-500 text-dark"
                     style={{
@@ -189,11 +282,11 @@ const ClientNavbar = () => {
                   </ActionIcon> */}
                   <Badge
                     color="rgba(0, 0, 0, 1)"
-                    className="header-cart font-weight-700"
+                    className={`${styles["header-cart"]} font-weight-700`}
                   >
                     {carts.length > 0 ? carts.length : 0}
                   </Badge>
-                  <div className="cart-detail">
+                  <div className={styles["cart-detail"]}>
                     {carts.length === 0 ? (
                       <>
                         <img
@@ -211,52 +304,57 @@ const ClientNavbar = () => {
                       </>
                     ) : (
                       <>
-                        <div className="container cart-content-overflow my-2">
+                        <div
+                          className={`container ${styles["cart-content-overflow"]} my-2`}
+                        >
                           <Row>
                             <Col xl="12" lg="12" md="12" sm="12">
-                              {carts.map((cart) => (
-                                <>
-                                  <Row className="mt-2">
-                                    <Col xl="4" lg="4" md="4" sm="4">
-                                      <img
-                                        src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                        alt="cart item img"
-                                        className="img-fluid"
-                                        style={{
-                                          maxHeight: "70px",
-                                          width: "100%",
-                                          objectFit: "cover",
-                                        }}
-                                      />
-                                    </Col>
-                                    <Col
-                                      xl="8"
-                                      lg="8"
-                                      md="8"
-                                      sm="8"
-                                      className="d-flex flex-wrap flex-column text-left"
-                                    >
-                                      <span className="font-weight-700 text-dark align-items-start">
-                                        {cart.course.courseName}
-                                      </span>
-                                      <span className="text-muted">
-                                        {cart.course.coursePrice.toLocaleString(
-                                          "it-IT",
-                                          {
-                                            style: "currency",
-                                            currency: "VND",
-                                          }
-                                        )}
-                                      </span>
-                                    </Col>
-                                  </Row>
-                                  <hr className="m-3 p-0 text-muted" />
-                                </>
-                              ))}
+                              {carts.length > 0 &&
+                                carts.map((cart) => (
+                                  <>
+                                    <Row className="mt-2">
+                                      <Col xl="4" lg="4" md="4" sm="4">
+                                        <img
+                                          src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                          alt="cart item img"
+                                          className="img-fluid"
+                                          style={{
+                                            maxHeight: "70px",
+                                            width: "100%",
+                                            objectFit: "cover",
+                                          }}
+                                        />
+                                      </Col>
+                                      <Col
+                                        xl="8"
+                                        lg="8"
+                                        md="8"
+                                        sm="8"
+                                        className="d-flex flex-wrap flex-column text-left"
+                                      >
+                                        <span className="font-weight-700 text-dark align-items-start">
+                                          {cart.course.courseName}
+                                        </span>
+                                        <span className="text-muted">
+                                          {cart.course.coursePrice.toLocaleString(
+                                            "it-IT",
+                                            {
+                                              style: "currency",
+                                              currency: "VND",
+                                            }
+                                          )}
+                                        </span>
+                                      </Col>
+                                    </Row>
+                                    <hr className="m-3 p-0 text-muted" />
+                                  </>
+                                ))}
                             </Col>
                           </Row>
                         </div>
-                        <div className="container cart-footer w-100">
+                        <div
+                          className={`container ${styles["cart-footer"]} w-100`}
+                        >
                           <p
                             className="m-2 p-0 text-dark font-weight-700 text-left"
                             style={{ fontSize: "20px" }}

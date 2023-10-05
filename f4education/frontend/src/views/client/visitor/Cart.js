@@ -25,18 +25,14 @@ import cartApi from "../../../api/cartApi";
 import courseApi from "../../../api/courseApi";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
-// const PUBLIC_IMAGE = "http://localhost:8080/img";
 
 const itemsBreadcum = [
-	{title: 'Trang chủ', href: '/'},
-	{title: 'Giỏ hàng', href: '/cart'},
+  { title: "Trang chủ", href: "/" },
+  { title: "Giỏ hàng", href: "/cart" },
 ].map((item, index) => (
-	<Anchor
-		href={item.href}
-		key={index}
-		color='dimmed'>
-		<Text fs='italic'>{item.title}</Text>
-	</Anchor>
+  <Anchor href={item.href} key={index} color="dimmed">
+    <Text fs="italic">{item.title}</Text>
+  </Anchor>
 ));
 
 // const cartItem = [
@@ -124,9 +120,7 @@ function Cart() {
   // *************** Action && Logic UI
   const handleCheckOut = async () => {
     if (selectedItem === null) {
-      alert(
-        "Chon khoa hoc di ban ei, 1 khoa thoi ban ei, 2 khoa hoc ko noi dau"
-      );
+      alert("Chon khoa hoc di ban ei, 1 khoa thoi");
       return;
     }
     // store cart to localstorage
@@ -279,14 +273,12 @@ function Cart() {
     setSelectedCart(cartCheckout);
   }, [selectedItem]);
 
-	return (
-		<>
-			{/* BreadCums */}
-			<Breadcrumbs
-				className='my-5 p-3'
-				style={{backgroundColor: '#ebebeb'}}>
-				{itemsBreadcum}
-			</Breadcrumbs>
+  return (
+    <>
+      {/* BreadCums */}
+      <Breadcrumbs className="my-5 p-3" style={{ backgroundColor: "#ebebeb" }}>
+        {itemsBreadcum}
+      </Breadcrumbs>
 
       {/* Title */}
       <h1 className="font-weight-700 text-dark my-5 display-4">Giỏ hàng</h1>
@@ -339,13 +331,9 @@ function Cart() {
                   {carts.length > 0 ? (
                     carts.map((cart, index) => (
                       <>
-                        <Grid>
+                        <Grid key={index}>
                           <Grid.Col span={2}>
-                            <Link
-                              Link
-                              to={`/course/${cart.course.courseId}`}
-                              key={index}
-                            >
+                            <Link Link to={`/course/${cart.course.courseId}`}>
                               <img
                                 src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
                                 // src={cart.course.courseImage}
@@ -508,15 +496,17 @@ function Cart() {
                   </Button>
                 </Grid.Col>
               </Grid>
-          </>
+            </>
           )}
         </>
       )}
 
+      {/* Newest Course */}
       <h3 className="font-weight-700 text-dark my-5">
         Những khóa học mới nhất
       </h3>
 
+      {/* Mantine Carousel */}
       <Carousel
         slideSize="25%"
         height="350px"
