@@ -94,6 +94,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 										"/api/classroomhistory/**",
 										"/api/sessions-history/**",
 										"/api/resource/**",
+										"/api/accounts/**",
 										"/img/**")
 								.permitAll()
 								.requestMatchers(
@@ -111,7 +112,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 										"/api/resource/**",
 										"/api/questions/**",
 										"/api/answers/**",
-										"/api/accounts/**",
 										"/api/teachers-history/**",
 										"/img/**")
 								.permitAll().anyRequest().authenticated());

@@ -6,7 +6,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @Entity
@@ -23,7 +22,7 @@ public class Role {
 	private ERole name;
 
 	@OneToMany(mappedBy = "role")
-	List<Account_role> role;
+	List<Account_role> accountRoles;
 
 	@Override
 	public String toString() {

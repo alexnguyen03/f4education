@@ -5,6 +5,7 @@ import java.util.List;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 
 public interface TeacherService {
+    
     List<TeacherDTO> getAllTeachersDTO();
 
     TeacherDTO getTeacherDTOByID(String teacherId);

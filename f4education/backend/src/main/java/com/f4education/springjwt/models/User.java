@@ -40,6 +40,8 @@ public class User {
 
 	private String token;
 
+	private Boolean status;
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	List<Account_role> account_role;

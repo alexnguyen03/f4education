@@ -18,6 +18,12 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
   Boolean existsByEmail(String email);
 
-  @Query("SELECT new com.f4education.springjwt.payload.request.AccountDTO(o) FROM User o")
+  @Query("SELECT o FROM User o WHERE o.id = ?1")
+  User findByID(Long id);
+
+  @Query("SELECT new com.f4education.springjwt.payload.request.AccountDTO(o.user) FROM Account_role o")
   List<AccountDTO> getAllAcountsDTO();
+
+  @Query("SELECT new com.f4education.springjwt.payload.request.AccountDTO(o.user) FROM Account_role o WHERE o.role.id = ?1")
+  List<AccountDTO> getAllAccountsDTOByRole(Integer role);
 }
