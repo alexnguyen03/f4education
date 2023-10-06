@@ -46,7 +46,7 @@ public class QuestionDetail {
 //	List<QuestionHistory> questionHistory;
 
     @OneToMany(mappedBy = "questionDetail")
-    List<Answer> answer;
+    List<Answer> answers;
 
     @ManyToOne
     @JsonIgnore

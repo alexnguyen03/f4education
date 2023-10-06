@@ -18,7 +18,7 @@ import com.f4education.springjwt.payload.request.QuestionDetailRequestDTO;
 @Service
 public class QuestionDetailServiceImpl implements QuestionDetailService {
     @Autowired
-    QuestionDetailReposotory questionDetailReposotory;
+    QuestionDetailReposotory questionDetailRepository;
 
     @Autowired
     QuestionReposotory questionRepository;
@@ -37,12 +37,12 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
     @Override
     public List<QuestionDetailResponseDTO> getAllQuestionDetail() {
-        List<QuestionDetail> questionDetails = questionDetailReposotory.findAll();
+        List<QuestionDetail> questionDetails = questionDetailRepository.findAll();
         return questionDetails.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }
 
     public List<QuestionDetailResponseDTO> getQuestionByCourseName(String courseName) {
-        List<QuestionDetail> questions = questionDetailReposotory.findByCourseName(courseName.trim());
+        List<QuestionDetail> questions = questionDetailRepository.findByCourseName(courseName.trim());
         return questions.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
     }
 
@@ -52,10 +52,10 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
         question.setCreateDate(new Date());
         question.setQuestionDetailId(questionDTO.getQuestionDetailId());
 
-        QuestionDetail saveQuestion = questionDetailReposotory.save(question);
+        QuestionDetail saveQuestion = questionDetailRepository.save(question);
 
-        if (!saveQuestion.getAnswer().isEmpty()) {
-            for (Answer as : saveQuestion.getAnswer()) {
+        if (!saveQuestion.getAnswers().isEmpty()) {
+            for (Answer as : saveQuestion.getAnswers()) {
                 as.setQuestionDetail(saveQuestion);
                 answerReposotory.save(as);
             }
@@ -66,7 +66,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
     @Override
     public QuestionDetailResponseDTO updateQuestionDetail(Integer questionId, QuestionDetailRequestDTO questionDTO) {
-        Optional<QuestionDetail> exitQuestion = questionDetailReposotory.findById(questionId);
+        Optional<QuestionDetail> exitQuestion = questionDetailRepository.findById(questionId);
 
         if (exitQuestion.isEmpty()) {
             return null;
@@ -74,9 +74,9 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
         QuestionDetail question = this.convertRequestToEntity(questionDTO);
 
-        QuestionDetail updateQuestion = questionDetailReposotory.save(question);
+        QuestionDetail updateQuestion = questionDetailRepository.save(question);
 
-        for (Answer as : updateQuestion.getAnswer()) {
+        for (Answer as : updateQuestion.getAnswers()) {
             as.setQuestionDetail(updateQuestion);
             answerReposotory.save(as);
         }
@@ -90,7 +90,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
         BeanUtils.copyProperties(question, questionDTO);
 
         questionDTO.setAdminName(question.getAdmin().getFullname());
-        questionDTO.setAnswer(question.getAnswer());
+        questionDTO.setAnswer(question.getAnswers());
 
         return questionDTO;
     }
@@ -107,7 +107,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
         question.setAdmin(admin);
         question.setCourse(course);
         question.setCourseName(course.getCourseName());
-        question.setAnswer(questionDTO.getAnswers());
+        question.setAnswers(questionDTO.getAnswers());
 
     }
 
@@ -127,7 +127,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
         questionDetail.setQuestionTitle(questionDTO.getQuestionTitle());
         questionDetail.setSubjectName(subject.getSubjectName());
         questionDetail.setCourseName(course.getCourseName());
-        questionDetail.setAnswer(questionDTO.getAnswers());
+        questionDetail.setAnswers(questionDTO.getAnswers());
 
         return questionDetail;
     }

@@ -25,7 +25,6 @@ public class Answer {
 
     @ManyToOne
     @JoinColumn(name = "question_detail_id")
-    @JsonIgnore
     QuestionDetail questionDetail;
 
     @Override

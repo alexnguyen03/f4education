@@ -77,10 +77,6 @@ public class QuestionServiceImpl implements QuestionService {
         Subject subject = subjectRepository.findById(questionDTO.getSubjectId()).get();
         Course course = courseRepository.findById(questionDTO.getCourseId()).get();
 
-        System.out.println(admin);
-        System.out.println(subject);
-        System.out.println(course);
-
         BeanUtils.copyProperties(questionDTO, question);
 
         question.setSubjectName(subject.getSubjectName());
@@ -98,6 +94,7 @@ public class QuestionServiceImpl implements QuestionService {
         BeanUtils.copyProperties(questionDTO, question);
 
         question.setSubjectName(subject.getSubjectName());
+
         question.setAdmin(admin);
         question.setCourseName(course.getCourseName());
 

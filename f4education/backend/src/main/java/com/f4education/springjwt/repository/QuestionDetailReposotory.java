@@ -17,7 +17,6 @@ public interface QuestionDetailReposotory extends JpaRepository<QuestionDetail, 
             "IS NOT NULL GROUP BY q2.courseName)")
     List<QuestionDetail> findDistinctByCourseName();
 
-
     @Query("SELECT q FROM QuestionDetail q WHERE q.courseName = :courseName")
     List<QuestionDetail> findByCourseName(String courseName);
 

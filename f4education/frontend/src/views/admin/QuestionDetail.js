@@ -1,4 +1,13 @@
-import { Badge, Blockquote, Select, Tabs, Tooltip } from "@mantine/core";
+import {
+  Badge,
+  Blockquote,
+  Checkbox,
+  Group,
+  Select,
+  Tabs,
+  Textarea,
+  Tooltip,
+} from "@mantine/core";
 import QuestionDetailHeader from "components/Headers/QuestionDetailHeader";
 import moment from "moment";
 import { Edit as EditIcon, Delete as DeleteIcon } from "@mui/icons-material";
@@ -285,12 +294,12 @@ const QuestionDetail = () => {
           <div className="d-flex align-items-center">
             <div>
               <label>
-                <input
-                  className="mt-3"
-                  type="radio"
-                  checked={group.radioValue}
+                <Checkbox
+                  color="cyan"
+                  className="mt-2"
                   onChange={() => handleRadioChange(index)}
                   style={{ width: "20px", height: "20px" }}
+                  checked={group.radioValue}
                 />
               </label>
             </div>
@@ -398,16 +407,27 @@ const QuestionDetail = () => {
                 style={{
                   background: "#f1f1f1",
                   borderRadius: "5px",
-                  minHeight: "60px",
+                  minHeight: "80px",
+                  overflow: "auto",
                 }}
               >
                 {/* Display question title */}
                 {editAnswer && questionDetail.questionId === editQuestionId ? (
-                  <InputGroup>
-                    <InputGroupAddon addonType="prepend">
-                      <InputGroupText>Câu hỏi {index + 1}</InputGroupText>
-                    </InputGroupAddon>
-                    <Input
+                  <Textarea
+                    label={`Câu hỏi: ${index + 1}`}
+                    className="w-100"
+                    autosize
+                    minRows={2}
+                    onChange={(e) =>
+                      handleOnchangeInputQuestionTitle(
+                        e.target.value,
+                        questionDetail.questionId
+                      )
+                    }
+                    value={questionDetail.questionTitle}
+                  />
+                ) : (
+                  /* <Input
                       className="pl-2"
                       type="text"
                       onChange={(e) =>
@@ -417,9 +437,7 @@ const QuestionDetail = () => {
                         )
                       }
                       value={questionDetail.questionTitle}
-                    />
-                  </InputGroup>
-                ) : (
+                    /> */
                   <span className="text-dark font-weight-600">
                     <strong>Question {index + 1}: </strong>
                     <span className="text-muted">
@@ -600,7 +618,7 @@ const QuestionDetail = () => {
       return answer;
     });
 
-    // *Notes: why using groupanswers instead use answers
+    // *Notes: why using groupanswers instead use answersi
     // use group answer have advantage which can be restore when use click edit second time;
     // Set Answer For render UI
     // setGroupAnswers(updatedGroupAnswer);
@@ -717,8 +735,16 @@ const QuestionDetail = () => {
               {editAnswer && question.questionId === editQuestionId ? (
                 <div className="d-flex align-items-center mb-2 mr-4">
                   <label>
-                    <input
+                    {/* <input
                       type="radio"
+                      name={`radio_${answerDetail.questionId}`}
+                      checked={answerDetail.isCorrect}
+                      onChange={() =>
+                        handleOnChangeRadioAnswerValue(answerDetail.answerId)
+                      }
+                    /> */}
+                    <Checkbox
+                      color="cyan"
                       name={`radio_${answerDetail.questionId}`}
                       checked={answerDetail.isCorrect}
                       onChange={() =>
@@ -741,14 +767,27 @@ const QuestionDetail = () => {
 
               {/* Answer Input */}
               {editAnswer && question.questionId === editQuestionId ? (
-                <input
-                  className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
+                // <input
+                //   className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
+                //   onChange={(e) => {
+                //     handleOnchangeInputAnswersValue(
+                //       e.target.value,
+                //       answerDetail.answerId
+                //     );
+                //   }}
+                //   name="text"
+                //   value={answerDetail.text}
+                // />
+                <Textarea
+                  autosize
+                  minRows={2}
                   onChange={(e) => {
                     handleOnchangeInputAnswersValue(
                       e.target.value,
                       answerDetail.answerId
                     );
                   }}
+                  className="w-100 mb-2"
                   name="text"
                   value={answerDetail.text}
                 />
@@ -946,8 +985,8 @@ const QuestionDetail = () => {
                   />
                 </FormGroup>
               </Col>
-              <Col xl={6} lg={6} md={6} sm={12}>
-                <FormGroup className="mb-3 col-12">
+              <Col xl={12} lg={12} md={12} sm={12}>
+                {/* <FormGroup className="mb-3 col-12">
                   <label className="form-control-label" htmlFor="questionTitle">
                     Tiêu đề câu hỏi?
                   </label>
@@ -966,7 +1005,16 @@ const QuestionDetail = () => {
                       value={question.questionTitle}
                     />
                   </InputGroup>
-                </FormGroup>
+                </FormGroup> */}
+                <Textarea
+                  placeholder="Câu hỏi?"
+                  label="Tiêu đề câu hỏi"
+                  className="w-100"
+                  withAsterisk
+                  onChange={handleChangeInput}
+                  name="questionTitle"
+                  value={question.questionTitle}
+                />
               </Col>
               <Col xl={12} lg={12} md={12} sm={12}>
                 <hr />

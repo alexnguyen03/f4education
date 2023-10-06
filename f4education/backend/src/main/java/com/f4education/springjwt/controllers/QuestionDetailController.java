@@ -24,7 +24,6 @@ public class QuestionDetailController {
     QuestionDetailServiceImpl questionService;
 
     @GetMapping
-//	@PreAuthorize("hasRole('ADMIN')")
     public List<QuestionDetailResponseDTO> findAll() {
         return questionService.getAllQuestionDetail();
     }
