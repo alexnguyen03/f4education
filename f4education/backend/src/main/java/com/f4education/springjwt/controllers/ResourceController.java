@@ -63,7 +63,7 @@ public class ResourceController {
 
 		for (MultipartFile files : file) {
 			CourseDTO course = coursesService.findById(resourceRequest.getCourseId());
-			resourceService.uploadFile(files, course.getCourseName());
+			resourceService.uploadFile(files, course.getCourseName(), type);
 		}
 		return resourceService.createResource(resourceRequest);
 	}
