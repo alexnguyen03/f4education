@@ -21,8 +21,8 @@ import lombok.NoArgsConstructor;
 public class BillDetail {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "detail_invoice_id")
-    private Integer detailInvoiceId;
+    @Column(name = "bill_detail_id")
+    private Integer billDetailId;
 
     private Double price;
 
@@ -43,7 +43,7 @@ public class BillDetail {
 
     @Override
     public String toString() {
-        return "DetailInvoice [detailInvoiceId=" + detailInvoiceId + ", price=" + price + ", totalPrice=" + totalPrice
+        return "DetailInvoice [detailInvoiceId=" + billDetailId + ", price=" + price + ", totalPrice=" + totalPrice
                 + ", note=" + note + "]";
     }
 }

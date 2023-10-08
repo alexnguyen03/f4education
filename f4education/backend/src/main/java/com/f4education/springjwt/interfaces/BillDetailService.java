@@ -12,7 +12,7 @@ import java.util.List;
 public interface BillDetailService {
     List<BillDetailResponseDTO> getAllBillDetail();
 
-    BillDetailResponseDTO getBillDetailById(Integer billId);
+    BillDetailResponseDTO getBillDetailById(Integer billDetailId);
 
-    BillDetailRequestDTO createBillDetail(BillDetailRequestDTO billRequestDTO);
+    BillDetailResponseDTO createBillDetail(BillDetailRequestDTO billRequestDTO);
 }

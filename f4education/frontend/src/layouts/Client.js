@@ -1,12 +1,13 @@
 import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 // reactstrap components
-import {Container, Row} from 'reactstrap';
+// import {Container} from 'reactstrap';
 import {useEffect, useRef} from 'react';
 // core components
 import ClientFooter from 'components/Footers/ClientFooter.js';
 import ClientNavbar from 'components/Navbars/ClientNavbar.js';
 
 import {routesClient} from 'routes.js';
+import { Container } from '@mantine/core';
 
 const Client = (props) => {
 	const mainContent = useRef(null);
@@ -47,11 +48,12 @@ const Client = (props) => {
 				className='main-content mt--5'
 				style={{backgroundColor: '#fff', minHeight: '100vh'}}
 				ref={mainContent}>
+
 				{/* Client header */}
 				<ClientNavbar />
 
 				{/* Page content */}
-				<Container className='pb-5 pt-8'>
+				<Container size="xl" px="xs" className='pb-5 pt-8'>
 					<Routes>
 						{getRoutes(routesClient)}
 						<Route

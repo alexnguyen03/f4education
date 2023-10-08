@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Badge, Col, Row } from "reactstrap";
 import logo from "../../assets/img/brand/f4.png";
 import cartEmptyimage from "../../assets/img/cart-empty.png";
@@ -7,8 +7,26 @@ import cartEmptyimage from "../../assets/img/cart-empty.png";
 
 // API
 import cartApi from "../../api/cartApi";
-import { Autocomplete, Avatar, Burger, Button, Menu, rem } from "@mantine/core";
 import {
+  Anchor,
+  Autocomplete,
+  Avatar,
+  Box,
+  Burger,
+  Button,
+  Center,
+  Divider,
+  Grid,
+  Group,
+  HoverCard,
+  Menu,
+  rem,
+  SimpleGrid,
+  Text,
+  useMantineTheme,
+} from "@mantine/core";
+import {
+  IconChevronDown,
   IconLayoutDashboard,
   IconLogout2,
   IconSchoolBell,
@@ -19,7 +37,6 @@ import { useDisclosure, useElementSize } from "@mantine/hooks";
 
 // css module
 import styles from "../../assets/css/customClientCss/Navbar.module.css";
-// import "../../assets/css/customClientCss/navbar-custom.css";
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
@@ -108,18 +125,10 @@ const ClientNavbar = () => {
   const [lastScrollTop, setLastScrollTop] = useState(0);
   const [activeItems, setActiveItems] = useState([false, false, false]);
   const [opened, { toggle }] = useDisclosure(false);
-  // const [homeActive, setHomeActive] = useState("");
-  // const [cartActive, setCartActive] = useState("");
-  // const [courseActive, setCourseActive] = useState("");
-  // const [searchParams] = useSearchParams();
 
   // *************** CART VARIABLE - AREA START
   const [carts, setCarts] = useState([]);
   const [totalPrice, setTotalPrice] = useState(0);
-
-  // useEffect(() => {
-
-  // }, [searchParams]);
 
   const fetchCart = async () => {
     try {
@@ -253,6 +262,60 @@ const ClientNavbar = () => {
               >
                 Giỏ hàng
               </Link>
+            </li>
+            <li className="nav-item">
+              <HoverCard
+                width={800}
+                position="bottom"
+                radius="sm"
+                shadow="md"
+                withinPortal
+              >
+                <HoverCard.Target>
+                  <Link
+                    to="#"
+                    className="nav-link custom-nav-link d-flex align-items-center"
+                  >
+                    <Text
+                      style={{
+                        fontSize: "18px",
+                        color: "#212121",
+                      }}
+                    >
+                      Danh mục
+                    </Text>
+                    <IconChevronDown
+                      style={{
+                        width: rem(16),
+                        height: rem(16),
+                        marginLeft: "5px",
+                        marginTop: "5px",
+                      }}
+                      // color={theme.colors.black[6]}
+                    />
+                  </Link>
+                </HoverCard.Target>
+
+                <HoverCard.Dropdown style={{ overflow: "hidden" }} mt="xl">
+                  <Group position="apart">
+                    <Text fw={500}>Khóa học</Text>
+                    <Link to="/course" fz="xs">
+                      Tất cả khóa học
+                    </Link>
+                  </Group>
+
+                  <Divider my="sm" />
+
+                  <SimpleGrid cols={2} mt={20} spacing={0}>
+                    <Grid>
+                      <Grid.Col span={8}>
+
+                      </Grid.Col>
+                      <Grid.Col span={4}></Grid.Col>
+                    </Grid>
+                  </SimpleGrid>
+                </HoverCard.Dropdown>
+              </HoverCard>
             </li>
           </ul>
 

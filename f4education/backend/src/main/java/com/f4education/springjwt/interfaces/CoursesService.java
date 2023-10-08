@@ -1,25 +1,27 @@
 package com.f4education.springjwt.interfaces;
 
+import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
-
-import java.util.List;
-
-import org.springframework.data.repository.query.Param;
 
 public interface CoursesService {
 	List<CourseDTO> findAllCourseDTO();
 
 	List<CourseDTO> findNewestCourse();
 
+	List<CourseDTO> findTop10SoldCourse();
+
 	Course findById(Integer id);
 
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
 	List<CourseDTO> findAllByAdminId(String adminId);
-	
+
 	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
-	
+
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
 }

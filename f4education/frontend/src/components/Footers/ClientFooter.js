@@ -9,7 +9,8 @@ const ClientFooter = () => {
       <Container>
         <footer style={{ marginTop: "100px" }}>
           <hr style={{ color: "rgb(158, 158, 158)" }} />
-          <div className="d-flex justify-content-start flex-wrap text-start">
+          <div className="d-flex justify-content-between flex-wrap text-start">
+            {/* Item */}
             <div className="d-flex flex-column" style={{ maxWidth: "350px" }}>
               <div className="flex flex-column font-weight-700 mb-3">
                 <span
@@ -61,25 +62,10 @@ const ClientFooter = () => {
                   </span>
                 </p>
               </div>
-              <div className="d-flex justify-content-start mt-2">
-                <Link to={"/"} className="navbar-brand font-weight-700">
-                  <img
-                    src={logo}
-                    alt="Logo"
-                    className="img-fluid"
-                    style={{ width: "47px", height: "47px" }}
-                  />
-                </Link>
-                <div
-                  className="d-flex flex-column d-none d-md-flex justify-content-center 
-			  				align-items-start text-dark font-weight-700 ml-2"
-                >
-                  <span>F4 education</span>
-                  <span>SOLD &amp; MANAGEMENTS</span>
-                </div>
-              </div>
             </div>
-            <div className="d-flex flex-column mx-5">
+            
+            {/* Item */}
+            <div className="d-flex flex-column">
               <div className="flex flex-column font-weight-700 mb-3">
                 <span
                   className="text-dark font-weight-700"
@@ -122,7 +108,9 @@ const ClientFooter = () => {
                 </li>
               </ul>
             </div>
-            <div className="d-flex flex-column mx-5">
+           
+            {/* item */}
+            <div className="d-flex flex-column">
               <div className="flex flex-column font-weight-700 mb-3">
                 <span
                   className="text-dark font-weight-700"
@@ -165,6 +153,17 @@ const ClientFooter = () => {
                 </li>
               </ul>
             </div>
+
+            {/* Item */}
+            <div className="d-flex flex-column">
+              <span className="text-white">.</span>
+            </div>
+          </div>
+          <div className="d-flex justify-content-between mt-4">
+            <span className="font-weight-700">
+              <img src={logo} alt="" width={40} heihg={40} />
+            </span>
+            <span className="font-weight-700">@2023, Inc</span>
           </div>
         </footer>
       </Container>

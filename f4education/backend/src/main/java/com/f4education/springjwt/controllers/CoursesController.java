@@ -2,36 +2,36 @@ package com.f4education.springjwt.controllers;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.f4education.springjwt.models.Course;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
-import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
-
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -52,7 +52,16 @@ public class CoursesController {
 	}
 
 	@GetMapping("/newest-courses")
-	public List<CourseDTO> getTop10NewsetCourse (){return courseService.findNewestCourse();}
+	public ResponseEntity<?> getTop10NewsetCourse() {
+		List<CourseDTO> list = courseService.findNewestCourse();
+		return ResponseEntity.ok(list);
+	}
+
+	@GetMapping("/top-selling")
+	public ResponseEntity<?> getTop10SoldCourse() {
+		List<CourseDTO> list = courseService.findTop10SoldCourse();
+		return ResponseEntity.ok(list);
+	}
 
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
@@ -108,9 +117,10 @@ public class CoursesController {
 		System.out.println(checkedSubjects);
 		return courseService.findBySubjectNames(checkedSubjects);
 	}
-	
+
 	@GetMapping("/duration/{checkedDurations}")
-	public List<CourseDTO> findCoursesByCheckedDurations(@PathVariable("checkedDurations") List<String> checkedDurations) {
+	public List<CourseDTO> findCoursesByCheckedDurations(
+			@PathVariable("checkedDurations") List<String> checkedDurations) {
 		return courseService.findByThoiLuongInRange(checkedDurations);
 	}
 }
