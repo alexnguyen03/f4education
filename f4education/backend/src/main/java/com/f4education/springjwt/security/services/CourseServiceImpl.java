@@ -49,9 +49,9 @@ public class CourseServiceImpl implements CoursesService {
     }
 
 
-	@Override
+    @Override
 	public CourseDTO findById(Integer id) {
-		return courseRepository.findById(id).get();
+		return convertEntityToDTO(courseRepository.findById(id).get());
 	}
 
     @Override
