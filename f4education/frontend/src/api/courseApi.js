@@ -34,6 +34,10 @@ const courseApi = {
 		const url = `/courses/course-histoty/${accountId}`;
 		return axiosClient.get(url);
 	},
+	findCourseById: (courseId) => {
+		const url = `/courses/course-detail/${courseId}`;
+		return axiosClient.get(url);
+	},
 };
 
 export default courseApi;

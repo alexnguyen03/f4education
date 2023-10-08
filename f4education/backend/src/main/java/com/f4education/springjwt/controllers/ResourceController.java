@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.interfaces.ResourceService;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
@@ -61,7 +62,7 @@ public class ResourceController {
 		}
 
 		for (MultipartFile files : file) {
-			Course course = coursesService.findById(resourceRequest.getCourseId());
+			CourseDTO course = coursesService.findById(resourceRequest.getCourseId());
 			resourceService.uploadFile(files, course.getCourseName());
 		}
 		return resourceService.createResource(resourceRequest);

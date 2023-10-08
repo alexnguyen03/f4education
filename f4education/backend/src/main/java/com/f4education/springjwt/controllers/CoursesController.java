@@ -112,4 +112,10 @@ public class CoursesController {
 	public List<CourseDTO> findCoursesByAccountId(@PathVariable("accountId") Integer accountId) {
 		return courseService.findAllCourseDTOByAccountId(accountId);
 	}
+	
+	@GetMapping("/course-detail/{courseId}")
+	public CourseDTO findCourseById(@PathVariable("courseId") Integer courseId) {
+		CourseDTO course = courseService.findById(courseId);
+		return course;
+	}
 }

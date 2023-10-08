@@ -82,6 +82,8 @@ public class Course implements Serializable {
 	public String toString() {
 		return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
 				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-				+ numberSession + ", image=" + image + "]";
+				+ numberSession + ", image=" + image + ", subject=" + subject + "]";
 	}
+
+	
 }

@@ -1,25 +1,14 @@
-import { Badge, Card, Grid, Image, Text } from "@mantine/core";
-import "bootstrap/dist/css/bootstrap.min.css";
+import { Badge, Loader } from "@mantine/core";
 import React, { useState, useEffect } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ExpandMore, ExpandLess } from "@material-ui/icons";
 import StarIcon from "@mui/icons-material/Star";
-import {Link} from 'react-router-dom';
-import classnames from "classnames";
-import {
-  TabContent,
-  TabPane,
-  Nav,
-  NavItem,
-  NavLink,
-  Row,
-  Col,
-} from "reactstrap";
-import { BorderColor } from "@mui/icons-material";
+import { Link } from "react-router-dom";
+import { Search as SearchIcon } from "@mui/icons-material";
+import { IconButton } from "@mui/material";
 
 import courseApi from "api/courseApi";
 import subjectApi from "api/subjectApi";
-import { duration } from "moment";
 const IMG_URL = "/courses/";
 
 function CourseClient() {
@@ -33,6 +22,7 @@ function CourseClient() {
   const [selectedValuePrice, setSelectedValuePrice] = useState(null);
   const [activeFilter, setActiveFilter] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isLoading, setLoading] = useState(true);
 
   const toggleAccordionRating = () => {
     setExpandedRating(!expandedRating);
@@ -51,6 +41,7 @@ function CourseClient() {
     try {
       const resp = await courseApi.getAll();
       setCourses(resp.reverse());
+      setLoading(false);
     } catch (error) {
       console.log("GetAllCourse", error);
     }
@@ -104,10 +95,12 @@ function CourseClient() {
 
   const findCoursesByCheckedSubject = async (checkedSubjects) => {
     try {
+      setLoading(true);
       const resp = await courseApi.findCoursesByCheckedSubjects(
         checkedSubjects
       );
       setCourses(resp.reverse());
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -115,10 +108,12 @@ function CourseClient() {
 
   const findCoursesByCheckedDuration = async (checkedDurations) => {
     try {
+      setLoading(true);
       const resp = await courseApi.findCoursesByCheckedDurations(
         checkedDurations
       );
       setCourses(resp.reverse());
+      setLoading(false);
     } catch (error) {
       console.log(error);
     }
@@ -205,13 +200,11 @@ function CourseClient() {
     <>
       <div className="col-lg-12">
         <div className="mt-7">
-          <div className="col-lg-12 p-0">
-            <h5>
-              <b>Tất cả các khóa học</b>
-            </h5>
+          <div className="col-lg-12">
+            <h1 className="py-3">Tất cả các khóa học</h1>
           </div>
-          <div className="d-flex mb-3">
-            <div class="p-1">
+          <div className="d-flex mb-3 ml-3">
+            <div class="p-2">
               <div
                 className="border border-dark p-3 filter-panel"
                 style={{ height: "82%" }}
@@ -220,9 +213,9 @@ function CourseClient() {
                 <span className="ml-1 font-weight-bold">Bộ lọc</span>
               </div>
             </div>
-            <div class="p-1">
+            <div class="p-2">
               <div
-                className="filter-select border border-dark pr-3"
+                className="filter-select border border-dark pr-3 p-2"
                 style={{ height: "82%" }}
               >
                 <label
@@ -233,7 +226,7 @@ function CourseClient() {
                 </label>
                 <select
                   style={{ borderColor: "transparent", boxShadow: "none" }}
-                  class="form-control mt-n2 pb-1 pt-0"
+                  class="form-control mt-n3 pb-1 pt-0 bg-transparent text-dark"
                   id="exampleFormControlSelect1"
                   onChange={handleSelectChange}
                 >
@@ -253,25 +246,42 @@ function CourseClient() {
                 </button>
               </div>
             )}
-            <div class="ml-auto p-2">
-              <p class="text-muted font-weight-bold mt-4">
-                {courses.length} kết quả
-              </p>
-            </div>
-          </div>
-          <div className="d-flex">
-            <div className="p-2 col-3">
-              <div className="col-lg-12">
-                <h5>Tìm kiếm</h5>
+            <div
+              className="p-1 mt-3"
+              style={{
+                marginLeft: 350,
+                width: "350px",
+                height: 50,
+                border: "1px solid #282a354d",
+                borderRadius: "25px",
+                background: "#fff",
+              }}
+            >
+              <div class="input-group">
+                <div class="input-group-prepend">
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                </div>
                 <input
-                  class="form-control w-100 mb-3"
+                  style={{border: "none", marginRight: 10 }}
+                  class="form-control"
                   type="text"
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                 />
               </div>
+            </div>
+            <div class="ml-auto p-2 mt-3">
+              <span class="text-dark font-weight-bold">
+                {filteredCourses.length} kết quả
+              </span>
+            </div>
+          </div>
+          <div className="d-flex">
+            <div className="p-2 col-4">
               <div className="col-lg-12">
-                <div className="border-top border-bottom">
+                <div className="border-top border-bottom pt-3">
                   <div onClick={toggleAccordionRating} className="my-3">
                     <h5>
                       Xếp hạng
@@ -383,7 +393,7 @@ function CourseClient() {
                 </div>
               </div>
               <div className="col-lg-12">
-                <div className="border-bottom">
+                <div className="border-bottom pt-3">
                   <div onClick={toggleAccordionTopic} className="my-3">
                     <h5>
                       Chủ đề
@@ -425,7 +435,7 @@ function CourseClient() {
                 </div>
               </div>
               <div className="col-lg-12">
-                <div className="border-bottom">
+                <div className="border-bottom pt-3">
                   <div onClick={toggleAccordionDuration} className="my-3">
                     <h5>
                       Thời lượng
@@ -491,8 +501,126 @@ function CourseClient() {
                 </div>
               </div>
             </div>
-            <div className="p-2 col-9">
-              {filteredCourses.map((course) => (
+            <div className="p-2 col-8">
+              {isLoading ? (
+                <Loader color="blue" style={{ margin: "20% 50%" }} />
+              ) : (
+                filteredCourses.map((course) => (
+                  <div
+                    className="d-flex border-bottom mb-3"
+                    key={course.courseId}
+                  >
+                    <div className="col-lg-3 p-0 mb-3">
+                      <img
+                        src={
+                          process.env.REACT_APP_IMAGE_URL +
+                          IMG_URL +
+                          course.image
+                        }
+                        style={{ width: 260, height: 145 }}
+                        className="img-fluid"
+                        alt="Course"
+                      />
+                    </div>
+                    <div className="col-lg-7 mb-3">
+                      <h5 style={{ lineHeight: "0.6" }}>{course.courseName}</h5>
+                      <span className="small">{course.courseDescription}</span>
+                      <br />
+                      <span class="text-muted small">
+                        Chủ đề: <b>{course.subject.subjectName}</b>
+                      </span>
+                      <br />
+                      <b>4.0</b>
+                      <span className="ml-2">
+                        <StarIcon
+                          style={{ marginBottom: 3 }}
+                          fontSize="inherit"
+                          color="warning"
+                        />
+                        <StarIcon
+                          style={{ marginBottom: 3 }}
+                          fontSize="inherit"
+                          color="warning"
+                        />
+                        <StarIcon
+                          style={{ marginBottom: 3 }}
+                          fontSize="inherit"
+                          color="warning"
+                        />
+                        <StarIcon
+                          style={{ marginBottom: 3 }}
+                          fontSize="inherit"
+                          color="warning"
+                        />
+                        <StarIcon
+                          style={{ marginBottom: 3 }}
+                          fontSize="inherit"
+                          color="warning"
+                        />
+                        <span class="text-muted small ml-2">(212)</span>
+                      </span>
+                      <br />
+                      <Badge
+                        className="p-0"
+                        size="md"
+                        color="pink"
+                        variant="light"
+                      >
+                        Thời lượng: {course.courseDuration} (giờ)
+                      </Badge>
+                      <Link
+                        to={`/course/course-detail-client/${course.courseId}`}
+                      >
+                        <button
+                          type="button"
+                          class="btn"
+                          style={{
+                            backgroundColor: "#a435f0",
+                            color: "white",
+                            fontWeight: "bold",
+                            borderRadius: 0,
+                            float: "right",
+                            marginTop: 10,
+                          }}
+                          onClick={() => handleRegistration(course)}
+                        >
+                          Thêm vào giỏ hàng
+                        </button>
+                      </Link>
+                    </div>
+                    <div
+                      className="col-lg-2 mb-3 p-0"
+                      style={{ lineHeight: "0.6" }}
+                    >
+                      <div
+                        class="d-flex align-items-start flex-column mb-2"
+                        style={{ height: 140 }}
+                      >
+                        <div class="mb-auto w-100">
+                          <b className="float-right">
+                            {course.coursePrice}
+                            <u>đ</u>
+                          </b>
+                        </div>
+                        <button
+                          type="button"
+                          class="btn w-100"
+                          style={{
+                            backgroundColor: "#172b4d",
+                            color: "white",
+                            fontWeight: "bold",
+                            borderRadius: 0,
+                          }}
+                          onClick={() => handleRegistration(course)}
+                        >
+                          Đăng ký
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))
+              )}
+              {/* {filteredCourses.map((course) => (
                 <div
                   className="d-flex border-bottom mb-3"
                   key={course.courseId}
@@ -603,7 +731,7 @@ function CourseClient() {
                     </div>
                   </div>
                 </div>
-              ))}
+              ))} */}
             </div>
           </div>
         </div>

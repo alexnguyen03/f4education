@@ -35,7 +35,8 @@ import QuestionDetail from 'views/admin/QuestionDetail';
 import Home from 'views/client/visitor/Home';
 import CourseClient from 'views/client/visitor/CourseClient';
 import CourseDetailClient from 'views/client/visitor/CourseDetailClient';
-import CourseHistoryClient from 'views/client/visitor/CourseHistoryClient';
+import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient';
+import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient';
 
 export var routes = [
 	{
@@ -197,10 +198,17 @@ export var routesClient = [
 		layout: '/client',
 	},
 	{
-		path: '/course-history',
-		name: 'lịch sử Khóa học',
+		path: '/course-register',
+		name: 'khóa học đăng ký',
 		icon: 'ni ni-planet text-blue',
-		component: <CourseHistoryClient />,
+		component: <CourseRegisterClient />,
+		layout: '/client',
+	},
+	{
+		path: '/course-register-detail/:courseId',
+		name: 'khóa học đăng ký chi tiết',
+		icon: 'ni ni-planet text-blue',
+		component: <CourseRegisterDetailClient />,
 		layout: '/client',
 	},
 ];

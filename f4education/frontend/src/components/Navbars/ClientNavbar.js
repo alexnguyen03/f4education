@@ -64,7 +64,7 @@ const ClientNavbar = () => {
 							<NavItem>
 								<NavLink
 									className='nav-link-icon'
-									to='/course-history'
+									to='/course-register'
 									tag={Link}>
 									<i className='ni ni-circle-08' />
 									<span className='nav-link-inner--text'>Khóa học đăng ký</span>

@@ -45,7 +45,7 @@ const Client = (props) => {
 				<ClientNavbar />
 
 				{/* Page content */}
-				<Container fluid={true}>
+				<Container>
 					<Row>
 						<Routes>
 							{getRoutes(routesClient)}
