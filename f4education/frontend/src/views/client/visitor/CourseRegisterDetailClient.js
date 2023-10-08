@@ -11,7 +11,7 @@ import {
 import { Search as SearchIcon } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { useParams } from "react-router-dom";
-import { useDisclosure } from '@mantine/hooks';
+import { useDisclosure } from "@mantine/hooks";
 
 import courseApi from "api/courseApi";
 const IMG_URL = "/courses/";
@@ -72,6 +72,8 @@ function CourseRegisterDetailClient() {
           <LoadingOverlay
             visible={visible}
             zIndex={1000}
+            color="rgba(46, 46, 46, 1)"
+            size={50}
             overlayProps={{ radius: "sm", blur: 2 }}
           />
           <Grid.Col span={4} p={30}>
