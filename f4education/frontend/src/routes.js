@@ -20,6 +20,8 @@ import Cart from 'views/client/visitor/Cart';
 import Checkout from 'views/client/visitor/Checkout';
 import Login from 'views/examples/Login';
 import CourseDetailClient from 'views/client/visitor/CourseDetailClient';
+import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient';
+import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient';
 
 import Accounts from 'views/admin/Accounts.js';
 
@@ -172,6 +174,20 @@ export var routesClient = [
 		name: 'Khóa học chi tiết',
 		icon: 'ni ni-planet text-blue',
 		component: <CourseDetailClient />,
+		layout: '/client',
+	},
+	{
+		path: '/course-register',
+		name: 'khóa học đăng ký',
+		icon: 'ni ni-planet text-blue',
+		component: <CourseRegisterClient />,
+		layout: '/client',
+	},
+	{
+		path: '/course-register-detail/:courseId',
+		name: 'khóa học đăng ký chi tiết',
+		icon: 'ni ni-planet text-blue',
+		component: <CourseRegisterDetailClient />,
 		layout: '/client',
 	},
 ];

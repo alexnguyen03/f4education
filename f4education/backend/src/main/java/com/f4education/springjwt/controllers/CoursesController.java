@@ -113,4 +113,15 @@ public class CoursesController {
 	public List<CourseDTO> findCoursesByCheckedDurations(@PathVariable("checkedDurations") List<String> checkedDurations) {
 		return courseService.findByThoiLuongInRange(checkedDurations);
 	}
+	
+	@GetMapping("/course-histoty/{accountId}")
+	public List<CourseDTO> findCoursesByAccountId(@PathVariable("accountId") Integer accountId) {
+		return courseService.findAllCourseDTOByAccountId(accountId);
+	}
+	
+	@GetMapping("/course-detail/{courseId}")
+	public CourseDTO findCourseById(@PathVariable("courseId") Integer courseId) {
+		CourseDTO course = courseService.findById(courseId);
+		return course;
+	}
 }

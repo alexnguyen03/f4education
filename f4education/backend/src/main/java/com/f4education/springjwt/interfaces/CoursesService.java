@@ -13,7 +13,7 @@ public interface CoursesService {
 
 	List<CourseDTO> findNewestCourse();
 
-	Course findById(Integer id);
+	CourseDTO findById(Integer id);
 
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
@@ -22,4 +22,6 @@ public interface CoursesService {
 	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
 	
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
+	
+	List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId);
 }

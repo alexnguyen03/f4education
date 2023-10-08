@@ -49,10 +49,10 @@ public class CourseServiceImpl implements CoursesService {
     }
 
 
-    @Override
-    public Course findById(Integer id) {
-        return courseRepository.findById(id).get();
-    }
+	@Override
+	public CourseDTO findById(Integer id) {
+		return courseRepository.findById(id).get();
+	}
 
     @Override
     public CourseDTO saveCourse(CourseRequest courseRequest) {
@@ -144,5 +144,12 @@ public class CourseServiceImpl implements CoursesService {
 	    }
 
 	    return ketQua;
+	}
+
+	@Override
+	public List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId) {
+		List<CourseDTO> list = courseRepository.findByAccountId(accountId).stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+		System.out.println(list);
+		return list;
 	}
 }

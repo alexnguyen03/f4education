@@ -1,5 +1,4 @@
 import { Badge, Card, Grid, Image, Text } from "@mantine/core";
-// import "bootstrap/dist/css/bootstrap.min.css";
 import React, { useState, useEffect } from "react";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { ExpandMore, ExpandLess } from "@material-ui/icons";
