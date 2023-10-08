@@ -503,7 +503,7 @@ function CourseClient() {
             </div>
             <div className="p-2 col-8">
               {isLoading ? (
-                <Loader color="blue" style={{ margin: "20% 50%" }} />
+                <Loader color="rgba(46, 46, 46, 1)" size={50} style={{ margin: "20% 50%" }} />
               ) : (
                 filteredCourses.map((course) => (
                   <div

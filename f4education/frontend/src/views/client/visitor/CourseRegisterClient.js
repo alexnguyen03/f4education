@@ -80,7 +80,7 @@ function CourseRegisterClient() {
         <h2 className="mb-3">Danh sách khóa học đã đăng ký</h2>
         <Grid>
           {isLoading ? (
-            <Loader color="blue" style={{ marginLeft: "50%" }} />
+            <Loader color="rgba(46, 46, 46, 1)" size={50} style={{ marginLeft: "50%" }} />
           ) : (
             searchCourses.map((course) => (
               <Grid.Col span={4}>
