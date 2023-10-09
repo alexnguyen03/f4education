@@ -43,7 +43,7 @@ root.render(
 				element={<ClientLayout />}
 			/>
 			<Route
-				path='/course/*/course-detail-client/:courseId'
+				path='/course/*/:courseId'
 				element={<ClientLayout />}
 			/>
 			<Route

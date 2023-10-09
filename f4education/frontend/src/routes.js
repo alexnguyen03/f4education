@@ -170,7 +170,7 @@ export var routesClient = [
 		layout: '/client',
 	},
 	{
-		path: '/course/course-detail-client/:courseId',
+		path: '/course/:courseId',
 		name: 'Khóa học chi tiết',
 		icon: 'ni ni-planet text-blue',
 		component: <CourseDetailClient />,
