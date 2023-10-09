@@ -15,9 +15,11 @@ public interface ResourceService {
 
 	ResourcesDTO createResource(ResourceRequest resourceRequest);
 
-	public void uploadFile(MultipartFile file, String folderName);
+	public void uploadFile(MultipartFile file, String folderName, String type);
 
-	List<GoogleDriveFileDTO> getAllFilesByFolder(String folderId) throws IOException, GeneralSecurityException;
+	List<GoogleDriveFileDTO> getAllFilesByFolderLesson(String folderId) throws Exception;
+	
+	List<GoogleDriveFileDTO> getAllFilesByFolderResource(String folderId) throws Exception;
 
 	public void deleteFile(String fileId) throws Exception;
 }

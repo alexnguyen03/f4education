@@ -1,46 +1,63 @@
-/*!
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import {BrowserRouter, Route, Routes, Navigate} from 'react-router-dom';
 
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
+// import MantineProvider from "@mantine/core";
+// import Notifications from "@mantine/notifications";
+// import "@mantine/notifications/styles.css";
 
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
+import 'assets/plugins/nucleo/css/nucleo.css';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+import 'assets/scss/argon-dashboard-react.scss';
 
-* Coded by Creative Tim
+import AdminLayout from 'layouts/Admin.js';
+import AuthLayout from 'layouts/Auth.js';
+import ClientLayout from 'layouts/Client.js';
+import {MantineProvider} from '@mantine/core';
+import {ModalsProvider} from '@mantine/modals';
 
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-
-import "assets/plugins/nucleo/css/nucleo.css";
-import "@fortawesome/fontawesome-free/css/all.min.css";
-import "assets/scss/argon-dashboard-react.scss";
-import "assets/css/costum-answer.css";
-
-import AdminLayout from "layouts/Admin.js";
-import AuthLayout from "layouts/Auth.js";
-import ResourceDetail from "views/admin/ResourceDetail";
-
-const root = ReactDOM.createRoot(document.getElementById("root"));
+const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
-  <BrowserRouter>
-    <Routes>
-      <Route path="/admin/*" element={<AdminLayout />} />
-      <Route path="/auth/*" element={<AuthLayout />} />
-      <Route path="*" element={<Navigate to="/admin/index" replace />} />
-      <Route path="/admin/*/:courseName" element={<AdminLayout />} />
-      <Route
-        path="/admin/*/:courseName/:folderId"
-        element={<AdminLayout />}
-      />
-    </Routes>
-  </BrowserRouter>
+	<BrowserRouter>
+		<Routes>
+			<Route
+				path='/admin/*'
+				element={<AdminLayout />}
+			/>
+			<Route
+				path='/auth/*'
+				element={<AuthLayout />}
+			/>
+			<Route
+				path='/admin'
+				element={
+					<Navigate
+						to='/admin/index'
+						replace
+					/>
+				}
+			/>
+			<Route
+				path='/*'
+				element={<ClientLayout />}
+			/>
+			<Route
+				path='/course/*/:courseId'
+				element={<ClientLayout />}
+			/>
+			<Route
+				path='/*/course-register-detail/:courseId'
+				element={<ClientLayout />}
+			/>
+			<Route
+				path='/admin/*/:courseName'
+				element={<AdminLayout />}
+			/>
+			<Route
+				path='/admin/*/:courseName/:folderId'
+				element={<AdminLayout />}
+			/>
+		</Routes>
+	</BrowserRouter>,
 );

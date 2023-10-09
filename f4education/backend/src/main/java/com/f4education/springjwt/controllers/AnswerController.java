@@ -45,5 +45,4 @@ public class AnswerController {
 	public AnswerDTO updateAnswer(@PathVariable("answerId") Integer answerId, @RequestBody AnswerDTO answerDTO) {
 		return answerService.updateAnswer(answerId, answerDTO);
 	}
-
 }

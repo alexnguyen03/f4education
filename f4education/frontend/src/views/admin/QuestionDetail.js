@@ -828,19 +828,19 @@ const QuestionDetail = () => {
               <h3 className="text-muted">
                 Môn học - {questionByCourseNameRoute.subjectName}
               </h3>
-              <h1 className="text-dark mb-1">
+              <h1 className="text-dark">
                 {questionByCourseNameRoute.courseName}
               </h1>
               <div className="d-flex align-items-center flex-wrap">
-                <h6>{questionByCourseNameRoute.adminName}</h6>
+                <h5>{questionByCourseNameRoute.adminName}</h5>
                 <span className="mx-1 font-weight-400 mt--1">
                   <i className="bx bx-minus"></i>
                 </span>
-                <h6>
+                <h5>
                   {moment(questionByCourseNameRoute.createDate).format(
                     "DD-MM-yyyy, h:mm:ss a"
                   )}
-                </h6>
+                </h5>
               </div>
             </div>
           </div>

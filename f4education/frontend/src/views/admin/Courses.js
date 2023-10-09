@@ -64,13 +64,13 @@ const Courses = () => {
 		courseId: '',
 		courseName: '',
 		coursePrice: 0,
-		courseDuration: '',
+		courseDuration: 0,
 		courseDescription: '',
 		numberSession: 0,
 		image: '',
 	});
 
-	// Thực hiện binding data
+	// 	// Thực hiện binding data
 	const handelOnChangeInput = (e) => {
 		validate();
 		setCourse({...course, [e.target.name]: e.target.value, numberSession: 0});
