@@ -16,6 +16,8 @@ import {
   Checkbox,
   HoverCard,
   Grid,
+  Title,
+  rem,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
 import { IconShoppingCartPlus } from "@tabler/icons-react";
@@ -281,7 +283,7 @@ function Cart() {
       </Breadcrumbs>
 
       {/* Title */}
-      <h1 className="font-weight-700 text-dark my-5 display-4">Giỏ hàng</h1>
+      <Title order={1} color="dark" fw={700}>Giỏ hàng</Title>
 
       {/* Loading */}
       {loading ? (
@@ -320,7 +322,7 @@ function Cart() {
             </>
           ) : (
             <>
-              <Grid>
+              <Grid mt={rem("1rem")}>
                 <Grid.Col xl="9" lg="9" md="12" sm="12">
                   <h5 className="font-weight-600 text-dark">
                     {carts.length} khóa học trong giỏ hàng
@@ -502,13 +504,13 @@ function Cart() {
       )}
 
       {/* Newest Course */}
-      <h3 className="font-weight-700 text-dark my-5">
+      <Title order={2} color="dark" fw={700} mt={rem("3rem")}>
         Những khóa học mới nhất
-      </h3>
+      </Title>
 
       {/* Mantine Carousel */}
       <Carousel
-        slideSize="25%"
+        slideSize="20%"
         height="350px"
         slideGap="lg"
         controlsOffset="xs"

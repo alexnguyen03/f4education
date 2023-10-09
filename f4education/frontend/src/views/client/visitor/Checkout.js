@@ -16,7 +16,6 @@ import moment from "moment";
 
 // CSS Module
 import styles from "../../../assets/css/customClientCss/Payment.module.css";
-
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
 const Checkout = () => {
@@ -213,7 +212,7 @@ const Checkout = () => {
     }
   }, [responseCode]);
 
-  const handleCreateRegisterCourse = (updateCartRequest) => {
+  const handleCreateRegisterCourse = async (updateCartRequest) => {
     const registerCourseRequest = updateCartRequest.map((rc) => ({
       courseId: rc.courseId,
       studentId: 1,
@@ -222,7 +221,7 @@ const Checkout = () => {
     console.log(registerCourseRequest[0]);
 
     try {
-      const resp = registerCourseApi.createRegisterCourse(
+      const resp = await registerCourseApi.createRegisterCourse(
         registerCourseRequest[0]
       );
     } catch (error) {
@@ -230,9 +229,9 @@ const Checkout = () => {
     }
   };
 
-  const handleCreateBillAndBillDetail = (updateCartRequest) => {
+  const handleCreateBillAndBillDetail = async (updateCartRequest) => {
     try {
-      const resp = billApi.createBill(bill);
+      const resp = await billApi.createBill(bill);
     } catch (error) {
       console.log("Bill: " + error);
     }
@@ -247,7 +246,7 @@ const Checkout = () => {
 
     // Bill detail
     try {
-      const resp = billApi.createBillDetail(billDetailRequest);
+      const resp = await billApi.createBillDetail(billDetailRequest);
     } catch (error) {
       console.log("BillDetail: " + error);
     }

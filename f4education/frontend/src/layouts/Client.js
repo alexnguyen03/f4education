@@ -67,6 +67,8 @@ const Client = (props) => {
 						/>
 					</Routes>
 				</Container>
+			
+				{/* Footer */}
 				<ClientFooter />
 			</div>
 		</>

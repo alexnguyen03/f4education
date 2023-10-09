@@ -91,10 +91,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/sessions-history/**",
                                         "/api/resource/**",
                                         "/api/cart/**",
-                                        "/api/payment/**",
                                         "/api/bills/**",
                                         "api/bill-detail/**",
-                                        "/api/payment-method/**",
                                         "/api/register-course/**",
                                         "/img/**")
                                 .permitAll()
@@ -103,7 +101,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/subjects/**",
                                         "/api/classs/**",
                                         "/api/courses-history/**",
-                                        "/api/subjectHistory/**",
+                                        "/api/subject-history/**",
                                         "/api/courses/**",
                                         "/api/classroom/**",
                                         "/api/sessions/**",

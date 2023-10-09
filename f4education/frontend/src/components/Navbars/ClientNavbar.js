@@ -16,6 +16,7 @@ import {
   Button,
   Center,
   Divider,
+  Flex,
   Grid,
   Group,
   HoverCard,
@@ -23,6 +24,7 @@ import {
   rem,
   SimpleGrid,
   Text,
+  Title,
   useMantineTheme,
 } from "@mantine/core";
 import {
@@ -265,7 +267,7 @@ const ClientNavbar = () => {
             </li>
             <li className="nav-item">
               <HoverCard
-                width={800}
+                width={"60vw"}
                 position="bottom"
                 radius="sm"
                 shadow="md"
@@ -306,14 +308,85 @@ const ClientNavbar = () => {
 
                   <Divider my="sm" />
 
-                  <SimpleGrid cols={2} mt={20} spacing={0}>
-                    <Grid>
-                      <Grid.Col span={8}>
+                  <Grid gutter="xl">
+                    <Grid.Col xl={4} lg={4} md={12} sm={12}>
+                      <Title order={3} fw={700} color="dark">
+                        Các chủ đề khóa học phổ biến
+                      </Title>
+                      <Text color="dimmed">
+                        Khám phá các khóa học miễn phí hoặc trả phí về các chủ
+                        đề mà bạn quan tâm.
+                      </Text>
+                      <Link to="/course" className="w-100">
+                        <Button color="violet" mt={"auto"} w="100%">
+                          Khám phá khóa học
+                        </Button>
+                      </Link>
 
-                      </Grid.Col>
-                      <Grid.Col span={4}></Grid.Col>
-                    </Grid>
-                  </SimpleGrid>
+                      <Divider orientation="vertical" size="sm" />  
+                    </Grid.Col>
+                    <Grid.Col xl={8} lg={8} md={12} sm={12}>
+                      <SimpleGrid cols={3} spacing="xl" verticalSpacing="sm">
+                        <Flex
+                          justify={"center"}
+                          align={"start"}
+                          direction={"column"}
+                          gap={"xl"}
+                        >
+                          <Text color="dark" fw={700}>
+                            Java
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            C#
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            PHP
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            JavaScript
+                          </Text>
+                        </Flex>
+                        <Flex
+                          justify={"center"}
+                          align={"start"}
+                          direction={"column"}
+                          gap={"xl"}
+                        >
+                          <Text color="dark" fw={700}>
+                            NextJS
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            ReactJS
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            Angular
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            NodeJS
+                          </Text>
+                        </Flex>
+                        <Flex
+                          justify={"center"}
+                          align={"start"}
+                          direction={"column"}
+                          gap={"xl"}
+                        >
+                          <Text color="dark" fw={700}>
+                            SQL Server
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            My SQL
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            Porto...
+                          </Text>
+                          <Text color="dark" fw={700}>
+                            Xampp
+                          </Text>
+                        </Flex>
+                      </SimpleGrid>
+                    </Grid.Col>
+                  </Grid>
                 </HoverCard.Dropdown>
               </HoverCard>
             </li>

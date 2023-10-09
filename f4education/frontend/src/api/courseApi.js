@@ -38,6 +38,10 @@ const courseApi = {
 		const url = '/courses/newest-courses';
 		return axiosClient.get(url);
 	},
+	getTopSellingCourse: () => {
+		const url = '/courses/top-selling';
+		return axiosClient.get(url);
+	},
 };
 
 export default courseApi;

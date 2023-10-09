@@ -1,9 +1,12 @@
 import { Carousel } from "@mantine/carousel";
 import {
+  Affix,
   Box,
   Button,
   Card,
+  Center,
   Flex,
+  Grid,
   Group,
   HoverCard,
   Image,
@@ -11,17 +14,25 @@ import {
   rem,
   Text,
   Title,
+  Transition,
 } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 
 import heroImage from "../../../assets/img/hero-home.jpg";
 import heroImage2 from "../../../assets/img/hero-home-2.jpg";
-import { IconShoppingCartPlus } from "@tabler/icons-react";
-import { useMediaQuery } from "@mantine/hooks";
+import {
+  IconArrowAutofitRight,
+  IconArrowUp,
+  IconChevronRightPipe,
+  IconShoppingCartPlus,
+} from "@tabler/icons-react";
+import { useMediaQuery, useWindowScroll } from "@mantine/hooks";
 import { breakpoints } from "@mui/system";
 
 // API
 import courseApi from "../../../api/courseApi";
+
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
 const HeroSlideShow = [
   {
@@ -135,14 +146,31 @@ const recommentTopic = [
 ];
 
 const Home = () => {
+  // Main Variable
   const [newestCourse, setNewestCourse] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [scroll, scrollTo] = useWindowScroll();
+
+  // Action Variable
+  const [showNotification, setShowNotification] = useState({
+    status: false,
+    message: "",
+  });
 
   const fetchNewestCourse = async () => {
     try {
       setLoading(false);
-      const resp = courseApi.getNewestCourse();
-      setNewestCourse(resp.data);
+      const resp = await courseApi.getNewestCourse();
+
+      if (resp.status === 200 && resp.data.length > 0) {
+        setNewestCourse(resp.data);
+        console.log(resp.data);
+      } else {
+        setShowNotification({
+          status: true,
+          message: "Lỗi không lấy được dữ liệu.",
+        });
+      }
       setLoading(true);
     } catch (error) {
       console.log(error);
@@ -206,11 +234,10 @@ const Home = () => {
           <HoverCard.Target>
             <Card.Section>
               <Image
-                // src={`${PUBLIC_IMAGE}/courses/${course.image}`}
-                src={learn.image}
+                src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
                 fit="cover"
                 width={"100%"}
-                height={"auto"}
+                height={150}
                 radius="sm"
                 withPlaceholder
               />
@@ -308,7 +335,7 @@ const Home = () => {
   return (
     <>
       {/* Mantine Hero Carousel */}
-      <Box mb="xl" mt="lg">
+      <Box my={rem("5rem")}>
         <Carousel
           slideSize="100%"
           height="400px"
@@ -344,7 +371,7 @@ const Home = () => {
       </Box>
 
       {/* wwhat learn nexxt */}
-      <Box mt="xl">
+      <Box mt={rem("5rem")}>
         <Title order={1} mt="lg" fw={700} color="dark">
           Tiếp theo học gì
         </Title>
@@ -379,7 +406,7 @@ const Home = () => {
       </Box>
 
       {/* Top sell course*/}
-      <Box mt="lg">
+      <Box>
         <Title order={1} mt="lg" fw={700} color="dark">
           Những khóa học bán chạy nhất
         </Title>
@@ -411,7 +438,7 @@ const Home = () => {
       </Box>
 
       {/* Topic recomment*/}
-      <Box mt="lg">
+      <Box my={rem("5rem")}>
         <Title order={1} mt="lg" fw={700} color="dark" mb="lg">
           Những chủ đề gợi ý cho bạn
         </Title>
@@ -440,6 +467,131 @@ const Home = () => {
           </Carousel>
         </Box>
       </Box>
+
+      {/* Other section */}
+      <Box my={rem("5rem")} bg="#10162f" p={rem("2rem")}>
+        <Grid grow>
+          <Grid.Col xl={6} lg={6} md={12} sm={12}>
+            <Box>
+              <Title
+                order={1}
+                color="#fff"
+                fw={700}
+                mx={"auto"}
+                align={"center"}
+                maw={300}
+              >
+                Gia nhập với chúng tôi ngay.
+              </Title>
+            </Box>
+          </Grid.Col>
+          <Grid.Col xl={6} lg={6} md={12} sm={12}>
+            <Group position="apart">
+              <Flex
+                gap="md"
+                justify="center"
+                align="center"
+                direction="column"
+                wrap="wrap"
+              >
+                <Title order={1} color="#fff" fw={700}>
+                  1M
+                </Title>
+                <Text color="#fff" fw={700}>
+                  Học viên
+                </Text>
+              </Flex>
+              <Flex
+                gap="md"
+                justify="center"
+                align="center"
+                direction="column"
+                wrap="wrap"
+              >
+                <Title order={1} color="#fff" fw={700}>
+                  10+
+                </Title>
+                <Text color="#fff" fw={700}>
+                  Quốc gia
+                </Text>
+              </Flex>
+              <Flex
+                gap="md"
+                justify="center"
+                align="center"
+                direction="column"
+                wrap="wrap"
+              >
+                <Title order={1} color="#fff" fw={700}>
+                  100+
+                </Title>
+                <Text color="#fff" fw={700}>
+                  Khóa học
+                </Text>
+              </Flex>
+            </Group>
+          </Grid.Col>
+        </Grid>
+      </Box>
+
+      <Box my={rem("5rem")} p={rem("2rem")}>
+        <Flex direction={"column"} justify="center" align={"center"}>
+          <Title order={1} color="dark" mx={"auto"}>
+            Bắt đầu và nâng cao kỹ năng của bạn
+          </Title>
+          <Text
+            color="dimmed"
+            align="center"
+            maw={500}
+            mx={"auto"}
+            my={rem("1.5rem")}
+          >
+            Cung cấp những khóa học lập trình, kiến thức bạn cần để có thể học
+            tập và đi làm chỉ trong 9 tháng.
+          </Text>
+          <Button variant="outline" color="dark" size="lg" uppercase>
+            Đăng ký ngay
+          </Button>
+        </Flex>
+      </Box>
+
+      <Box my={rem("5rem")} p={rem("2rem")}>
+        <Flex direction={"column"} justify="center" align={"center"}>
+          <Text
+            color="dimmed"
+            align="center"
+            maw={500}
+            mx={"auto"}
+            my={rem("1.5rem")}
+          >
+            Cần hỗ trợ, liên hệ cho chúng tôi ngay bây giờ.
+          </Text>
+          <Title
+            order={1}
+            color="dark"
+            mx={"auto"}
+            component="a"
+            href="mailTo:tronghientran18@gmail.com"
+          >
+            F4 Education <IconArrowAutofitRight />
+          </Title>
+        </Flex>
+      </Box>
+
+      {/* Affix Button */}
+      <Affix position={{ bottom: rem(20), right: rem(20) }}>
+        <Transition transition="slide-up" mounted={scroll.y > 0}>
+          {(transitionStyles) => (
+            <Button
+              color="violet"
+              style={transitionStyles}
+              onClick={() => scrollTo({ y: 0 })}
+            >
+              <IconArrowUp size="1rem" />
+            </Button>
+          )}
+        </Transition>
+      </Affix>
     </>
   );
 };

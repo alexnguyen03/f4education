@@ -280,7 +280,7 @@ const Subjects = () => {
 			const body = subjectHistory;
 			console.log(body);
 			const resp = await subjectHistoryApi.createSubjectHistory(body);
-			console.log(resp);
+			console.log(resp.data);
 		} catch (error) {
 			console.log(error);
 		}
