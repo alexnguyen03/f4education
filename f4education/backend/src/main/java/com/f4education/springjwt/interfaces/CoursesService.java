@@ -15,6 +15,10 @@ public interface CoursesService {
 
 	List<CourseDTO> findTop10SoldCourse();
 
+	List<CourseDTO> findTop10SoldCourse();
+
+	List<CourseDTO> findTop10SoldCourse();
+
 	Course findById(Integer id);
 
 	CourseDTO saveCourse(CourseRequest courseRequest);
@@ -24,4 +28,6 @@ public interface CoursesService {
 	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
 
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
+	
+	List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId);
 }

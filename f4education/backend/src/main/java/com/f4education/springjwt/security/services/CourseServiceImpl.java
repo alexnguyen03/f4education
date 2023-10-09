@@ -51,9 +51,9 @@ public class CourseServiceImpl implements CoursesService {
 				.collect(Collectors.toList());
 	}
 
-	@Override
-	public Course findById(Integer id) {
-		return courseRepository.findById(id).get();
+    @Override
+	public CourseDTO findById(Integer id) {
+		return convertEntityToDTO(courseRepository.findById(id).get());
 	}
 
 	@Override
@@ -145,5 +145,12 @@ public class CourseServiceImpl implements CoursesService {
 		}
 
 		return ketQua;
+	}
+
+	@Override
+	public List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId) {
+		List<CourseDTO> list = courseRepository.findByAccountId(accountId).stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+		System.out.println(list);
+		return list;
 	}
 }

@@ -34,6 +34,14 @@ const courseApi = {
 		const url = `/courses/duration/${checkedDurations}`;
 		return axiosClient.get(url);
 	},
+	findCoursesByAccountId: (accountId) => {
+		const url = `/courses/course-histoty/${accountId}`;
+		return axiosClient.get(url);
+	},
+	findCourseById: (courseId) => {
+		const url = `/courses/course-detail/${courseId}`;
+		return axiosClient.get(url);
+	},
 	getNewestCourse: () => {
 		const url = '/courses/newest-courses';
 		return axiosClient.get(url);
