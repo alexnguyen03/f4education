@@ -228,7 +228,7 @@ const Courses = () => {
 		try {
 			setLoadingCourses(true);
 			const resp = await courseApi.getAll();
-			setCourses(resp.reverse());
+			setCourses(resp.data.reverse());
 			setLoadingCourses(false);
 		} catch (error) {
 			console.log('failed to fetch data', error);
