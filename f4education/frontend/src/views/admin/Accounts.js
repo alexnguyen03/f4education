@@ -13,7 +13,7 @@ import {Warning} from '@material-ui/icons';
 import {Button, Card, CardBody, CardHeader, Col, Container, Form, CardImg, FormGroup, Input, Label, Modal, Row, ButtonGroup} from 'reactstrap';
 import Select from 'react-select';
 const IMG_URL = '/courses/';
-const Teachers = () => {
+const Accounts = () => {
 	const user = JSON.parse(localStorage.getItem('user') ?? '');
 	const [imgData, setImgData] = useState(null);
 	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
@@ -91,7 +91,8 @@ const Teachers = () => {
 		setLoadingHistoryInfo(true);
 		try {
 			const resp = await teacherApi.getTeacherHistoryByCourseid(id);
-			setListHistoryById(resp.reverse());
+			console.log('🚀 ~ file: Accounts.js:94 ~ handelShowHistory ~ resp:', resp);
+			setListHistoryById(resp.data.reverse());
 			setLoadingHistoryInfo(false);
 		} catch (error) {
 			console.log('failed to fetch data', error);
@@ -310,7 +311,7 @@ const Teachers = () => {
 			setLoadingTeachers(true);
 			const resp = await teacherApi.getAllTeachers();
 			console.log(resp);
-			setTeachers(resp.reverse());
+			setTeachers(resp.data.reverse());
 			setLoadingTeachers(false);
 		} catch (error) {
 			console.log('failed to load data', error);
@@ -335,7 +336,7 @@ const Teachers = () => {
 		try {
 			setLoadingTeachersHistory(true);
 			const resp = await teacherApi.getAllTeachersHistory();
-			setTeacherHistories(resp.reverse());
+			setTeacherHistories(resp.data.reverse());
 			setLoadingTeachersHistory(false);
 			console.log(setTeacherHistories);
 		} catch (error) {
@@ -809,4 +810,4 @@ const Teachers = () => {
 		</>
 	);
 };
-export default memo(Teachers);
+export default memo(Accounts);
