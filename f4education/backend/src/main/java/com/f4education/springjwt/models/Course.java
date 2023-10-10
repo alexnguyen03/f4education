@@ -62,13 +62,6 @@ public class Course implements Serializable {
     @JoinColumn(name = "subject_id")
     Subject subject;
 
-    @Override
-    public String toString() {
-        return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
-                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-                + numberSession + ", image=" + image + "]";
-    }
-
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "admin_id")
@@ -82,5 +75,12 @@ public class Course implements Serializable {
         this.courseDescription = courseDescription;
         this.numberSession = numberSession;
         this.image = image;
+    }
+
+    @Override
+    public String toString() {
+        return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
+                + numberSession + ", image=" + image + "]";
     }
 }

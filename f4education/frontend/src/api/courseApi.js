@@ -16,11 +16,15 @@ const courseApi = {
 	},
 	addCourse: (body) => {
 		const url = '/courses';
-		return axiosClient.post(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
+		return axiosClient.post(url, body, {
+			headers: {'Content-Type': 'multipart/form-data'},
+		});
 	},
 	updateCourse: (body) => {
 		const url = '/courses';
-		return axiosClient.put(url, body, {headers: {'Content-Type': 'multipart/form-data'}});
+		return axiosClient.put(url, body, {
+			headers: {'Content-Type': 'multipart/form-data'},
+		});
 	},
 	getNewestCourse: () => {
 		const url = '/courses/newest-courses';
@@ -37,6 +41,10 @@ const courseApi = {
 	},
 	findCoursesByCheckedDurations: (checkedDurations) => {
 		const url = `/courses/duration/${checkedDurations}`;
+		return axiosClient.get(url);
+	},
+	getNewestCourse: () => {
+		const url = '/courses/newest-courses';
 		return axiosClient.get(url);
 	},
 };

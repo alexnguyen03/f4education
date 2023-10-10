@@ -1,6 +1,7 @@
 package com.f4education.springjwt.controllers;
 
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
@@ -22,6 +23,12 @@ public class RegisterCourseController {
     @GetMapping
     public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAll() {
         return registerCourseService.getAllRegisterCourse();
+    }
+
+    @GetMapping("/distinc")
+    public ResponseEntity<?> findAllDistincByCourse_CourseName() {
+        List<RegisterCourseResponseDTO> list = registerCourseService.getAllRegisterCoursesByCourse_CourseName();
+        return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{studentId}")

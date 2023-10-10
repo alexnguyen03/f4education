@@ -41,6 +41,7 @@ const Login = () => {
 
 			if (resp.status === 200 && resp.status) {
 				setUser(resp.data);
+				console.log('🚀 ~ file: Login.js:44 ~ handleLogin ~ resp.data:', resp.data);
 				storeUserInfo(resp.data);
 				const role = resp.data.roles[0];
 				if (role === 'ROLE_ADMIN') {
@@ -79,6 +80,7 @@ const Login = () => {
 				storeUserInfo({email: email, accessToken: accessToken, id: id, username: username, refreshToken: refreshToken, fullName: givenName, imageName: imageUrl});
 
 				const role = response.data.roles[0];
+				console.log('🚀 ~ file: Login.js:82 ~ responseGoogleSuccess ~ role:', role);
 				if (role === 'ROLE_ADMIN') {
 					navigate('/admin');
 				} else if (role === 'ROLE_TEACHER') {
@@ -126,9 +128,11 @@ const Login = () => {
 		return true;
 	};
 	useEffect(() => {
-		gapi.load('client:auth2', () => {
-			gapi.auth2.init({clientId: process.env.REACT_APP_CLIENTID});
-		});
+		if (process.env.REACT_APP_CLIENTID) {
+			gapi.load('client:auth2', () => {
+				gapi.auth2.init({clientId: process.env.REACT_APP_CLIENTID});
+			});
+		}
 	}, []);
 	return (
 		<>

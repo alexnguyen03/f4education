@@ -1,7 +1,13 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import com.f4education.springjwt.interfaces.CoursesService;
-import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.CourseHistory;
 import com.f4education.springjwt.models.Subject;
@@ -12,14 +18,6 @@ import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CoursesService {
@@ -71,6 +69,7 @@ public class CourseServiceImpl implements CoursesService {
 
     @Override
     public List<CourseDTO> findAllByAdminId(String adminId) {
+        List<Course> ls = courseRepository.findAllByAdmin_AdminId(adminId);
         return courseRepository.findAllByAdmin_AdminId(adminId).stream()
                 .map(this::convertEntityToDTO)
                 .collect(Collectors.toList());
@@ -124,11 +123,9 @@ public class CourseServiceImpl implements CoursesService {
 
     public List<ThoiLuongRange> kiemTraChu(List<String> danhSach) {
         List<ThoiLuongRange> ketQua = new ArrayList<>();
-
         boolean coShort = danhSach.contains("short");
         boolean coMedium = danhSach.contains("medium");
         boolean coLong = danhSach.contains("long");
-
         if (coShort && coMedium) {
             ketQua.add(new ThoiLuongRange(0, 90));
         } else if (coShort && coLong) {
@@ -142,7 +139,6 @@ public class CourseServiceImpl implements CoursesService {
         } else if (coLong) {
             ketQua.add(new ThoiLuongRange(90, 120));
         }
-
         return ketQua;
     }
 }

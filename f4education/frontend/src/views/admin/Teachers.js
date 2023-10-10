@@ -1,304 +1,377 @@
-import {
-  Edit as EditIcon,
-  RemoveCircleOutline as RemoveCircleOutlineIcon,
-  Search,
-} from "@mui/icons-material";
-import { Box, IconButton } from "@mui/material";
-import teacherApi from "api/teacherApi";
-import moment from "moment";
-import TeacherHeader from "components/Headers/TeacherHeader";
-import { MaterialReactTable } from "material-react-table";
-import { memo, useEffect, useMemo, useState } from "react";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  Col,
-  Container,
-  Form,
-  FormGroup,
-  Input,
-  Label,
-  Modal,
-  Row,
-  ButtonGroup,
-} from "reactstrap";
-import Select from "react-select";
+import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
+import {Box, IconButton} from '@mui/material';
+import teacherApi from 'api/teacherApi';
+import moment from 'moment';
+import TeacherHeader from 'components/Headers/TeacherHeader';
+import {MaterialReactTable} from 'material-react-table';
+import {memo, useEffect, useMemo, useState} from 'react';
+import {IconEyeSearch} from '@tabler/icons-react';
+import {Typography} from '@material-ui/core';
+import ReactLoading from 'react-loading';
+import {Timeline, Event} from 'react-timeline-scribble';
+import {Warning} from '@material-ui/icons';
+import {Button, Card, CardBody, CardHeader, Col, Container, Form, CardImg, FormGroup, Input, Label, Modal, Row, ButtonGroup} from 'reactstrap';
+import Select from 'react-select';
+const IMG_URL = '/courses/';
 const Teachers = () => {
-  const user = JSON.parse(localStorage.getItem("user") ?? "");
-  const [imgData, setImgData] = useState(null);
-  const [showForm, setShowForm] = useState(false);
-  const [loadingTeachers, setLoadingTeachers] = useState(true);
-  const [update, setUpdate] = useState(false);
-  const [teachers, setTeachers] = useState([]);
-  const [rSelected, setRSelected] = useState(null); //radio button
-  const [selectedSubject, setSelectedSubject] = useState({
-    value: "0",
-    label: "",
-  });
-  const [options, setOptions] = useState([{ value: "0", label: "" }]);
+	const user = JSON.parse(localStorage.getItem('user') | '');
+	const [imgData, setImgData] = useState(null);
+	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
+	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
+	const [showForm, setShowForm] = useState(false);
+	const [loadingTeachers, setLoadingTeachers] = useState(true);
+	const [loadingTeachersHistory, setLoadingTeachersHistory] = useState(true);
+	const [teachers, setTeachers] = useState([]);
+	const [rSelected, setRSelected] = useState(null); //radio button
+	const [image, setImage] = useState(null);
+	const [update, setUpdate] = useState(false);
+	const [teacherHistories, setTeacherHistories] = useState([]);
+	const [showHistoryTable, setShowHistoryTable] = useState(false);
+	const [listHistoryById, setListHistoryById] = useState([]);
+	const [errors, setErrors] = useState({});
 
-  // const [selectedId, setSelectedId] = useState(-1);
-  // const [subjects, setSubjects] = useState([]);
-  // const [image, setImage] = useState(null);
+	//Nhận data gửi lên từ server
+	const [teacher, setTeacher] = useState({
+		teacherId: '',
+		fullname: '',
+		gender: true,
+		dateOfBirth: '',
+		citizenIdentification: '',
+		address: '',
+		levels: '',
+		phone: '',
+		image: '',
+		acccountID: 0,
+	});
 
-  //Nhận data gửi lên từ server
-  const [teacher, setTeacher] = useState({
-    teacherId: "",
-    fullname: "",
-    gender: true,
-    dateOfBirth: "",
-    citizenIdentification: "",
-    address: "",
-    levels: "",
-    phone: "",
-    image: "",
-    acccountID: 0,
-  });
+	// Dùng để gửi request về sever
+	const [teacherRequest, setTeacherRequest] = useState({
+		teacherId: '',
+		fullname: '',
+		gender: true,
+		dateOfBirth: '',
+		citizenIdentification: '',
+		address: '',
+		levels: '',
+		phone: '',
+		image: '',
+		acccountID: 0,
+		// acccountAdmin: 0,
+	});
 
-  // Dùng để gửi request về sever
-  const [teacherRequest, setTeacherRequest] = useState({
-    subjectId: 0,
-    adminId: "",
-    courseName: "",
-    coursePrice: 0,
-    courseDuration: "",
-    courseDescription: "",
-    numberSession: 0,
-    image: "",
-  });
+	const handelOnChangeInput = (e) => {
+		//Còn đang xử lý
+		setTeacher({
+			...teacher,
+			[e.target.name]: e.target.value,
+			numberSession: 0,
+		});
+		console.log('🚀 ~ file: Teachers.js:74 ~ handelOnChangeInput ~ teacher:', e.target.value);
+	};
 
-  const handelOnChangeInput = (e) => {
-    //Còn đang xử lý
-    setTeacher({
-      ...teacher,
-      [e.target.name]: e.target.value,
-      numberSession: 0,
-    });
-    console.log(
-      "🚀 ~ file: Teachers.js:74 ~ handelOnChangeInput ~ teacher:",
-      e.target.value
-    );
-  };
+	// Cập nhật hình ảnh
+	const onChangePicture = (e) => {
+		setImage(null);
+		if (e.target.files[0]) {
+			setImage(e.target.files[0]);
+			const reader = new FileReader();
+			reader.addEventListener('load', () => {
+				setImgData(reader.result);
+			});
+			reader.readAsDataURL(e.target.files[0]);
+			setTeacher((preTeacher) => ({
+				...preTeacher,
+				image: e.target.files[0].name,
+			}));
+		}
+	};
 
-  // const handleOnChangeSelect = (e) => {
-  // 	const selectedIndex = e.target.options.selectedIndex;
-  // 	setSubjectId(e.target.options[selectedIndex].getAttribute('data-value'));
-  // 	setCourseRequest((preCourse) => ({
-  // 		...preCourse,
-  // 		subjectId: parseInt(subjectId),
-  // 	}));
-  // };
+	const handelShowHistory = async (id) => {
+		setShowHistoryInfo(true);
+		setLoadingHistoryInfo(true);
+		try {
+			const resp = await teacherApi.getTeacherHistoryByCourseid(id);
+			setListHistoryById(resp.data.reverse());
+			setLoadingHistoryInfo(false);
+		} catch (error) {
+			console.log('failed to fetch data', error);
+		}
+	};
 
-  //Cập nhật hình ảnh
-  // const onChangePicture = (e) => {
-  // 	setImage(null);
-  // 	if (e.target.files[0]) {
-  // 		setImage(e.target.files[0]);
-  // 		const reader = new FileReader();
-  // 		reader.addEventListener('load', () => {
-  // 			setImgData(reader.result);
-  // 		});
-  // 		reader.readAsDataURL(e.target.files[0]);
-  // 		setCourse((preCourse) => ({
-  // 			...preCourse,
-  // 			image: e.target.files[0].name,
-  // 		}));
-  // 	}
-  // };
+	const columns = useMemo(
+		() => [
+			{
+				accessorKey: 'fullname',
+				header: 'Tên giảng viên',
+				size: 100,
+			},
+			{
+				accessorKey: 'gender',
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					if (row.gender) {
+						return <span>Nam</span>;
+					} else {
+						return <span>Nữ</span>;
+					}
+				},
+				header: 'Giới tính',
+				size: 30,
+			},
+			{
+				accessorFn: (row) => moment(row.dateOfBirth).format('DD/MM/yyyy'),
+				header: 'Ngày sinh',
+				size: 60,
+			},
+			{
+				accessorKey: 'phone',
+				header: 'Số điện thoại',
+				size: 75,
+			},
+			{
+				accessorKey: 'address',
+				header: 'Địa chỉ',
+				size: 75,
+			},
+		],
+		[],
+	);
 
-  const columns = useMemo(
-    () => [
-      {
-        accessorKey: "fullname",
-        header: "Tên giảng viên",
-        size: 100,
-      },
-      {
-        accessorKey: "gender",
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          if (row.gender) {
-            return <span>Nam</span>;
-          } else {
-            return <span>Nữ</span>;
-          }
-        },
-        header: "Giới tính",
-        size: 30,
-      },
-      {
-        accessorFn: (row) => moment(row.dateOfBirth).format("DD/MM/yyyy"),
-        header: "Ngày sinh",
-        size: 60,
-      },
-      {
-        accessorKey: "phone",
-        header: "Số điện thoại",
-        size: 75,
-      },
-      {
-        accessorKey: "address",
-        header: "Địa chỉ",
-        size: 75,
-      },
-      // {
-      // 	accessorKey: 'coursePrice',
-      // 	header: 'Giá (đ)',
-      // 	size: 60,
-      // },
-      // {
-      // 	accessorKey: 'subject.admin.adminId',
-      // 	header: 'Mã người tạo',
-      // 	size: 80,
-      // },
-    ],
-    []
-  );
+	const columnsTeacherHistory = useMemo(
+		() => [
+			{
+				accessorKey: 'fullname',
+				header: 'Tên giảng viên',
+				size: 100,
+			},
+			{
+				accessorKey: 'gender',
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					if (row.gender) {
+						return <span>Nam</span>;
+					} else {
+						return <span>Nữ</span>;
+					}
+				},
+				header: 'Giới tính',
+				size: 30,
+			},
+			{
+				accessorFn: (row) => moment(row.dateOfBirth).format('DD/MM/yyyy'),
+				header: 'Ngày sinh',
+				size: 60,
+			},
+			{
+				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss a'),
+				header: 'Ngày thao tác',
+				size: 60,
+			},
+			{
+				accessorKey: 'adminName',
+				header: 'Người thao tác',
+				size: 80,
+			},
+			{
+				accessorKey: 'action',
+				header: 'Hành động',
+				size: 80,
+			},
+		],
+		[],
+	);
 
-  // const fetchCourses = async () => {
-  // 	try {
-  // 		const resp = await courseApi.getAll();
-  // 		setCourses([...resp]);
-  // 	} catch (error) {
-  // 		console.log('failed to fetch data', error);
-  // 	}
-  // };
+	const handleEditFrom = (row) => {
+		setShowForm(true);
+		setUpdate(true);
+		const selectedTeacher = teachers.find((teacher) => teacher.teacherId === row.original.teacherId);
+		// setImage(process.env.REACT_APP_IMAGE_URL + IMG_URL + selectedTeacher.image);
+		setTeacher({...selectedTeacher});
+		setRSelected(selectedTeacher.gender);
+	};
 
-  // const fetchSubject = async () => {
-  // 	try {
-  // 		const resp = await subjectApi.getAllSubject();
-  // 		setSubjects(resp);
-  // 	} catch (error) {
-  // 		console.log(error);
-  // 	}
-  // };
+	const handleResetForm = () => {
+		// hide form
+		setShowForm((pre) => !pre);
+		setImgData(null);
+		setUpdate(false);
+		setTeacher({
+			// subjectName: '',
+			teacherId: '',
+			fullname: '',
+			gender: true,
+			dateOfBirth: '',
+			citizenIdentification: '',
+			address: '',
+			levels: '',
+			phone: '',
+			image: '',
+			acccountID: 0,
+		});
+		setErrors({});
+	};
 
-  // const convertToArray = () => {
-  // 	const convertedArray = subjects.map((item) => ({
-  // 		value: item.subjectId,
-  // 		label: item.subjectName,
-  // 	}));
-  // 	console.log(options);
-  // 	return convertedArray;
-  // };
+	const handleSubmitForm = (e) => {
+		e.preventDefault();
+		updateTeacher();
+		// console.log(teacher);
+		if (image) {
+			setTeacher((preTeacher) => ({
+				...preTeacher,
+				image: image.name,
+			}));
+		}
+	};
 
-  const handleEditFrom = (row) => {
-    setShowForm(true);
-    const selectedTeacher = teachers.find(
-      (teacher) => teacher.teacherId === row.original.teacherId
-    );
-    setUpdate((pre) => !pre);
-    setTeacher({ ...selectedTeacher });
-    console.log(
-      "🚀 ~ file: Teachers.js:177 ~ handleEditFrom ~ selectedTeacher:",
-      selectedTeacher
-    );
-  };
+	const validateForm = () => {
+		let validationErrors = {};
+		let test = 0;
+		if (!teacher.fullname) {
+			validationErrors.fullname = 'Vui lòng nhập tên giảng viên !!!';
+			test++;
+		} else {
+			validationErrors.fullname = '';
+		}
 
-  const handleResetForm = () => {
-    // hide form
-    setShowForm((pre) => !pre);
-    setImgData(null);
-    // set course == null
-    setTeacher({
-      // subjectName: '',
-      teacherId: "",
-      fullname: "",
-      gender: true,
-      dateOfBirth: "",
-      citizenIdentification: "",
-      address: "",
-      levels: "",
-      phone: "",
-      image: "",
-      acccountID: 0,
-    });
-  };
+		if (!teacher.citizenIdentification) {
+			validationErrors.citizenIdentification = 'Vui lòng nhập CCCD của giảng viên!!!';
+			test++;
+		} else {
+			if (teacher.citizenIdentification.length != 12) {
+				validationErrors.citizenIdentification = 'Số CCCD gồm 12 số!!!';
+				test++;
+			} else {
+				validationErrors.citizenIdentification = '';
+			}
+		}
 
-  // const handleShowAddForm = () => {
-  // 	setShowForm((pre) => !pre);
-  // 	setUpdate(false);
-  // 	handleSelect(options[0]);
-  // 	console.log(courseRequest);
-  // };
+		if (!teacher.address) {
+			validationErrors.address = 'Vui lòng nhập địa chỉ của giảng viên!!!';
+			test++;
+		} else {
+			validationErrors.address = '';
+		}
 
-  const handleSubmitForm = (e) => {
-    e.preventDefault();
-    if (update) {
-      console.log("updated");
-      // if (image) {
-      // 	setCourse((preCourse) => ({
-      // 		...preCourse,
-      // 		image: image.name,
-      // 	}));
-      // }
-      setUpdate(false);
-      console.log(teacherRequest);
-    } else {
-      // console.log(subjectId);
-      setTeacherRequest((preCourse) => ({
-        ...preCourse,
-        adminId: user.username,
-        numberSession: 0,
-      }));
-      addTeacher();
-    }
-  };
+		if (!teacher.levels) {
+			validationErrors.levels = 'Vui lòng nhập trình độ học vấn của giảng viên!!!';
+			test++;
+		} else {
+			validationErrors.levels = '';
+		}
 
-  const addTeacher = async () => {
-    const formData = new FormData();
-    formData.append("teacherRequest", JSON.stringify(teacherRequest));
-    // formData.append('file', image);
-    console.log([...formData]);
-    console.log({ ...teacherRequest });
-    try {
-      const resp = await teacherApi.addTeacher(formData);
-      setTeacher([...resp]);
-    } catch (error) {
-      console.log("🚀 ~ file: Teachers.js:257 ~ addTeacher ~ error:", error);
-    }
-  };
+		const isVNPhoneMobile = /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
 
-  // function handleSelect(data) {
-  // 	setSelectedSubject(data);
-  // 	setCourseRequest((pre) => ({...pre, subjectId: parseInt(selectedSubject.value)}));
-  // 	console.log(courseRequest);
-  // }
+		if (!isVNPhoneMobile.test(teacher.phone)) {
+			validationErrors.phone = 'Không đúng định dạng số điện thoại!!!';
+			test++;
+		} else {
+			validationErrors.phone = '';
+		}
 
-  //gọi API lấy data
-  const getAllTeacher = async () => {
-    if (teachers.length > 0) {
-      setLoadingTeachers(false);
-      return;
-    }
+		if (test === 0) {
+			return {};
+		}
+		return validationErrors;
+	};
 
-    try {
-      setLoadingTeachers(true);
-      const resp = await teacherApi.getAllTeachers();
-      console.log(resp);
-      setTeachers(resp.reverse());
-      setLoadingTeachers(false);
-    } catch (error) {
-      console.log("failed to load data", error);
-    }
-  };
+	const updateTeacher = async () => {
+		const validationErrors = validateForm();
+		console.log(Object.keys(validationErrors).length);
 
-  //load data lên ta
-  useEffect(() => {
-    if (teachers.length > 0) return;
-    getAllTeacher();
-  }, []);
+		if (Object.keys(validationErrors).length === 0) {
+			const formData = new FormData();
+			formData.append('teacherRequest', JSON.stringify(teacherRequest));
+			formData.append('file', image);
+			console.log('🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:', image);
+			try {
+				const resp = await teacherApi.updateTeacher(formData);
+				handleResetForm();
+				getAllTeacher();
+			} catch (error) {
+				console.log('🚀 ~ file: Teachers.js:257 ~ updateTeacher ~ error:', error);
+			}
+		} else {
+			setErrors(validationErrors);
+		}
+	};
 
-  // useEffect(() => {
-  // 	const {courseName, coursePrice, courseDuration, courseDescription, numberSession, image} = {...course};
+	//gọi API lấy data
+	const getAllTeacher = async () => {
+		if (teachers.length > 0 && !update) {
+			setLoadingTeachers(false);
+			console.log(update);
+			return;
+		}
 
-  // 	setCourseRequest({courseName: courseName, coursePrice: coursePrice, courseDuration: courseDuration, courseDescription: courseDescription, numberSession: numberSession, image: image, subjectId: parseInt(selectedSubject.value), adminId: user.username});
-  // }, [course, selectedSubject]);
+		try {
+			// console.log(update);
+			setLoadingTeachers(true);
+			const resp = await teacherApi.getAllTeachers();
+			console.log('🚀 ~ file: Teachers.js:313 ~ getAllTeacher ~ resp:', resp);
+			setTeachers(resp.data.reverse());
+			setLoadingTeachers(false);
+		} catch (error) {
+			console.log('failed to load data', error);
+		}
+	};
 
-  return (
+	const setGender = (gender) => {
+		setTeacher((preTeacher) => ({
+			...preTeacher,
+			gender: gender,
+		}));
+	};
+
+	const handleShowAllHistory = () => {
+		if (teacherHistories.length === 0) {
+			getAllCourseHistory();
+		}
+		setShowHistoryTable((pre) => !pre);
+	};
+
+	const getAllCourseHistory = async () => {
+		try {
+			setLoadingTeachersHistory(true);
+			const resp = await teacherApi.getAllTeachersHistory();
+			// setTeacherHistories(resp.data.reverse());
+			setLoadingTeachersHistory(false);
+			console.log(setTeacherHistories);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+
+	useEffect(() => {
+		setListHistoryById([...listHistoryById]);
+	}, [loadingHistoryInfo]);
+
+	useEffect(() => {
+		const {teacherId, fullname, gender, dateOfBirth, citizenIdentification, address, levels, phone, image, acccountID} = {...teacher};
+
+		setTeacherRequest({
+			// acccountAdmin: user.id,
+			teacherId: teacherId,
+			fullname: fullname,
+			gender: gender,
+			dateOfBirth: dateOfBirth,
+			citizenIdentification: citizenIdentification,
+			address: address,
+			levels: levels,
+			phone: phone,
+			image: image,
+			acccountID: acccountID,
+		});
+	}, [teacher]);
+
+	//load data lên ta
+	useEffect(() => {
+		if (teachers.length > 0) return;
+		getAllTeacher();
+	}, []);
+
+	return (
 		<>
 			<TeacherHeader />
 			<Container
@@ -307,77 +380,117 @@ const Teachers = () => {
 				<Card className='bg-secondary shadow'>
 					{/* Header */}
 					<CardHeader className='bg-white border-0 d-flex justify-content-between'>
-						<h3 className='mb-0'>BẢNG GIẢNG VIÊN</h3>
+						<h3 className='mb-0'>{showHistoryTable ? 'LỊCH SỬ CHỈNH SỬA GIÁO VIÊN' : 'BẢNG GIẢNG VIÊN'}</h3>
 						<Button
 							color='default'
-							type='button'>
-							Lịch sử giáo viên
+							type='button'
+							onClick={handleShowAllHistory}>
+							{showHistoryTable ? 'Danh sách giáo viên' : 'Lịch sử giảng viên '}
 						</Button>
 					</CardHeader>
 
 					<CardBody>
-						<MaterialReactTable
-							muiTableBodyProps={{
-								sx: {
-									//stripe the rows, make odd rows a darker color
-									'& tr:nth-of-type(odd)': {
-										backgroundColor: '#f5f5f5',
+						{!showHistoryTable && (
+							<MaterialReactTable
+								enableColumnResizing
+								enableGrouping
+								enableStickyHeader
+								enableStickyFooter
+								enableRowNumbers
+								state={{isLoading: loadingTeachers}}
+								displayColumnDefOptions={{
+									'mrt-row-actions': {
+										header: 'Thao tác',
+										size: 20,
+										// Something else here
 									},
-								},
-							}}
-							enableColumnResizing
-							enableGrouping
-							enableStickyHeader
-							enableStickyFooter
-							enableRowNumbers
-							state={{isLoading: loadingTeachers}}
-							displayColumnDefOptions={{
-								'mrt-row-actions': {
-									header: 'Thao tác',
-									size: 20,
-									// Something else here
-								},
-								'mrt-row-numbers': {
-									size: 5,
-								},
-							}}
-							positionActionsColumn='last'
-							columns={columns}
-							data={teachers}
-							renderTopToolbarCustomActions={() => (
-								<Button
-									// onClick={handleShowAddForm}
-									color='primary'
-									variant='contained'>
-									<i className='bx bx-layer-plus'></i>
-									Thêm giảng viên
-								</Button>
-							)}
-							enableRowActions
-							renderRowActions={({row, table}) => (
-								<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-									<IconButton
-										color='secondary'
-										onClick={() => {
-											handleEditFrom(row);
+									'mrt-row-numbers': {
+										size: 5,
+									},
+								}}
+								positionActionsColumn='last'
+								columns={columns}
+								data={teachers}
+								enableRowActions
+								renderRowActions={({row, table}) => (
+									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
+										<IconButton
+											color='secondary'
+											onClick={() => {
+												handleEditFrom(row);
+											}}>
+											<EditIcon />
+										</IconButton>
+										<IconButton
+											color='info'
+											onClick={() => {
+												console.log(row.original.teacherId);
+												handelShowHistory(row.original.teacherId);
+											}}>
+											<IconEyeSearch />
+										</IconButton>
+									</Box>
+								)}
+								muiTablePaginationProps={{
+									rowsPerPageOptions: [10, 20, 50, 100],
+									showFirstButton: true,
+									showLastButton: true,
+								}}
+							/>
+						)}
+
+						{showHistoryTable && (
+							<MaterialReactTable
+								enableColumnResizing
+								enableGrouping
+								enableStickyHeader
+								enableStickyFooter
+								enableRowNumbers
+								state={{isLoading: loadingTeachersHistory}}
+								displayColumnDefOptions={{
+									// 'mrt-row-actions': {
+									// 	header: 'Thao tác',
+									// 	size: 20,
+									// 	// Something else here
+									// },
+									'mrt-row-numbers': {
+										size: 5,
+									},
+								}}
+								columns={columnsTeacherHistory}
+								data={teacherHistories}
+								renderDetailPanel={({row}) => (
+									<Box
+										sx={{
+											display: 'grid',
+											margin: 'auto',
+											gridTemplateColumns: '1fr 1fr',
+											width: '100%',
 										}}>
-										<EditIcon />
-									</IconButton>
-									<IconButton
-										color='error'
-										onClick={() => {
-											teachers.splice(row.index, 1);
-										}}>
-										<RemoveCircleOutlineIcon />
-									</IconButton>
-								</Box>
-							)}
-							muiTablePaginationProps={{
-								rowsPerPageOptions: [10, 20, 50, 100],
-								showFirstButton: true,
-								showLastButton: true,
-							}}
-						/>
+										<Typography>Số CCCD: {row.original.citizenIdentification}</Typography>
+										<Typography>Địa chỉ: {row.original.address}</Typography>
+										<Typography>Trình độ: {row.original.levels}</Typography>
+										<Typography>Số điện thoại: {row.original.phone}</Typography>
+										<Typography>Ảnh đại diện:</Typography>
+										<Typography>
+											<div className='previewProfilePic px-3'>
+												<img
+													alt=''
+													width={200}
+													className=''
+													src={process.env.REACT_APP_IMAGE_URL + IMG_URL + row.original.image}
+												/>
+											</div>
+										</Typography>
+									</Box>
+								)}
+								muiTablePaginationProps={{
+									rowsPerPageOptions: [10, 20, 50, 100],
+									showFirstButton: true,
+									showLastButton: true,
+								}}
+							/>
+						)}
 
 						<Modal
 							className='modal-dialog-centered  modal-lg '
@@ -388,7 +501,7 @@ const Teachers = () => {
 								onSubmit={handleSubmitForm}
 								encType='multipart/form-data'>
 								<div className='modal-header'>
-									<h3 className='mb-0'>Thông tin giảng viên</h3>
+									<h3 className='mb-0'>Thông tin giảng viên '{teacher.teacherId}'</h3>
 									<button
 										aria-label='Close'
 										className='close'
@@ -402,21 +515,6 @@ const Teachers = () => {
 									<div className='px-lg-2'>
 										<Row>
 											<Col sm={6}>
-												{/* <FormGroup>
-                          <label
-                            className="form-control-label"
-                            htmlFor="input-username"
-                          >
-                            Tên môn học
-                          </label>
-                          <Select
-                            options={options}
-                            placeholder="Select color"
-                            value={selectedSubject}
-                            onChange={handleSelect}
-                            isSearchable={true}
-                          />
-                        </FormGroup> */}
 												<FormGroup>
 													<label
 														className='form-control-label'
@@ -433,53 +531,82 @@ const Teachers = () => {
 														name='fullname'
 														value={teacher.fullname}
 													/>
+													{errors.fullname && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.fullname}</div>}
 												</FormGroup>
 												<Row>
 													<Col md={12}>
-														{/* <FormGroup>
-                              <label
-                                className="form-control-label"
-                                htmlFor="input-first-name"
-                              >
-                                Giới tính
-                              </label>
-                              <Input
-                                className="form-control-alternative"
-                                id="input-courseDuration"
-                                placeholder="Thời lượng"
-                                type="radio"
-                                value={teacher.gender}
-                                name="gender"
-                                onChange={handelOnChangeInput}
-                              />
-                            </FormGroup> */}
-
 														<ButtonGroup>
 															<Button
 																color='primary'
 																outline
-																onClick={() => setRSelected(1)}
-																active={rSelected === 1}>
-																Radio 1
+																onClick={() => setGender(true)}
+																active={teacher.gender === true}>
+																Nam
 															</Button>
 															<Button
 																color='primary'
 																outline
-																onClick={() => setRSelected(2)}
-																active={rSelected === 2}>
-																Radio 2
-															</Button>
-															<Button
-																color='primary'
-																outline
-																onClick={() => setRSelected(3)}
-																active={rSelected === 3}>
-																Radio 3
+																name='gender'
+																onClick={() => setGender(false)}
+																active={teacher.gender === false}>
+																Nữ
 															</Button>
 														</ButtonGroup>
 													</Col>
 													<Col md={12}>
 														<FormGroup>
+															<br></br>
+															<label
+																className='form-control-label'
+																htmlFor='input-email'>
+																Trình độ học vấn
+															</label>
+
+															<Input
+																className='form-control-alternative'
+																id='input-course-name'
+																placeholder='Trình độ học vấn'
+																type='text'
+																onChange={handelOnChangeInput}
+																name='levels'
+																value={teacher.levels}
+															/>
+															{errors.levels && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.levels}</div>}
+															<br></br>
+															<label
+																className='form-control-label'
+																htmlFor='input-email'>
+																Số điện thoại
+															</label>
+
+															<Input
+																className='form-control-alternative'
+																id='input-course-name'
+																placeholder='Số điện thoại'
+																type='text'
+																onChange={handelOnChangeInput}
+																name='phone'
+																value={teacher.phone}
+															/>
+															{errors.phone && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.phone}</div>}
+															<br></br>
+															<label
+																className='form-control-label'
+																htmlFor='citizenIdentification'>
+																Số CCCD
+															</label>
+
+															<Input
+																className='form-control-alternative'
+																id='citizenIdentification'
+																placeholder='Số CCCD'
+																type='text'
+																onChange={handelOnChangeInput}
+																name='citizenIdentification'
+																value={teacher.citizenIdentification}
+															/>
+															{errors.citizenIdentification && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.citizenIdentification}</div>}
+															<br></br>
 															<label
 																className='form-control-label'
 																htmlFor='input-last-name'>
@@ -517,43 +644,47 @@ const Teachers = () => {
 																type='textarea'
 																onChange={handelOnChangeInput}
 															/>
+															{errors.address && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.address}</div>}
+															<Label
+																htmlFor='exampleFile'
+																className='form-control-label'>
+																Ảnh đại diện
+															</Label>
+															<div className='custom-file'>
+																<input
+																	type='file'
+																	name='imageFile'
+																	accept='image/*'
+																	className='custom-file-input form-control-alternative'
+																	id='customFile'
+																	onChange={onChangePicture}
+																/>
+																<label
+																	className='custom-file-label'
+																	htmlFor='customFile'>
+																	Chọn hình ảnh
+																</label>
+															</div>
 														</FormGroup>
 													</Col>
-													{/* <Col md={12}>
-                            <FormGroup>
-                              <Label
-                                htmlFor="exampleFile"
-                                className="form-control-label"
-                              >
-                                Hình ảnh khóa học
-                              </Label>
-                              <div className="custom-file">
-                                <input
-                                  type="file"
-                                  name="imageFile"
-                                  accept="image/*"
-                                  className="custom-file-input form-control-alternative"
-                                  id="customFile"
-                                  onChange={onChangePicture}
-                                  // multiple={true}
-                                />
-                                <label
-                                  className="custom-file-label"
-                                  htmlFor="customFile"
-                                >
-                                  Chọn hình ảnh
-                                </label>
-                              </div>
-                            </FormGroup>
-                          </Col>
-                          <div className="previewProfilePic px-3">
-                            <img
-                              alt=""
-                              width={120}
-                              className="playerProfilePic_home_tile"
-                              src={imgData}
-                            />
-                          </div> */}
+													<div className='previewProfilePic px-3'>
+														{imgData && (
+															<img
+																alt=''
+																width={350}
+																className='playerProfilePic_home_tile'
+																src={imgData}
+															/>
+														)}
+														{!imgData && (
+															<img
+																alt=''
+																width={350}
+																className=''
+																src={process.env.REACT_APP_IMAGE_URL + IMG_URL + teacher.image}
+															/>
+														)}
+													</div>
 												</Row>
 											</Col>
 										</Row>
@@ -577,10 +708,105 @@ const Teachers = () => {
 								</div>
 							</Form>
 						</Modal>
+
+						<Modal
+							className='modal-dialog-centered  modal-lg'
+							isOpen={showHistoryInfo}
+							toggle={() => setShowHistoryInfo((pre) => !pre)}>
+							<div className='modal-header'>
+								<h3 className='mb-0'>Lịch sử chỉnh sửa của giảng viên </h3>
+								<button
+									aria-label='Close'
+									className='close'
+									data-dismiss='modal'
+									type='button'
+									onClick={() => {
+										setShowHistoryInfo(false);
+									}}>
+									<span aria-hidden={true}>×</span>
+								</button>
+							</div>
+							<div className='modal-body'>
+								<div className='text-center  mb-3'>HIỆN TẠI - {moment(new Date()).format('DD/MM/yyyy, h:mm A')}</div>
+
+								{loadingHistoryInfo ? (
+									<div className='d-flex justify-content-center'>
+										<ReactLoading
+											type={'cylon'}
+											color='#357edd'
+										/>
+									</div>
+								) : (
+									listHistoryById.map((item) => (
+										<Timeline key={item.courseHistoryId}>
+											<Event
+												interval={<span className='fw-bold fs-3'>{moment(item.modifyDate).format('DD/MM/yyyy, h:mm A')}</span>}
+												title={<span className={`alert alert-${item.action === 'UPDATE' ? 'primary' : 'success'} px-3 mb-3`}> {item.action === 'UPDATE' ? 'Cập nhật' : 'Thêm mới'} </span>}>
+												<Card>
+													{/* <br></br> */}
+													<Row>
+														<Col className='text-left'>
+															<strong>
+																<h4>{item.adminName}</h4>{' '}
+															</strong>
+														</Col>
+													</Row>
+													{/* <br></br> */}
+
+													<CardImg
+														alt='Card image cap'
+														src={process.env.REACT_APP_IMAGE_URL + IMG_URL + item.image}
+														width={300}
+													/>
+													<CardBody>
+														<Row>
+															<Col className='text-left font-weight-normal'>
+																<br></br>
+																<strong>Tên giảng viên:</strong> {item.fullname} <br></br>
+																<strong>Ngày sinh:</strong> {moment(item.dateOfBirth).format('DD/MM/yyyy')}
+																<br></br>
+																<strong>Ngày sinh:</strong> {moment(item.dateOfBirth).format('DD/MM/yyyy')}
+																<br></br>
+																<strong>Số CCCD:</strong> {item.citizenIdentification}
+																<br></br>
+																<strong>Địa chỉ:</strong> {item.address}
+																<br></br>
+																<strong>Trình độ học vấn:</strong> {item.levels}
+																<br></br>
+																<strong>Số điện thoại:</strong> {item.phone}
+															</Col>
+														</Row>
+													</CardBody>
+												</Card>
+											</Event>
+										</Timeline>
+									))
+								)}
+
+								{listHistoryById.length === 0 && !loadingHistoryInfo && (
+									<div className='text-warning text-center my-5 py-5'>
+										<Warning /> Không tìm thấy lịch sử{' '}
+									</div>
+								)}
+								<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>
+							</div>
+
+							<div className='modal-footer'>
+								<Button
+									color='secondary'
+									data-dismiss='modal'
+									type='button'
+									onClick={() => {
+										setShowHistoryInfo(false);
+									}}>
+									Đóng
+								</Button>
+							</div>
+						</Modal>
 					</CardBody>
 				</Card>
 			</Container>
 		</>
-  );
+	);
 };
 export default memo(Teachers);

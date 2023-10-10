@@ -1,0 +1,36 @@
+:root {
+    --smoothTransition: all 0.3s linear;
+}
+
+.answer-input {
+    transform: translate(-2px, -6px);
+    font-size: 16px;
+    outline: none;
+    border: none;
+    border-bottom: 0.5px solid rgb(126, 126, 126) !important;
+    color: #bdbdbd !important;
+    transition: var(--smoothTransition);
+}
+
+.answer-input:focus {
+    border: none;
+    border-left: 6px solid #fb6340;
+    transition: var(--smoothTransition);
+}
+
+.slide-in {
+    transform: translateX(50px);
+    opacity: 0;
+    transition: var(--smoothTransition);
+}
+
+.slide-in.show {
+    opacity: 1;
+    transform: translateX(0);
+    transition: var(--smoothTransition);
+}
+
+.course-image {
+    box-shadow: 3px 2px 2px 2px 3px rgb(189, 189, 189);
+    filter: brightness(90%) contrast(110%) saturate(0%) brightness(110%);
+}

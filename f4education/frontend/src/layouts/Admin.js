@@ -70,7 +70,6 @@ const Admin = (props) => {
 	};
 	useEffect(() => {
 		getAdminInfo();
-		console.log("🚀 ~ file: Admin.js:74 ~ useEffect ~ JSON.parse(localStorage.getItem('user') | '');:", JSON.parse(localStorage.getItem('user')));
 	});
 
 	return (

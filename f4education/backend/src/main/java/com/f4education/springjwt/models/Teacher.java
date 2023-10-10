@@ -1,9 +1,12 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -32,9 +35,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Teacher")
-@Getter
-@Setter
-public class Teacher {
+public class Teacher implements Serializable {
 	@Id
 	// @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "teacher_id")
@@ -57,13 +58,18 @@ public class Teacher {
 	private String phone;
 
 	private String image;
-	
+	@JsonIgnore
+
 	@OneToMany(mappedBy = "teacher")
 	List<Classes> classes;
-
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	User user;
+	@JsonIgnore
+
+	@OneToMany(mappedBy = "teacher")
+	List<TeacherHistory> teacherHistory;
 
 	@Override
 	public String toString() {
@@ -71,4 +77,5 @@ public class Teacher {
 				+ dateOfBirth + ", citizenIdentification=" + citizenIdentification + ", levels=" + levels + ", address="
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
+
 }

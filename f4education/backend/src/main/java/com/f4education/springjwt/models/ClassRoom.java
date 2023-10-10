@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -29,7 +30,7 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Classroom")
-public class ClassRoom {
+public class ClassRoom implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "classroom_id")
@@ -37,15 +38,15 @@ public class ClassRoom {
 
 	@Column(name = "classroom_name")
 	private String classroomName;
-	
+
 	private String status;
-	
+
 	@OneToMany(mappedBy = "classRoom")
 	List<Schedule> schedules;
-	
+
 	@OneToMany(mappedBy = "classRoom")
-	List<ClassRoomHistory> classRoomHistories ;
-	
+	List<ClassRoomHistory> classRoomHistories;
+
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	Admin admin;

@@ -22,6 +22,8 @@ import ClassDetail from 'views/admin/ClassDetail';
 import Login from 'views/examples/Login';
 import CourseDetailClient from 'views/client/visitor/CourseDetailClient';
 
+import Accounts from 'views/admin/Accounts.js';
+
 export var routes = [
 	{
 		path: '/index',
@@ -74,7 +76,14 @@ export var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/classs',
+		path: '/register',
+		name: 'Tài khoản',
+		icon: 'ni ni-circle-08 text-pink',
+		component: <Accounts />,
+		layout: '/admin',
+	},
+	{
+		path: '/classes',
 		name: 'Lớp học',
 		icon: 'fa-solid fa-users-line text-danger',
 		component: <Classs />,
@@ -102,7 +111,7 @@ export var routes = [
 		layout: '/admin',
 	},
 	{
-		path: '/class-detail/:courseName',
+		path: '/class-detail/:classIdParam',
 		name: 'Chi tiết lớp học',
 		icon: 'ni ni-key-25 text-info',
 		component: <ClassDetail />,

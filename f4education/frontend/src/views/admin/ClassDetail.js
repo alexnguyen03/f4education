@@ -15,48 +15,169 @@ import Divider from '@material-ui/core/Divider';
 import {Avatar, Group, Text, TransferList} from '@mantine/core';
 
 import courseApi from '../../api/courseApi';
+import teacherApi from '../../api/teacherApi';
+import {useParams} from 'react-router-dom';
+import classApi from 'api/classApi';
+import registerCourseApi from 'api/registerCourseApi';
+const IMG_URL = process.env.REACT_APP_IMAGE_URL + '/courses/';
 const ClassDetail = () => {
-	const [selectedInClass, setSelectedInClass] = useState([]);
+	let {classIdParam} = useParams();
+	const [listTeacher, setListTeacher] = useState([]);
 
+	const [classDetail, setClassDetail] = useState({
+		classId: 0,
+		className: '',
+		startDate: '',
+		endDate: '',
+		maximumQuantity: 0,
+		status: '',
+		admin: {
+			adminId: '',
+			fullname: '',
+			gender: true,
+			dateOfBirth: '',
+			citizenIdentification: '',
+			address: '',
+			phone: '',
+			image: '',
+		},
+		students: [],
+		teacher: {
+			teacherId: '',
+			fullname: '',
+		},
+	});
 	const [listCourse, setListCourse] = useState([]);
-	const [studentInCourse, setStudentInCourse] = useState([]);
-	const [studentInClass, setStudentInClass] = useState([
+	const [listStudentInCourse, setListStudentInCourse] = useState([]);
+	const [listStudentInClass, setListStudentInClass] = useState([
 		{value: 'sv', label: 'Svelte'},
 		{value: 'rw', label: 'Redwood'},
 		{value: 'np', label: 'NumPy'},
 	]);
-	const [data, setData] = useState([studentInCourse, studentInClass]);
+	const [data, setData] = useState([listStudentInCourse, listStudentInClass]);
 
 	// ! HANDLE FUNCTIONS
-	const handleSave = () => {};
+	const handleSave = () => {
+		setListStudentInCourse(data[0]);
+		setListStudentInClass([data[1]]);
+		console.log('🚀 ~ file: ClassDetail.js:65 ~ handleSave ~ classDetail:', classDetail);
+	};
 
 	const handleOnChangeTransferList = (dataInList) => {
 		setData(dataInList);
-		const stInClass = dataInList[1];
-
-		setStudentInCourse(stInClass);
-
-		console.log('🚀 ~ file: ClassDetail.js:61 ~ handleOnChangeTransferList ~ studentInCourse:', stInClass);
-		setStudentInClass([data[1]]);
+		setListStudentInCourse(data[0]);
+		setListStudentInClass(data[1]);
 	};
 
 	//! CALL APIS
 	const getRegisterCourse = async () => {
 		try {
-			const resp = await courseApi.getRegisterCourse();
-			setListCourse(
-				resp.data.map((item) => {
-					const {registerCourseId, courseName, image} = {...item};
-					return {value: registerCourseId, label: courseName + ' || id: ' + registerCourseId, image: image};
-				}),
-			);
-			// console.log('🚀 ~ file: ClassDetail.js:71 ~ getRegisterCourse ~ resp:', resp);
+			const resp = await registerCourseApi.getRegisterCourseDistinc();
+			if (resp.status === 200 && resp.data.length > 0) {
+				setListCourse(
+					resp.data.map((item) => {
+						// do class registerCourseController co lop HandleResponseDTO nen phai lay data x 2
+						const {registerCourseId, courseName, image, classes} = {...item};
+
+						return {value: registerCourseId, label: courseName, image: image};
+					}),
+				);
+			}
 		} catch (error) {
 			console.log('🚀 ~ file: ClassDetail.js:74 ~ getRegisterCourse ~ error:', error);
 		}
 	};
+	const getAllStudentInCourse = async () => {
+		try {
+			const resp = await registerCourseApi.getAllRegisterCourse();
+			console.log('🚀 ~ file: ClassDetail.js:93 ~ getAllStudentInCourse ~ resp:', resp);
+			const listRegisterCourse = resp.data.data.filter((item) => item.courseId === classDetail.courseId);
+			// console.log('🚀 ~ file: ClassDetail.js:95 ~ getAllStudentInCourse ~ listRegisterCourse:', listRegisterCourse.length);
+			// console.log('🚀 ~ file: ClassDetail.js:95 ~ getAllStudentInCourse ~ classDetail.courseId:', classDetail.courseId);
+			if (resp.status === 200 && resp.data.length > 0) {
+				console.log('🚀 ~ file: ClassDetail.js:99 ~ getAllStudentInCourse ~ resp.data:', resp.data);
+			}
+		} catch (error) {
+			console.log('🚀 ~ file: ClassDetail.js:74 ~ getRegisterCourse ~ error:', error);
+		}
+	};
+	const getAllTeachers = async () => {
+		try {
+			const resp = await teacherApi.getAllTeachers();
+			console.log('🚀 ~ file: ClassDetail.js:63 ~ getAllTeachers ~ resp:', resp);
+			if (resp.status === 200 && resp.data.length > 0) {
+				setListTeacher(
+					resp.data.map((item) => {
+						const {fullname, teacherId, image, gender} = {...item};
+						return {value: teacherId, label: `${gender ? 'Thầy ' : 'Cô '} ${fullname}`, image: image};
+					}),
+				);
+			}
+		} catch (error) {
+			console.log('🚀 ~ file: ClassDetail.js:109 ~ getAllTeachers ~ error:', error);
+		}
+	};
+	const handleOnChangeTeacher = (val) => {
+		const {value, label} = {...val};
+		setClassDetail((prevState) => ({
+			...prevState,
+			teacher: {
+				...prevState.teacher,
+				teacherId: value,
+				fullname: label,
+			},
+		}));
+		console.log('🚀 ~ file: ClassDetail.js:81 ~ handleOnChangeTeacher ~ e.target.value:', value);
+	};
+	const getClassByClassId = async () => {
+		try {
+			const resp = await classApi.getClassById(classIdParam);
+			setClassDetail(resp.data);
+			console.log('🚀 ~ file: ClassDetail.js:90 ~ getClassByClassId ~ resp:', resp);
+		} catch (error) {
+			console.log(error);
+		}
+	};
+	// ! render UI
+	const renderStatus = (status) => {
+		switch (status) {
+			case 'Chưa bắt đầu':
+				return (
+					<Badge
+						className='font-weight-bold'
+						color='warning'>
+						{status}
+					</Badge>
+				);
+				break;
+			case 'Đang diễn ra':
+				return (
+					<Badge
+						className='font-weight-bold'
+						color='primary'>
+						{status}
+					</Badge>
+				);
+				break;
+			case 'Kết thúc':
+				return (
+					<Badge
+						className='font-weight-bold'
+						color='success'>
+						{status}
+					</Badge>
+				);
+				break;
+
+			default:
+				break;
+		}
+	};
 	useEffect(() => {
+		getClassByClassId();
 		getRegisterCourse();
+		getAllTeachers();
+		getAllStudentInCourse();
 	}, []);
 
 	return (
@@ -68,30 +189,50 @@ const ClassDetail = () => {
 				<Card>
 					<CardHeader>
 						<Row>
-							<Col md={4}>
-								<Label>Chọn khóa học</Label>
-								<Select
-									options={listCourse}
-									placeholder='Chọn môn học'
-									value={{}}
-									onChange={() => {}}
-									isSearchable={true}
-									className='form-control-alternative '
-									styles={{outline: 'none'}}
-								/>
-							</Col>
-							<Col md={4}>
-								<Label>Chọn giáo viên phụ trách</Label>
-								<Select
-									options={listCourse}
-									placeholder='Chọn môn học'
-									value={{}}
-									onChange={() => {}}
-									isSearchable={true}
-									className='form-control-alternative '
-									styles={{outline: 'none'}}
-								/>
-							</Col>
+							{
+								<>
+									<Col md={4}>
+										<Label>Chọn khóa học</Label>
+										<Select
+											options={listCourse}
+											placeholder='Chọn khóa học'
+											onChange={(e) => {
+												console.log(e);
+											}}
+											isSearchable={true}
+											className='form-control-alternative '
+											styles={{outline: 'none'}}
+										/>
+									</Col>
+									<Col md={4}>
+										<Label>Chọn giáo viên phụ trách</Label>
+										<Select
+											formatOptionLabel={(teacher) => (
+												<div className='d-flex'>
+													<div className='country-option '>
+														<img
+															width={'35'}
+															height={'35'}
+															className='rounded-circle'
+															src={IMG_URL + teacher.image}
+															alt='teacher-image'
+														/>
+													</div>
+													<div className='d-flex flex-column justify-content-center ml-3'>{teacher.label}</div>
+												</div>
+											)}
+											options={listTeacher}
+											placeholder='Chọn môn học'
+											onChange={(val) => {
+												handleOnChangeTeacher(val);
+											}}
+											isSearchable={true}
+											className='form-control-alternative '
+											styles={{outline: 'none'}}
+										/>
+									</Col>
+								</>
+							}
 							<Col
 								md={4}
 								className='mt-4 pt-1'>
@@ -118,7 +259,7 @@ const ClassDetail = () => {
 											<Badge
 												className='font-weight-bold'
 												color='success'>
-												40
+												{classDetail.maximumQuantity}
 											</Badge>
 										</div>
 									</div>
@@ -133,7 +274,7 @@ const ClassDetail = () => {
 											<Badge
 												className='font-weight-bold'
 												color='info'>
-												40
+												{classDetail.maximumQuantity - data[1].length}
 											</Badge>
 										</div>
 									</div>
@@ -144,13 +285,7 @@ const ClassDetail = () => {
 									className=''>
 									<div className='shadow text-center   py-4 rounded px-4'>
 										<span>Trạng thái :</span>
-										<div>
-											<Badge
-												className='font-weight-bold'
-												color='warning'>
-												Running
-											</Badge>
-										</div>
+										<div>{renderStatus(classDetail.status)}</div>
 									</div>
 								</Col>
 
@@ -158,12 +293,12 @@ const ClassDetail = () => {
 									md={3}
 									className=''>
 									<div className='shadow text-center   py-4 rounded px-4'>
-										<div>Giảng viên phụ trách: </div>
+										<div>Giáo viên phụ trách: </div>
 										<div>
 											<Badge
 												className='font-weight-bold'
-												color='info'>
-												Trần Văn Thiện
+												color={`${classDetail.teacher ? 'info' : 'danger'} `}>
+												{classDetail.teacher != null ? classDetail.teacher.fullname : 'Chưa có giáo viên'}
 											</Badge>
 										</div>
 									</div>

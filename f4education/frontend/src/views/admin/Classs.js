@@ -3,7 +3,7 @@ import ClasssHeader from 'components/Headers/ClasssHeader';
 import {useState, useMemo, useEffect} from 'react';
 import {MaterialReactTable} from 'material-react-table';
 import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
-import {Box, IconButton} from '@mui/material';
+import {Box, IconButton, MenuItem} from '@mui/material';
 import moment from 'moment';
 import {notifications} from '@mantine/notifications';
 
@@ -12,6 +12,7 @@ import classApi from 'api/classApi';
 
 // gọi API từ classHistoryApi
 import classHistoryApi from 'api/classHistoryApi';
+import {Link} from 'react-router-dom';
 
 const Classs = () => {
 	const [classses, setClassses] = useState([]);
@@ -124,6 +125,8 @@ const Classs = () => {
 
 	// edit row class
 	const handleEditRow = (row) => {
+		console.log('🚀 ~ file: Classs.js:128 ~ handleEditRow ~ row:', typeof row.original.classId);
+
 		setShowFormClass(true);
 		setUpdate(false);
 		setSelectedStatus(row.original.status);
@@ -166,7 +169,7 @@ const Classs = () => {
 	const getDataClass = async () => {
 		try {
 			const resp = await classApi.getAllClass();
-			setClassses(resp);
+			setClassses(resp.data);
 		} catch (error) {
 			console.log(error);
 		}
@@ -213,133 +216,132 @@ const Classs = () => {
 		}
 	};
 
-  // bảng lớp học
-  const columnClass = useMemo(
-    () => [
-      {
-        accessorKey: "className",
-        header: "Tên lớp học",
-        size: 100,
-      },
-      {
-        accessorKey: "startDate",
-        accessorFn: (row) =>
-          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss A"),
-        header: "Ngày bắt đầu",
-        size: 90,
-      },
-      {
-        accessorKey: "endDate",
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          if (row.endDate !== null) {
-            return (
-              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss A")}</span>
-            );
-          } else {
-            return <span>Chưa kết thúc</span>;
-          }
-        },
-        header: "Ngày kết thúc",
-        size: 90,
-      },
-      {
-        accessorKey: "maximumQuantity",
-        header: "Số lượng tối đa",
-        size: 95,
-      },
-      {
-        accessorKey: "admin.fullname",
-        header: "Người tạo",
-        size: 95,
-      },
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        size: 95,
-      },
-    ],
-    []
-  );
+	// bảng lớp học
+	const columnClass = useMemo(
+		() => [
+			{
+				accessorKey: 'classId',
+				header: 'Mã lớp học',
+				size: 100,
+			},
+			{
+				accessorKey: 'className',
+				header: 'Tên lớp học',
+				size: 100,
+			},
+			{
+				accessorKey: 'startDate',
+				accessorFn: (row) => moment(row.startDate).format('DD/MM/yyyy, h:mm:ss A'),
+				header: 'Ngày bắt đầu',
+				size: 90,
+			},
+			{
+				accessorKey: 'endDate',
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					if (row.endDate !== null) {
+						return <span>{moment(row.endDate).format('DD/MM/yyyy, h:mm:ss A')}</span>;
+					} else {
+						return <span>Chưa kết thúc</span>;
+					}
+				},
+				header: 'Ngày kết thúc',
+				size: 90,
+			},
+			{
+				accessorKey: 'maximumQuantity',
+				header: 'Số lượng tối đa',
+				size: 95,
+			},
+			{
+				accessorKey: 'admin.fullname',
+				header: 'Người tạo',
+				size: 95,
+			},
+			{
+				accessorKey: 'status',
+				header: 'Trạng thái',
+				size: 95,
+			},
+		],
+		[],
+	);
 
 	// hiển thị tiếng việt
 	const displayActionHistory = (action) => {
 		return action === 'CREATE' ? 'Thêm mới' : 'Cập nhật';
 	};
 
-  // bảng lịch sử lớp học
-  const columnClassHistory = useMemo(
-    () => [
-      {
-        accessorKey: "classId",
-        header: "Mã lớp học",
-        size: 90,
-      },
-      {
-        accessorKey: "className",
-        header: "Tên lớp học",
-        size: 100,
-      },
-      {
-        accessorKey: "startDate",
-        accessorFn: (row) =>
-          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss A"),
-        header: "Ngày bắt đầu",
-        size: 105,
-      },
-      {
-        accessorKey: "endDate",
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          if (row.endDate !== null) {
-            return (
-              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss A")}</span>
-            );
-          } else {
-            return <span>Chưa kết thúc</span>;
-          }
-        },
-        header: "Ngày kết thúc",
-        size: 105,
-      },
-      {
-        accessorKey: "maximumQuantity",
-        header: "Số lượng tối đa",
-        size: 95,
-      },
-      {
-        accessorKey: "admin.fullname",
-        header: "Người chỉnh sửa",
-        size: 100,
-      },
-      {
-        accessorKey: "status",
-        header: "Trạng thái",
-        size: 95,
-      },
-      {
-        accessorFn: (row) =>
-        moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
-        header: "Ngày Chỉnh Sửa",
-        size: 120,
-      },
-      {
-        accessorKey: "action",
-        accessorFn: (row) => displayActionHistory(row.action),
-        header: "Hành động",
-        size: 100,
-      },
-    ],
-    []
-  );
+	// bảng lịch sử lớp học
+	const columnClassHistory = useMemo(
+		() => [
+			{
+				accessorKey: 'classId',
+				header: 'Mã lớp học',
+				size: 90,
+			},
+			{
+				accessorKey: 'className',
+				header: 'Tên lớp học',
+				size: 100,
+			},
+			{
+				accessorKey: 'startDate',
+				accessorFn: (row) => moment(row.startDate).format('DD/MM/yyyy, h:mm:ss A'),
+				header: 'Ngày bắt đầu',
+				size: 105,
+			},
+			{
+				accessorKey: 'endDate',
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					if (row.endDate !== null) {
+						return <span>{moment(row.endDate).format('DD/MM/yyyy, h:mm:ss A')}</span>;
+					} else {
+						return <span>Chưa kết thúc</span>;
+					}
+				},
+				header: 'Ngày kết thúc',
+				size: 105,
+			},
+			{
+				accessorKey: 'maximumQuantity',
+				header: 'Số lượng tối đa',
+				size: 95,
+			},
+			{
+				accessorKey: 'admin.fullname',
+				header: 'Người chỉnh sửa',
+				size: 100,
+			},
+			{
+				accessorKey: 'status',
+				header: 'Trạng thái',
+				size: 95,
+			},
+			{
+				accessorFn: (row) => moment(row.modifyDate).format('DD-MM-yyyy, h:mm:ss a'),
+				header: 'Ngày Chỉnh Sửa',
+				size: 120,
+			},
+			{
+				accessorKey: 'action',
+				accessorFn: (row) => displayActionHistory(row.action),
+				header: 'Hành động',
+				size: 100,
+			},
+		],
+		[],
+	);
 
 	// lấy tấc cả dữ liệu ClassHistory từ database (gọi api)
 	const getDataClassHistory = async () => {
 		try {
 			const resp = await classHistoryApi.getAllClassHistory();
-			setClassHistories(resp);
+			console.log('🚀 ~ file: Classs.js:335 ~ getDataClassHistory ~ resp:', resp);
+			setClassHistories(resp.data);
 		} catch (error) {
 			console.log(error);
 		}
@@ -368,7 +370,6 @@ const Classs = () => {
 	useEffect(() => {
 		getDataClass();
 		getDataClassHistory();
-		getDataClassHistoryByClassId();
 	}, []);
 
 	return (
@@ -413,25 +414,40 @@ const Classs = () => {
 										Thêm lớp học
 									</Button>
 								)}
+								initialState={{columnVisibility: {classId: false}}}
 								enableRowActions
-								renderRowActions={({row, table}) => (
-									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-										<IconButton
-											color='secondary'
-											onClick={() => {
-												handleEditRow(row);
-											}}>
+								renderRowActionMenuItems={(row) => [
+									<MenuItem
+										key='edit'
+										onClick={() => {
+											handleEditRow(row.row);
+										}}>
+										<IconButton color='secondary'>
 											<EditIcon />
 										</IconButton>
-										<IconButton
-											color='info'
-											onClick={() => {
-												handleShowClassHistory(row);
-											}}>
-											<i class='fa-sharp fa-solid fa-eye'></i>
+										Chỉnh sửa
+									</MenuItem>,
+									<MenuItem
+										key='history'
+										onClick={() => handleShowClassHistory(row.row)}>
+										<IconButton color='info'>
+											<i className='fa-sharp fa-solid fa-eye'></i>
 										</IconButton>
-									</Box>
-								)}
+										Lịch sử
+									</MenuItem>,
+									<MenuItem
+										key='setClass'
+										onClick={() => console.info('Delete')}>
+										<Link
+											to={`/admin/class-detail/${row.row.original.classId}`}
+											className='text-dark'>
+											<IconButton color='primary'>
+												<i class='fa-solid fa-bars-progress'></i>
+											</IconButton>
+											Xếp lớp | {row.row.original.classId}
+										</Link>
+									</MenuItem>,
+								]}
 								muiTablePaginationProps={{
 									rowsPerPageOptions: [10, 20, 50, 100],
 									showFirstButton: false,

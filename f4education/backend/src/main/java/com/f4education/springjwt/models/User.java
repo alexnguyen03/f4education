@@ -10,6 +10,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Data
 @Entity
 @AllArgsConstructor
@@ -29,15 +35,26 @@ public class User implements Serializable {
 
 	private String token;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<Account_role> account_role;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<Teacher> teachers;
 
 	@OneToOne(mappedBy = "user")
 	private RefreshToken refreshToken;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "user")
+	List<Admin> admins;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "user")
+	List<Student> students;
+
+	@JsonIgnore
 	@ManyToMany(fetch = FetchType.LAZY)
 	@JoinTable(name = "account_role", joinColumns = @JoinColumn(name = "account_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();

@@ -14,9 +14,5 @@ public class RegisterCourseRequestDTO {
 
 	private Integer courseId;
 
-	private Integer numberSession;
-	
-	private String status;
-
 	private Integer studentId;
 }

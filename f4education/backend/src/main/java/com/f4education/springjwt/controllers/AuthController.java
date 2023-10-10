@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -74,10 +76,10 @@ public class AuthController {
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
     String jwt = jwtUtils.generateJwtToken(userDetails);
-    List<String> roles = userDetails.getAuthorities().stream()
+    List<String> roles = userDetails.getAuthorities()
+        .stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
-
     RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);
     if (refreshToken == null) {
       refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
@@ -173,8 +175,10 @@ public class AuthController {
     // SecurityContextHolder.getContext().getAuthentication()
     // .getPrincipal();
     // Long userId = userDetails.getId();
+    ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
     refreshTokenService.deleteByUserId(id);
-    return ResponseEntity.ok(new MessageResponse("Log out successful!"));
+    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+        .body(new MessageResponse("You've been signed out!"));
   }
 
   @GetMapping("/{email}")

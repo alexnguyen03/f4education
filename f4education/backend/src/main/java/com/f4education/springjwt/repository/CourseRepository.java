@@ -16,13 +16,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
 	List<Course> findAllByCourseName(String courseName);
 
-	@Query("SELECT c FROM Course c ORDER BY c.courseId DESC")
-	List<Course> findTop10LatestCourses();
-
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName IN (:subjectNames)")
 	List<Course> findBySubjectNames(@Param("subjectNames") List<String> subjectNames);
 
 	@Query("SELECT k FROM Course k WHERE k.courseDuration >= :minThoiLuong AND k.courseDuration <= :maxThoiLuong")
 	List<Course> findByThoiLuongInRange(@Param("minThoiLuong") Integer minThoiLuong,
 			@Param("maxThoiLuong") Integer maxThoiLuong);
+
+	@Query("SELECT c FROM Course c ORDER BY c.courseId DESC LIMIT 10")
+	List<Course> findTop10LatestCourses();
 }

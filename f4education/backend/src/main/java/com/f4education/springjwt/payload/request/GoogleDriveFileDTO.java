@@ -15,4 +15,5 @@ public class GoogleDriveFileDTO implements Serializable {
 	private String name;
 	private String link;
 	private String size;
+	private String type;
 }

@@ -40,6 +40,9 @@ import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
 // jsr250Enabled = true,
 // prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
+
+    @Value("${f4education.app.jwtSecret}")
+    private String key;
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
@@ -50,12 +53,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
     }
-
-    // @Override
-    // public void configure(AuthenticationManagerBuilder
-    // authenticationManagerBuilder) throws Exception {
-    // authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
-    // }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -87,7 +84,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                 .requestMatchers(
                                         "/api/auth/**",
                                         "/api/subjects/**",
-                                        "/api/classs/**",
+                                        "/api/classes/**",
                                         "/api/classhistory/**",
                                         "/api/classroom/**",
                                         "/api/classroomhistory/**",
@@ -98,6 +95,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/bills/**",
                                         "api/bill-detail/**",
                                         "/api/payment-method/**",
+                                        "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/img/**")
                                 .permitAll()
@@ -120,7 +118,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/payment/**",
                                         "/api/bills",
                                         "/api/bill-detail/**",
+                                        "/api/accounts/**",
+                                        "/api/teachers-history/**",
                                         "/api/payment-method/**",
+                                        "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/img/**")
                                 .permitAll().anyRequest().authenticated());

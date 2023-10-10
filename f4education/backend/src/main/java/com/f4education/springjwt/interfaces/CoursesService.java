@@ -1,6 +1,7 @@
 package com.f4education.springjwt.interfaces;
 
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 
@@ -18,8 +19,8 @@ public interface CoursesService {
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
 	List<CourseDTO> findAllByAdminId(String adminId);
-	
+
 	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
-	
+
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
 }
