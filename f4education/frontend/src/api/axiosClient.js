@@ -1,33 +1,33 @@
 // api/axiosClient.js
-import axios from 'axios';
-import queryString from 'query-string';
+import axios from "axios";
+import queryString from "query-string";
 
 const axiosClient = axios.create({
-	baseURL: process.env.REACT_APP_API_URL,
-	headers: {
-		'Content-Type': 'application/json',
-	},
-	paramsSerializer: (params) => queryString.stringify(params),
+  baseURL: process.env.REACT_APP_API_URL,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  paramsSerializer: (params) => queryString.stringify(params),
 });
 axiosClient.interceptors.request.use(async (config) => {
-	const accessToken = JSON.parse(localStorage.getItem('accessToken'));
-	console.log(accessToken);
-	if (accessToken) {
-		config.headers.Authorization = `Bearer ${accessToken}`;
-	}
-	// config.headers['Content-Type'] = 'application/json';
-	return config;
+  const accessToken = JSON.parse(localStorage.getItem("accessToken"));
+  console.log(accessToken);
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  // config.headers['Content-Type'] = 'application/json';
+  return config;
 });
 axiosClient.interceptors.response.use(
-	(response) => {
-		if (response && response.data) {
-			return response.data;
-		}
-		return response;
-	},
-	(error) => {
-		// Handle errors
-		throw error;
-	},
+  (response) => {
+    if (response && response.data) {
+      return response;
+    }
+    return response;
+  },
+  (error) => {
+    // Handle errors
+    throw error;
+  }
 );
 export default axiosClient;

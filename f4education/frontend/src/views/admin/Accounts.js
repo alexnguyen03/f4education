@@ -1,23 +1,18 @@
 import {
   Edit as EditIcon,
   RemoveCircleOutline as RemoveCircleOutlineIcon,
-  Search,
 } from "@mui/icons-material";
 import { Box, IconButton } from "@mui/material";
 import Tab from "react-bootstrap/Tab";
 import Tabs from "react-bootstrap/Tabs";
-import teacherApi from "api/teacherApi";
 import accountApi from "api/accountApi";
 import moment from "moment";
 import AccountHeader from "components/Headers/AccountHeader";
 import { MaterialReactTable } from "material-react-table";
 import { memo, useEffect, useMemo, useState } from "react";
-import { Notifications } from "@mantine/notifications";
-import { IconEyeSearch } from "@tabler/icons-react";
-import { Typography } from "@material-ui/core";
-import ReactLoading from "react-loading";
-import { Timeline, Event } from "react-timeline-scribble";
-import { Warning } from "@material-ui/icons";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import React from "react";
 import {
   Button,
   Card,
@@ -26,7 +21,6 @@ import {
   Col,
   Container,
   Form,
-  CardImg,
   FormGroup,
   Input,
   Label,
@@ -34,7 +28,6 @@ import {
   Row,
   ButtonGroup,
 } from "reactstrap";
-import Select from "react-select";
 const IMG_URL = "/courses/";
 const Teachers = () => {
   const user = JSON.parse(localStorage.getItem("user") ?? "");
@@ -58,6 +51,69 @@ const Teachers = () => {
   const [showHistoryTable, setShowHistoryTable] = useState(false);
   const [listHistoryById, setListHistoryById] = useState([]);
   const [errors, setErrors] = useState({});
+  const toastId = React.useRef(null);
+
+  // notification loading
+  const notifi_loading = (mess) => {
+    toastId.current = toast(mess, {
+      type: toast.TYPE.LOADING,
+      autoClose: false,
+      isLoading: true,
+      closeButton: false,
+      closeOnClick: true,
+    });
+  };
+
+  //notifications success
+  const update_success = (mess) => {
+    toast.update(toastId.current, {
+      type: toast.TYPE.SUCCESS,
+      render: mess,
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      closeButton: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      isLoading: false,
+    });
+  };
+
+  //notifications fail
+  const update_fail = (mess) => {
+    toast.update(toastId.current, {
+      type: toast.TYPE.ERROR,
+      render: mess,
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      closeButton: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      isLoading: false,
+    });
+  };
+
+  // //custom notification
+  const notifi = (mess, type) => {
+    toast(mess, {
+      type: toast.TYPE[type],
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
 
   //Nhận data gửi lên từ server
   const [teacher, setTeacher] = useState({
@@ -475,11 +531,16 @@ const Teachers = () => {
     try {
       setLoadingTeachers(true);
       const resp = await accountApi.getAllAccountsByRole(2);
-      console.log(resp);
-      setTeachers(resp.reverse());
+      if (resp.status === 200) {
+        setTeachers(resp.data.reverse());
+      } else {
+        setTeachers(resp.data.reverse());
+      }
+
       setLoadingTeachers(false);
     } catch (error) {
       console.log("failed to load data", error);
+      notifi("Lỗi kết nối server", "ERROR");
     }
   };
 
@@ -493,7 +554,7 @@ const Teachers = () => {
       setLoadingStudents(true);
       const resp = await accountApi.getAllAccountsByRole(1);
       console.log(resp);
-      setStudents(resp.reverse());
+      setStudents(resp.data.reverse());
       setLoadingStudents(false);
     } catch (error) {
       console.log("failed to load data", error);
@@ -510,7 +571,7 @@ const Teachers = () => {
       setLoadingAdmins(true);
       const resp = await accountApi.getAllAccountsByRole(3);
       console.log(resp);
-      setAdmins(resp.reverse());
+      setAdmins(resp.data.reverse());
       setLoadingAdmins(false);
     } catch (error) {
       console.log("failed to load data", error);
@@ -527,6 +588,14 @@ const Teachers = () => {
     }));
   };
 
+  const setStatus_2 = (status) => {
+    setTeacher((preTeacher) => ({
+      ...preTeacher,
+      status: status,
+    }));
+  };
+
+  //thay đổi dữ liệu của teacher để gửi request đến server
   useEffect(() => {
     const {
       id,
@@ -568,7 +637,7 @@ const Teachers = () => {
     });
   }, [teacher]);
 
-  //load data lên table
+  //load data của 3 vai trò lên table
   useEffect(() => {
     // if (teachers.length > 0) return;
     getAllStudent();
@@ -578,6 +647,7 @@ const Teachers = () => {
 
   return (
     <>
+      <ToastContainer />
       <AccountHeader />
       <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
@@ -851,37 +921,40 @@ const Teachers = () => {
                             readOnly={update}
                             value={teacher.password}
                           />
-                          <br></br>
-                          <Col md={12}>
-                            <label
-                              className="form-control-label"
-                              htmlFor="input-email"
-                            >
-                              Password
-                            </label>
-                            <br></br>
-                            <ButtonGroup>
-                              <Button
-                                color="primary"
-                                outline
-                                onClick={() => setGender_2(true)}
-                                active={teacher.teacher.gender === true}
-                              >
-                                Nam
-                              </Button>
-                              <Button
-                                color="primary"
-                                outline
-                                name="gender"
-                                onClick={() => setGender_2(false)}
-                                active={teacher.teacher.gender === false}
-                              >
-                                Nữ
-                              </Button>
-                            </ButtonGroup>
-                          </Col>
-
-                          <br></br>
+                        </FormGroup>
+                      </Col>
+                      <Col md={6}>
+                        <label
+                          className="form-control-label"
+                          htmlFor="input-email"
+                        >
+                          Trạng thái
+                        </label>
+                        <br></br>
+                        <ButtonGroup>
+                          <Button
+                            color="success"
+                            outline
+                            onClick={() => setStatus_2(true)}
+                            active={teacher.status === true}
+                          >
+                            Mở khóa
+                          </Button>
+                          <Button
+                            color="danger"
+                            outline
+                            name="gender"
+                            onClick={() => setStatus_2(false)}
+                            active={teacher.status === false}
+                          >
+                            Khóa
+                          </Button>
+                        </ButtonGroup>
+                      </Col>
+                    </Row>
+                    <Row>
+                      <Col sm={6}>
+                        <FormGroup>
                           <label
                             className="form-control-label"
                             htmlFor="input-email"
