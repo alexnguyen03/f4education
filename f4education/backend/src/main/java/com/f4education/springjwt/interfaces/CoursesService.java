@@ -15,11 +15,7 @@ public interface CoursesService {
 
 	List<CourseDTO> findTop10SoldCourse();
 
-	List<CourseDTO> findTop10SoldCourse();
-
-	List<CourseDTO> findTop10SoldCourse();
-
-	Course findById(Integer id);
+	CourseDTO findById(Integer id);
 
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
