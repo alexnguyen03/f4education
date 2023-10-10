@@ -8,7 +8,7 @@ const ClientFooter = () => {
     <>
       <Container size="xl" px="xs" className="py-5" bg={"#25262B"}>
         <footer className="p-5">
-          {/* <hr style={{ color: "rgb(158, 158, 158)" }} /> */}
+          
           <div className="d-flex justify-content-between flex-wrap text-start">
             {/* Item */}
             <div className="d-flex flex-column" style={{ maxWidth: "350px" }}>
@@ -88,7 +88,7 @@ const ClientFooter = () => {
                     Facebook
                   </Link>
                 </li>
-                <li>
+                <li className="my-2">
                   <Link
                     to="https://github.com/hientt1803"
                     className="text-decoration-none font-weight-500"
@@ -136,10 +136,10 @@ const ClientFooter = () => {
                     Trang chủ
                   </Link>
                 </li>
-                <li>
+                <li className="my-2">
                   <Link
                     to="/course"
-                    className="text-decoration-none font-weight-500"
+                    className="text-decoration-none font-weight-500 my-2"
                     style={{ color: "#ADB5BD" }}
                   >
                     Khóa học
@@ -170,6 +170,7 @@ const ClientFooter = () => {
             </span>
             <span className="font-weight-700 text-white">@2023, Inc</span>
           </div>
+          
         </footer>
       </Container>
     </>

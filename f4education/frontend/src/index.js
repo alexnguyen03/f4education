@@ -13,14 +13,14 @@ import 'assets/scss/argon-dashboard-react.scss';
 import AdminLayout from 'layouts/Admin.js';
 import AuthLayout from 'layouts/Auth.js';
 import ClientLayout from 'layouts/Client.js';
-import {MantineProvider} from '@mantine/core';
-import {ModalsProvider} from '@mantine/modals';
+import Teacher from 'layouts/Teacher';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
 	<BrowserRouter>
 		<Routes>
+			{/* Admin Route */}
 			<Route
 				path='/admin/*'
 				element={<AdminLayout />}
@@ -38,6 +38,8 @@ root.render(
 					/>
 				}
 			/>
+
+			{/* Client Route */}
 			<Route
 				path='/*'
 				element={<ClientLayout />}
@@ -57,6 +59,12 @@ root.render(
 			<Route
 				path='/admin/*/:courseName/:folderId'
 				element={<AdminLayout />}
+			/>
+
+			{/* Teacher Route */}
+			<Route
+				path='/teacher/*'
+				element={<Teacher />}
 			/>
 		</Routes>
 	</BrowserRouter>,

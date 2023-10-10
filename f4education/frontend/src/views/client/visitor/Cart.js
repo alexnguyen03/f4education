@@ -18,14 +18,18 @@ import {
   Grid,
   Title,
   rem,
+  getStylesRef,
 } from "@mantine/core";
 import { Carousel } from "@mantine/carousel";
+
+// Icon
 import { IconShoppingCartPlus } from "@tabler/icons-react";
 
 // API - declare variable
 import cartApi from "../../../api/cartApi";
 import courseApi from "../../../api/courseApi";
 import cartEmptyimage from "../../../assets/img/cart-empty.png";
+
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
 const itemsBreadcum = [
@@ -36,35 +40,6 @@ const itemsBreadcum = [
     <Text fs="italic">{item.title}</Text>
   </Anchor>
 ));
-
-// const cartItem = [
-//   {
-//     courseId: "1",
-//     courseName: "Khóa học ReactJS cho người mới từ 10 năm exp.",
-//     courseImage:
-//       "https://images.unsplash.com/photo-1695309534427-12bdf0afdd0b?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-//     subjectName: "ReactJS",
-//     ratings: 4.6,
-//     reviews: 100.345,
-//     courseDuration: "35h",
-//     courseLecture: "10 bài học",
-//     coursePrice: 359.135,
-//   },
-//   {
-//     courseId: "2",
-//     courseName: " Khóa học Java Spring boot cho người mới từ 10 năm exp.",
-//     courseImage:
-//       "https://images.unsplash.com/photo-1695075989376-ac0e8549ec8f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwxOHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60",
-//     subjectName: "Java Spring boot",
-//     ratings: 3.5,
-//     reviews: 70.395,
-//     courseDuration: "14h",
-//     courseLecture: "4 bài học",
-//     coursePrice: 839.284,
-//   },
-// ];
-
-// zalopay vnpay
 
 function Cart() {
   // *************** Main Variable
@@ -88,7 +63,13 @@ function Cart() {
     try {
       setLoading(true);
       const resp = await cartApi.getAllCart();
-      setCarts(resp.data);
+
+      if (resp.status === 200 && resp.data.length > 0) {
+        setCarts(resp.data);
+      } else {
+        console.log("Loi fetch cart ba con oi");
+      }
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -99,7 +80,13 @@ function Cart() {
     try {
       setLoading(true);
       const resp = await courseApi.getNewestCourse();
-      setNewestCourse(resp.data);
+      
+      if (resp.status === 200 && resp.data.length > 0) {
+        setNewestCourse(resp.data);
+      } else {
+        console.log("loi fetch newestcourse ba con oi");
+      }
+
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -283,7 +270,9 @@ function Cart() {
       </Breadcrumbs>
 
       {/* Title */}
-      <Title order={1} color="dark" fw={700}>Giỏ hàng</Title>
+      <Title order={1} color="dark" fw={700}>
+        Giỏ hàng
+      </Title>
 
       {/* Loading */}
       {loading ? (
@@ -330,7 +319,7 @@ function Cart() {
                   <hr className="text-muted mt-0 pt-0" />
 
                   {/* item */}
-                  {carts.length > 0 ? (
+                  {carts.length > 0 &&
                     carts.map((cart, index) => (
                       <>
                         <Grid key={index}>
@@ -436,36 +425,7 @@ function Cart() {
                           </Grid.Col>
                         </Grid>
                       </>
-                    ))
-                  ) : (
-                    <>
-                      <Card className="w-100 shadow-lg">
-                        <Card.Section className="text-center">
-                          <img
-                            src={cartEmptyimage}
-                            width="40%"
-                            height="40%"
-                            alt=""
-                            className="img-fluid"
-                          />
-                          <h1 className="font-weight-800">
-                            Giỏ hàng của bạn trống. <br />
-                            Tiếp tục mua sắm để tìm một khóa học ưng ý!
-                          </h1>
-                          <Link to={"/course"}>
-                            <Button
-                              color="violet"
-                              size={"lg"}
-                              className="font-weight-800 mb-5 mt-2"
-                              style={{ borderRadius: "2px", fontSize: "20px" }}
-                            >
-                              Tìm Khóa học
-                            </Button>
-                          </Link>
-                        </Card.Section>
-                      </Card>
-                    </>
-                  )}
+                    ))}
                 </Grid.Col>
                 <Grid.Col
                   xl="3"
@@ -522,6 +482,21 @@ function Cart() {
           control: {
             background: "#212121",
             color: "#fff",
+            fontSize: rem(25),
+            "&[data-inactive]": {
+              opacity: 0,
+              cursor: "default",
+            },
+            ref: getStylesRef("controls"),
+            transition: "opacity 150ms ease",
+            opacity: 0,
+          },
+          root: {
+            "&:hover": {
+              [`& .${getStylesRef("controls")}`]: {
+                opacity: 1,
+              },
+            },
           },
         }}
       >
