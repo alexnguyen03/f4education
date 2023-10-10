@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,15 +24,16 @@ import com.f4education.springjwt.payload.request.SubjectDTO;
 @RestController
 @RequestMapping("/api/classs")
 public class ClassController {
-	
+
 	@Autowired
 	ClassService classService;
-	
+
 	@GetMapping
-	public List<ClassDTO> getAll() {
-		return classService.findAll();
+	public ResponseEntity<?> getAll() {
+		List<ClassDTO> classList = classService.findAll();
+		return ResponseEntity.ok(classList);
 	}
-	
+
 	@GetMapping("/{id}")
 	public ClassDTO findById(@PathVariable("id") Integer classId) {
 		return classService.getClassById(classId);
@@ -43,8 +45,7 @@ public class ClassController {
 	}
 
 	@PutMapping("/{id}")
-	public ClassDTO updateSubject(@PathVariable("id") Integer classId, 
-			@RequestBody ClassDTO classDTO) {
+	public ClassDTO updateSubject(@PathVariable("id") Integer classId, @RequestBody ClassDTO classDTO) {
 		return classService.updateClass(classId, classDTO);
 	}
 }
