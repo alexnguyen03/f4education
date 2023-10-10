@@ -1,6 +1,5 @@
 package com.f4education.springjwt.controllers;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,9 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.AccountService;
-import com.f4education.springjwt.models.Admin;
-import com.f4education.springjwt.models.Student;
-import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.request.AccountDTO;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -42,19 +38,19 @@ public class AccountController {
     XFile xfileService;
 
     @GetMapping
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AccountDTO> getAllAccountsDTO() {
         return accountService.getAllAccountsDTO();
     }
 
     @GetMapping("/{role}")
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public List<AccountDTO> getByRole(@PathVariable("role") Integer role) {
         return accountService.getAllAccountsDTOByRole(role);
     }
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    // @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN')")
     public AccountDTO updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
         ObjectMapper mapper = new ObjectMapper();

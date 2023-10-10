@@ -12,6 +12,7 @@ import moment from "moment";
 import AccountHeader from "components/Headers/AccountHeader";
 import { MaterialReactTable } from "material-react-table";
 import { memo, useEffect, useMemo, useState } from "react";
+import { Notifications } from "@mantine/notifications";
 import { IconEyeSearch } from "@tabler/icons-react";
 import { Typography } from "@material-ui/core";
 import ReactLoading from "react-loading";
@@ -172,7 +173,7 @@ const Teachers = () => {
     }
   };
 
-  const columns_1 = useMemo(
+  const columns_student = useMemo(
     () => [
       {
         accessorKey: "username",
@@ -185,12 +186,12 @@ const Teachers = () => {
         size: 75,
       },
       {
-        accessorKey: "teacher.fullname",
+        accessorKey: "student.fullname",
         accessorFn: (row) => row,
         Cell: ({ cell }) => {
           const row = cell.getValue();
           try {
-            return <span>{row.students.fullname}</span>;
+            return <span>{row.student.fullname}</span>;
           } catch (error) {
             <span className="text-danger">Chưa có thông tin học viên</span>;
           }
@@ -202,7 +203,7 @@ const Teachers = () => {
     []
   );
 
-  const columns_2 = useMemo(
+  const columns_teacher = useMemo(
     () => [
       {
         accessorKey: "username",
@@ -220,7 +221,7 @@ const Teachers = () => {
         Cell: ({ cell }) => {
           const row = cell.getValue();
           try {
-            return <span>{row.teachers.fullname}</span>;
+            return <span>{row.teacher.fullname}</span>;
           } catch (error) {
             return (
               <span className="text-danger">Chưa có thông tin giảng viên</span>
@@ -234,7 +235,7 @@ const Teachers = () => {
     []
   );
 
-  const columns_3 = useMemo(
+  const columns_admin = useMemo(
     () => [
       {
         accessorKey: "username",
@@ -617,7 +618,7 @@ const Teachers = () => {
                     },
                   }}
                   positionActionsColumn="last"
-                  columns={columns_1}
+                  columns={columns_student}
                   data={students}
                   renderTopToolbarCustomActions={() => (
                     <Button
@@ -682,7 +683,7 @@ const Teachers = () => {
                     },
                   }}
                   positionActionsColumn="last"
-                  columns={columns_2}
+                  columns={columns_teacher}
                   data={teachers}
                   renderTopToolbarCustomActions={() => (
                     <Button
@@ -747,7 +748,7 @@ const Teachers = () => {
                     },
                   }}
                   positionActionsColumn="last"
-                  columns={columns_3}
+                  columns={columns_admin}
                   data={admins}
                   renderTopToolbarCustomActions={() => (
                     <Button

@@ -3,10 +3,7 @@ package com.f4education.springjwt.security.services;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.modelmapper.Conditions;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.config.Configuration;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,9 +23,6 @@ public class AccountServiceImpl implements AccountService {
 
     private User convertToEntity(AccountDTO accountDTO, User user) {
         ModelMapper modelMapper = new ModelMapper();
-        Configuration configuration = modelMapper.getConfiguration();
-        configuration.setMatchingStrategy(MatchingStrategies.STRICT);
-        configuration.setPropertyCondition(Conditions.isNotNull());
         modelMapper.map(accountDTO, user);
         return user;
     }

@@ -52,7 +52,7 @@
     "@mantine/form": "^6.0.19",
     "@mantine/hooks": "^6.0.19",
     "@mantine/modals": "^6.0.19",
-    "@mantine/notifications": "^6.0.19",
+    "@mantine/notifications": "^6.0.21",
     "@mantine/nprogress": "^6.0.19",
     "@mantine/tiptap": "^6.0.19",
     "@material-ui/core": "^4.12.4",
