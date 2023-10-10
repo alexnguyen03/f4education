@@ -221,10 +221,10 @@ const Courses = () => {
 		[],
 	);
 	const getAllCourse = async () => {
-		if (courses.length > 0) {
-			setLoadingCourses(false);
-			return;
-		}
+		// if (courses.length > 0) {
+		// 	setLoadingCourses(false);
+		// 	return;
+		// }
 		try {
 			setLoadingCourses(true);
 			const resp = await courseApi.getAll();
@@ -439,7 +439,7 @@ const Courses = () => {
 								enableStickyHeader
 								enableStickyFooter
 								enableRowNumbers
-								// state={{isLoading: loadingCourses}}
+								state={{isLoading: loadingCourses}}
 								displayColumnDefOptions={{
 									'mrt-row-actions': {
 										header: 'Thao tác',

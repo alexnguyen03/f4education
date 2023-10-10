@@ -202,6 +202,7 @@ const Resource = () => {
       const resp = await resourceApi.getAllResource();
       if (resp.status === 200 && resp.data.length > 0) {
         setResources(resp.data);
+        setLoadingResource(false);
       } else if (resp.data.isEmpty) {
         notification("warn", "Chưa có phòng học !!!");
       }
@@ -240,7 +241,7 @@ const Resource = () => {
           getDataResource();
           handleResetForm();
         } else {
-          notification("error", "Thêm tài nguyên thất bại !!!");
+          notification("error", "Thêm thất bại !!!");
         }
       } catch (error) {
         console.log("Thêm thất bại", error);
@@ -426,7 +427,7 @@ const Resource = () => {
                 enableGrouping
                 enableStickyHeader
                 enableStickyFooter
-                // state={{ isLoading: loadingResource }}
+                state={{ isLoading: loadingResource }}
                 columns={columnClass}
                 data={resources}
                 positionActionsColumn="last"
@@ -441,7 +442,7 @@ const Resource = () => {
                 enableRowActions
                 renderRowActions={({ row, table }) => (
                   <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-                    <Link
+                    {/* <Link
                       to={`/admin/resourceDetail/${
                         row.original.course.courseName
                       }/${getFolderId(row.original.link)}`}
@@ -454,7 +455,7 @@ const Resource = () => {
                       >
                         <EditIcon />
                       </IconButton>
-                    </Link>
+                    </Link> */}
                     <IconButton
                       color="info"
                       onClick={() => {
