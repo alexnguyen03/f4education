@@ -157,9 +157,7 @@ const ClasssRoom = () => {
       if (resp.status === 200 && resp.data.length > 0) {
         setClassRooms(resp.data);
       } else if (resp.data.isEmpty) {
-        console.log("Dữ liệu rỗng");
-      } else {
-        console.log("Lỗi");
+        notification("warn", "Chưa có phòng học !!!");
       }
     } catch (error) {
       console.log(error);
