@@ -26,4 +26,6 @@ public interface CoursesService {
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
 	
 	List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId);
+
+	List<CourseDTO> getCourseBySubjectName(String subjectName);
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.payload.request.SubjectHistoryDTO;
+import com.f4education.springjwt.payload.request.SubjectHistoryRequest;
 import com.f4education.springjwt.security.services.SubjectHistoryServiceImpl;
 
 @CrossOrigin("*")
@@ -25,6 +26,11 @@ public class SubjectHistoryController {
 	public ResponseEntity<?> findAll() {
 		List<SubjectHistoryDTO> lst = subjectHistoryService.getAllSubjectsHistory();
 		return ResponseEntity.ok(lst);
+	}
+	
+	@GetMapping("/subjectid/{id}")
+	public List<SubjectHistoryDTO> findBySubjectId(@PathVariable("id") Integer subjectId) {
+		return subjectHistoryService.findBySubjectId(subjectId);
 	}
 
 	@GetMapping("/{id}")

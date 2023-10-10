@@ -57,6 +57,12 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
+	public List<CourseDTO> getCourseBySubjectName(String subjectName) {
+		List<Course> course = courseRepository.getCourseBySubjectName(subjectName);
+		return course.stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+	}
+
+	@Override
 	public CourseDTO saveCourse(CourseRequest courseRequest) {
 		String action = "CREATE";
 		Course course = this.convertRequestToEntity(courseRequest);

@@ -50,6 +50,10 @@ const courseApi = {
 		const url = '/courses/top-selling';
 		return axiosClient.get(url);
 	},
+	getCourseBySubjectName: (subjectName)=>{
+		const url = `/courses/${subjectName}`;
+		return axiosClient.get(url);
+	}
 };
 
 export default courseApi;

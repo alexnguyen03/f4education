@@ -240,6 +240,8 @@ const Home = () => {
                 height={150}
                 radius="sm"
                 withPlaceholder
+                component="a"
+                href={`/course/${learn.courseId}`}
               />
             </Card.Section>
           </HoverCard.Target>

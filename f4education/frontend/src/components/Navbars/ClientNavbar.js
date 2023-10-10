@@ -298,7 +298,7 @@ const ClientNavbar = () => {
                   </Link>
                 </HoverCard.Target>
 
-                <HoverCard.Dropdown style={{ overflow: "hidden" }} mt="xl">
+                <HoverCard.Dropdown style={{ overflow: "hidden" }} mt="xl" p={20}>
                   <Group position="apart">
                     <Text fw={500}>Khóa học</Text>
                     <Link to="/course" fz="xs">
@@ -322,9 +322,8 @@ const ClientNavbar = () => {
                           Khám phá khóa học
                         </Button>
                       </Link>
-
-                      <Divider orientation="vertical" size="sm" />  
                     </Grid.Col>
+                      {/* <Divider orientation="vertical" size="sm" /> */}
                     <Grid.Col xl={8} lg={8} md={12} sm={12}>
                       <SimpleGrid cols={3} spacing="xl" verticalSpacing="sm">
                         <Flex
@@ -386,6 +385,7 @@ const ClientNavbar = () => {
                         </Flex>
                       </SimpleGrid>
                     </Grid.Col>
+                    <h1>Nao co y tuong lam tiep cai nay</h1>
                   </Grid>
                 </HoverCard.Dropdown>
               </HoverCard>
@@ -588,6 +588,8 @@ const ClientNavbar = () => {
                   className="mt-1 ml-2 font-weight-700"
                   onClick={() => handleLogin(login)}
                   style={{ borderRadius: "2px" }}
+                  component="a"
+                  href="/auth/login"
                 >
                   Đăng nhập
                 </Button>

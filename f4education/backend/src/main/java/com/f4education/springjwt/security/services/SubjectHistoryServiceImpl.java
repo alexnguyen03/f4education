@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import com.f4education.springjwt.interfaces.SubjectHistoryService;
 import com.f4education.springjwt.models.SubjectHistory;
 import com.f4education.springjwt.payload.request.SubjectHistoryDTO;
+import com.f4education.springjwt.payload.request.SubjectHistoryRequest;
+import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.SubjectHistoryRepository;
 
 @Service
@@ -21,6 +23,12 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 	@Override
 	public List<SubjectHistoryDTO> getAllSubjectsHistory() {
 		List<SubjectHistory> subjectHistory = subjectHistoryRepository.findAll();
+		return subjectHistory.stream().map(this::convertToReponseDTO).collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<SubjectHistoryDTO> findBySubjectId(Integer subjectId) {
+		List<SubjectHistory> subjectHistory = subjectHistoryRepository.findBySubjectId(subjectId);
 		return subjectHistory.stream().map(this::convertToReponseDTO).collect(Collectors.toList());
 	}
 
@@ -36,15 +44,29 @@ public class SubjectHistoryServiceImpl implements SubjectHistoryService {
 
 	private SubjectHistoryDTO convertToReponseDTO(SubjectHistory subjectHistory) {
 		SubjectHistoryDTO subjectHistoryDTO = new SubjectHistoryDTO();
-		String adminId = subjectHistory.getAdmin().getAdminId();
+		String adminName = subjectHistory.getAdmin().getFullname();
 		Integer subjectId = subjectHistory.getSubject().getSubjectId();
 
 		BeanUtils.copyProperties(subjectHistory, subjectHistoryDTO);
 
-		subjectHistoryDTO.setModifyDate(subjectHistory.getModifyDate());
-		subjectHistoryDTO.setAdminId(adminId);
+		subjectHistoryDTO.setAdminName(adminName);
 		subjectHistoryDTO.setSubjectId(subjectId);
 
 		return subjectHistoryDTO;
 	}
+
+//	private SubjectHistoryRequest convertToRequest(SubjectHistory subjectHistory) {
+//		SubjectHistoryRequest subjectHistoryDTO = new SubjectHistoryRequest();
+//		String adminId = subjectHistory.getAdmin().getAdminId();
+//		Integer subjectId = subjectHistory.getSubject().getSubjectId();
+//
+//		BeanUtils.copyProperties(subjectHistory, subjectHistoryDTO);
+//		BeanUtils.copyProperties(subjectHistory, subjectHistoryDTO);
+//
+//		subjectHistoryDTO.setModifyDate(subjectHistory.getModifyDate());
+//		subjectHistoryDTO.setAdminId(adminId);
+//		subjectHistoryDTO.setSubjectId(subjectId);
+//
+//		return subjectHistoryDTO;
+//	}
 }
