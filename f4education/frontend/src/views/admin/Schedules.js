@@ -2,11 +2,31 @@ import SchedulesHeader from 'components/Headers/SchedulesHeader';
 import React, {useState} from 'react';
 import {Alert, Button, Card, CardBody, CardHeader, Col, Container, Nav, NavItem, NavLink, Row} from 'reactstrap';
 import classnames from 'classnames';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+
+import {INITIAL_EVENTS, createEventId} from '../../utils/event-utils';
 function Schedules() {
 	const [navPills, setNavPills] = useState(1);
 	const toggleNavs = (e, state, index) => {
 		e.preventDefault();
 		setNavPills(index);
+	};
+	const handleDateSelect = (selectInfo) => {
+		let title = prompt('Please enter a new title for your event');
+		let calendarApi = selectInfo.view.calendar;
+
+		calendarApi.unselect(); // clear date selection
+
+		if (title) {
+			calendarApi.addEvent({
+				id: createEventId(),
+				title,
+				start: selectInfo.startStr,
+				end: selectInfo.endStr,
+				allDay: selectInfo.allDay,
+			});
+		}
 	};
 	return (
 		<>
@@ -137,7 +157,34 @@ function Schedules() {
 											</NavItem>
 										</Nav>
 									</Col>
-									<Col sm={10}></Col>
+									<Col sm={10}>
+										<FullCalendar
+											plugins={[dayGridPlugin]}
+											headerToolbar={{
+												left: 'prev,next today',
+												center: 'title',
+												right: 'dayGridMonth,timeGridWeek,timeGridDay',
+											}}
+											initialView='dayGridMonth'
+											editable={true}
+											selectable={true}
+											selectMirror={true}
+											dayMaxEvents={true}
+											weekends={true}
+											// initialEvents={INITIAL_EVENTS} // alternatively, use the `events` setting to fetch from a feed
+											// select={this.handleDateSelect}
+											// eventContent={renderEventContent} // custom render function
+											eventClick={(e) => {
+												console.log(e);
+											}}
+											// eventsSet={this.handleEvents} // called after events are initialized/added/changed/removed
+											/* you can update a remote database when these fire:
+            eventAdd={function(){}}
+            eventChange={function(){}}
+            eventRemove={function(){}}
+            */
+										/>
+									</Col>
 								</Row>
 							</CardBody>
 						</Card>
