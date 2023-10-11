@@ -7,6 +7,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,25 +33,26 @@ public class TeacherController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public List<TeacherDTO> getAllTeachers() {
-        return teacherService.getAllTeachersDTO();
+    public ResponseEntity<?> getAllTeachers() {
+        List<TeacherDTO> list = teacherService.getAllTeachersDTO();
+        return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public TeacherDTO getTeacher(@PathVariable("id") String teacherID) {
-        return teacherService.getTeacherDTOByID(teacherID);
-    }
+    // @GetMapping("/{id}")
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public TeacherDTO getTeacher(@PathVariable("id") String teacherID) {
+    // return teacherService.getTeacherDTOByID(teacherID);
+    // }
 
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public TeacherDTO createSubject(@RequestBody TeacherDTO teacherDTO) {
-        return teacherService.createTeacher(teacherDTO);
-    }
+    // @PostMapping
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public TeacherDTO createSubject(@RequestBody TeacherDTO teacherDTO) {
+    // return teacherService.createTeacher(teacherDTO);
+    // }
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public TeacherDTO updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
+    public ResponseEntity<?> updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
         ObjectMapper mapper = new ObjectMapper();
         TeacherDTO teacherRequest = new TeacherDTO();
@@ -68,6 +70,7 @@ public class TeacherController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return teacherService.updateTeacher(teacherRequest);
+        TeacherDTO teacherDTO = teacherService.updateTeacher(teacherRequest);
+        return ResponseEntity.ok(teacherDTO);
     }
 }

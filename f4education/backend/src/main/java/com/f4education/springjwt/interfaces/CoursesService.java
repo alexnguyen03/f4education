@@ -2,9 +2,6 @@ package com.f4education.springjwt.interfaces;
 
 import java.util.List;
 
-import org.springframework.http.ResponseEntity;
-
-import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 
@@ -24,7 +21,7 @@ public interface CoursesService {
 	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
 
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
-	
+
 	List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId);
 
 	List<CourseDTO> getCourseBySubjectName(String subjectName);

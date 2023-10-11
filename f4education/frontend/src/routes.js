@@ -20,7 +20,8 @@ import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient';
 import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient';
 import InformationTeacher from 'views/teacher/information';
 
-import Accounts from 'views/admin/Accounts.js';
+import Accounts from 'views/admin/Accounts';
+import Schedules from 'views/admin/Schedules';
 
 export var routes = [
 	{
@@ -92,6 +93,13 @@ export var routes = [
 		name: 'Câu hỏi',
 		icon: 'ni ni-ui-04 text-primary',
 		component: <Questions />,
+		layout: '/admin',
+	},
+	{
+		path: '/schedule',
+		name: 'Thời khóa biểu',
+		icon: 'ni ni-ui-04 text-primary',
+		component: <Schedules />,
 		layout: '/admin',
 	},
 
