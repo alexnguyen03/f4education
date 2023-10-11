@@ -2,12 +2,15 @@ package com.f4education.springjwt.controllers;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,22 +18,32 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.models.ERole;
+import com.f4education.springjwt.models.RefreshToken;
 import com.f4education.springjwt.models.Role;
 import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.payload.request.LoginRequest;
 import com.f4education.springjwt.payload.request.SignupRequest;
+import com.f4education.springjwt.payload.request.TokenRefreshRequest;
 import com.f4education.springjwt.payload.response.JwtResponse;
 import com.f4education.springjwt.payload.response.MessageResponse;
+import com.f4education.springjwt.payload.response.TokenRefreshResponse;
 import com.f4education.springjwt.repository.RoleRepository;
 import com.f4education.springjwt.repository.UserRepository;
+import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
 import com.f4education.springjwt.security.jwt.JwtUtils;
+import com.f4education.springjwt.security.jwt.exception.TokenRefreshException;
+import com.f4education.springjwt.security.services.RefreshTokenServiceImpl;
 import com.f4education.springjwt.security.services.UserDetailsImpl;
+
+import io.jsonwebtoken.JwtException;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -50,6 +63,8 @@ public class AuthController {
 
   @Autowired
   JwtUtils jwtUtils;
+  @Autowired
+  RefreshTokenServiceImpl refreshTokenService;
 
   @PostMapping("/signin")
   public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -60,16 +75,24 @@ public class AuthController {
     SecurityContextHolder.getContext().setAuthentication(authentication);
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-    String jwt = jwtUtils.generateJwtToken(authentication);
+    String jwt = jwtUtils.generateJwtToken(userDetails);
     List<String> roles = userDetails.getAuthorities().stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
+    RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);
+    if (refreshToken == null) {
+      refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
+    }
 
-    return ResponseEntity.ok(new JwtResponse(jwt,
+    return ResponseEntity.ok(new JwtResponse(
+        jwt,
         userDetails.getId(),
         userDetails.getUsername(),
+        userDetails.getFullName(),
         userDetails.getEmail(),
-        roles));
+        roles,
+        refreshToken.getToken(),
+        userDetails.getImageName()));
   }
 
   @PostMapping("/signup")
@@ -126,5 +149,61 @@ public class AuthController {
     userRepository.save(user);
 
     return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+  }
+
+  @PostMapping("/refresh-token")
+  public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    if (request.equals("")) {
+      return ResponseEntity.badRequest().body("Refresh token is not valid");
+    }
+    String requestRefreshToken = request.getRefreshToken();
+
+    return refreshTokenService.findByToken(requestRefreshToken)
+        .map(refreshTokenService::verifyExpiration)
+        .map(RefreshToken::getUser)
+        .map(user -> {
+          String token = jwtUtils.generateTokenFromUsername(user.getUsername());
+          return ResponseEntity.ok(new TokenRefreshResponse(token, requestRefreshToken));
+        }).orElse(ResponseEntity.notFound().build());
+
+  }
+
+  @PostMapping("/signout/{id}")
+  public ResponseEntity<?> logoutUser(@PathVariable Long id) {
+    // UserDetailsImpl userDetails = (UserDetailsImpl)
+    // SecurityContextHolder.getContext().getAuthentication()
+    // .getPrincipal();
+    // Long userId = userDetails.getId();
+    ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+    refreshTokenService.deleteByUserId(id);
+    return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, cookie.toString())
+        .body(new MessageResponse("You've been signed out!"));
+  }
+
+  @GetMapping("/{email}")
+  public ResponseEntity<?> getRoleByEmail(@PathVariable("email") String email) {
+
+    User foundUser = userRepository.findByEmail(email);
+    if (foundUser == null) {
+      return ResponseEntity.notFound().build();
+    }
+
+    String jwt = jwtUtils.generateJwtToken(foundUser);
+    List<String> roles = foundUser.getRoles().stream()
+        .map(item -> item.getName().name())
+        .collect(Collectors.toList());
+    UserDetailsImpl userDetails = UserDetailsImpl.build(foundUser);
+    RefreshToken refreshToken = refreshTokenService.findByUserId(foundUser.getId()).orElse(null);
+    if (refreshToken == null) {
+      refreshToken = refreshTokenService.createRefreshToken(foundUser.getId());
+    }
+    return ResponseEntity.ok(new JwtResponse(jwt,
+        foundUser.getId(),
+        foundUser.getUsername(),
+        foundUser.getEmail(),
+        jwt, roles,
+        refreshToken.getToken(),
+        userDetails.getImageName()));
+
   }
 }

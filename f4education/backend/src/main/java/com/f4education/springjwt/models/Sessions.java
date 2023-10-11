@@ -30,6 +30,9 @@ public class Sessions implements Serializable {
 	@OneToMany(mappedBy = "sessions")
 	private List<SessionsHistory> sessionsHistorys;
 	@JsonIgnore
+	@OneToMany(mappedBy = "sessions")
+	private List<Schedule> schedules  ;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	private Admin admin;

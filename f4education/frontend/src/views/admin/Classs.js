@@ -213,125 +213,127 @@ const Classs = () => {
 		}
 	};
 
-	// bảng lớp học
-	const columnClass = useMemo(
-		() => [
-			{
-				accessorKey: 'classId',
-				header: 'Mã lớp học',
-				size: 100,
-			},
-			{
-				accessorKey: 'className',
-				header: 'Tên lớp học',
-				size: 100,
-			},
-			{
-				accessorKey: 'startDate',
-				accessorFn: (row) => moment(row.startDate).format('DD/MM/yyyy, h:mm:ss a'),
-				header: 'Ngày bắt đầu',
-				size: 90,
-			},
-			{
-				accessorKey: 'endDate',
-				accessorFn: (row) => row,
-				Cell: ({cell}) => {
-					const row = cell.getValue();
-					if (row.endDate !== null) {
-						return <span>{moment(row.endDate).format('DD/MM/yyyy, h:mm:ss a')}</span>;
-					} else {
-						return <span>Chưa kết thúc</span>;
-					}
-				},
-				header: 'Ngày kết thúc',
-				size: 90,
-			},
-			{
-				accessorKey: 'maximumQuantity',
-				header: 'Số lượng tối đa',
-				size: 95,
-			},
-			{
-				accessorKey: 'admin.fullname',
-				header: 'Người tạo',
-				size: 95,
-			},
-			{
-				accessorKey: 'status',
-				header: 'Trạng thái',
-				size: 95,
-			},
-		],
-		[],
-	);
+  // bảng lớp học
+  const columnClass = useMemo(
+    () => [
+      {
+        accessorKey: "className",
+        header: "Tên lớp học",
+        size: 100,
+      },
+      {
+        accessorKey: "startDate",
+        accessorFn: (row) =>
+          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss A"),
+        header: "Ngày bắt đầu",
+        size: 90,
+      },
+      {
+        accessorKey: "endDate",
+        accessorFn: (row) => row,
+        Cell: ({ cell }) => {
+          const row = cell.getValue();
+          if (row.endDate !== null) {
+            return (
+              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss A")}</span>
+            );
+          } else {
+            return <span>Chưa kết thúc</span>;
+          }
+        },
+        header: "Ngày kết thúc",
+        size: 90,
+      },
+      {
+        accessorKey: "maximumQuantity",
+        header: "Số lượng tối đa",
+        size: 95,
+      },
+      {
+        accessorKey: "admin.fullname",
+        header: "Người tạo",
+        size: 95,
+      },
+      {
+        accessorKey: "status",
+        header: "Trạng thái",
+        size: 95,
+      },
+    ],
+    []
+  );
 
 	// hiển thị tiếng việt
 	const displayActionHistory = (action) => {
 		return action === 'CREATE' ? 'Thêm mới' : 'Cập nhật';
 	};
 
-	// bảng lịch sử lớp học
-	const columnClassHistory = useMemo(
-		() => [
-			{
-				accessorKey: 'classId',
-				header: 'Mã lớp học',
-				size: 90,
-			},
-			{
-				accessorKey: 'className',
-				header: 'Tên lớp học',
-				size: 100,
-			},
-			{
-				accessorKey: 'startDate',
-				accessorFn: (row) => moment(row.startDate).format('DD/MM/yyyy, h:mm:ss a'),
-				header: 'Ngày bắt đầu',
-				size: 105,
-			},
-			{
-				accessorKey: 'endDate',
-				accessorFn: (row) => row,
-				Cell: ({cell}) => {
-					const row = cell.getValue();
-					if (row.endDate !== null) {
-						return <span>{moment(row.endDate).format('DD/MM/yyyy, h:mm:ss a')}</span>;
-					} else {
-						return <span>Chưa kết thúc</span>;
-					}
-				},
-				header: 'Ngày kết thúc',
-				size: 105,
-			},
-			{
-				accessorKey: 'maximumQuantity',
-				header: 'Số lượng tối đa',
-				size: 95,
-			},
-			{
-				accessorKey: 'admin.fullname',
-				header: 'Người chỉnh sửa',
-				size: 100,
-			},
-			{
-				accessorKey: 'status',
-				header: 'Trạng thái',
-				size: 95,
-			},
-			{
-				accessorFn: (row) => moment(row.modifyDate).format('DD-MM-yyyy, h:mm:ss a'),
-				header: 'Ngày Chỉnh Sửa',
-				size: 120,
-			},
-			{
-				accessorKey: 'action',
-				accessorFn: (row) => displayActionHistory(row.action),
-				header: 'Hành động',
-				size: 100,
-			},
-		],
-		[],
-	);
+  // bảng lịch sử lớp học
+  const columnClassHistory = useMemo(
+    () => [
+      {
+        accessorKey: "classId",
+        header: "Mã lớp học",
+        size: 90,
+      },
+      {
+        accessorKey: "className",
+        header: "Tên lớp học",
+        size: 100,
+      },
+      {
+        accessorKey: "startDate",
+        accessorFn: (row) =>
+          moment(row.startDate).format("DD/MM/yyyy, h:mm:ss A"),
+        header: "Ngày bắt đầu",
+        size: 105,
+      },
+      {
+        accessorKey: "endDate",
+        accessorFn: (row) => row,
+        Cell: ({ cell }) => {
+          const row = cell.getValue();
+          if (row.endDate !== null) {
+            return (
+              <span>{moment(row.endDate).format("DD/MM/yyyy, h:mm:ss A")}</span>
+            );
+          } else {
+            return <span>Chưa kết thúc</span>;
+          }
+        },
+        header: "Ngày kết thúc",
+        size: 105,
+      },
+      {
+        accessorKey: "maximumQuantity",
+        header: "Số lượng tối đa",
+        size: 95,
+      },
+      {
+        accessorKey: "admin.fullname",
+        header: "Người chỉnh sửa",
+        size: 100,
+      },
+      {
+        accessorKey: "status",
+        header: "Trạng thái",
+        size: 95,
+      },
+      {
+        accessorFn: (row) =>
+        moment(row.modifyDate).format("DD-MM-yyyy, h:mm:ss a"),
+        header: "Ngày Chỉnh Sửa",
+        size: 120,
+      },
+      {
+        accessorKey: "action",
+        accessorFn: (row) => displayActionHistory(row.action),
+        header: "Hành động",
+        size: 100,
+      },
+    ],
+    []
+  );
 
 	// lấy tấc cả dữ liệu ClassHistory từ database (gọi api)
 	const getDataClassHistory = async () => {

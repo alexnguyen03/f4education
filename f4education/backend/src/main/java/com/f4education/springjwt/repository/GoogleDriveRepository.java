@@ -1,7 +1,11 @@
 package com.f4education.springjwt.repository;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -9,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.security.services.SessionService;
+import com.google.api.client.http.FileContent;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -23,6 +28,41 @@ public class GoogleDriveRepository {
 	@Autowired
 	SessionService sessionService;
 
+	public List<File> getAllFilesInFolderLesson(String folderId) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+
+		// Lấy danh sách file trong thư mục "BÀI HỌC"
+		String subFolderLessonId = searchFolderId(folderId, "BÀI HỌC", driveQuickstart.getInstance());
+		List<File> allFiles = new ArrayList<>();
+		FileList result = driveQuickstart.getInstance().files().list().setQ("'" + subFolderLessonId + "' in parents")
+				.setSpaces("drive").setFields("files(id, name, size)").execute();
+
+		List<File> files = result.getFiles();
+		if (files != null && !files.isEmpty()) {
+			allFiles.addAll(files);
+		}
+
+		return allFiles;
+	}
+
+	public List<File> getAllFilesInFolderResource(String folderId) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+
+		// Lấy danh sách file trong thư mục "BÀI HỌC"
+		String subFolderResourceId = searchFolderId(folderId, "TÀI NGUYÊN", driveQuickstart.getInstance());
+
+		List<File> allFiles = new ArrayList<>();
+		FileList result = driveQuickstart.getInstance().files().list().setQ("'" + subFolderResourceId + "' in parents")
+				.setSpaces("drive").setFields("files(id, name, size)").execute();
+
+		List<File> files = result.getFiles();
+		if (files != null && !files.isEmpty()) {
+			allFiles.addAll(files);
+		}
+
+		return allFiles;
+	}
+
 	// Set permission drive file
 	private Permission setPermission(String type, String role) {
 		Permission permission = new Permission();
@@ -31,19 +71,50 @@ public class GoogleDriveRepository {
 		return permission;
 	}
 
+	private boolean fileExists(String filename, String folderId) throws IOException, GeneralSecurityException {
+		FileList fileList = driveQuickstart.getInstance().files().list()
+				.setQ("name = '" + filename + "' and '" + folderId + "' in parents").setSpaces("drive").execute();
+
+		List<File> files = fileList.getFiles();
+		return files != null && !files.isEmpty();
+	}
+
 	// Upload file
-	public String uploadFile(MultipartFile file, String folderName) {
+	public String uploadFile(MultipartFile file, String folderName, String type) {
 		try {
 			String folderId = getFolderId(folderName);
 			sessionService.set("folderId", folderId);
+
 			if (null != file) {
+				// Tạo hai thư mục con
+				String subFolderLessonId = findOrCreateFolder(folderId, "BÀI HỌC", driveQuickstart.getInstance());
+				String subFolderResourceId = findOrCreateFolder(folderId, "TÀI NGUYÊN", driveQuickstart.getInstance());
+
+				// Chọn một trong hai thư mục để tải lên
+				String selectedFolderId = "";
+				if (type.equals("BÀI HỌC")) {
+					selectedFolderId = subFolderLessonId;
+				} else if (type.equals("TÀI NGUYÊN")) {
+					selectedFolderId = subFolderResourceId;
+				}
+
+				// Kiểm tra xem file đã tồn tại trên Google Drive chưa
+				if (fileExists(file.getOriginalFilename(), selectedFolderId)) {
+					System.out.println("File already exists on Google Drive.");
+					return null;
+				}
+
+				// Tạo metadata cho tệp
 				File fileMetadata = new File();
-				fileMetadata.setParents(Collections.singletonList(folderId));
+				fileMetadata.setParents(Collections.singletonList(selectedFolderId));
 				fileMetadata.setName(file.getOriginalFilename());
+
+				// Tạo tệp trên Google Drive
 				File uploadFile = driveQuickstart.getInstance().files().create(fileMetadata,
 						new InputStreamContent(file.getContentType(), new ByteArrayInputStream(file.getBytes())))
 						.setFields("id").execute();
 
+				// Đặt quyền truy cập cho tệp
 				driveQuickstart.getInstance().permissions()
 						.create(uploadFile.getId(), setPermission("anyone", "reader")).execute();
 
@@ -116,5 +187,10 @@ public class GoogleDriveRepository {
 		} while (pageToken != null && folderId == null);
 
 		return folderId;
+	}
+
+	public void deleteFile(String fileId) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		driveQuickstart.getInstance().files().delete(fileId).execute();
 	}
 }

@@ -1,22 +1,27 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
 import com.f4education.springjwt.interfaces.CoursesService;
-import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.CourseHistory;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.ThoiLuongRange;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class CourseServiceImpl implements CoursesService {
@@ -31,15 +36,24 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll()
-				.stream()
-				.map(this::convertEntityToDTO)
+		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+	}
+
+	@Override
+	public List<CourseDTO> findNewestCourse() {
+		return courseRepository.findTop10LatestCourses().stream().map(this::convertEntityToDTO)
 				.collect(Collectors.toList());
 	}
 
 	@Override
-	public Course findById(Integer id) {
-		return courseRepository.findById(id).get();
+	public List<CourseDTO> findTop10SoldCourse() {
+		return courseRepository.findTopSellingCourses().stream().map(this::convertEntityToDTO)
+				.collect(Collectors.toList());
+	}
+
+    @Override
+	public CourseDTO findById(Integer id) {
+		return convertEntityToDTO(courseRepository.findById(id).get());
 	}
 
 	@Override
@@ -60,8 +74,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseDTO> findAllByAdminId(String adminId) {
-		return courseRepository.findAllByAdmin_AdminId(adminId).stream()
-				.map(this::convertEntityToDTO)
+		return courseRepository.findAllByAdmin_AdminId(adminId).stream().map(this::convertEntityToDTO)
 				.collect(Collectors.toList());
 	}
 
@@ -89,5 +102,55 @@ public class CourseServiceImpl implements CoursesService {
 		courseHistory.setModifyDate(new Date());
 		courseHistory.setAction(action);
 		courseHistoryRepository.save(courseHistory);
+	}
+
+	@Override
+	public List<CourseDTO> findBySubjectNames(List<String> checkedSubjects) {
+		List<CourseDTO> list = courseRepository.findBySubjectNames(checkedSubjects).stream()
+				.map(this::convertEntityToDTO).collect(Collectors.toList());
+		return list;
+	}
+
+	@Override
+	public List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations) {
+		List<CourseDTO> list = new ArrayList<>();
+		List<ThoiLuongRange> ketQua = this.kiemTraChu(checkedDurations);
+		System.out.println(ketQua);
+		for (ThoiLuongRange range : ketQua) {
+			list = courseRepository.findByThoiLuongInRange(range.getMinThoiLuong(), range.getMaxThoiLuong()).stream()
+					.map(this::convertEntityToDTO).collect(Collectors.toList());
+		}
+		return list;
+	}
+
+	public List<ThoiLuongRange> kiemTraChu(List<String> danhSach) {
+		List<ThoiLuongRange> ketQua = new ArrayList<>();
+
+		boolean coShort = danhSach.contains("short");
+		boolean coMedium = danhSach.contains("medium");
+		boolean coLong = danhSach.contains("long");
+
+		if (coShort && coMedium) {
+			ketQua.add(new ThoiLuongRange(0, 90));
+		} else if (coShort && coLong) {
+			ketQua.add(new ThoiLuongRange(0, 120));
+		} else if (coMedium && coLong) {
+			ketQua.add(new ThoiLuongRange(60, 120));
+		} else if (coShort) {
+			ketQua.add(new ThoiLuongRange(0, 60));
+		} else if (coMedium) {
+			ketQua.add(new ThoiLuongRange(60, 90));
+		} else if (coLong) {
+			ketQua.add(new ThoiLuongRange(90, 120));
+		}
+
+		return ketQua;
+	}
+
+	@Override
+	public List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId) {
+		List<CourseDTO> list = courseRepository.findByAccountId(accountId).stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+		System.out.println(list);
+		return list;
 	}
 }

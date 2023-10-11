@@ -44,9 +44,9 @@ public class Student implements Serializable {
 	@Column(name = "image")
 	private String image;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "student")
-	List<Attendance> attendances;
+	// @JsonIgnore
+	// @OneToMany(mappedBy = "student")
+	// List<Attendance> attendances;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
@@ -66,7 +66,11 @@ public class Student implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	List<Schedule> schedules;
+	List<Cart> carts;
+
+	// @JsonIgnore
+	// @OneToMany(mappedBy = "student")
+	// List<Schedule> schedules;
 
 	@ManyToOne
 	@JsonIgnore
@@ -77,5 +81,15 @@ public class Student implements Serializable {
 	public String toString() {
 		return "Student [studentId=" + studentId + ", fullname=" + fullname + ", gender=" + gender + ", address="
 				+ address + ", phone=" + phone + ", image=" + image + "]";
+	}
+
+	public Student(Integer studentId, String fullname, Boolean gender, String address, String phone, String image) {
+		super();
+		this.studentId = studentId;
+		this.fullname = fullname;
+		this.gender = gender;
+		this.address = address;
+		this.phone = phone;
+		this.image = image;
 	}
 }

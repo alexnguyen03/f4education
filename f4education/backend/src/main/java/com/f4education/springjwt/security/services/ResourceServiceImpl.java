@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -15,12 +16,15 @@ import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Resources;
 import com.f4education.springjwt.payload.request.AdminDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.ResourceRepository;
+import com.f4education.springjwt.ultils.ConvertByteToMB;
+import com.google.api.services.drive.model.File;
 
 @Service
 public class ResourceServiceImpl implements ResourceService {
@@ -30,13 +34,13 @@ public class ResourceServiceImpl implements ResourceService {
 
 	@Autowired
 	private AdminRepository adminRepository;
-	
+
 	@Autowired
 	CourseRepository courseRepository;
 
 	@Autowired
 	GoogleDriveRepository googleDriveRepository;
-	
+
 	@Autowired
 	SessionService sessionService;
 
@@ -51,8 +55,21 @@ public class ResourceServiceImpl implements ResourceService {
 		String action = "CREATE";
 		Resources resources = new Resources();
 		convertToEntity(resourceRequest, resources);
-		Resources saveResource = resourceRepository.save(resources);
-		return convertToDto(saveResource);
+		List<Resources> listResources = resourceRepository.findAll();
+		Resources saveResource = null;
+		boolean found = false;
+		for (Resources r : listResources) {
+			if (r.getCourse().getCourseId() == resources.getCourse().getCourseId()) {
+				found = true;
+				break;
+			}
+		}
+
+		if (!found) {
+			saveResource = resourceRepository.save(resources);
+			return convertToDto(saveResource);
+		}
+		return null;
 	}
 
 	private ResourcesDTO convertToDto(Resources resources) {
@@ -62,7 +79,7 @@ public class ResourceServiceImpl implements ResourceService {
 		resourcesDTO.setAdminName(admin.getFullname());
 		return resourcesDTO;
 	}
-	
+
 	private Resources convertToEntity(ResourceRequest resourceRequest, Resources resources) {
 		BeanUtils.copyProperties(resourceRequest, resources);
 		Course course = courseRepository.findById(resourceRequest.getCourseId()).get();
@@ -75,7 +92,56 @@ public class ResourceServiceImpl implements ResourceService {
 	}
 
 	@Override
-	public void uploadFile(MultipartFile file, String folderName) {
-		googleDriveRepository.uploadFile(file, folderName);
+	public void uploadFile(MultipartFile file, String folderName, String type) {
+		googleDriveRepository.uploadFile(file, folderName, type);
+	}
+
+	@Override
+	public List<GoogleDriveFileDTO> getAllFilesByFolderLesson(String folderId) throws Exception {
+		GoogleDriveRepository googleDriveRepository = new GoogleDriveRepository();
+		List<File> files = googleDriveRepository.getAllFilesInFolderLesson(folderId);
+		List<GoogleDriveFileDTO> googleDriveFileDTOs = new ArrayList<>();
+
+		if (files != null) {
+			for (File f : files) {
+				if (f.getSize() != null) {
+					GoogleDriveFileDTO googleDriveFileDTO = new GoogleDriveFileDTO();
+					googleDriveFileDTO.setId(f.getId());
+					googleDriveFileDTO.setName(f.getName());
+					googleDriveFileDTO.setSize(ConvertByteToMB.getSize(f.getSize()));
+					googleDriveFileDTO.setLink("https://drive.google.com/file/d/" + f.getId() + "/view?usp=sharing");
+					googleDriveFileDTO.setType("lesson");
+					googleDriveFileDTOs.add(googleDriveFileDTO);
+				}
+			}
+		}
+		return googleDriveFileDTOs;
+	}
+	
+	@Override
+	public List<GoogleDriveFileDTO> getAllFilesByFolderResource(String folderId) throws Exception {
+		GoogleDriveRepository googleDriveRepository = new GoogleDriveRepository();
+		List<File> files = googleDriveRepository.getAllFilesInFolderResource(folderId);
+		List<GoogleDriveFileDTO> googleDriveFileDTOs = new ArrayList<>();
+
+		if (files != null) {
+			for (File f : files) {
+				if (f.getSize() != null) {
+					GoogleDriveFileDTO googleDriveFileDTO = new GoogleDriveFileDTO();
+					googleDriveFileDTO.setId(f.getId());
+					googleDriveFileDTO.setName(f.getName());
+					googleDriveFileDTO.setSize(ConvertByteToMB.getSize(f.getSize()));
+					googleDriveFileDTO.setLink("https://drive.google.com/file/d/" + f.getId() + "/view?usp=sharing");
+					googleDriveFileDTO.setType("resource");
+					googleDriveFileDTOs.add(googleDriveFileDTO);
+				}
+			}
+		}
+		return googleDriveFileDTOs;
+	}
+
+	@Override
+	public void deleteFile(String fileId) throws Exception {
+		googleDriveRepository.deleteFile(fileId);
 	}
 }

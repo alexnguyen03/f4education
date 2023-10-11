@@ -11,8 +11,4 @@ public interface SubjectHistoryService {
 	List<SubjectHistoryDTO> getAllSubjectsHistory();
 
 	SubjectHistoryDTO getSubjectHistoryById(Integer subjectHistoryId);
-
-	SubjectHistoryDTO createSubjectHistory(SubjectHistoryDTO SubjectHistoryDTO);
-
-	SubjectHistoryDTO updateSubjectHistory(Integer subjectHistoryId, SubjectHistoryDTO SubjectHistoryDTO);
 }

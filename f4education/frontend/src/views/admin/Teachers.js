@@ -14,6 +14,9 @@ import { Typography } from "@material-ui/core";
 import ReactLoading from "react-loading";
 import { Timeline, Event } from "react-timeline-scribble";
 import { Warning } from "@material-ui/icons";
+import React from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
   Button,
   Card,
@@ -31,9 +34,10 @@ import {
   ButtonGroup,
 } from "reactstrap";
 import Select from "react-select";
+
 const IMG_URL = "/courses/";
 const Teachers = () => {
-  const user = JSON.parse(localStorage.getItem("user") ?? "");
+  const user = JSON.parse(localStorage.getItem("user") | "");
   const [imgData, setImgData] = useState(null);
   const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
   const [showHistoryInfo, setShowHistoryInfo] = useState(false);
@@ -48,6 +52,70 @@ const Teachers = () => {
   const [showHistoryTable, setShowHistoryTable] = useState(false);
   const [listHistoryById, setListHistoryById] = useState([]);
   const [errors, setErrors] = useState({});
+  const toastId = React.useRef(null);
+
+  // notification loading
+  const notifi_loading = () => {
+    toastId.current = toast("Đang cập nhật dữ liệu...", {
+      type: toast.TYPE.LOADING,
+      autoClose: false,
+      isLoading: true,
+      closeButton: false,
+      closeOnClick: true,
+    });
+  };
+
+  //notifications success
+  const update_success = () => {
+    toast.update(toastId.current, {
+      type: toast.TYPE.SUCCESS,
+      render: "Cập nhật dữ liệu thành công",
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      closeButton: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      isLoading: false,
+    });
+  };
+
+  //notifications fail
+  const update_fail = () => {
+    toast.update(toastId.current, {
+      type: toast.TYPE.ERROR,
+      render: "Lỗi kết nối server",
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      closeButton: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      isLoading: false,
+    });
+  };
+
+  //custom notification
+  const notifi = (mess, type) => {
+    toast(mess, {
+      // type: type,
+      type: toast.TYPE[type],
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+    });
+  };
 
   //Nhận data gửi lên từ server
   const [teacher, setTeacher] = useState({
@@ -78,6 +146,7 @@ const Teachers = () => {
     // acccountAdmin: 0,
   });
 
+  // Thay đổi giá trị trên ô input
   const handelOnChangeInput = (e) => {
     //Còn đang xử lý
     setTeacher({
@@ -108,18 +177,20 @@ const Teachers = () => {
     }
   };
 
+  // Show lịch sử giáo viên
   const handelShowHistory = async (id) => {
     setShowHistoryInfo(true);
     setLoadingHistoryInfo(true);
     try {
       const resp = await teacherApi.getTeacherHistoryByCourseid(id);
-      setListHistoryById(resp.reverse());
+      setListHistoryById(resp.data.reverse());
       setLoadingHistoryInfo(false);
     } catch (error) {
       console.log("failed to fetch data", error);
     }
   };
 
+  // Sường table để hiển thị dữ liệu
   const columns = useMemo(
     () => [
       {
@@ -206,6 +277,7 @@ const Teachers = () => {
     []
   );
 
+  //Show form edit thông tin giáo viên
   const handleEditFrom = (row) => {
     setShowForm(true);
     setUpdate(true);
@@ -217,6 +289,7 @@ const Teachers = () => {
     setRSelected(selectedTeacher.gender);
   };
 
+  //Reset form edit
   const handleResetForm = () => {
     // hide form
     setShowForm((pre) => !pre);
@@ -242,12 +315,12 @@ const Teachers = () => {
     e.preventDefault();
     updateTeacher();
     // console.log(teacher);
-    if (image) {
-      setTeacher((preTeacher) => ({
-        ...preTeacher,
-        image: image.name,
-      }));
-    }
+    // if (image) {
+    //   setTeacher((preTeacher) => ({
+    //     ...preTeacher,
+    //     image: image.name,
+    //   }));
+    // }
   };
 
   const validateForm = () => {
@@ -309,19 +382,26 @@ const Teachers = () => {
     console.log(Object.keys(validationErrors).length);
 
     if (Object.keys(validationErrors).length === 0) {
+      notifi_loading();
       const formData = new FormData();
       formData.append("teacherRequest", JSON.stringify(teacherRequest));
       formData.append("file", image);
-      console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
       try {
         const resp = await teacherApi.updateTeacher(formData);
-        handleResetForm();
-        getAllTeacher();
+        console.log("🚀 ~ file: Teachers.js:391 ~ updateTeacher ~ resp:", resp);
+        if (resp.status === 200) {
+          handleResetForm();
+          getAllTeacher();
+          update_success();
+        } else {
+          update_fail();
+        }
       } catch (error) {
         console.log(
           "🚀 ~ file: Teachers.js:257 ~ updateTeacher ~ error:",
           error
         );
+        update_fail();
       }
     } else {
       setErrors(validationErrors);
@@ -337,14 +417,21 @@ const Teachers = () => {
     }
 
     try {
-      console.log(update);
+      // console.log(update);
       setLoadingTeachers(true);
       const resp = await teacherApi.getAllTeachers();
-      console.log(resp);
-      setTeachers(resp.reverse());
+      if (resp.status === 200) {
+        setTeachers(resp.data.reverse());
+      } else {
+        notifi("Lỗi kết nối server", "ERROR");
+        setTeachers([]);
+      }
       setLoadingTeachers(false);
     } catch (error) {
       console.log("failed to load data", error);
+      notifi("Lỗi kết nối server", "ERROR");
+      setTeachers([]);
+      setLoadingTeachers(false);
     }
   };
 
@@ -366,7 +453,7 @@ const Teachers = () => {
     try {
       setLoadingTeachersHistory(true);
       const resp = await teacherApi.getAllTeachersHistory();
-      setTeacherHistories(resp.reverse());
+      // setTeacherHistories(resp.data.reverse());
       setLoadingTeachersHistory(false);
       console.log(setTeacherHistories);
     } catch (error) {
@@ -415,6 +502,7 @@ const Teachers = () => {
 
   return (
     <>
+      <ToastContainer />
       <TeacherHeader />
       <Container className="mt--7" fluid>
         <Card className="bg-secondary shadow">
@@ -792,6 +880,14 @@ const Teachers = () => {
                   >
                     Hủy
                   </Button>
+                  {/* Nút test notification */}
+                  {/* <Button
+                    color="primary"
+                    className="px-5"
+                    onClick={update_fail}
+                  >
+                    Lưu
+                  </Button> */}
                   <Button color="primary" type="submit" className="px-5">
                     Lưu
                   </Button>
@@ -856,7 +952,6 @@ const Teachers = () => {
                           <Row>
                             <Col className="text-left">
                               <strong>
-                                {" "}
                                 <h4>{item.adminName}</h4>{" "}
                               </strong>
                             </Col>

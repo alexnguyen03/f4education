@@ -1,4 +1,4 @@
-import {Button, Card, CardBody, CardHeader, FormGroup, Form, Input, Container, Row, Col, Modal} from 'reactstrap';
+import {Button, Card, CardBody, CardHeader, FormGroup, Form, Input, Container, Row, Col, Modal, ButtonGroup} from 'reactstrap';
 import ResourcesHeader from 'components/Headers/ResourcesHeader';
 import {useState, useMemo, useEffect} from 'react';
 import {MaterialReactTable} from 'material-react-table';
@@ -6,7 +6,7 @@ import {Edit as EditIcon, Delete as DeleteIcon} from '@mui/icons-material';
 import {Box, IconButton} from '@mui/material';
 import moment from 'moment';
 import Select from 'react-select';
-import {Link} from 'react-router-dom';
+import {Routes, Route, useParams, Link} from 'react-router-dom';
 
 // gọi API từ resourceApi
 import resourceApi from 'api/resourceApi';
@@ -33,7 +33,8 @@ const Resource = () => {
 		label: '',
 	});
 	const [options, setOptions] = useState([{value: '0', label: ''}]);
-	const [file, setFile] = useState(null);
+	const [file, setFile] = useState([null]);
+	const [rSelected, setRSelected] = useState(null);
 
 	// khởi tạo Resource
 	const [resource, setResource] = useState({
@@ -87,9 +88,10 @@ const Resource = () => {
 	};
 
 	const onChangeFile = (e) => {
-		setFile(null);
-		if (e.target.files[0]) {
-			setFile(e.target.files[0]);
+		setFile([]);
+		if (e.target.files.length > 0) {
+			const selectedFiles = Array.from(e.target.files);
+			setFile(selectedFiles);
 		}
 	};
 
@@ -134,9 +136,20 @@ const Resource = () => {
 		const id = row.resourcesId;
 		return (
 			<span key={id}>
-				<Link to={`${link}`}>{row.link}</Link>
+				<a
+					target='_blank'
+					rel='noreferrer'
+					href={`${link}`}>
+					Đường dẫn đi đến thư mục
+				</a>
 			</span>
 		);
+	}
+
+	function getFolderId(url) {
+		const startIndex = url.lastIndexOf('/') + 1; // Tìm vị trí bắt đầu của folderId
+		const folderId = url.substring(startIndex); // Lấy phần tử từ startIndex đến hết chuỗi
+		return folderId;
 	}
 
 	// resetModal ClassHistory
@@ -157,10 +170,18 @@ const Resource = () => {
 
 	const addResource = async () => {
 		const formData = new FormData();
-		formData.append('resource', JSON.stringify(resource));
-		formData.append('file', file);
+		formData.append('resourceRequest', JSON.stringify(resourceRequest));
+		var files = []; // Mảng chứa các đối tượng file
+		// Lặp qua mảng file và thêm từng đối tượng file vào formData
+		for (var i = 0; i < file.length; i++) {
+			formData.append('file', file[i]);
+		}
+		if (rSelected === 1) {
+			formData.append('type', 'BÀI HỌC');
+		} else if (rSelected === 2) {
+			formData.append('type', 'TÀI NGUYÊN');
+		}
 		console.log([...formData]);
-		console.log({...resource});
 		try {
 			const resp = await resourceApi.createResource(formData);
 			handleResetForm();
@@ -189,13 +210,13 @@ const Resource = () => {
 			{
 				accessorKey: 'course.courseName',
 				header: 'Tên khóa học',
-				size: 150,
+				size: 180,
 			},
 			{
 				accessorFn: (row) => row.link,
 				Cell: ({cell}) => renderCellWithLink(cell.row.original),
 				header: 'Link',
-				size: 200,
+				size: 150,
 			},
 			{
 				accessorKey: 'createDate',
@@ -370,7 +391,7 @@ const Resource = () => {
 								enableRowActions
 								renderRowActions={({row, table}) => (
 									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-										<Link to={`/admin/resourceDetail/${row.original.resourcesId}`}>
+										<Link to={`/admin/resourceDetail/${row.original.course.courseName}/${getFolderId(row.original.link)}`}>
 											<IconButton
 												color='secondary'
 												onClick={() => {
@@ -459,6 +480,28 @@ const Resource = () => {
 											</FormGroup>
 										</Col>
 									)}
+									<Col md={12}>
+										<FormGroup>
+											<label className='form-control-label'>Loại tài nguyên</label>
+											<br />
+											<ButtonGroup>
+												<Button
+													color='primary'
+													outline
+													onClick={() => setRSelected(1)}
+													active={rSelected === 1}>
+													Bài học
+												</Button>
+												<Button
+													color='primary'
+													outline
+													onClick={() => setRSelected(2)}
+													active={rSelected === 2}>
+													Tài nguyên
+												</Button>
+											</ButtonGroup>
+										</FormGroup>
+									</Col>
 									<Col md={12}>
 										<FormGroup>
 											<label

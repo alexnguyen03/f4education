@@ -2,6 +2,7 @@ package com.f4education.springjwt.controllers;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -23,9 +24,10 @@ import org.springframework.web.multipart.MultipartFile;
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.interfaces.ResourceService;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.request.CourseDTO;
+import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
-import com.f4education.springjwt.security.services.SessionService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -40,17 +42,15 @@ public class ResourceController {
 	@Autowired
 	CoursesService coursesService;
 
-	@Autowired
-	SessionService sessionService;
-
 	@GetMapping
 	public List<ResourcesDTO> getAll() {
 		return resourceService.findAll();
 	}
 
 	@PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResourcesDTO createResource(@RequestParam("file") MultipartFile file,
-			@RequestPart("resourceRequest") String resourceRequestClient) {
+	public ResourcesDTO createResource(@RequestParam("file") MultipartFile[] file,
+			@RequestPart("resourceRequest") String resourceRequestClient, @RequestParam("type") String type) {
+
 		ObjectMapper mapper = new ObjectMapper();
 		ResourceRequest resourceRequest = new ResourceRequest();
 		try {
@@ -61,9 +61,23 @@ public class ResourceController {
 			e.printStackTrace();
 		}
 
-		Course course = coursesService.findById(resourceRequest.getCourseId());
-		resourceService.uploadFile(file, course.getCourseName());
-		System.out.println(resourceRequest);
+		for (MultipartFile files : file) {
+			CourseDTO course = coursesService.findById(resourceRequest.getCourseId());
+			resourceService.uploadFile(files, course.getCourseName(), type);
+		}
 		return resourceService.createResource(resourceRequest);
+	}
+
+	@GetMapping("/file/{folderId}")
+	public List<GoogleDriveFileDTO> getAllFilesByFolder(@PathVariable("folderId") String folderId) throws Exception {
+		List<GoogleDriveFileDTO> lists = new ArrayList<>();
+	    lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
+	    lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
+		return lists;
+	}
+
+	@GetMapping("/delete/file/{id}")
+	public void deleteFile(@PathVariable String id) throws Exception {
+		resourceService.deleteFile(id);
 	}
 }

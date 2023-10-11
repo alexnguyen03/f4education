@@ -1,15 +1,11 @@
 import {FormGroup} from '@mui/material';
 import SubjectHeader from 'components/Headers/SubjectHeader';
-import {MaterialReactTable} from 'material-react-table';
+import MaterialReactTable from 'material-react-table';
 import moment from 'moment';
 import {useEffect, useMemo, useState} from 'react';
 
 // reactstrap components
 import {Button, Card, CardBody, CardHeader, Container, Input, Modal} from 'reactstrap';
-
-// Stoatify component
-// import { ToastContainer, toast } from "react-toastify";
-// import "react-toastify/dist/ReactToastify.css";
 
 // Axios
 import subjectApi from '../../api/subjectApi';
@@ -68,9 +64,8 @@ const Subjects = () => {
 	const fetchSubjects = async () => {
 		try {
 			const resp = await subjectApi.getAllSubject();
-			setSubjectArray(resp);
-			setSubjects(resp);
-			console.log(resp);
+			setSubjectArray(resp.data);
+			setSubjects(resp.data);
 			console.log('restarted application');
 		} catch (error) {
 			console.log(error);
@@ -97,8 +92,9 @@ const Subjects = () => {
 		if (validateForm(action)) {
 			try {
 				const body = subject;
+				// create subject
 				const resp = await subjectApi.createSubject(body);
-				console.log(resp);
+				console.log(resp.data);
 
 				// Create SubjectHistory
 				handleCreateNewSubjectHistory(subject, action);
@@ -129,7 +125,7 @@ const Subjects = () => {
 			try {
 				const body = subject;
 				const resp = await subjectApi.updateSubject(body, subject.subjectId);
-				console.log(resp);
+				console.log(resp.data);
 
 				// Add subjectHistory
 				handleCreateNewSubjectHistory(subject, action);
@@ -267,8 +263,7 @@ const Subjects = () => {
 	const fetchSubjectHistory = async () => {
 		try {
 			const resp = await subjectHistoryApi.getAllSubjectHistory();
-			setSubjectHistories(resp);
-			console.log(resp);
+			setSubjectHistories(resp.data);
 			console.log('restarted subjectHistory application');
 		} catch (error) {
 			console.log(error);
@@ -285,7 +280,7 @@ const Subjects = () => {
 			const body = subjectHistory;
 			console.log(body);
 			const resp = await subjectHistoryApi.createSubjectHistory(body);
-			console.log(resp);
+			console.log(resp.data);
 		} catch (error) {
 			console.log(error);
 		}
@@ -393,7 +388,6 @@ const Subjects = () => {
 				<Modal
 					className='modal-dialog-centered'
 					isOpen={showModal}
-					toggle={showModal}
 					backdrop={'static'}>
 					<div className='modal-header'>
 						<h3

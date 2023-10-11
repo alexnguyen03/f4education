@@ -60,6 +60,9 @@ public class Teacher implements Serializable {
 	private String phone;
 
 	private String image;
+	
+	@OneToMany(mappedBy = "teacher")
+	List<Classes> classes;
 
 	@JsonIgnore
 	@ManyToOne

@@ -212,22 +212,22 @@ const Teachers = () => {
     });
   };
 
-  // Cập nhật hình ảnh
-  const onChangePicture = (e) => {
-    setImage(null);
-    if (e.target.files[0]) {
-      setImage(e.target.files[0]);
-      const reader = new FileReader();
-      reader.addEventListener("load", () => {
-        setImgData(reader.result);
-      });
-      reader.readAsDataURL(e.target.files[0]);
-      setTeacher((preTeacher) => ({
-        ...preTeacher,
-        image: e.target.files[0].name,
-      }));
-    }
-  };
+	// Cập nhật hình ảnh
+	const onChangePicture = (e) => {
+		setImage(null);
+		if (e.target.files[0]) {
+			setImage(e.target.files[0]);
+			const reader = new FileReader();
+			reader.addEventListener('load', () => {
+				setImgData(reader.result);
+			});
+			reader.readAsDataURL(e.target.files[0]);
+			setTeacher((preTeacher) => ({
+				...preTeacher,
+				image: e.target.files[0].name,
+			}));
+		}
+	};
 
   const columns_student = useMemo(
     () => [
@@ -323,51 +323,50 @@ const Teachers = () => {
     []
   );
 
-  const columnsTeacherHistory = useMemo(
-    () => [
-      {
-        accessorKey: "fullname",
-        header: "Tên giảng viên",
-        size: 100,
-      },
-      {
-        accessorKey: "gender",
-        accessorFn: (row) => row,
-        Cell: ({ cell }) => {
-          const row = cell.getValue();
-          if (row.gender) {
-            return <span>Nam</span>;
-          } else {
-            return <span>Nữ</span>;
-          }
-        },
-        header: "Giới tính",
-        size: 30,
-      },
-      {
-        accessorFn: (row) => moment(row.dateOfBirth).format("DD/MM/yyyy"),
-        header: "Ngày sinh",
-        size: 60,
-      },
-      {
-        accessorFn: (row) =>
-          moment(row.modifyDate).format("DD/MM/yyyy, h:mm:ss a"),
-        header: "Ngày thao tác",
-        size: 60,
-      },
-      {
-        accessorKey: "adminName",
-        header: "Người thao tác",
-        size: 80,
-      },
-      {
-        accessorKey: "action",
-        header: "Hành động",
-        size: 80,
-      },
-    ],
-    []
-  );
+	const columnsTeacherHistory = useMemo(
+		() => [
+			{
+				accessorKey: 'fullname',
+				header: 'Tên giảng viên',
+				size: 100,
+			},
+			{
+				accessorKey: 'gender',
+				accessorFn: (row) => row,
+				Cell: ({cell}) => {
+					const row = cell.getValue();
+					if (row.gender) {
+						return <span>Nam</span>;
+					} else {
+						return <span>Nữ</span>;
+					}
+				},
+				header: 'Giới tính',
+				size: 30,
+			},
+			{
+				accessorFn: (row) => moment(row.dateOfBirth).format('DD/MM/yyyy'),
+				header: 'Ngày sinh',
+				size: 60,
+			},
+			{
+				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss a'),
+				header: 'Ngày thao tác',
+				size: 60,
+			},
+			{
+				accessorKey: 'adminName',
+				header: 'Người thao tác',
+				size: 80,
+			},
+			{
+				accessorKey: 'action',
+				header: 'Hành động',
+				size: 80,
+			},
+		],
+		[],
+	);
 
   const handleEditFrom_2 = (row) => {
     setShowForm_2(true);
@@ -463,21 +462,20 @@ const Teachers = () => {
       validationErrors.levels = "";
     }
 
-    const isVNPhoneMobile =
-      /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
+		const isVNPhoneMobile = /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
 
-    if (!isVNPhoneMobile.test(teacher.phone)) {
-      validationErrors.phone = "Không đúng định dạng số điện thoại!!!";
-      test++;
-    } else {
-      validationErrors.phone = "";
-    }
+		if (!isVNPhoneMobile.test(teacher.phone)) {
+			validationErrors.phone = 'Không đúng định dạng số điện thoại!!!';
+			test++;
+		} else {
+			validationErrors.phone = '';
+		}
 
-    if (test === 0) {
-      return {};
-    }
-    return validationErrors;
-  };
+		if (test === 0) {
+			return {};
+		}
+		return validationErrors;
+	};
 
   const updateTeacher = async () => {
     const validationErrors = validateForm();
