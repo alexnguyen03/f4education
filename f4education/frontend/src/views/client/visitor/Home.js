@@ -6,6 +6,7 @@ import {
   Card,
   Center,
   Flex,
+  getStylesRef,
   Grid,
   Group,
   HoverCard,
@@ -228,7 +229,7 @@ const Home = () => {
   // learnext course Carousel
   const LearnNextSlides = newestCourse.map((learn) => (
     <Carousel.Slide key={learn.courseId}>
-      <HoverCard width={"100%"} shadow="md" position="bottom">
+      <HoverCard width={"95%"} shadow="md" position="bottom">
         {/* Target Hover */}
         <Card className="card-hover-overlay">
           <HoverCard.Target>
@@ -240,9 +241,12 @@ const Home = () => {
                 height={150}
                 radius="sm"
                 withPlaceholder
+                component="a"
+                href={`/course/${learn.courseId}`}
               />
             </Card.Section>
           </HoverCard.Target>
+         
           <Box>
             <Text fw={500} lineClamp={2} fs="lg">
               {learn.courseName}
@@ -272,7 +276,7 @@ const Home = () => {
         </Card>
 
         {/* Value hover */}
-        <HoverCard.Dropdown>
+        <HoverCard.Dropdown mt={"-10px"}>
           <Button
             color="grape"
             variant="light"
@@ -397,6 +401,16 @@ const Home = () => {
                   opacity: 0,
                   cursor: "default",
                 },
+                ref: getStylesRef("controls"),
+                transition: "opacity 150ms ease",
+                opacity: 0,
+              },
+              root: {
+                "&:hover": {
+                  [`& .${getStylesRef("controls")}`]: {
+                    opacity: 1,
+                  },
+                },
               },
             }}
           >
@@ -428,6 +442,16 @@ const Home = () => {
                 "&[data-inactive]": {
                   opacity: 0,
                   cursor: "default",
+                },
+                ref: getStylesRef("controls"),
+                transition: "opacity 150ms ease",
+                opacity: 0,
+              },
+              root: {
+                "&:hover": {
+                  [`& .${getStylesRef("controls")}`]: {
+                    opacity: 1,
+                  },
                 },
               },
             }}
@@ -579,11 +603,13 @@ const Home = () => {
       </Box>
 
       {/* Affix Button */}
-      <Affix position={{ bottom: rem(20), right: rem(20) }}>
+      <Affix position={{ bottom: rem(20), right: rem(20) }} opacity={"0.7"}>
         <Transition transition="slide-up" mounted={scroll.y > 0}>
           {(transitionStyles) => (
             <Button
-              color="violet"
+              color="dark"
+              // px={1}
+              radius={"50%"}
               style={transitionStyles}
               onClick={() => scrollTo({ y: 0 })}
             >

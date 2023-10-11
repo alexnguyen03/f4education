@@ -1,17 +1,14 @@
 import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 // reactstrap components
-// import {Container} from 'reactstrap';
 import { useEffect, useRef } from "react";
+
 // core components
-import ClientFooter from "components/Footers/ClientFooter.js";
-import ClientNavbar from "components/Navbars/ClientNavbar.js";
 
-import { routesClient } from "routes.js";
+import { routesTeacher } from "routes.js";
 import { Container } from "@mantine/core";
+import Sidebar from "components/Sidebar/Sidebar";
 
-import "../assets/css/custom-client-css/Index.css";
-
-const Client = (props) => {
+const Teacher = (props) => {
   const mainContent = useRef(null);
   const location = useLocation();
 
@@ -23,13 +20,9 @@ const Client = (props) => {
     mainContent.current.scrollTop = 0;
   }, [location]);
 
-  const getRoutes = (routesClient) => {
-    return routesClient.map((prop, key) => {
-      // console.log(
-      //   "🚀 ~ file: Client.js:28 ~ returnroutesClient.map ~ prop.layout:",
-      //   prop.component
-      // );
-      if (prop.layout === "/client") {
+  const getRoutes = (routesTeacher) => {
+    return routesTeacher.map((prop, key) => {
+      if (prop.layout === "/teacher") {
         return (
           <Route path={prop.path} element={prop.component} key={key} exact />
         );
@@ -41,27 +34,30 @@ const Client = (props) => {
 
   return (
     <>
+      {/* Sidebar */}
+      <Sidebar
+				{...props}
+				routes={routesTeacher}
+				logo={{
+					innerLink: '/teacher/*',
+					imgSrc: require('../assets/img/brand/argon-react.png'),
+					imgAlt: '...',
+				}}
+			/>
       <div
         className="main-content mt--5"
         style={{ backgroundColor: "#fff", minHeight: "100vh" }}
         ref={mainContent}
       >
-        {/* Client header */}
-        <ClientNavbar />
-
         {/* Page content */}
         <Container size="xl" px="xs" className="pb-5 pt-8">
           <Routes>
-            {getRoutes(routesClient)}
-            <Route path="*" element={<Navigate to="/" replace />} />
+            {getRoutes(routesTeacher)}
           </Routes>
         </Container>
       </div>
-
-      {/* Footer */}
-      <ClientFooter />
     </>
   );
 };
 
-export default Client;
+export default Teacher;

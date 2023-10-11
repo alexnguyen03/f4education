@@ -3,13 +3,13 @@ package com.f4education.springjwt.security.services;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.f4education.springjwt.interfaces.AdminService;
 import com.f4education.springjwt.interfaces.SubjectService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Bill;
@@ -21,6 +21,7 @@ import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.models.SubjectHistory;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
 import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.payload.request.SubjectRequest;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.SubjectHistoryRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
@@ -52,8 +53,8 @@ public class SubjectServiceImpl implements SubjectService {
 	}
 
 	@Override
-	public SubjectDTO createSubject(SubjectDTO subjectDTO) {
-		Subject subject = this.convertRequestToEntity(subjectDTO);
+	public SubjectDTO createSubject(SubjectRequest subjectRequest) {
+		Subject subject = this.convertRequestToEntity(subjectRequest);
 
 		subject.setCreateDate(new Date());
 
@@ -64,13 +65,13 @@ public class SubjectServiceImpl implements SubjectService {
 	}
 
 	@Override
-	public SubjectDTO updateSubject(Integer subjectId, SubjectDTO subjectDTO) {
+	public SubjectDTO updateSubject(Integer subjectId, SubjectRequest subjectRequest) {
 		Optional<Subject> exitsubject = subjectRepository.findById(subjectId);
 
 		if (exitsubject.isPresent()) {
 			Subject subject = exitsubject.get();
 
-			subject.setSubjectName(subjectDTO.getSubjectName());
+			subject.setSubjectName(subjectRequest.getSubjectName());
 
 			Subject updateSubject = subjectRepository.save(subject);
 
@@ -83,24 +84,24 @@ public class SubjectServiceImpl implements SubjectService {
 	private SubjectDTO convertToResponseDTO(Subject subject) {
 		SubjectDTO subjectDTO = new SubjectDTO();
 
-		String adminId = subject.getAdmin().getAdminId();
+		String adminId = subject.getAdmin().getFullname();
 
 		BeanUtils.copyProperties(subject, subjectDTO);
 
-		subjectDTO.setAdminId(adminId);
+		subjectDTO.setAdminName(adminId);
 		subjectDTO.setCreateDate(subject.getCreateDate());
 
 		return subjectDTO;
 	}
 
-	private Subject convertRequestToEntity(SubjectDTO subjectDTO) {
+	private Subject convertRequestToEntity(SubjectRequest subjectRequest) {
 		Subject subject = new Subject();
 
-		Admin admin = adminRepository.findById(subjectDTO.getAdminId()).get();
+		Admin admin = adminRepository.findById(subjectRequest.getAdminId()).get();
 
-		BeanUtils.copyProperties(subjectDTO, subject);
+		BeanUtils.copyProperties(subjectRequest, subject);
 
-		subject.setSubjectName(subjectDTO.getSubjectName());
+		subject.setSubjectName(subjectRequest.getSubjectName());
 		subject.setAdmin(admin);
 
 		return subject;

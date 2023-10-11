@@ -15,7 +15,7 @@ import Paypal from "./PayPal";
 import moment from "moment";
 
 // CSS Module
-import styles from "../../../assets/css/customClientCss/Payment.module.css";
+import styles from "../../../assets/css/custom-client-css/Payment.module.css";
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
 const Checkout = () => {

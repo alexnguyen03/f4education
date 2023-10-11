@@ -8,13 +8,11 @@ import cartEmptyimage from "../../assets/img/cart-empty.png";
 // API
 import cartApi from "../../api/cartApi";
 import {
-  Anchor,
   Autocomplete,
   Avatar,
-  Box,
   Burger,
   Button,
-  Center,
+  Container,
   Divider,
   Flex,
   Grid,
@@ -25,7 +23,6 @@ import {
   SimpleGrid,
   Text,
   Title,
-  useMantineTheme,
 } from "@mantine/core";
 import {
   IconChevronDown,
@@ -38,7 +35,7 @@ import {
 import { useDisclosure, useElementSize } from "@mantine/hooks";
 
 // css module
-import styles from "../../assets/css/customClientCss/Navbar.module.css";
+import styles from "../../assets/css/custom-client-css/Navbar.module.css";
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
 
@@ -189,6 +186,7 @@ const ClientNavbar = () => {
   });
 
   return (
+    // <Container size="30rem" px={0}>
     <nav
       className={`navbar navbar-expand-lg ${styles.navbarAnimate}`}
       id="navbarAnimate"
@@ -209,6 +207,8 @@ const ClientNavbar = () => {
         >
           <Burger opened={opened} onClick={toggle} />
         </button>
+
+        {/* Content */}
         <div
           className="collapse navbar-collapse text-dark font-weight-600"
           id="navbarSupportedContent"
@@ -267,7 +267,7 @@ const ClientNavbar = () => {
             </li>
             <li className="nav-item">
               <HoverCard
-                width={"60vw"}
+                width={"75vw"}
                 position="bottom"
                 radius="sm"
                 shadow="md"
@@ -299,7 +299,7 @@ const ClientNavbar = () => {
                 </HoverCard.Target>
 
                 <HoverCard.Dropdown style={{ overflow: "hidden" }} mt="xl">
-                  <Group position="apart">
+                  <Group position="apart" p={rem("1.5rem")}>
                     <Text fw={500}>Khóa học</Text>
                     <Link to="/course" fz="xs">
                       Tất cả khóa học
@@ -308,7 +308,7 @@ const ClientNavbar = () => {
 
                   <Divider my="sm" />
 
-                  <Grid gutter="xl">
+                  <Grid gutter="xl" p={rem("1.5rem")}>
                     <Grid.Col xl={4} lg={4} md={12} sm={12}>
                       <Title order={3} fw={700} color="dark">
                         Các chủ đề khóa học phổ biến
@@ -322,9 +322,8 @@ const ClientNavbar = () => {
                           Khám phá khóa học
                         </Button>
                       </Link>
-
-                      <Divider orientation="vertical" size="sm" />  
                     </Grid.Col>
+                    {/* <Divider orientation="vertical" size="sm" /> */}
                     <Grid.Col xl={8} lg={8} md={12} sm={12}>
                       <SimpleGrid cols={3} spacing="xl" verticalSpacing="sm">
                         <Flex
@@ -588,6 +587,8 @@ const ClientNavbar = () => {
                   className="mt-1 ml-2 font-weight-700"
                   onClick={() => handleLogin(login)}
                   style={{ borderRadius: "2px" }}
+                  // component="a"
+                  // href="/auth/login"
                 >
                   Đăng nhập
                 </Button>
@@ -597,6 +598,7 @@ const ClientNavbar = () => {
         </div>
       </div>
     </nav>
+    // </Container>
   );
 };
 

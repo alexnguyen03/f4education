@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.payload.request.SubjectRequest;
 import com.f4education.springjwt.security.services.SubjectServiceImpl;
 
 @CrossOrigin("*")
@@ -52,7 +53,7 @@ public class SubjectController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createSubject(@RequestBody SubjectDTO subjectRequest) {
+	public ResponseEntity<?> createSubject(@RequestBody SubjectRequest subjectRequest) {
 		if (subjectRequest == null) {
 			return ResponseEntity.badRequest().body("Invalid request data");
 		}
@@ -73,7 +74,7 @@ public class SubjectController {
 	@PutMapping("/{id}")
 //	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateSubject(@PathVariable("id") Integer subjectId,
-			@RequestBody SubjectDTO subjectRequest) {
+			@RequestBody SubjectRequest subjectRequest) {
 		if (subjectId == null) {
 			return ResponseEntity.badRequest().body("message: where my id? u kd m?");
 		} else {

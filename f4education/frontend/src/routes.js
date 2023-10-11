@@ -1,9 +1,5 @@
 import Index from 'views/Index.js';
-import Profile from 'views/examples/Profile.js';
-import Maps from 'views/examples/Maps.js';
 import Register from 'views/examples/Register.js';
-import Tables from 'views/examples/Tables.js';
-import Icons from 'views/examples/Icons.js';
 import Subjects from 'views/admin/Subjects';
 import Sessions from 'views/admin/Sessions';
 import Courses from 'views/admin/Courses.js';
@@ -22,6 +18,7 @@ import Login from 'views/examples/Login';
 import CourseDetailClient from 'views/client/visitor/CourseDetailClient';
 import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient';
 import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient';
+import InformationTeacher from 'views/teacher/information';
 
 import Accounts from 'views/admin/Accounts';
 import Schedules from 'views/admin/Schedules';
@@ -199,3 +196,13 @@ export var routesClient = [
 		layout: '/client',
 	},
 ];
+
+export const routesTeacher = [
+	{
+		path: '/teacher-information',
+		name: 'Thông tin tài khoản',
+		icon: 'ni ni-tv-2 text-primary',
+		component: <InformationTeacher />,
+		layout: '/teacher',
+	},
+] 
