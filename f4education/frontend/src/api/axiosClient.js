@@ -10,7 +10,7 @@ const axiosClient = axios.create({
 	paramsSerializer: (params) => queryString.stringify(params),
 });
 axiosClient.interceptors.request.use(async (config) => {
-	var accessToken = localStorage.getItem('accessToken');
+	var accessToken = JSON.parse(localStorage.getItem('accessToken'));
 
 	if (accessToken) {
 		console.log('🚀 ~ file: axiosClient.js:15 ~ axiosClient.interceptors.request.use ~ accessToken:', accessToken);
