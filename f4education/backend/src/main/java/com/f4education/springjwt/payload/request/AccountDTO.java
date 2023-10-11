@@ -26,10 +26,6 @@ public class AccountDTO {
     Admin admin;
     Student student;
 
-    List<Teacher> teachers;
-    List<Admin> admins;
-    List<Student> students;
-
     // Serializable info = null;
     public AccountDTO(User user) {
         this.id = user.getId();

@@ -34,4 +34,9 @@ public class Account_role {
 		return "Account_role [id=" + id + "]";
 	}
 
+	public Account_role(Role role, User user) {
+		this.role = role;
+		this.user = user;
+	}
+
 }

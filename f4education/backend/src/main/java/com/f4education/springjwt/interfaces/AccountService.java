@@ -12,4 +12,6 @@ public interface AccountService {
     AccountDTO createAccount(AccountDTO accountDTO);
 
     AccountDTO updateAccount(AccountDTO accountDTO);
+
+    Boolean existsByEmail(String email);
 }
