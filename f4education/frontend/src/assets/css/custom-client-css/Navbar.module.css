@@ -2,7 +2,7 @@
     --smoothTransition: all 0.3s linear;
 }
 
-.navbarAnimate {
+.navbar-animate {
     clear: both;
     position: fixed;
     top: 0;
