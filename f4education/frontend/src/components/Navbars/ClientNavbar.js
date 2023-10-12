@@ -12,7 +12,6 @@ import {
   Avatar,
   Burger,
   Button,
-  Container,
   Divider,
   Flex,
   Grid,
@@ -172,15 +171,24 @@ const ClientNavbar = () => {
   };
 
   window.addEventListener("scroll", function () {
-    const navbar = this.document.querySelector("#navbarAnimate");
+    const navbar = this.document.querySelector("#navbar-animate");
     let scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+
+    window.addEventListener("scroll", function () {
+      if (window.pageYOffset === 0) {
+        navbar.style.boxShadow = "none";
+      } else {
+        navbar.style.boxShadow = "#63636333 2px 2px 8px 0px";
+      }
+    });
+
     if (scrollTop === 0) {
-      navbar.style.top = "0";
+      navbar.style.top = 0;
     }
     if (scrollTop > lastScrollTop) {
       navbar.style.top = "-80px";
     } else {
-      navbar.style.top = "0";
+      navbar.style.top = 0;
     }
     setLastScrollTop(scrollTop);
   });
@@ -188,8 +196,8 @@ const ClientNavbar = () => {
   return (
     // <Container size="30rem" px={0}>
     <nav
-      className={`navbar navbar-expand-lg ${styles.navbarAnimate}`}
-      id="navbarAnimate"
+      className={`navbar navbar-expand-lg ${styles["navbar-animate"]}`}
+      id="navbar-animate"
     >
       <div className="container-xl">
         <Link to={"/"} className="navbar-brand">
@@ -318,7 +326,7 @@ const ClientNavbar = () => {
                         đề mà bạn quan tâm.
                       </Text>
                       <Link to="/course" className="w-100">
-                        <Button color="violet" mt={"auto"} w="100%">
+                        <Button color="violet" mt="auto" w="100%">
                           Khám phá khóa học
                         </Button>
                       </Link>

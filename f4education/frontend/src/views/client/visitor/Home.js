@@ -4,7 +4,6 @@ import {
   Box,
   Button,
   Card,
-  Center,
   Flex,
   getStylesRef,
   Grid,
@@ -16,104 +15,36 @@ import {
   Text,
   Title,
   Transition,
+  SimpleGrid,
+  ThemeIcon,
+  Skeleton,
 } from "@mantine/core";
 import React, { useEffect, useState } from "react";
 
-import heroImage from "../../../assets/img/hero-home.jpg";
-import heroImage2 from "../../../assets/img/hero-home-2.jpg";
 import {
   IconArrowAutofitRight,
   IconArrowUp,
-  IconChevronRightPipe,
   IconShoppingCartPlus,
 } from "@tabler/icons-react";
-import { useMediaQuery, useWindowScroll } from "@mantine/hooks";
+import { useWindowScroll } from "@mantine/hooks";
 import { breakpoints } from "@mui/system";
+import {
+  IconCalendarTime,
+  IconCertificate,
+  IconCoin,
+} from "@tabler/icons-react";
+import PropTypes from "prop-types";
+import Dots from "../../../utils/Dots";
+
+// scss import
+import classes from "../../../assets/scss/custom-module-scss/client-custom/home/FeaturesAsymmetrical.module.scss";
+import classHeroText from "../../../assets/scss/custom-module-scss/client-custom/home/HeroText.module.scss";
 
 // API
 import courseApi from "../../../api/courseApi";
+import { Link } from "react-router-dom";
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL;
-
-const HeroSlideShow = [
-  {
-    id: 1,
-    title: "Học từ mọi nơi",
-    subTitle:
-      "Trên ghế dài, ở sân sau hoặc trên đường đi làm. Ứng dụng của chúng tôi cho phép bạn quyết định.",
-    image: heroImage,
-  },
-  {
-    id: 2,
-    title: "Được hỗ trợ bởi cộng đồng",
-    subTitle:
-      "Hãy tin tưởng xếp hạng và đánh giá để đưa ra lựa chọn thông minh hơn. Bắt đầu với các khóa học được xếp hạng hàng đầu của chúng tôi.",
-    image: heroImage2,
-  },
-];
-
-const nextLearnCourse = [
-  {
-    id: 1,
-    image:
-      "https://images.unsplash.com/photo-1696312868237-c563a5e25578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60",
-    courseName: "NextJS & Mantine",
-    master: "Nguyen Van A",
-    rating: 4.8,
-    review: 36,
-    coursePrice: "947,150",
-  },
-  {
-    id: 2,
-    image:
-      "https://images.unsplash.com/photo-1696312868237-c563a5e25578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60",
-    courseName: "NextJS & Mantine",
-    master: "Nguyen Van A",
-    rating: 4.8,
-    review: 36,
-    coursePrice: "947,150",
-  },
-  {
-    id: 3,
-    image:
-      "https://images.unsplash.com/photo-1696312868237-c563a5e25578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60",
-    courseName: "NextJS & Mantine",
-    master: "Nguyen Van A",
-    rating: 2.8,
-    review: 36,
-    coursePrice: "947,150",
-  },
-  {
-    id: 4,
-    image:
-      "https://images.unsplash.com/photo-1696312868237-c563a5e25578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60",
-    courseName: "NextJS & Mantine",
-    master: "Nguyen Van A",
-    rating: 3.2,
-    review: 36,
-    coursePrice: "947,150",
-  },
-  {
-    id: 5,
-    image:
-      "https://images.unsplash.com/photo-1696312868237-c563a5e25578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60",
-    courseName: "NextJS & Mantine",
-    master: "Nguyen Van A",
-    rating: 4.8,
-    review: 36,
-    coursePrice: "947,150",
-  },
-  {
-    id: 6,
-    image:
-      "https://images.unsplash.com/photo-1696312868237-c563a5e25578?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60",
-    courseName: "NextJS & Mantine",
-    master: "Nguyen Van A",
-    rating: 1.3,
-    review: 36,
-    coursePrice: "947,150",
-  },
-];
 
 const recommentTopic = [
   {
@@ -146,17 +77,33 @@ const recommentTopic = [
   },
 ];
 
+const mockdata = [
+  {
+    icon: IconCalendarTime,
+    title: "Học ở mọi nơi bạn muốn",
+    description:
+      "Hệ thống học tập của chúng tôi rất tự do giờ giấc cũng như cách thứ bạn học tập, bạn có thể ngồi ở nhà hoặc đến trung tâm.",
+  },
+  {
+    icon: IconCertificate,
+    title: "Những khóa học chất lượng",
+    description:
+      "Tim của Slakoth chỉ đập một lần một phút. Dù có chuyện gì xảy ra đi nữa, việc đi loanh quanh bất động là bằng lòng.",
+  },
+  {
+    icon: IconCoin,
+    title: "Giá cả rất phải chăng",
+    description:
+      "Chúng tôi cung cấp những khóa học chất lượng với giá cả cực kì phải chăng, chỉ bằng vài ly trà sữa",
+  },
+];
+
 const Home = () => {
   // Main Variable
   const [newestCourse, setNewestCourse] = useState([]);
   const [loading, setLoading] = useState(false);
   const [scroll, scrollTo] = useWindowScroll();
 
-  // Action Variable
-  const [showNotification, setShowNotification] = useState({
-    status: false,
-    message: "",
-  });
 
   const fetchNewestCourse = async () => {
     try {
@@ -167,10 +114,7 @@ const Home = () => {
         setNewestCourse(resp.data);
         console.log(resp.data);
       } else {
-        setShowNotification({
-          status: true,
-          message: "Lỗi không lấy được dữ liệu.",
-        });
+       console.log("cannot get data");
       }
       setLoading(true);
     } catch (error) {
@@ -178,102 +122,65 @@ const Home = () => {
     }
   };
 
-  // break point
-  const HeroImageBreakPoint = useMediaQuery("(max-width: 500px)");
-
-  // Hero Carousel
-  const HeroSlides = HeroSlideShow.map((hero) => (
-    <Carousel.Slide key={hero.id}>
-      <Card
-        shadow="sm"
-        padding="xl"
-        target="_blank"
-        style={{
-          position: "relative",
-        }}
-      >
-        <Card.Section>
-          <Image
-            src={hero.image}
-            width={HeroImageBreakPoint ? "100%" : "100vw"}
-            height={400}
-            alt="study now!"
-            fit={HeroImageBreakPoint ? "cover" : "contain"}
-            ml={HeroImageBreakPoint ? 0 : "xl"}
-          />
-        </Card.Section>
-
-        <Card.Section
-          bg={"#fff"}
-          className="p-3 shadow d-none d-md-block d-sm-block"
-          style={{
-            position: "absolute",
-            top: "30%",
-            left: "20%",
-            transform: "translate(-25%,-30%)",
-            maxWidth: "400px",
-          }}
-        >
-          <Text fw={700} weight={500} size="xl">
-            {hero.title}
-          </Text>
-
-          <Text mt="xs" color={"#343A40"} size="lg">
-            {hero.subTitle}
-          </Text>
-        </Card.Section>
-      </Card>
-    </Carousel.Slide>
-  ));
-
   // learnext course Carousel
   const LearnNextSlides = newestCourse.map((learn) => (
     <Carousel.Slide key={learn.courseId}>
       <HoverCard width={"95%"} shadow="md" position="bottom">
         {/* Target Hover */}
-        <Card className="card-hover-overlay">
-          <HoverCard.Target>
-            <Card.Section>
-              <Image
-                src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
-                fit="cover"
-                width={"100%"}
-                height={150}
-                radius="sm"
-                withPlaceholder
-                component="a"
-                href={`/course/${learn.courseId}`}
-              />
-            </Card.Section>
-          </HoverCard.Target>
-         
-          <Box>
-            <Text fw={500} lineClamp={2} fs="lg">
-              {learn.courseName}
-            </Text>
-            <Text fw={500} c="dimmed" lineClamp={2} fs="sm">
-              {/* {learn.master} */}
-              Jonh Macro
-            </Text>
-            <Box>
-              <Flex justify="flex-start" gap="sm">
-                <Text>3.7</Text>
-                <Group position="center">
-                  <Rating value={3.6} fractions={2} readOnly />
-                </Group>
-                <Text c="dimmed">({39})</Text>
-              </Flex>
-            </Box>
-            <Box>
-              <Text fw={500}>
-                {learn.coursePrice.toLocaleString("it-IT", {
-                  style: "currency",
-                  currency: "VND",
-                })}
-              </Text>
-            </Box>
-          </Box>
-        </Card>
+        {loading ? (
+          <>
+            <Card className="card-hover-overlay">
+              <HoverCard.Target>
+                <Card.Section>
+                  <Image
+                    src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                    fit="cover"
+                    width={"100%"}
+                    height={150}
+                    radius="sm"
+                    withPlaceholder
+                    component="a"
+                    href={`/course/${learn.courseId}`}
+                  />
+                </Card.Section>
+              </HoverCard.Target>
+
+              <Box>
+                <Text fw={500} lineClamp={2} fs="lg">
+                  {learn.courseName}
+                </Text>
+                <Text fw={500} c="dimmed" lineClamp={2} fs="sm">
+                  {/* {learn.master} */}
+                  Jonh Macro
+                </Text>
+                <Box>
+                  <Flex justify="flex-start" gap="sm">
+                    <Text>3.7</Text>
+                    <Group position="center">
+                      <Rating value={3.6} fractions={2} readOnly />
+                    </Group>
+                    <Text c="dimmed">({39})</Text>
+                  </Flex>
+                </Box>
+                <Box>
+                  <Text fw={500}>
+                    {learn.coursePrice.toLocaleString("it-IT", {
+                      style: "currency",
+                      currency: "VND",
+                    })}
+                  </Text>
+                </Box>
+              </Box>
+            </Card>
+          </>
+        ) : (
+          <>
+            <Skeleton height={200} radius="sm" mb="sm" />
+            <Skeleton height={8} radius="xl" />
+            <Skeleton height={8} radius="xl" />
+            <Skeleton height={8} radius="xl" />
+          </>
+        )}
 
         {/* Value hover */}
         <HoverCard.Dropdown mt={"-10px"}>
@@ -331,6 +238,34 @@ const Home = () => {
     </Carousel.Slide>
   ));
 
+  // Feature
+  function Feature({ icon: Icon, title, description }) {
+    return (
+      <div>
+        <ThemeIcon variant="light" size={40} radius={40}>
+          <Icon style={{ width: rem(18), height: rem(18) }} stroke={1.5} />
+        </ThemeIcon>
+        <Text mt="sm" mb={7} fw={700} color="dark">
+          {title}
+        </Text>
+        <Text size="sm" c="dimmed" lh={1.6} fw={500}>
+          {description}
+        </Text>
+      </div>
+    );
+  }
+
+  //  Feature section
+  Feature.propTypes = {
+    icon: PropTypes.elementType,
+    title: PropTypes.string,
+    description: PropTypes.string,
+  };
+
+  const features = mockdata.map((feature, index) => (
+    <Feature {...feature} key={index} />
+  ));
+
   // UseEffect AREA
   useEffect(() => {
     fetchNewestCourse();
@@ -339,40 +274,94 @@ const Home = () => {
   return (
     <>
       {/* Mantine Hero Carousel */}
-      <Box my={rem("5rem")}>
-        <Carousel
-          slideSize="100%"
-          height="400px"
-          slideGap="lg"
-          controlsOffset="xs"
-          align="start"
-          loop
-          dragFree
-          withIndicators
-          slidesToScroll={1}
-          styles={{
-            control: {
-              background: "#212121",
-              color: "#fff",
-            },
-            "&[data-inactive]": {
-              opacity: 0,
-              cursor: "default",
-            },
-            indicator: {
-              width: rem(12),
-              height: rem(4),
-              transition: "width 250ms ease",
+      <Group className={classHeroText.wrapper} size={1400} mb={rem("5rem")}>
+        <Dots className={classHeroText.dots} style={{ left: 0, top: 0 }} />
+        <Dots className={classHeroText.dots} style={{ left: 60, top: 0 }} />
+        <Dots className={classHeroText.dots} style={{ left: 0, top: 140 }} />
+        <Dots className={classHeroText.dots} style={{ right: 0, top: 60 }} />
 
-              "&[data-active]": {
-                width: rem(40),
-              },
-            },
-          }}
+        <Box mx={"auto"}>
+          <Title
+            className={classHeroText.title}
+            maw={500}
+            color="dark"
+            align="center"
+          >
+            Tham gia cùng với
+            <Text
+              component="span"
+              className={classHeroText.highlight}
+              mx={rem("0.5rem")}
+              inherit
+            >
+              hàng triệu
+            </Text>
+            sinh viên tại F4 Education.
+          </Title>
+          <br />
+          <Title
+            order={5}
+            maw={600}
+            size="lg"
+            c="dimmed"
+            className={classHeroText.description}
+          >
+            Học những khóa học lập trình mà bạn thích Java, Python, Reactjs ,
+            Ruby,... cùng hàng trăm những khóa học về kỹ năng giao tiếp, kỹ năng
+            thực chiến khác đang chờ đợi các bạn tham gia.
+          </Title>
+          <br />
+          <div className={classHeroText.controls}>
+            <Link to="/course">
+              <Button
+                className={classHeroText.control}
+                size="lg"
+                variant="default"
+                color="gray"
+              >
+                Xem khóa học
+              </Button>
+            </Link>
+            <Button className={classHeroText.control} size="lg" ml={rem(3)}>
+              Đăng ký tài khoản
+            </Button>
+          </div>
+        </Box>
+      </Group>
+
+      {/* Feature section */}
+      <Group position="apart" my={rem("8rem")} className={classes.wrapper}>
+        <Title className={classes.title} align="center" color="dark">
+          Nâng cấp khả năng và kiến thức của bạn
+        </Title>
+
+        <br />
+
+        <Title
+          order={5}
+          size="sm"
+          className={classes.description}
+          align="center"
+          maw={600}
+          color="dimmed"
         >
-          {HeroSlides}
-        </Carousel>
-      </Box>
+          Cung cấp cho bạn và nhóm của bạn kiến ​​thức, kinh nghiệm và sự tự tin
+          mà bạn và họ cần để giải quyết mọi vấn đề.
+        </Title>
+
+        <SimpleGrid
+          mt={60}
+          cols={3}
+          spacing="lg"
+          breakpoints={[
+            { maxWidth: "md", cols: 3, spacing: "md" },
+            { maxWidth: "sm", cols: 2, spacing: "sm" },
+            { maxWidth: "xs", cols: 1, spacing: "sm" },
+          ]}
+        >
+          {features}
+        </SimpleGrid>
+      </Group>
 
       {/* wwhat learn nexxt */}
       <Box mt={rem("5rem")}>
@@ -603,7 +592,11 @@ const Home = () => {
       </Box>
 
       {/* Affix Button */}
-      <Affix position={{ bottom: rem(20), right: rem(20) }} opacity={"0.7"}>
+      <Affix
+        position={{ bottom: rem(-20), right: rem(20) }}
+        h={"150px"}
+        opacity={"0.7"}
+      >
         <Transition transition="slide-up" mounted={scroll.y > 0}>
           {(transitionStyles) => (
             <Button
