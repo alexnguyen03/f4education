@@ -41,18 +41,18 @@ import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
 // prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
-	@Value("${f4education.app.jwtSecret}")
-	private String key;
-	@Autowired
-	UserDetailsServiceImpl userDetailsService;
+    @Value("${f4education.app.jwtSecret}")
+    private String key;
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
-	@Bean
-	public AuthTokenFilter authenticationJwtTokenFilter() {
-		return new AuthTokenFilter();
-	}
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -61,18 +61,18 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 
-		return authProvider;
-	}
+        return authProvider;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -116,9 +116,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/bills",
                                         "/api/bill-detail/**",
                                         "/api/accounts/**",
-										"/api/teachers-history/**",
+                                        "/api/teachers-history/**",
                                         "/api/payment-method/**",
                                         "/api/register-course/**",
+                                        "/api/accounts/**",
                                         "/img/**")
                                 .permitAll().anyRequest().authenticated());
 

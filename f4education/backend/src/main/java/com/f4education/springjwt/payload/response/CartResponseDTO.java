@@ -15,6 +15,6 @@ public class CartResponseDTO {
 	private Integer cartId;
 	private Boolean status;
 	private Course course;
-	private Integer studentId;
+	private String studentId;
 	private Date createDate;
 }
