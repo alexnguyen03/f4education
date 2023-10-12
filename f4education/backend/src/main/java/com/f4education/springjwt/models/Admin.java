@@ -40,7 +40,6 @@ public class Admin implements Serializable {
 	private List<Course> course;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "admin_id")
 	private String adminId;
 
