@@ -67,8 +67,10 @@ function CourseClient() {
   const getAllCourse = async () => {
     try {
       const resp = await courseApi.getAll();
-      setCourses(resp.data.reverse());
-      setLoading(false);
+      if (resp.status === 200) {
+        setCourses(resp.data.reverse());
+        setLoading(false);
+      }
     } catch (error) {
       console.log("GetAllCourse", error);
     }
@@ -78,7 +80,9 @@ function CourseClient() {
   const getAllSubject = async () => {
     try {
       const resp = await subjectApi.getAllSubject();
-      setSubjects(resp.data);
+      if (resp.status === 200) {
+        setSubjects(resp.data);
+      }
     } catch (error) {
       console.log("GetAllSubject", error);
     }
@@ -126,8 +130,10 @@ function CourseClient() {
       const resp = await courseApi.findCoursesByCheckedSubjects(
         checkedSubjects
       );
-      setCourses(resp.reverse());
-      setLoading(false);
+      if (resp.status === 200) {
+        setCourses(resp.data.reverse());
+        setLoading(false);
+      }
     } catch (error) {
       console.log(error);
     }
@@ -139,8 +145,10 @@ function CourseClient() {
       const resp = await courseApi.findCoursesByCheckedDurations(
         checkedDurations
       );
-      setCourses(resp.reverse());
-      setLoading(false);
+      if (resp.status === 200) {
+        setCourses(resp.data.reverse());
+        setLoading(false);
+      }
     } catch (error) {
       console.log(error);
     }
