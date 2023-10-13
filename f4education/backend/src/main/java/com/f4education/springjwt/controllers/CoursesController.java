@@ -129,9 +129,9 @@ public class CoursesController {
 		return courseService.findByThoiLuongInRange(checkedDurations);
 	}
 	
-	@GetMapping("/course-histoty/{accountId}")
-	public List<CourseDTO> findCoursesByAccountId(@PathVariable("accountId") Integer accountId) {
-		return courseService.findAllCourseDTOByAccountId(accountId);
+	@GetMapping("/course-register/{studentId}")
+	public List<CourseDTO> findCoursesByStudentId(@PathVariable("studentId") Integer studentId) {
+		return courseService.findAllCourseDTOByStudentId(studentId);
 	}
 	
 	@GetMapping("/course-detail/{courseId}")

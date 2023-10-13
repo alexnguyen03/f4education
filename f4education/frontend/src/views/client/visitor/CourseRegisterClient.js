@@ -15,9 +15,10 @@ function CourseRegisterClient() {
   // lấy tất cả các khóa học
   const getAllCourseByAccountId = async () => {
     try {
-      const resp = await courseApi.findCoursesByAccountId(4);
-      setCourses(resp.reverse());
+      const resp = await courseApi.findCoursesByStudenttId(2);
+      setCourses(resp.data.reverse());
       setLoading(false);
+      console.log(resp.data);
     } catch (error) {
       console.log("GetAllCourse", error);
     }
