@@ -64,7 +64,7 @@ public class CoursesController {
 	@ResponseBody
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> addCourse(@RequestPart("courseRequest") String courseRequestString,
-			@RequestParam("file") MultipartFile file) {
+			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
 		// String newFile = "";
 		CourseRequest courseRequest = new CourseRequest();
@@ -112,11 +112,6 @@ public class CoursesController {
 	public ResponseEntity<?> findAllByAdminId(@PathVariable("adminId") String adminId) {
 		List<CourseDTO> courseDTO = courseService.findAllByAdminId(adminId);
 		return ResponseEntity.ok(courseDTO); 
-	}
-	
-	@GetMapping("/{subjectName}")
-	public List<CourseDTO> getCourseBySubjectName(@PathVariable("subjectName") String subjectName){
-		return courseService.getCourseBySubjectName(subjectName);
 	}
 	
 	@GetMapping("/{subjectName}")
