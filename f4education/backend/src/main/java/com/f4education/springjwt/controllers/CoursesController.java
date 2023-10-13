@@ -43,8 +43,9 @@ public class CoursesController {
 
 	@GetMapping
 	// @PreAuthorize("hasRole('ADMIN')")
-	public List<CourseDTO> getAllCourse() {
-		return courseService.findAllCourseDTO();
+	public ResponseEntity<?> getAllCourse() {
+		List<CourseDTO> list = courseService.findAllCourseDTO();
+		return ResponseEntity.ok(list);
 	}
 
 	@GetMapping("/newest-courses")
@@ -62,8 +63,8 @@ public class CoursesController {
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
 	@PreAuthorize("hasRole('ADMIN')")
-	public CourseDTO addCourse(@RequestPart("courseRequest") String courseRequestString,
-			@RequestParam("file") Optional<MultipartFile> file) {
+	public ResponseEntity<?> addCourse(@RequestPart("courseRequest") String courseRequestString,
+			@RequestParam("file") MultipartFile file) {
 		ObjectMapper mapper = new ObjectMapper();
 		// String newFile = "";
 		CourseRequest courseRequest = new CourseRequest();
@@ -78,12 +79,14 @@ public class CoursesController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return courseService.saveCourse(courseRequest);
+		
+		CourseDTO courseDTO = courseService.saveCourse(courseRequest);
+		return ResponseEntity.ok(courseDTO);
 	}
 
 	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasRole('ADMIN')")
-	public CourseDTO updateCourse(@RequestPart("courseRequest") String courseRequestString,
+	public ResponseEntity<?> updateCourse(@RequestPart("courseRequest") String courseRequestString,
 			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
 		CourseRequest courseRequest = new CourseRequest();
@@ -99,13 +102,21 @@ public class CoursesController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return courseService.saveCourse(courseRequest);
+		
+		CourseDTO courseDTO = courseService.saveCourse(courseRequest);
+		return ResponseEntity.ok(courseDTO);
 	}
 
 	@GetMapping("/actor/{adminId}")
 	@PreAuthorize("hasRole('ADMIN')")
-	public List<CourseDTO> findAllByAdminId(@PathVariable("adminId") String adminId) {
-		return courseService.findAllByAdminId(adminId);
+	public ResponseEntity<?> findAllByAdminId(@PathVariable("adminId") String adminId) {
+		List<CourseDTO> courseDTO = courseService.findAllByAdminId(adminId);
+		return ResponseEntity.ok(courseDTO); 
+	}
+	
+	@GetMapping("/{subjectName}")
+	public List<CourseDTO> getCourseBySubjectName(@PathVariable("subjectName") String subjectName){
+		return courseService.getCourseBySubjectName(subjectName);
 	}
 	
 	@GetMapping("/{subjectName}")
@@ -114,25 +125,28 @@ public class CoursesController {
 	}
 
 	@GetMapping("/topic/{checkedSubjects}")
-	public List<CourseDTO> findCoursesByCheckedSubjects(@PathVariable("checkedSubjects") List<String> checkedSubjects) {
+	public ResponseEntity<?> findCoursesByCheckedSubjects(@PathVariable("checkedSubjects") List<String> checkedSubjects) {
 		System.out.println(checkedSubjects);
-		return courseService.findBySubjectNames(checkedSubjects);
+		List<CourseDTO> courseDTO =courseService.findBySubjectNames(checkedSubjects);
+		return ResponseEntity.ok(courseDTO); 
 	}
 
 	@GetMapping("/duration/{checkedDurations}")
-	public List<CourseDTO> findCoursesByCheckedDurations(
+	public ResponseEntity<?> findCoursesByCheckedDurations(
 			@PathVariable("checkedDurations") List<String> checkedDurations) {
-		return courseService.findByThoiLuongInRange(checkedDurations);
+		List<CourseDTO> courseDTO =courseService.findByThoiLuongInRange(checkedDurations);
+		return ResponseEntity.ok(courseDTO);  
 	}
 
 	@GetMapping("/course-histoty/{accountId}")
-	public List<CourseDTO> findCoursesByAccountId(@PathVariable("accountId") Integer accountId) {
-		return courseService.findAllCourseDTOByAccountId(accountId);
+	public ResponseEntity<?> findCoursesByAccountId(@PathVariable("accountId") Integer accountId) {
+		List<CourseDTO> courseDTO = courseService.findAllCourseDTOByAccountId(accountId);
+		return ResponseEntity.ok(courseDTO); 
 	}
 
 	@GetMapping("/course-detail/{courseId}")
-	public CourseDTO findCourseById(@PathVariable("courseId") Integer courseId) {
+	public ResponseEntity<?> findCourseById(@PathVariable("courseId") Integer courseId) {
 		CourseDTO course = courseService.findById(courseId);
-		return course;
+		return ResponseEntity.ok(course);
 	}
 }
