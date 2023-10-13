@@ -137,11 +137,10 @@ public class CoursesController {
 		List<CourseDTO> courseDTO =courseService.findByThoiLuongInRange(checkedDurations);
 		return ResponseEntity.ok(courseDTO);  
 	}
-
-	@GetMapping("/course-histoty/{accountId}")
-	public ResponseEntity<?> findCoursesByAccountId(@PathVariable("accountId") Integer accountId) {
-		List<CourseDTO> courseDTO = courseService.findAllCourseDTOByAccountId(accountId);
-		return ResponseEntity.ok(courseDTO); 
+	
+	@GetMapping("/course-register/{studentId}")
+	public List<CourseDTO> findCoursesByStudentId(@PathVariable("studentId") Integer studentId) {
+		return courseService.findAllCourseDTOByStudentId(studentId);
 	}
 
 	@GetMapping("/course-detail/{courseId}")

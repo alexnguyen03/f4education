@@ -15,9 +15,12 @@ function CourseRegisterClient() {
   // lấy tất cả các khóa học
   const getAllCourseByAccountId = async () => {
     try {
-      const resp = await courseApi.findCoursesByAccountId(4);
-      setCourses(resp.reverse());
-      setLoading(false);
+      const resp = await courseApi.findCoursesByStudenttId(2);
+      if (resp.status === 200) {
+        setCourses(resp.data.reverse());
+        setLoading(false);
+        console.log(resp.data);
+      }
     } catch (error) {
       console.log("GetAllCourse", error);
     }
@@ -80,7 +83,11 @@ function CourseRegisterClient() {
         <h2 className="mb-3">Danh sách khóa học đã đăng ký</h2>
         <Grid>
           {isLoading ? (
-            <Loader color="rgba(46, 46, 46, 1)" size={50} style={{ marginLeft: "50%" }} />
+            <Loader
+              color="rgba(46, 46, 46, 1)"
+              size={50}
+              style={{ marginLeft: "50%" }}
+            />
           ) : (
             searchCourses.map((course) => (
               <Grid.Col span={4}>

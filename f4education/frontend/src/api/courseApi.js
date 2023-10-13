@@ -34,8 +34,8 @@ const courseApi = {
 		const url = `/courses/duration/${checkedDurations}`;
 		return axiosClient.get(url);
 	},
-	findCoursesByAccountId: (accountId) => {
-		const url = `/courses/course-histoty/${accountId}`;
+	findCoursesByStudenttId: (studentId) => {
+		const url = `/courses/course-register/${studentId}`;
 		return axiosClient.get(url);
 	},
 	findCourseById: (courseId) => {
