@@ -57,7 +57,8 @@ public class AccountController {
     @GetMapping("/{role}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getByRole(@PathVariable("role") Integer role) {
-        return ResponseEntity.ok(accountService.getAllAccountsDTOByRole(role));
+        List<AccountDTO> list = accountService.getAllAccountsDTOByRole(role);
+        return ResponseEntity.ok(list);
     }
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -113,9 +114,6 @@ public class AccountController {
                     }
                     if (create) {
                         admin.setAdminId(id);
-                        if(savedFile == null) {
-                            admin.setImage("defaultImgUser.jpg");
-                        }
                     }
                     accountDTO.setAdmin(admin);
                     break;

@@ -1,7 +1,5 @@
 package com.f4education.springjwt.security.services;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -114,7 +112,8 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<AccountDTO> getAllAccountsDTOByRole(Integer role) {
-        return userRepository.getAllAccountsDTOByRole(role);
+        List<AccountDTO> list = userRepository.getAllAccountsDTOByRole(role);
+        return list;
     }
 
     @Override
