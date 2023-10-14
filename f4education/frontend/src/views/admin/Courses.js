@@ -52,8 +52,6 @@ const Courses = () => {
     const user = JSON.parse(localStorage.getItem('user') | '')
     const [image, setImage] = useState(null)
 
-    const [duration, setDuration] = useState(0)
-    const hourPerSesRef = useRef(0)
     const [imgData, setImgData] = useState(null)
     const [showForm, setShowForm] = useState(false)
     const [showHistoryTable, setShowHistoryTable] = useState(false)
@@ -69,10 +67,33 @@ const Courses = () => {
         value: '0',
         label: ''
     })
+
     const [options, setOptions] = useState([{ value: '0', label: '' }])
     const [msgError, setMsgError] = useState({})
     const [listHistoryById, setListHistoryById] = useState([])
-    const [course, setCourse] = useState({})
+    const [course, setCourse] = useState({
+        courseId: 'null',
+        courseName: '',
+        courseDuration: 0,
+        numberSession: 0,
+        coursePrice: 6000000,
+        courseDescription: '',
+        image: '',
+        subject: {
+            subjectId: 0,
+            subjectName: '',
+            admin: {
+                adminId: '',
+                fullname: '',
+                gender: true,
+                dateOfBirth: '',
+                citizenIdentification: '',
+                address: '',
+                phone: '',
+                image: ''
+            }
+        }
+    })
 
     const [courseRequest, setCourseRequest] = useState({
         subjectId: 0,
@@ -88,7 +109,11 @@ const Courses = () => {
 
     // Thực hiện binding data
     const handelOnChangeInput = (e) => {
-        setCourse({ ...course, [e.target.name]: e.target.value })
+        setCourse({
+            ...course,
+            [e.target.name]: e.target.value,
+            courseDuration: course.numberSession * 2
+        })
     }
 
     const validate = () => {
@@ -200,16 +225,12 @@ const Courses = () => {
                 header: 'Tên khóa học',
                 size: 150
             },
-            {
-                accessorKey: 'courseDuration',
-                header: 'Thời lượng (h)',
-                size: 75
-            },
-            {
-                accessorKey: 'hourPerSession',
-                header: 'Giờ/Ca',
-                size: 20
-            },
+            // {
+            //     accessorKey: 'courseDuration',
+            //     header: 'Thời lượng (h)',
+            //     size: 75
+            // },
+
             {
                 accessorKey: 'numberSession',
                 header: 'Số ca',
@@ -333,62 +354,49 @@ const Courses = () => {
         const selectedCourse = courses.find(
             (course) => course.courseId === row.original.courseId
         )
-        console.log(
-            '🚀 ~ file: Courses.js:358 ~ handleEditForm ~ selectedCourse:',
-            selectedCourse
-        )
-        console.log(
-            '🚀 ~ file: Courses.js:357 ~ handleEditForm ~ row.original:',
-            row.original.courseDuration
-        )
-        setUpdate(true)
-        setCourse((prev) => ({
-            ...prev,
-            ...selectedCourse,
-            courseDuration: 51515
-        }))
 
-        console.log(
-            '🚀 ~ file: Courses.js:348 ~ handleEditForm ~ course:',
-            course
-        )
+        setUpdate(true)
+
+        setCourse({ ...selectedCourse })
+
+        const { subject } = { ...row.original }
         setSelectedSubject({
             ...selectedSubject,
-            value: selectedCourse.subject.subjectId,
-            label: selectedCourse.subject.subjectName
+            value: subject.subjectId,
+            label: subject.subjectName
         })
     }
 
     const handleResetForm = () => {
-        console.log(
-            '🚀 ~ file: Courses.js:360 ~ handleResetForm ~ course:',
-            course
-        )
-        // setMsgError({})
-        // setUpdate((pre) => !pre)
-        // setShowForm((pre) => !pre)
-        // setImgData(null)
-        // setCourse({
-        //     courseName: '',
-        //     courseDuration: 100,
-        //     coursePrice: 6000000,
-        //     courseDescription: '',
-        //     image: '',
-        //     subject: {
-        //         subjectId: 0,
-        //         subjectName: '',
-        //         admin: {
-        //             adminId: '',
-        //             fullname: '',
-        //             gender: true,
-        //             dateOfBirth: '',
-        //             citizenIdentification: '',
-        //             address: '',
-        //             phone: '',
-        //             image: ''
-        //         }
-        //     }
-        // })
+        // console.log(
+        //     '🚀 ~ file: Courses.js:360 ~ handleResetForm ~ course:',
+        //     course
+        // )
+        setMsgError({})
+        setUpdate((pre) => !pre)
+        setShowForm((pre) => !pre)
+        setImgData(null)
+        setCourse({
+            courseName: '',
+            courseDuration: 100,
+            coursePrice: 6000000,
+            courseDescription: '',
+            image: '',
+            subject: {
+                subjectId: 0,
+                subjectName: '',
+                admin: {
+                    adminId: '',
+                    fullname: '',
+                    gender: true,
+                    dateOfBirth: '',
+                    citizenIdentification: '',
+                    address: '',
+                    phone: '',
+                    image: ''
+                }
+            }
+        })
     }
 
     const handleShowAddForm = () => {
@@ -481,12 +489,12 @@ const Courses = () => {
         // console.log(courseRequest);
     }
 
-    useLayoutEffect(() => {
-        setCourse({
-            ...course,
-            courseDuration: course.hourPerSession * course.numberSession
-        })
-    }, [course.hourPerSession, course.numberSession])
+    // useLayoutEffect(() => {
+    //     setCourse({
+    //         ...course,
+    //         courseDuration: 2 * course.numberSession
+    //     })
+    // }, [course.numberSession])
 
     useEffect(() => {
         setListHistoryById([...listHistoryById])
@@ -862,7 +870,9 @@ const Courses = () => {
                                                 type="number"
                                                 name="numberSession"
                                                 placeholder="Số ca học"
-                                                onChange={handelOnChangeInput}
+                                                onBlur={handelOnChangeInput}
+                                                // onChange={handelOnChangeInput}
+                                                onKeyDown={handelOnChangeInput}
                                             />
                                             {msgError.coursePriceErr && (
                                                 <p className="text-danger mt-1">
@@ -871,40 +881,6 @@ const Courses = () => {
                                             )}
                                         </FormGroup>
 
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-last-name"
-                                            >
-                                                Số giờ/ca
-                                            </label>
-                                            <select
-                                                value={String(
-                                                    course.hourPerSession
-                                                )}
-                                                name="hourPerSession"
-                                                onChange={handelOnChangeInput}
-                                                className="custom-select custom-select-lg mb-3 form-control-alternative"
-                                            >
-                                                <option value="">
-                                                    Chọn số giờ / ca học
-                                                </option>
-                                                <option value="1.5">
-                                                    1,5 giờ/ca
-                                                </option>
-                                                <option value="2">
-                                                    2 giờ/ca
-                                                </option>
-                                                <option value="2.5">
-                                                    2,5 giờ/ca
-                                                </option>
-                                            </select>
-                                            {msgError.hourPerSessionErr && (
-                                                <p className="text-danger mt-1">
-                                                    {msgError.hourPerSessionErr}
-                                                </p>
-                                            )}
-                                        </FormGroup>
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
@@ -917,7 +893,7 @@ const Courses = () => {
                                                 id="input-courseDuration"
                                                 placeholder="Thời lượng"
                                                 type="number"
-                                                readOnly
+                                                // readOnly
                                                 value={course.courseDuration}
                                                 name="courseDuration"
                                                 onChange={handelOnChangeInput}

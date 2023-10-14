@@ -90,7 +90,7 @@ const Accounts = () => {
             type: toast.TYPE.ERROR,
             render: mess,
             position: 'top-right',
-            autoClose: 5000,
+            // autoClose: false,
             hideProgressBar: false,
             closeOnClick: true,
             closeButton: true,
@@ -124,7 +124,7 @@ const Accounts = () => {
         password: '',
         email: '',
         roles: 1,
-        status: false,
+        status: true,
         student: {
             studentId: 0,
             fullname: '',
@@ -142,7 +142,7 @@ const Accounts = () => {
         password: '',
         email: '',
         roles: 2,
-        status: false,
+        status: true,
         teacher: {
             teacherId: 0,
             fullname: '',
@@ -163,7 +163,7 @@ const Accounts = () => {
         password: '',
         email: '',
         roles: 3,
-        status: false,
+        status: true,
         admin: {
             adminId: '',
             fullname: '',
@@ -310,7 +310,7 @@ const Accounts = () => {
             {
                 accessorKey: 'email',
                 header: 'Email',
-                size: 75
+                size: 85
             },
             {
                 accessorKey: 'student.fullname',
@@ -338,8 +338,51 @@ const Accounts = () => {
                         )
                     }
                 },
-                header: 'Tên người dùng',
+                header: 'Tên học viên',
                 size: 70
+            },
+            {
+                accessorKey: 'student.phone',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.student.phone === null ||
+                            row.student.phone === ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.student.phone}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin
+                            </span>
+                        )
+                    }
+                },
+                header: 'SĐT',
+                size: 50
+            },
+            {
+                accessorKey: 'status',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.status === false) {
+                        return <span className="text-danger">Đã khóa</span>
+                    } else {
+                        return <span className="text-success">Đã mở khóa</span>
+                    }
+                },
+                header: 'Trạng thái',
+                size: 30
             }
         ],
         []
@@ -385,6 +428,49 @@ const Accounts = () => {
                 },
                 header: 'Tên người dùng',
                 size: 70
+            },
+            {
+                accessorKey: 'teacher.phone',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.teacher.phone === null ||
+                            row.teacher.phone === ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.teacher.phone}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin
+                            </span>
+                        )
+                    }
+                },
+                header: 'SĐT',
+                size: 50
+            },
+            {
+                accessorKey: 'status',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.status === false) {
+                        return <span className="text-danger">Đã khóa</span>
+                    } else {
+                        return <span className="text-success">Đã mở khóa</span>
+                    }
+                },
+                header: 'Trạng thái',
+                size: 30
             }
         ],
         []
@@ -495,6 +581,10 @@ const Accounts = () => {
                 selectedSutdent.student.image
         )
 
+        console.log(
+            '🚀 ~ file: Accounts.js:496 ~ Accounts ~ selectedSutdent.student.image:',
+            selectedSutdent.student.image
+        )
         setStudent({ ...selectedSutdent })
         setRSelected(selectedSutdent.student.gender)
     }
@@ -544,7 +634,7 @@ const Accounts = () => {
             password: '',
             email: '',
             roles: 1,
-            status: false,
+            status: true,
             student: {
                 studentId: 0,
                 fullname: '',
@@ -569,7 +659,7 @@ const Accounts = () => {
             password: '',
             email: '',
             roles: 0,
-            status: false,
+            status: true,
             teacher: {
                 teacherId: 0,
                 fullname: '',
@@ -595,7 +685,7 @@ const Accounts = () => {
             username: '',
             password: '',
             email: '',
-            status: false,
+            status: true,
             roles: 3,
             admin: {
                 adminId: '',
@@ -1061,12 +1151,6 @@ const Accounts = () => {
     //gọi API lấy data với vai trò giảng viên
     const getAllTeacher = async () => {
         console.log('getAllTeacher ~ teachers:', teachers)
-
-        // if (teachers.length > 0) {
-        //   setLoadingTeachers(false);
-        //   return;
-        // }
-
         try {
             setLoadingTeachers(true)
             const resp = await accountApi.getAllAccountsByRole(2)
@@ -1079,6 +1163,8 @@ const Accounts = () => {
             setLoadingTeachers(false)
         } catch (error) {
             console.log('failed to load data', error)
+            setTeachers([])
+            setLoadingTeachers(false)
             notifi('Lỗi kết nối server', 'ERROR')
         }
     }
@@ -1101,6 +1187,8 @@ const Accounts = () => {
             setLoadingStudents(false)
         } catch (error) {
             console.log('failed to load data', error)
+            setStudents([])
+            setLoadingStudents(false)
             notifi('Lỗi kết nối server', 'ERROR')
         }
     }
@@ -1123,6 +1211,8 @@ const Accounts = () => {
             setLoadingAdmins(false)
         } catch (error) {
             console.log('failed to load data', error)
+            setAdmins([])
+            setLoadingAdmins(false)
             notifi('Lỗi kết nối server', 'ERROR')
         }
     }
@@ -1598,6 +1688,7 @@ const Accounts = () => {
                                                     )}
                                                     <br />
                                                     <label
+                                                        hidden={update}
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
@@ -1613,7 +1704,7 @@ const Accounts = () => {
                                                             handelOnChangeInput_1
                                                         }
                                                         name="password"
-                                                        readOnly={update}
+                                                        hidden={update}
                                                         value={student.password}
                                                     />
                                                     {errors_1.password && (
@@ -1840,7 +1931,9 @@ const Accounts = () => {
                                                                 alt=""
                                                                 width={350}
                                                                 className="playerProfilePic_home_tile"
-                                                                src={imgData}
+                                                                src={
+                                                                    '../../assets/img/defaultImgUser.jpg'
+                                                                }
                                                             />
                                                         )}
                                                         {!imgData && (
@@ -1855,6 +1948,18 @@ const Accounts = () => {
                                                                     student
                                                                         .student
                                                                         .image
+                                                                }
+                                                            />
+                                                        )}
+                                                        {student.student.image}
+                                                        {student.student
+                                                            .image === null && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className=""
+                                                                src={
+                                                                    '../../assets/img/defaultImgUser.jpg'
                                                                 }
                                                             />
                                                         )}
@@ -1941,6 +2046,7 @@ const Accounts = () => {
                                                     )}
                                                     <br />
                                                     <label
+                                                        hidden={update}
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
@@ -1956,7 +2062,7 @@ const Accounts = () => {
                                                             handelOnChangeInput_2
                                                         }
                                                         name="password"
-                                                        readOnly={update}
+                                                        hidden={update}
                                                         value={teacher.password}
                                                     />
                                                     {errors.password && (
@@ -2382,6 +2488,7 @@ const Accounts = () => {
                                                     )}
                                                     <br />
                                                     <label
+                                                        hidden={update}
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
@@ -2397,7 +2504,7 @@ const Accounts = () => {
                                                             handelOnChangeInput_3
                                                         }
                                                         name="password"
-                                                        readOnly={update}
+                                                        hidden={update}
                                                         value={admin.password}
                                                     />
                                                     {errors.password && (

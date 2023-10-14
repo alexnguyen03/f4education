@@ -13,8 +13,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.TeacherService;
-import com.f4education.springjwt.models.Teacher;
-import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -57,7 +55,7 @@ public class TeacherController {
 			teacherRequest = mapper.readValue(teacherRequestString, TeacherDTO.class);
 			if (file.isPresent()) {
 				if (!file.isEmpty()) {
-					File savedFile = xfileService.save(file.get(), "/courses");
+					File savedFile = xfileService.save(file.orElse(null), "/courses");
 					teacherRequest.setImage(savedFile.getName());
 				}
 			}
