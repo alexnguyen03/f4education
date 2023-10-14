@@ -22,7 +22,7 @@
     transition: var(--smoothTransition);
 }
 
-@media (max-width:991px) {
+@media (max-width: 991px) {
     .custom-nav-link {
         position: relative;
         color: #555555 !important;
@@ -54,7 +54,7 @@
     transition: var(--smoothTransition);
 }
 
-@media (max-width:991px) {
+@media (max-width: 991px) {
     .custom-nav-link::after {
         position: absolute;
         content: '';

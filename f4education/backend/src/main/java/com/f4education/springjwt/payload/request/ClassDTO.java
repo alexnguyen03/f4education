@@ -24,6 +24,7 @@ public class ClassDTO {
 	private String status;
 	private AdminDTO admin;
 	private List<RegisterCourse> registerCourses;
+	private List<Student> students;
 	private Teacher teacher;
 	private Integer courseId;
 

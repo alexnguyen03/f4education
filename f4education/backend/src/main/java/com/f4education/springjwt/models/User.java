@@ -35,6 +35,8 @@ public class User implements Serializable {
 
 	private String token;
 
+	private Boolean status;
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "user")
 	private List<Account_role> account_role;

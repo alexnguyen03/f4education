@@ -37,6 +37,7 @@ public class JwtUtils {
   @Value("${f4education.app.jwtCookieName}")
   private String jwtCookie;
 
+  // public String generateJwtToken(Authentication authentication) {
   public String generateJwtToken(User user) {
 
     return Jwts.builder()

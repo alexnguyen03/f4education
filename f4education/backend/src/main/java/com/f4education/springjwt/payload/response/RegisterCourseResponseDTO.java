@@ -32,13 +32,11 @@ public class RegisterCourseResponseDTO {
 
     private String studentName;
 
-    private Integer studentId;
-
-    private Classes classes;
-
     private Date startDate;
 
     private Date endDate;
+
+    private String studentId;
 
     private Integer courseId;
 }

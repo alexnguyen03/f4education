@@ -2,6 +2,7 @@ package com.f4education.springjwt.security.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.f4education.springjwt.repository.BillDetailRepository;
@@ -17,99 +18,108 @@ import com.f4education.springjwt.models.Bill;
 import com.f4education.springjwt.models.PaymentMethod;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
+import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.response.BillResponseDTO;
 import com.f4education.springjwt.repository.BillRepository;
 import com.f4education.springjwt.repository.PaymentMethodRepository;
 
 @Service
 public class BillServiceImp implements BillService {
-    @Autowired
-    private BillRepository billRepository;
+	@Autowired
+	private BillRepository billRepository;
 
-    @Autowired
-    private PaymentMethodRepository paymentMethodRepository;
+	@Autowired
+	private PaymentMethodRepository paymentMethodRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+	@Autowired
+	private StudentRepository studentRepository;
 
-    @Override
-    public List<BillResponseDTO> getAllBill() {
-        List<Bill> bills = billRepository.findAll();
-        return bills.stream().map(this::convertToReponseDTO).collect(Collectors.toList());
-    }
+	@Override
+	public List<BillResponseDTO> getAllBill() {
+		List<BillResponseDTO> bills = billRepository.findAll().stream().map(this::convertToReponseDTO)
+				.collect(Collectors.toList());
+		return bills;
+	}
 
-    @Override
-    public BillResponseDTO getBillById(Integer billId) {
-        Bill bill = billRepository.findById(billId).get();
+	@Override
+	public BillResponseDTO getBillById(Integer billId) {
+		Optional<Bill> billOptional = billRepository.findById(billId);
+		if (billOptional.isPresent()) {
+			Bill bill = billOptional.get();
+			return this.convertToReponseDTO(bill);
+		}
+		return null;
+	}
 
-        if (bill != null) {
-            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("message: Bill Id can not be found");
-        }
-        return convertToReponseDTO(bill);
-    }
+	@Override
+	public BillResponseDTO createBill(BillRequestDTO billRequestDTO) {
+		Bill bill = this.convertRequestToEntity(billRequestDTO);
 
-    @Override
-    public BillResponseDTO createBill(BillRequestDTO billRequestDTO) {
-        Bill bill = this.convertRequestToEntity(billRequestDTO);
+		bill.setCreateDate(new Date());
+		bill.setStatus("Đã thanh toán");
+		bill.setNote("");
 
-        bill.setCreateDate(new Date());
-        bill.setStatus("Đã thanh toán");
-        bill.setNote("");
+		Bill newBill = billRepository.save(bill);
 
-        Bill newBill = billRepository.save(bill);
+		return this.convertToReponseDTO(newBill);
+	}
 
-        return convertToReponseDTO(newBill);
-    }
+	@Override
+	public BillResponseDTO updateBill(Integer billId, BillRequestDTO billRequestDTO) {
+		Optional<Bill> exitBill = billRepository.findById(billId);
 
-    @Override
-    public BillResponseDTO updateBill(Integer billId, BillRequestDTO billRequestDTO) {
-        Bill exitBill = billRepository.findById(billId).get();
+		if (exitBill.isPresent()) {
+			Bill bill = exitBill.get();
+			
+			convertRequestToEntity(billRequestDTO, bill);
 
-        convertRequestToEntity(billRequestDTO, exitBill);
+			Bill updateBill = billRepository.save(bill);
+			return this.convertToReponseDTO(updateBill);
+		}
+		return null;
+	}
 
-        Bill updateBill = billRepository.save(exitBill);
-        return convertToReponseDTO(updateBill);
-    }
+	private BillResponseDTO convertToReponseDTO(Bill bill) {
+		BillResponseDTO billRespDTO = new BillResponseDTO();
 
-    private BillResponseDTO convertToReponseDTO(Bill bill) {
-        BillResponseDTO billRespDTO = new BillResponseDTO();
+		PaymentMethod paymentMethod = paymentMethodRepository.findById(bill.getPaymentMethod().getPaymentMethodId())
+				.get();
 
-        PaymentMethod paymentMethod = paymentMethodRepository.findById(bill.getPaymentMethod().getPaymentMethodId())
-                .get();
+		BeanUtils.copyProperties(bill, billRespDTO);
 
-        BeanUtils.copyProperties(bill, billRespDTO);
+		billRespDTO.setPaymentMethod(paymentMethod.getPaymentMethodName());
+		billRespDTO.setStatus(bill.getStatus());
+		billRespDTO.setTotalPrice(bill.getTotalPrice());
 
-        billRespDTO.setPaymentMethod(paymentMethod.getPaymentMethodName());
-        billRespDTO.setStatus(bill.getStatus());
-        billRespDTO.setTotalPrice(bill.getTotalPrice());
+		return billRespDTO;
+	}
 
-        return billRespDTO;
-    }
+	private Bill convertRequestToEntity(BillRequestDTO billRequestDTO) {
+		Bill bill = new Bill();
 
-    private Bill convertRequestToEntity(BillRequestDTO billRequestDTO) {
-        Bill bill = new Bill();
+		PaymentMethod paymentMethod = paymentMethodRepository
+				.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
+		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
 
-        PaymentMethod paymentMethod = paymentMethodRepository.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
-        Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
+		BeanUtils.copyProperties(billRequestDTO, bill);
 
-        BeanUtils.copyProperties(billRequestDTO, bill);
+		bill.setTotalPrice(billRequestDTO.getTotalPrice());
+		bill.setPaymentMethod(paymentMethod);
+		bill.setStudent(student);
 
-        bill.setTotalPrice(billRequestDTO.getTotalPrice());
-        bill.setPaymentMethod(paymentMethod);
-        bill.setStudent(student);
+		return bill;
+	}
 
-        return bill;
-    }
+	private void convertRequestToEntity(BillRequestDTO billRequestDTO, Bill bill) {
+		PaymentMethod paymentMethod = paymentMethodRepository
+				.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
 
-    private void convertRequestToEntity(BillRequestDTO billRequestDTO, Bill bill) {
-        PaymentMethod paymentMethod = paymentMethodRepository.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
+		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
 
-        Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
+		BeanUtils.copyProperties(billRequestDTO, bill);
 
-        BeanUtils.copyProperties(billRequestDTO, bill);
-
-        bill.setTotalPrice(billRequestDTO.getTotalPrice());
-        bill.setPaymentMethod(paymentMethod);
-        bill.setStudent(student);
-    }
+		bill.setTotalPrice(billRequestDTO.getTotalPrice());
+		bill.setPaymentMethod(paymentMethod);
+		bill.setStudent(student);
+	}
 }

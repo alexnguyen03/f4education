@@ -67,6 +67,10 @@ public class Course implements Serializable {
     @JoinColumn(name = "admin_id")
     Admin admin;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "course")
+    List<BillDetail> billDetails;
+
     public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
             Integer numberSession, String image) {
         this.courseName = courseName;
@@ -81,6 +85,7 @@ public class Course implements Serializable {
     public String toString() {
         return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
                 + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-                + numberSession + ", image=" + image + "]";
+                + numberSession + ", image=" + image + ", subject=" + subject + "]";
     }
+
 }

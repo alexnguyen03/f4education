@@ -35,25 +35,24 @@ public class TeacherController {
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getAllTeachers() {
         List<TeacherDTO> list = teacherService.getAllTeachersDTO();
-
         return ResponseEntity.ok(list);
     }
 
-    @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
-    public TeacherDTO getTeacher(@PathVariable("id") String teacherID) {
-        return teacherService.getTeacherDTOByID(teacherID);
-    }
+    // @GetMapping("/{id}")
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public TeacherDTO getTeacher(@PathVariable("id") String teacherID) {
+    // return teacherService.getTeacherDTOByID(teacherID);
+    // }
 
-    @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public TeacherDTO createSubject(@RequestBody TeacherDTO teacherDTO) {
-        return teacherService.createTeacher(teacherDTO);
-    }
+    // @PostMapping
+    // @PreAuthorize("hasRole('ADMIN')")
+    // public TeacherDTO createSubject(@RequestBody TeacherDTO teacherDTO) {
+    // return teacherService.createTeacher(teacherDTO);
+    // }
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public TeacherDTO updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
+    public ResponseEntity<?> updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
         ObjectMapper mapper = new ObjectMapper();
         TeacherDTO teacherRequest = new TeacherDTO();
@@ -71,6 +70,7 @@ public class TeacherController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return teacherService.updateTeacher(teacherRequest);
+        TeacherDTO teacherDTO = teacherService.updateTeacher(teacherRequest);
+        return ResponseEntity.ok(teacherDTO);
     }
 }

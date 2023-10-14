@@ -1,812 +1,2768 @@
-import {Edit as EditIcon, RemoveCircleOutline as RemoveCircleOutlineIcon, Search} from '@mui/icons-material';
-import {Box, IconButton} from '@mui/material';
-import teacherApi from 'api/teacherApi';
-import moment from 'moment';
-import AccountHeader from 'components/Headers/AccountHeader';
-import {MaterialReactTable} from 'material-react-table';
-import {memo, useEffect, useMemo, useState} from 'react';
-import {IconEyeSearch} from '@tabler/icons-react';
-import {Typography} from '@material-ui/core';
-import ReactLoading from 'react-loading';
-import {Timeline, Event} from 'react-timeline-scribble';
-import {Warning} from '@material-ui/icons';
-import {Button, Card, CardBody, CardHeader, Col, Container, Form, CardImg, FormGroup, Input, Label, Modal, Row, ButtonGroup} from 'reactstrap';
-import Select from 'react-select';
-const IMG_URL = '/courses/';
-const Teachers = () => {
-	const user = JSON.parse(localStorage.getItem('user') ?? '');
-	const [imgData, setImgData] = useState(null);
-	const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true);
-	const [showHistoryInfo, setShowHistoryInfo] = useState(false);
-	const [showForm, setShowForm] = useState(false);
-	const [loadingTeachers, setLoadingTeachers] = useState(true);
-	const [loadingTeachersHistory, setLoadingTeachersHistory] = useState(true);
-	const [teachers, setTeachers] = useState([]);
-	const [rSelected, setRSelected] = useState(null); //radio button
-	const [image, setImage] = useState(null);
-	const [update, setUpdate] = useState(false);
-	const [teacherHistories, setTeacherHistories] = useState([]);
-	const [showHistoryTable, setShowHistoryTable] = useState(false);
-	const [listHistoryById, setListHistoryById] = useState([]);
-	const [errors, setErrors] = useState({});
+import {
+    Edit as EditIcon,
+    Margin,
+    RemoveCircleOutline as RemoveCircleOutlineIcon
+} from '@mui/icons-material'
+import { Box, IconButton } from '@mui/material'
+import Tab from 'react-bootstrap/Tab'
+import Tabs from 'react-bootstrap/Tabs'
+import accountApi from '../../api/accountApi'
+import moment from 'moment'
+import AccountHeader from 'components/Headers/AccountHeader'
+import { MaterialReactTable } from 'material-react-table'
+import { memo, useEffect, useMemo, useState } from 'react'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import React from 'react'
+import {
+    Button,
+    Card,
+    CardBody,
+    CardHeader,
+    Col,
+    Container,
+    Form,
+    FormGroup,
+    Input,
+    Label,
+    Modal,
+    Row,
+    ButtonGroup
+} from 'reactstrap'
+const IMG_URL = '/courses/'
+const Accounts = () => {
+    const user = JSON.parse(localStorage.getItem('user') ?? '')
+    const [imgData, setImgData] = useState(null)
+    const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true)
+    const [showHistoryInfo, setShowHistoryInfo] = useState(false)
+    const [showForm_1, setShowForm_1] = useState(false)
+    const [showForm_2, setShowForm_2] = useState(false)
+    const [showForm_3, setShowForm_3] = useState(false)
+    const [loadingTeachers, setLoadingTeachers] = useState(true)
+    const [loadingStudents, setLoadingStudents] = useState(true)
+    const [loadingAdmins, setLoadingAdmins] = useState(true)
+    const [loadingTeachersHistory, setLoadingTeachersHistory] = useState(true)
+    const [teachers, setTeachers] = useState([])
+    const [students, setStudents] = useState([])
+    const [admins, setAdmins] = useState([])
+    const [rSelected, setRSelected] = useState(null) //radio button
+    const [image, setImage] = useState(null)
+    const [update, setUpdate] = useState(false)
+    const [teacherHistories, setTeacherHistories] = useState([])
+    const [showHistoryTable, setShowHistoryTable] = useState(false)
+    const [listHistoryById, setListHistoryById] = useState([])
+    const [errors, setErrors] = useState({})
+    const [errors_1, setErrors_1] = useState({})
+    const toastId = React.useRef(null)
 
-	//Nhận data gửi lên từ server
-	const [teacher, setTeacher] = useState({
-		teacherId: '',
-		fullname: '',
-		gender: true,
-		dateOfBirth: '',
-		citizenIdentification: '',
-		address: '',
-		levels: '',
-		phone: '',
-		image: '',
-		acccountID: 0,
-	});
+    // notification loading
+    const notifi_loading = (mess) => {
+        toastId.current = toast(mess, {
+            type: toast.TYPE.LOADING,
+            autoClose: false,
+            isLoading: true,
+            closeButton: false,
+            closeOnClick: true
+        })
+    }
 
-	// Dùng để gửi request về sever
-	const [teacherRequest, setTeacherRequest] = useState({
-		teacherId: '',
-		fullname: '',
-		gender: true,
-		dateOfBirth: '',
-		citizenIdentification: '',
-		address: '',
-		levels: '',
-		phone: '',
-		image: '',
-		acccountID: 0,
-		// acccountAdmin: 0,
-	});
+    //notifications success
+    const update_success = (mess) => {
+        toast.update(toastId.current, {
+            type: toast.TYPE.SUCCESS,
+            render: mess,
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            closeButton: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+            isLoading: false
+        })
+    }
 
-	const handelOnChangeInput = (e) => {
-		//Còn đang xử lý
-		setTeacher({
-			...teacher,
-			[e.target.name]: e.target.value,
-			numberSession: 0,
-		});
-		console.log('🚀 ~ file: Teachers.js:74 ~ handelOnChangeInput ~ teacher:', e.target.value);
-	};
+    //notifications fail
+    const update_fail = (mess) => {
+        toast.update(toastId.current, {
+            type: toast.TYPE.ERROR,
+            render: mess,
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            closeButton: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored',
+            isLoading: false
+        })
+    }
 
-	// Cập nhật hình ảnh
-	const onChangePicture = (e) => {
-		setImage(null);
-		if (e.target.files[0]) {
-			setImage(e.target.files[0]);
-			const reader = new FileReader();
-			reader.addEventListener('load', () => {
-				setImgData(reader.result);
-			});
-			reader.readAsDataURL(e.target.files[0]);
-			setTeacher((preTeacher) => ({
-				...preTeacher,
-				image: e.target.files[0].name,
-			}));
-		}
-	};
+    //custom notification
+    const notifi = (mess, type) => {
+        toast(mess, {
+            type: toast.TYPE[type],
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: 'colored'
+        })
+    }
 
-	const handelShowHistory = async (id) => {
-		setShowHistoryInfo(true);
-		setLoadingHistoryInfo(true);
-		try {
-			const resp = await teacherApi.getTeacherHistoryByCourseid(id);
-			setListHistoryById(resp.reverse());
-			setLoadingHistoryInfo(false);
-		} catch (error) {
-			console.log('failed to fetch data', error);
-		}
-	};
+    //Nhận data vai trò học viên gửi lên từ server
+    const [student, setStudent] = useState({
+        id: 0,
+        username: '',
+        password: '',
+        email: '',
+        roles: 1,
+        status: false,
+        student: {
+            studentId: 0,
+            fullname: '',
+            gender: true,
+            address: '',
+            phone: '',
+            image: ''
+        }
+    })
 
-	const columns = useMemo(
-		() => [
-			{
-				accessorKey: 'fullname',
-				header: 'Tên giảng viên',
-				size: 100,
-			},
-			{
-				accessorKey: 'gender',
-				accessorFn: (row) => row,
-				Cell: ({cell}) => {
-					const row = cell.getValue();
-					if (row.gender) {
-						return <span>Nam</span>;
-					} else {
-						return <span>Nữ</span>;
-					}
-				},
-				header: 'Giới tính',
-				size: 30,
-			},
-			{
-				accessorFn: (row) => moment(row.dateOfBirth).format('DD/MM/yyyy'),
-				header: 'Ngày sinh',
-				size: 60,
-			},
-			{
-				accessorKey: 'phone',
-				header: 'Số điện thoại',
-				size: 75,
-			},
-			{
-				accessorKey: 'address',
-				header: 'Địa chỉ',
-				size: 75,
-			},
-		],
-		[],
-	);
+    //Nhận data vai trò giảng viên gửi lên từ server
+    const [teacher, setTeacher] = useState({
+        id: 0,
+        username: '',
+        password: '',
+        email: '',
+        roles: 2,
+        status: false,
+        teacher: {
+            teacherId: 0,
+            fullname: '',
+            gender: true,
+            dateOfBirth: '',
+            citizenIdentification: '',
+            levels: '',
+            address: '',
+            phone: '',
+            image: ''
+        }
+    })
 
-	const columnsTeacherHistory = useMemo(
-		() => [
-			{
-				accessorKey: 'fullname',
-				header: 'Tên giảng viên',
-				size: 100,
-			},
-			{
-				accessorKey: 'gender',
-				accessorFn: (row) => row,
-				Cell: ({cell}) => {
-					const row = cell.getValue();
-					if (row.gender) {
-						return <span>Nam</span>;
-					} else {
-						return <span>Nữ</span>;
-					}
-				},
-				header: 'Giới tính',
-				size: 30,
-			},
-			{
-				accessorFn: (row) => moment(row.dateOfBirth).format('DD/MM/yyyy'),
-				header: 'Ngày sinh',
-				size: 60,
-			},
-			{
-				accessorFn: (row) => moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss a'),
-				header: 'Ngày thao tác',
-				size: 60,
-			},
-			{
-				accessorKey: 'adminName',
-				header: 'Người thao tác',
-				size: 80,
-			},
-			{
-				accessorKey: 'action',
-				header: 'Hành động',
-				size: 80,
-			},
-		],
-		[],
-	);
+    //Nhận data vai trò admin gửi lên từ server
+    const [admin, setAdmin] = useState({
+        id: 0,
+        username: '',
+        password: '',
+        email: '',
+        roles: 3,
+        status: false,
+        admin: {
+            adminId: '',
+            fullname: '',
+            gender: true,
+            dateOfBirth: '',
+            citizenIdentification: '',
+            levels: '',
+            address: '',
+            phone: '',
+            image: ''
+        }
+    })
 
-	const handleEditFrom = (row) => {
-		setShowForm(true);
-		setUpdate(true);
-		const selectedTeacher = teachers.find((teacher) => teacher.teacherId === row.original.teacherId);
-		// setImage(process.env.REACT_APP_IMAGE_URL + IMG_URL + selectedTeacher.image);
-		setTeacher({...selectedTeacher});
-		setRSelected(selectedTeacher.gender);
-	};
+    // Dùng để gửi request về sever
+    const [teacherRequest, setTeacherRequest] = useState({
+        id: 0,
+        username: '',
+        password: '',
+        email: '',
+        roles: 0,
+        teacher: {
+            teacherId: 0,
+            fullname: '',
+            gender: true,
+            dateOfBirth: '',
+            citizenIdentification: '',
+            levels: '',
+            address: '',
+            phone: '',
+            image: ''
+        }
+        // acccountAdmin: 0,
+    })
 
-	const handleResetForm = () => {
-		// hide form
-		setShowForm((pre) => !pre);
-		setImgData(null);
-		setUpdate(false);
-		setTeacher({
-			// subjectName: '',
-			teacherId: '',
-			fullname: '',
-			gender: true,
-			dateOfBirth: '',
-			citizenIdentification: '',
-			address: '',
-			levels: '',
-			phone: '',
-			image: '',
-			acccountID: 0,
-		});
-		setErrors({});
-	};
+    const [studentRequest, setStudentRequest] = useState({
+        id: 0,
+        username: '',
+        password: '',
+        email: '',
+        roles: 1,
+        status: false,
+        student: {
+            studentId: 0,
+            fullname: '',
+            gender: true,
+            address: '',
+            phone: '',
+            image: ''
+        }
+    })
 
-	const handleSubmitForm = (e) => {
-		e.preventDefault();
-		updateTeacher();
-		// console.log(teacher);
-		if (image) {
-			setTeacher((preTeacher) => ({
-				...preTeacher,
-				image: image.name,
-			}));
-		}
-	};
+    const [adminRequest, setAdminRequest] = useState({
+        id: 0,
+        username: '',
+        password: '',
+        email: '',
+        roles: 3,
+        status: false,
+        admin: {
+            adminId: '',
+            fullname: '',
+            gender: true,
+            dateOfBirth: '',
+            citizenIdentification: '',
+            levels: '',
+            address: '',
+            phone: '',
+            image: ''
+        }
+    })
 
-	const validateForm = () => {
-		let validationErrors = {};
-		let test = 0;
-		if (!teacher.fullname) {
-			validationErrors.fullname = 'Vui lòng nhập tên giảng viên !!!';
-			test++;
-		} else {
-			validationErrors.fullname = '';
-		}
+    const handelOnChangeInput_1 = (e) => {
+        const { name, value } = e.target
+        setStudent((preStudent) => ({
+            ...preStudent,
+            [name]: value,
+            student: {
+                ...preStudent.student,
+                [name]: value
+            },
+            numberSession: 0
+        }))
+    }
 
-		if (!teacher.citizenIdentification) {
-			validationErrors.citizenIdentification = 'Vui lòng nhập CCCD của giảng viên!!!';
-			test++;
-		} else {
-			if (teacher.citizenIdentification.length != 12) {
-				validationErrors.citizenIdentification = 'Số CCCD gồm 12 số!!!';
-				test++;
-			} else {
-				validationErrors.citizenIdentification = '';
-			}
-		}
+    // Thay đổi giá trị các thuộc tính của giảng viên
+    const handelOnChangeInput_2 = (e) => {
+        const { name, value } = e.target
+        setTeacher((prevTeacher) => ({
+            ...prevTeacher,
+            [name]: value,
+            teacher: {
+                ...prevTeacher.teacher,
+                [name]: value
+            },
+            numberSession: 0
+        }))
+    }
 
-		if (!teacher.address) {
-			validationErrors.address = 'Vui lòng nhập địa chỉ của giảng viên!!!';
-			test++;
-		} else {
-			validationErrors.address = '';
-		}
+    const handelOnChangeInput_3 = (e) => {
+        const { name, value } = e.target
+        setAdmin((prevAdmin) => ({
+            ...prevAdmin,
+            [name]: value,
+            admin: {
+                ...prevAdmin.admin,
+                [name]: value
+            },
+            numberSession: 0
+        }))
+    }
 
-		if (!teacher.levels) {
-			validationErrors.levels = 'Vui lòng nhập trình độ học vấn của giảng viên!!!';
-			test++;
-		} else {
-			validationErrors.levels = '';
-		}
+    const handelOnChangeInput = (e) => {
+        setTeacher({
+            ...teacher,
+            [e.target.name]: e.target.value,
+            numberSession: 0
+        })
+    }
 
-		const isVNPhoneMobile = /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/;
+    // Cập nhật hình ảnh
+    const onChangePicture = (e) => {
+        setImage(null)
+        if (e.target.files[0]) {
+            setImage(e.target.files[0])
+            const reader = new FileReader()
+            reader.addEventListener('load', () => {
+                setImgData(reader.result)
+            })
+            reader.readAsDataURL(e.target.files[0])
+            setTeacher((preTeacher) => ({
+                ...preTeacher,
+                image: e.target.files[0].name
+            }))
+        }
+    }
 
-		if (!isVNPhoneMobile.test(teacher.phone)) {
-			validationErrors.phone = 'Không đúng định dạng số điện thoại!!!';
-			test++;
-		} else {
-			validationErrors.phone = '';
-		}
+    const columns_student = useMemo(
+        () => [
+            {
+                accessorKey: 'username',
+                header: 'Tên tài khoản',
+                size: 50
+            },
+            {
+                accessorKey: 'email',
+                header: 'Email',
+                size: 75
+            },
+            {
+                accessorKey: 'student.fullname',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.student.fullname === null ||
+                            row.student.fullname == ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin học viên
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.student.fullname}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin học viên
+                            </span>
+                        )
+                    }
+                },
+                header: 'Tên người dùng',
+                size: 70
+            }
+        ],
+        []
+    )
 
-		if (test === 0) {
-			return {};
-		}
-		return validationErrors;
-	};
+    const columns_teacher = useMemo(
+        () => [
+            {
+                accessorKey: 'username',
+                header: 'Tên tài khoản',
+                size: 50
+            },
+            {
+                accessorKey: 'email',
+                header: 'Email',
+                size: 75
+            },
+            {
+                accessorKey: 'teacher.fullname',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.teacher.fullname === null ||
+                            row.teacher.fullname == ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin giảng viên
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.teacher.fullname}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin giảng viên
+                            </span>
+                        )
+                    }
+                },
+                header: 'Tên người dùng',
+                size: 70
+            }
+        ],
+        []
+    )
 
-	const updateTeacher = async () => {
-		const validationErrors = validateForm();
-		console.log(Object.keys(validationErrors).length);
+    const columns_admin = useMemo(
+        () => [
+            {
+                accessorKey: 'username',
+                header: 'Tên tài khoản',
+                size: 50
+            },
+            {
+                accessorKey: 'email',
+                header: 'Email',
+                size: 75
+            },
+            {
+                accessorKey: 'admin.fullname',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.admin.fullname === null ||
+                            row.admin.fullname == ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin quản trị viên
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.admin.fullname}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin quản trị viên
+                            </span>
+                        )
+                    }
+                },
+                header: 'Tên người dùng',
+                size: 70
+            }
+        ],
+        []
+    )
 
-		if (Object.keys(validationErrors).length === 0) {
-			const formData = new FormData();
-			formData.append('teacherRequest', JSON.stringify(teacherRequest));
-			formData.append('file', image);
-			console.log('🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:', image);
-			try {
-				const resp = await teacherApi.updateTeacher(formData);
-				handleResetForm();
-				getAllTeacher();
-			} catch (error) {
-				console.log('🚀 ~ file: Teachers.js:257 ~ updateTeacher ~ error:', error);
-			}
-		} else {
-			setErrors(validationErrors);
-		}
-	};
+    const columnsTeacherHistory = useMemo(
+        () => [
+            {
+                accessorKey: 'fullname',
+                header: 'Tên giảng viên',
+                size: 100
+            },
+            {
+                accessorKey: 'gender',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.gender) {
+                        return <span>Nam</span>
+                    } else {
+                        return <span>Nữ</span>
+                    }
+                },
+                header: 'Giới tính',
+                size: 30
+            },
+            {
+                accessorFn: (row) =>
+                    moment(row.dateOfBirth).format('DD/MM/yyyy'),
+                header: 'Ngày sinh',
+                size: 60
+            },
+            {
+                accessorFn: (row) =>
+                    moment(row.modifyDate).format('DD/MM/yyyy, h:mm:ss a'),
+                header: 'Ngày thao tác',
+                size: 60
+            },
+            {
+                accessorKey: 'adminName',
+                header: 'Người thao tác',
+                size: 80
+            },
+            {
+                accessorKey: 'action',
+                header: 'Hành động',
+                size: 80
+            }
+        ],
+        []
+    )
 
-	//gọi API lấy data
-	const getAllTeacher = async () => {
-		if (teachers.length > 0 && !update) {
-			setLoadingTeachers(false);
-			console.log(update);
-			return;
-		}
+    // Mở model edit của học viên
+    const handleEditFrom_1 = (row) => {
+        setShowForm_1(true)
+        setUpdate(true)
+        const selectedSutdent = students.find(
+            (student) => student.id === row.original.id
+        )
+        setImage(
+            process.env.REACT_APP_IMAGE_URL +
+                IMG_URL +
+                selectedSutdent.student.image
+        )
 
-		try {
-			console.log(update);
-			setLoadingTeachers(true);
-			const resp = await teacherApi.getAllTeachers();
-			console.log(resp);
-			setTeachers(resp.reverse());
-			setLoadingTeachers(false);
-		} catch (error) {
-			console.log('failed to load data', error);
-		}
-	};
+        setStudent({ ...selectedSutdent })
+        setRSelected(selectedSutdent.student.gender)
+    }
 
-	const setGender = (gender) => {
-		setTeacher((preTeacher) => ({
-			...preTeacher,
-			gender: gender,
-		}));
-	};
+    // Mở model edit của giảng viên
+    const handleEditFrom_2 = (row) => {
+        setShowForm_2(true)
+        setUpdate(true)
+        const selectedTeacher = teachers.find(
+            (teacher) => teacher.id === row.original.id
+        )
+        setImage(
+            process.env.REACT_APP_IMAGE_URL +
+                IMG_URL +
+                selectedTeacher.teacher.image
+        )
 
-	const handleShowAllHistory = () => {
-		if (teacherHistories.length === 0) {
-			getAllCourseHistory();
-		}
-		setShowHistoryTable((pre) => !pre);
-	};
+        setTeacher({ ...selectedTeacher })
+        setRSelected(selectedTeacher.teacher.gender)
+    }
 
-	const getAllCourseHistory = async () => {
-		try {
-			setLoadingTeachersHistory(true);
-			const resp = await teacherApi.getAllTeachersHistory();
-			setTeacherHistories(resp.reverse());
-			setLoadingTeachersHistory(false);
-			console.log(setTeacherHistories);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+    const handleEditFrom_3 = (row) => {
+        setShowForm_3(true)
+        setUpdate(true)
+        const selectedAdmin = admins.find(
+            (admin) => admin.id === row.original.id
+        )
+        setImage(
+            process.env.REACT_APP_IMAGE_URL +
+                IMG_URL +
+                selectedAdmin.admin.image
+        )
 
-	useEffect(() => {
-		setListHistoryById([...listHistoryById]);
-	}, [loadingHistoryInfo]);
+        setAdmin({ ...selectedAdmin })
+        setRSelected(selectedAdmin.admin.gender)
+    }
 
-	useEffect(() => {
-		const {teacherId, fullname, gender, dateOfBirth, citizenIdentification, address, levels, phone, image, acccountID} = {...teacher};
+    // Reset model của học viên
+    const handleResetForm_1 = async () => {
+        // hide form
+        setShowForm_1((pre) => !pre)
+        setUpdate(false)
+        setImgData(null)
+        setStudent({
+            id: 0,
+            username: '',
+            password: '',
+            email: '',
+            roles: 1,
+            status: false,
+            student: {
+                studentId: 0,
+                fullname: '',
+                gender: true,
+                address: '',
+                phone: '',
+                image: ''
+            }
+        })
+        setErrors_1({})
+    }
 
-		setTeacherRequest({
-			// acccountAdmin: user.id,
-			teacherId: teacherId,
-			fullname: fullname,
-			gender: gender,
-			dateOfBirth: dateOfBirth,
-			citizenIdentification: citizenIdentification,
-			address: address,
-			levels: levels,
-			phone: phone,
-			image: image,
-			acccountID: acccountID,
-		});
-	}, [teacher]);
+    // Reset model của giảng viên
+    const handleResetForm_2 = async () => {
+        // hide form
+        setShowForm_2((pre) => !pre)
+        setUpdate(false)
+        setImgData(null)
+        setTeacher({
+            id: 0,
+            username: '',
+            password: '',
+            email: '',
+            roles: 0,
+            status: false,
+            teacher: {
+                teacherId: 0,
+                fullname: '',
+                gender: true,
+                dateOfBirth: '',
+                citizenIdentification: '',
+                levels: '',
+                address: '',
+                phone: '',
+                image: ''
+            }
+        })
+        setErrors({})
+    }
 
-	//load data lên ta
-	useEffect(() => {
-		if (teachers.length > 0) return;
-		getAllTeacher();
-	}, []);
+    const handleResetForm_3 = async () => {
+        // hide form
+        setShowForm_3((pre) => !pre)
+        setUpdate(false)
+        setImgData(null)
+        setAdmin({
+            id: 0,
+            username: '',
+            password: '',
+            email: '',
+            status: false,
+            roles: 3,
+            admin: {
+                adminId: '',
+                fullname: '',
+                gender: true,
+                dateOfBirth: '',
+                citizenIdentification: '',
+                levels: '',
+                address: '',
+                phone: '',
+                image: ''
+            }
+        })
+        setErrors({})
+    }
 
-	return (
-		<>
-			<AccountHeader />
-			<Container
-				className='mt--7'
-				fluid>
-				<Card className='bg-secondary shadow'>
-					{/* Header */}
-					<CardHeader className='bg-white border-0 d-flex justify-content-between'>
-						<h3 className='mb-0'>{showHistoryTable ? 'LỊCH SỬ CHỈNH SỬA GIÁO VIÊN' : 'BẢNG GIẢNG VIÊN'}</h3>
-						<Button
-							color='default'
-							type='button'
-							onClick={handleShowAllHistory}>
-							{showHistoryTable ? 'Danh sách giáo viên' : 'Lịch sử giảng viên '}
-						</Button>
-					</CardHeader>
+    // Gọi API của học viên
+    const handleSubmitForm_1 = (e) => {
+        e.preventDefault()
+        if (update) {
+            updateStudent()
+        } else {
+            createStudent()
+        }
+    }
 
-					<CardBody>
-						{!showHistoryTable && (
-							<MaterialReactTable
-								enableColumnResizing
-								enableGrouping
-								enableStickyHeader
-								enableStickyFooter
-								enableRowNumbers
-								state={{isLoading: loadingTeachers}}
-								displayColumnDefOptions={{
-									'mrt-row-actions': {
-										header: 'Thao tác',
-										size: 20,
-										// Something else here
-									},
-									'mrt-row-numbers': {
-										size: 5,
-									},
-								}}
-								positionActionsColumn='last'
-								columns={columns}
-								data={teachers}
-								enableRowActions
-								renderRowActions={({row, table}) => (
-									<Box sx={{display: 'flex', flexWrap: 'nowrap', gap: '8px'}}>
-										<IconButton
-											color='secondary'
-											onClick={() => {
-												handleEditFrom(row);
-											}}>
-											<EditIcon />
-										</IconButton>
-										<IconButton
-											color='info'
-											onClick={() => {
-												console.log(row.original.teacherId);
-												handelShowHistory(row.original.teacherId);
-											}}>
-											<IconEyeSearch />
-										</IconButton>
-									</Box>
-								)}
-								muiTablePaginationProps={{
-									rowsPerPageOptions: [10, 20, 50, 100],
-									showFirstButton: true,
-									showLastButton: true,
-								}}
-							/>
-						)}
+    // Gọi API của giảng viên
+    const handleSubmitForm_2 = (e) => {
+        e.preventDefault()
+        if (update) {
+            updateTeacher()
+        } else {
+            createTeacher()
+        }
+        // if (image) {
+        //   setTeacher((preTeacher) => ({
+        //     ...preTeacher,
+        //     teacher: {
+        //       ...preTeacher.teacher,
+        //       image: image.name,
+        //     },
+        //   }));
+        // }
+    }
 
-						{showHistoryTable && (
-							<MaterialReactTable
-								enableColumnResizing
-								enableGrouping
-								enableStickyHeader
-								enableStickyFooter
-								enableRowNumbers
-								state={{isLoading: loadingTeachersHistory}}
-								displayColumnDefOptions={{
-									// 'mrt-row-actions': {
-									// 	header: 'Thao tác',
-									// 	size: 20,
-									// 	// Something else here
-									// },
-									'mrt-row-numbers': {
-										size: 5,
-									},
-								}}
-								columns={columnsTeacherHistory}
-								data={teacherHistories}
-								renderDetailPanel={({row}) => (
-									<Box
-										sx={{
-											display: 'grid',
-											margin: 'auto',
-											gridTemplateColumns: '1fr 1fr',
-											width: '100%',
-										}}>
-										<Typography>Số CCCD: {row.original.citizenIdentification}</Typography>
-										<Typography>Địa chỉ: {row.original.address}</Typography>
-										<Typography>Trình độ: {row.original.levels}</Typography>
-										<Typography>Số điện thoại: {row.original.phone}</Typography>
-										<Typography>Ảnh đại diện:</Typography>
-										<Typography>
-											<div className='previewProfilePic px-3'>
-												<img
-													alt=''
-													width={200}
-													className=''
-													src={process.env.REACT_APP_IMAGE_URL + IMG_URL + row.original.image}
-												/>
-											</div>
-										</Typography>
-									</Box>
-								)}
-								muiTablePaginationProps={{
-									rowsPerPageOptions: [10, 20, 50, 100],
-									showFirstButton: true,
-									showLastButton: true,
-								}}
-							/>
-						)}
+    const handleSubmitForm_3 = (e) => {
+        e.preventDefault()
+        if (update) {
+            updateAdmin()
+        } else {
+            createAdmin()
+        }
+    }
 
-						<Modal
-							className='modal-dialog-centered  modal-lg '
-							isOpen={showForm}
-							backdrop='static'
-							toggle={() => setShowForm((pre) => !pre)}>
-							<Form
-								onSubmit={handleSubmitForm}
-								encType='multipart/form-data'>
-								<div className='modal-header'>
-									<h3 className='mb-0'>Thông tin giảng viên '{teacher.teacherId}'</h3>
-									<button
-										aria-label='Close'
-										className='close'
-										data-dismiss='modal'
-										type='button'
-										onClick={handleResetForm}>
-										<span aria-hidden={true}>×</span>
-									</button>
-								</div>
-								<div className='modal-body'>
-									<div className='px-lg-2'>
-										<Row>
-											<Col sm={6}>
-												<FormGroup>
-													<label
-														className='form-control-label'
-														htmlFor='input-email'>
-														Tên giảng viên
-													</label>
+    const validateForm_1 = () => {
+        let validationErrors = {}
+        let test = 0
 
-													<Input
-														className='form-control-alternative'
-														id='input-course-name'
-														placeholder='Tên giảng viên'
-														type='text'
-														onChange={handelOnChangeInput}
-														name='fullname'
-														value={teacher.fullname}
-													/>
-													{errors.fullname && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.fullname}</div>}
-												</FormGroup>
-												<Row>
-													<Col md={12}>
-														<ButtonGroup>
-															<Button
-																color='primary'
-																outline
-																onClick={() => setGender(true)}
-																active={teacher.gender === true}>
-																Nam
-															</Button>
-															<Button
-																color='primary'
-																outline
-																name='gender'
-																onClick={() => setGender(false)}
-																active={teacher.gender === false}>
-																Nữ
-															</Button>
-														</ButtonGroup>
-													</Col>
-													<Col md={12}>
-														<FormGroup>
-															<br></br>
-															<label
-																className='form-control-label'
-																htmlFor='input-email'>
-																Trình độ học vấn
-															</label>
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-															<Input
-																className='form-control-alternative'
-																id='input-course-name'
-																placeholder='Trình độ học vấn'
-																type='text'
-																onChange={handelOnChangeInput}
-																name='levels'
-																value={teacher.levels}
-															/>
-															{errors.levels && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.levels}</div>}
-															<br></br>
-															<label
-																className='form-control-label'
-																htmlFor='input-email'>
-																Số điện thoại
-															</label>
+        if (!student.email) {
+            validationErrors.email = 'Vui lòng nhập email!!!'
+            test++
+        } else {
+            if (!isEmail.test(student.email)) {
+                validationErrors.email = 'Không đúng định dạng email!!!'
+                test++
+            } else {
+                validationErrors.email = ''
+            }
+        }
 
-															<Input
-																className='form-control-alternative'
-																id='input-course-name'
-																placeholder='Số điện thoại'
-																type='text'
-																onChange={handelOnChangeInput}
-																name='phone'
-																value={teacher.phone}
-															/>
-															{errors.phone && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.phone}</div>}
-															<br></br>
-															<label
-																className='form-control-label'
-																htmlFor='citizenIdentification'>
-																Số CCCD
-															</label>
+        if (!student.password) {
+            validationErrors.password = 'Vui lòng nhập password!!!'
+            test++
+        } else {
+            if (student.password.length < 6) {
+                validationErrors.password = 'Password tối thiểu gồm 6 kí tự!!!'
+                test++
+            } else {
+                validationErrors.password = ''
+            }
+        }
 
-															<Input
-																className='form-control-alternative'
-																id='citizenIdentification'
-																placeholder='Số CCCD'
-																type='text'
-																onChange={handelOnChangeInput}
-																name='citizenIdentification'
-																value={teacher.citizenIdentification}
-															/>
-															{errors.citizenIdentification && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.citizenIdentification}</div>}
-															<br></br>
-															<label
-																className='form-control-label'
-																htmlFor='input-last-name'>
-																Ngày sinh
-															</label>
+        if (!student.student.fullname) {
+            validationErrors.fullname = 'Vui lòng nhập tên!!!'
+            test++
+        } else {
+            validationErrors.fullname = ''
+        }
 
-															<Input
-																className='form-control-alternative'
-																// value={teacher.dateOfBirth}
-																value={moment(teacher.dateOfBirth).format('YYYY-MM-DD')}
-																// pattern="yyyy-MM-dd"
-																id='input-coursePrice'
-																type='date'
-																name='dateOfBirth'
-																onChange={handelOnChangeInput}
-															/>
-														</FormGroup>
-													</Col>
-												</Row>
-											</Col>
-											<Col sm={6}>
-												<Row>
-													<Col md={12}>
-														<FormGroup>
-															<label
-																className='form-control-label'
-																htmlFor='input-last-name'>
-																Địa chỉ
-															</label>
-															<Input
-																className='form-control-alternative'
-																id='input-courseDescription'
-																name='address'
-																value={teacher.address}
-																type='textarea'
-																onChange={handelOnChangeInput}
-															/>
-															{errors.address && <div className='text-danger mt-1 font-italic font-weight-light'>{errors.address}</div>}
-															<Label
-																htmlFor='exampleFile'
-																className='form-control-label'>
-																Ảnh đại diện
-															</Label>
-															<div className='custom-file'>
-																<input
-																	type='file'
-																	name='imageFile'
-																	accept='image/*'
-																	className='custom-file-input form-control-alternative'
-																	id='customFile'
-																	onChange={onChangePicture}
-																/>
-																<label
-																	className='custom-file-label'
-																	htmlFor='customFile'>
-																	Chọn hình ảnh
-																</label>
-															</div>
-														</FormGroup>
-													</Col>
-													<div className='previewProfilePic px-3'>
-														{imgData && (
-															<img
-																alt=''
-																width={350}
-																className='playerProfilePic_home_tile'
-																src={imgData}
-															/>
-														)}
-														{!imgData && (
-															<img
-																alt=''
-																width={350}
-																className=''
-																src={process.env.REACT_APP_IMAGE_URL + IMG_URL + teacher.image}
-															/>
-														)}
-													</div>
-												</Row>
-											</Col>
-										</Row>
-									</div>
-									<hr className='my-4' />
-								</div>
-								<div className='modal-footer'>
-									<Button
-										color='secondary'
-										data-dismiss='modal'
-										type='button'
-										onClick={handleResetForm}>
-										Hủy
-									</Button>
-									<Button
-										color='primary'
-										type='submit'
-										className='px-5'>
-										Lưu
-									</Button>
-								</div>
-							</Form>
-						</Modal>
+        if (!student.student.address) {
+            validationErrors.address = 'Vui lòng nhập địa chỉ!!!'
+            test++
+        } else {
+            validationErrors.address = ''
+        }
 
-						<Modal
-							className='modal-dialog-centered  modal-lg'
-							isOpen={showHistoryInfo}
-							toggle={() => setShowHistoryInfo((pre) => !pre)}>
-							<div className='modal-header'>
-								<h3 className='mb-0'>Lịch sử chỉnh sửa của giảng viên </h3>
-								<button
-									aria-label='Close'
-									className='close'
-									data-dismiss='modal'
-									type='button'
-									onClick={() => {
-										setShowHistoryInfo(false);
-									}}>
-									<span aria-hidden={true}>×</span>
-								</button>
-							</div>
-							<div className='modal-body'>
-								<div className='text-center  mb-3'>HIỆN TẠI - {moment(new Date()).format('DD/MM/yyyy, h:mm A')}</div>
+        const isVNPhoneMobile =
+            /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/
 
-								{loadingHistoryInfo ? (
-									<div className='d-flex justify-content-center'>
-										<ReactLoading
-											type={'cylon'}
-											color='#357edd'
-										/>
-									</div>
-								) : (
-									listHistoryById.map((item) => (
-										<Timeline key={item.courseHistoryId}>
-											<Event
-												interval={<span className='fw-bold fs-3'>{moment(item.modifyDate).format('DD/MM/yyyy, h:mm A')}</span>}
-												title={<span className={`alert alert-${item.action === 'UPDATE' ? 'primary' : 'success'} px-3 mb-3`}> {item.action === 'UPDATE' ? 'Cập nhật' : 'Thêm mới'} </span>}>
-												<Card>
-													{/* <br></br> */}
-													<Row>
-														<Col className='text-left'>
-															<strong>
-																<h4>{item.adminName}</h4>
-															</strong>
-														</Col>
-													</Row>
-													{/* <br></br> */}
+        if (!isVNPhoneMobile.test(student.student.phone)) {
+            validationErrors.phone = 'Không đúng định dạng số điện thoại!!!'
+            test++
+        } else {
+            validationErrors.phone = ''
+        }
 
-													<CardImg
-														alt='Card image cap'
-														src={process.env.REACT_APP_IMAGE_URL + IMG_URL + item.image}
-														width={300}
-													/>
-													<CardBody>
-														<Row>
-															<Col className='text-left font-weight-normal'>
-																<br></br>
-																<strong>Tên giảng viên:</strong> {item.fullname} <br></br>
-																<strong>Ngày sinh:</strong> {moment(item.dateOfBirth).format('DD/MM/yyyy')}
-																<br></br>
-																<strong>Ngày sinh:</strong> {moment(item.dateOfBirth).format('DD/MM/yyyy')}
-																<br></br>
-																<strong>Số CCCD:</strong> {item.citizenIdentification}
-																<br></br>
-																<strong>Địa chỉ:</strong> {item.address}
-																<br></br>
-																<strong>Trình độ học vấn:</strong> {item.levels}
-																<br></br>
-																<strong>Số điện thoại:</strong> {item.phone}
-															</Col>
-														</Row>
-													</CardBody>
-												</Card>
-											</Event>
-										</Timeline>
-									))
-								)}
+        if (test === 0) {
+            return {}
+        }
+        return validationErrors
+    }
 
-								{listHistoryById.length === 0 && !loadingHistoryInfo && (
-									<div className='text-warning text-center my-5 py-5'>
-										<Warning /> Không tìm thấy lịch sử{' '}
-									</div>
-								)}
-								<div className='text-center'>NƠI MỌI THỨ BẮT ĐẦU</div>
-							</div>
+    const validateForm_2 = () => {
+        let validationErrors = {}
+        let test = 0
 
-							<div className='modal-footer'>
-								<Button
-									color='secondary'
-									data-dismiss='modal'
-									type='button'
-									onClick={() => {
-										setShowHistoryInfo(false);
-									}}>
-									Đóng
-								</Button>
-							</div>
-						</Modal>
-					</CardBody>
-				</Card>
-			</Container>
-		</>
-	);
-};
-export default memo(Teachers);
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+        if (!teacher.email) {
+            validationErrors.email = 'Vui lòng nhập email!!!'
+            test++
+        } else {
+            if (!isEmail.test(teacher.email)) {
+                validationErrors.email = 'Không đúng định dạng email!!!'
+                test++
+            } else {
+                validationErrors.email = ''
+            }
+        }
+
+        if (!teacher.password) {
+            validationErrors.password = 'Vui lòng nhập password!!!'
+            test++
+        } else {
+            if (teacher.password.length < 6) {
+                validationErrors.password = 'Password tối thiểu gồm 6 kí tự!!!'
+                test++
+            } else {
+                validationErrors.password = ''
+            }
+        }
+
+        if (!teacher.teacher.dateOfBirth) {
+            validationErrors.dateOfBirth = 'Vui lòng chọn ngày sinh!!!'
+            test++
+        } else {
+            validationErrors.dateOfBirth = ''
+        }
+
+        if (!teacher.teacher.fullname) {
+            validationErrors.fullname = 'Vui lòng nhập tên!!!'
+            test++
+        } else {
+            validationErrors.fullname = ''
+        }
+
+        if (!teacher.teacher.citizenIdentification) {
+            validationErrors.citizenIdentification = 'Vui lòng nhập CCCD!!!'
+            test++
+        } else {
+            if (teacher.teacher.citizenIdentification.length !== 12) {
+                validationErrors.citizenIdentification = 'Số CCCD gồm 12 số!!!'
+                test++
+            } else {
+                validationErrors.citizenIdentification = ''
+            }
+        }
+
+        if (!teacher.teacher.address) {
+            validationErrors.address = 'Vui lòng nhập địa chỉ!!!'
+            test++
+        } else {
+            validationErrors.address = ''
+        }
+
+        if (!teacher.teacher.levels) {
+            validationErrors.levels = 'Vui lòng nhập trình độ học vấn!!!'
+            test++
+        } else {
+            validationErrors.levels = ''
+        }
+
+        const isVNPhoneMobile =
+            /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/
+
+        if (!isVNPhoneMobile.test(teacher.teacher.phone)) {
+            validationErrors.phone = 'Không đúng định dạng số điện thoại!!!'
+            test++
+        } else {
+            validationErrors.phone = ''
+        }
+
+        if (test === 0) {
+            return {}
+        }
+        return validationErrors
+    }
+
+    const validateForm_3 = () => {
+        let validationErrors = {}
+        let test = 0
+
+        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+        if (!admin.email) {
+            validationErrors.email = 'Vui lòng nhập email!!!'
+            test++
+        } else {
+            if (!isEmail.test(admin.email)) {
+                validationErrors.email = 'Không đúng định dạng email!!!'
+                test++
+            } else {
+                validationErrors.email = ''
+            }
+        }
+
+        if (!admin.password) {
+            validationErrors.password = 'Vui lòng nhập password!!!'
+            test++
+        } else {
+            if (admin.password.length < 6) {
+                validationErrors.password = 'Password tối thiểu gồm 6 kí tự!!!'
+                test++
+            } else {
+                validationErrors.password = ''
+            }
+        }
+
+        if (!admin.admin.dateOfBirth) {
+            validationErrors.dateOfBirth = 'Vui lòng chọn ngày sinh!!!'
+            test++
+        } else {
+            validationErrors.dateOfBirth = ''
+        }
+
+        if (!admin.admin.fullname) {
+            validationErrors.fullname = 'Vui lòng nhập tên!!!'
+            test++
+        } else {
+            validationErrors.fullname = ''
+        }
+
+        if (!admin.admin.citizenIdentification) {
+            validationErrors.citizenIdentification = 'Vui lòng nhập CCCD!!!'
+            test++
+        } else {
+            if (admin.admin.citizenIdentification.length !== 12) {
+                validationErrors.citizenIdentification = 'Số CCCD gồm 12 số!!!'
+                test++
+            } else {
+                validationErrors.citizenIdentification = ''
+            }
+        }
+
+        if (!admin.admin.address) {
+            validationErrors.address = 'Vui lòng nhập địa chỉ!!!'
+            test++
+        } else {
+            validationErrors.address = ''
+        }
+
+        if (!admin.admin.levels) {
+            validationErrors.levels = 'Vui lòng nhập trình độ học vấn!!!'
+            test++
+        } else {
+            validationErrors.levels = ''
+        }
+
+        const isVNPhoneMobile =
+            /^(0|\+84)(\s|\.)?((3[2-9])|(5[689])|(7[06-9])|(8[1-689])|(9[0-46-9]))(\d)(\s|\.)?(\d{3})(\s|\.)?(\d{3})$/
+
+        if (!isVNPhoneMobile.test(admin.admin.phone)) {
+            validationErrors.phone = 'Không đúng định dạng số điện thoại!!!'
+            test++
+        } else {
+            validationErrors.phone = ''
+        }
+
+        if (test === 0) {
+            return {}
+        }
+        return validationErrors
+    }
+
+    // Thêm thông tin học viên
+    const createStudent = async () => {
+        const validate = validateForm_1()
+
+        if (Object.keys(validate).length === 0) {
+            notifi_loading('Đang thêm dữ liệu...')
+            const formData = new FormData()
+            formData.append('request', JSON.stringify(studentRequest))
+            formData.append('file', image)
+            // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
+            try {
+                const resp = await accountApi.addAccount(formData)
+                if (resp.status === 200) {
+                    update_success('Thêm dữ liệu thành công')
+                    handleResetForm_1()
+                    getAllStudent()
+                } else {
+                    if (resp.data.message === '1') {
+                        update_fail('Email đã được sử dụng')
+                    } else {
+                        update_fail('Lỗi kết nối server')
+                    }
+                }
+            } catch (error) {
+                console.log('updateTeacher', error)
+                update_fail('Lỗi kết nối server')
+            }
+        } else {
+            setErrors_1(validate)
+        }
+    }
+
+    // Cập nhật thông tin học viên
+    const updateStudent = async () => {
+        const validationErrors = validateForm_1()
+
+        if (Object.keys(validationErrors).length === 0) {
+            notifi_loading('Đang cập nhật dữ liệu...')
+            const formData = new FormData()
+            formData.append('request', JSON.stringify(studentRequest))
+            formData.append('file', image)
+            try {
+                const resp = await accountApi.updateAccount(formData)
+                if (resp.status === 200) {
+                    handleResetForm_1()
+                    getAllStudent()
+                    update_success('Cập nhật thành công!')
+                } else {
+                    update_fail('Lỗi kết nối server!')
+                }
+            } catch (error) {
+                console.log('updateTeacher', error)
+                update_fail('Lỗi kết nối server!')
+            }
+        } else {
+            setErrors_1(validationErrors)
+        }
+    }
+    // Cập nhật thông tin giảng viên
+    const updateTeacher = async () => {
+        const validationErrors = validateForm_2()
+
+        if (Object.keys(validationErrors).length === 0) {
+            notifi_loading('Đang cập nhật dữ liệu...')
+            const formData = new FormData()
+            formData.append('request', JSON.stringify(teacherRequest))
+            formData.append('file', image)
+            try {
+                const resp = await accountApi.updateAccount(formData)
+                if (resp.status === 200) {
+                    handleResetForm_2()
+                    getAllTeacher()
+                    update_success('Cập nhật thành công!')
+                } else {
+                    update_fail('Lỗi kết nối server!')
+                }
+            } catch (error) {
+                console.log('updateTeacher', error)
+                update_fail('Lỗi kết nối server!')
+            }
+        } else {
+            setErrors(validationErrors)
+        }
+    }
+
+    // Thêm thông tin giảng viên
+    const createTeacher = async () => {
+        const validationErrors = validateForm_2()
+
+        if (Object.keys(validationErrors).length == 0) {
+            notifi_loading('Đang thêm dữ liệu...')
+            const formData = new FormData()
+            formData.append('request', JSON.stringify(teacherRequest))
+            formData.append('file', image)
+            // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
+            try {
+                const resp = await accountApi.addAccount(formData)
+                if (resp.status === 200) {
+                    update_success('Thêm dữ liệu thành công')
+                    handleResetForm_2()
+                    getAllTeacher()
+                } else {
+                    if (resp.data.message === '1') {
+                        update_fail('Email đã được sử dụng')
+                    } else {
+                        update_fail('Lỗi kết nối server')
+                    }
+                }
+            } catch (error) {
+                console.log('updateTeacher', error)
+                update_fail('Lỗi kết nối server')
+            }
+        } else {
+            setErrors(validationErrors)
+        }
+    }
+
+    // Cập nhật thông tin giảng viên
+    const updateAdmin = async () => {
+        const validationErrors = validateForm_3()
+
+        if (Object.keys(validationErrors).length === 0) {
+            notifi_loading('Đang cập nhật dữ liệu...')
+            const formData = new FormData()
+            formData.append('request', JSON.stringify(adminRequest))
+            formData.append('file', image)
+            try {
+                const resp = await accountApi.updateAccount(formData)
+                if (resp.status === 200) {
+                    handleResetForm_3()
+                    getAllAdmin()
+                    update_success('Cập nhật thành công!')
+                } else {
+                    update_fail('Lỗi kết nối server!')
+                }
+            } catch (error) {
+                console.log('updateTeacher', error)
+                update_fail('Lỗi kết nối server!')
+            }
+        } else {
+            setErrors(validationErrors)
+        }
+    }
+
+    // Thêm thông tin giảng viên
+    const createAdmin = async () => {
+        const validationErrors = validateForm_3()
+
+        if (Object.keys(validationErrors).length === 0) {
+            notifi_loading('Đang thêm dữ liệu...')
+            const formData = new FormData()
+            formData.append('request', JSON.stringify(adminRequest))
+            formData.append('file', image)
+            // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
+            try {
+                const resp = await accountApi.addAccount(formData)
+                if (resp.status === 200) {
+                    handleResetForm_3()
+                    getAllAdmin()
+                    update_success('Thêm dữ liệu thành công')
+                } else {
+                    if (resp.data.message === '1') {
+                        update_fail('Email đã được sử dụng')
+                    } else {
+                        update_fail('Lỗi kết nối server')
+                    }
+                }
+            } catch (error) {
+                console.log('updateTeacher', error)
+                update_fail('Lỗi kết nối server')
+            }
+        } else {
+            setErrors(validationErrors)
+        }
+    }
+
+    //gọi API lấy data với vai trò giảng viên
+    const getAllTeacher = async () => {
+        console.log('getAllTeacher ~ teachers:', teachers)
+
+        // if (teachers.length > 0) {
+        //   setLoadingTeachers(false);
+        //   return;
+        // }
+
+        try {
+            setLoadingTeachers(true)
+            const resp = await accountApi.getAllAccountsByRole(2)
+            if (resp.status === 200) {
+                setTeachers(resp.data.reverse())
+            } else {
+                setTeachers([])
+            }
+
+            setLoadingTeachers(false)
+        } catch (error) {
+            console.log('failed to load data', error)
+            notifi('Lỗi kết nối server', 'ERROR')
+        }
+    }
+
+    // Lấy thông tin với vai trò học viên
+    const getAllStudent = async () => {
+        // if (students.length > 0) {
+        //   setLoadingStudents(false);
+        //   return;
+        // }
+
+        try {
+            setLoadingStudents(true)
+            const resp = await accountApi.getAllAccountsByRole(1)
+            if (resp.status === 200) {
+                setStudents(resp.data.reverse())
+            } else {
+                setStudents([])
+            }
+            setLoadingStudents(false)
+        } catch (error) {
+            console.log('failed to load data', error)
+            notifi('Lỗi kết nối server', 'ERROR')
+        }
+    }
+
+    // Lấy thông tin với vai trò là Admin
+    const getAllAdmin = async () => {
+        // if (admins.length > 0) {
+        //   setLoadingAdmins(false);
+        //   return;
+        // }
+
+        try {
+            setLoadingAdmins(true)
+            const resp = await accountApi.getAllAccountsByRole(3)
+            if (resp.status === 200) {
+                setAdmins(resp.data.reverse())
+            } else {
+                setAdmins([])
+            }
+            setLoadingAdmins(false)
+        } catch (error) {
+            console.log('failed to load data', error)
+            notifi('Lỗi kết nối server', 'ERROR')
+        }
+    }
+
+    const setGender_1 = (gender) => {
+        setStudent((preStudent) => ({
+            ...preStudent,
+            student: {
+                ...preStudent.student,
+                gender: gender
+            }
+        }))
+    }
+
+    const setGender_2 = (gender) => {
+        setTeacher((preTeacher) => ({
+            ...preTeacher,
+            teacher: {
+                ...preTeacher.teacher,
+                gender: gender
+            }
+        }))
+    }
+
+    const setGender_3 = (gender) => {
+        setAdmin((preAdmin) => ({
+            ...preAdmin,
+            admin: {
+                ...preAdmin.admin,
+                gender: gender
+            }
+        }))
+    }
+
+    const setStatus_1 = (status) => {
+        setStudent((preStudent) => ({
+            ...preStudent,
+            status: status
+        }))
+    }
+
+    const setStatus_2 = (status) => {
+        setTeacher((preTeacher) => ({
+            ...preTeacher,
+            status: status
+        }))
+    }
+
+    const setStatus_3 = (status) => {
+        setAdmin((prevAdmin) => ({
+            ...prevAdmin,
+            status: status
+        }))
+    }
+
+    //thay đổi dữ liệu của teacher để gửi request đến server
+    //teacherRequest
+    useEffect(() => {
+        const {
+            id,
+            username,
+            password,
+            email,
+            status,
+            teacher: {
+                teacherId,
+                fullname,
+                gender,
+                dateOfBirth,
+                citizenIdentification,
+                levels,
+                address,
+                phone,
+                image
+            }
+        } = { ...teacher }
+        setTeacherRequest({
+            id: id,
+            username: username,
+            password: password,
+            email: email,
+            status: status,
+            roles: 2,
+            teacher: {
+                teacherId: teacherId,
+                fullname: fullname,
+                gender: gender,
+                dateOfBirth: dateOfBirth,
+                citizenIdentification: citizenIdentification,
+                levels: levels,
+                address: address,
+                phone: phone,
+                image: image
+            }
+        })
+    }, [teacher])
+
+    useEffect(() => {
+        const {
+            id,
+            username,
+            password,
+            email,
+            status,
+            student: { studentId, fullname, gender, address, phone, image }
+        } = { ...student }
+        setStudentRequest({
+            id: id,
+            username: username,
+            password: password,
+            email: email,
+            status: status,
+            roles: 1,
+            student: {
+                studentId: studentId,
+                fullname: fullname,
+                gender: gender,
+                address: address,
+                phone: phone,
+                image: image
+            }
+        })
+    }, [student])
+
+    //load data của 3 vai trò lên table
+    useEffect(() => {
+        // if (teachers.length > 0) return;
+        getAllStudent()
+        getAllTeacher()
+        getAllAdmin()
+    }, [])
+
+    useEffect(() => {
+        const {
+            id,
+            username,
+            password,
+            email,
+            roles,
+            status,
+            admin: {
+                adminId,
+                fullname,
+                gender,
+                dateOfBirth,
+                citizenIdentification,
+                levels,
+                address,
+                phone,
+                image
+            }
+        } = { ...admin }
+        setAdminRequest({
+            id: id,
+            username: username,
+            password: password,
+            email: email,
+            status: status,
+            roles: 3,
+            admin: {
+                adminId: adminId,
+                fullname: fullname,
+                gender: gender,
+                dateOfBirth: dateOfBirth,
+                citizenIdentification: citizenIdentification,
+                levels: levels,
+                address: address,
+                phone: phone,
+                image: image
+            }
+        })
+    }, [admin])
+
+    return (
+        <>
+            <ToastContainer />
+            <AccountHeader />
+            <Container className="mt--7" fluid>
+                <Card className="bg-secondary shadow">
+                    {/* Header */}
+                    <CardHeader className="bg-white border-0 d-flex justify-content-between">
+                        <h3 className="mb-0">
+                            {showHistoryTable
+                                ? 'LỊCH SỬ CHỈNH SỬA GIÁO VIÊN'
+                                : 'BẢNG TÀI KHOẢN'}
+                        </h3>
+                        <Button
+                            color="default"
+                            type="button"
+                            onClick={() => {}}
+                        >
+                            {showHistoryTable
+                                ? 'Danh sách giáo viên'
+                                : 'Lịch sử giảng viên '}
+                        </Button>
+                    </CardHeader>
+
+                    <CardBody>
+                        <Tabs
+                            defaultActiveKey="sinhVien"
+                            id="fill-tab-example"
+                            className="mb-3"
+                            fill
+                        >
+                            <Tab
+                                eventKey="sinhVien"
+                                title={<strong>Sinh viên</strong>}
+                            >
+                                <MaterialReactTable
+                                    enableColumnResizing
+                                    enableGrouping
+                                    enableStickyHeader
+                                    enableStickyFooter
+                                    enableRowNumbers
+                                    state={{ isLoading: loadingStudents }}
+                                    displayColumnDefOptions={{
+                                        'mrt-row-actions': {
+                                            header: 'Thao tác',
+                                            size: 20
+                                        },
+                                        'mrt-row-numbers': {
+                                            size: 5
+                                        }
+                                    }}
+                                    positionActionsColumn="last"
+                                    columns={columns_student}
+                                    data={students}
+                                    renderTopToolbarCustomActions={() => (
+                                        <Button
+                                            onClick={() => {
+                                                handleResetForm_1()
+                                            }}
+                                            color="success"
+                                            variant="contained"
+                                        >
+                                            <i className="bx bx-layer-plus"></i>
+                                            Thêm học viên
+                                        </Button>
+                                    )}
+                                    enableRowActions
+                                    renderRowActions={({ row, table }) => (
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexWrap: 'nowrap',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <IconButton
+                                                color="secondary"
+                                                onClick={() => {
+                                                    handleEditFrom_1(row)
+                                                }}
+                                            >
+                                                <EditIcon />
+                                            </IconButton>
+                                            {/* <IconButton
+                        color="info"
+                        onClick={() => {
+                          // handelShowHistory(row.original.teacherId);
+                        }}
+                      >
+                        <IconEyeSearch />
+                      </IconButton> */}
+                                        </Box>
+                                    )}
+                                    muiTablePaginationProps={{
+                                        rowsPerPageOptions: [10, 20, 50, 100],
+                                        showFirstButton: true,
+                                        showLastButton: true
+                                    }}
+                                />
+                            </Tab>
+
+                            <Tab
+                                eventKey="gaingVien"
+                                className="bold-title"
+                                title={<strong>Giảng viên</strong>}
+                            >
+                                <MaterialReactTable
+                                    enableColumnResizing
+                                    enableGrouping
+                                    enableStickyHeader
+                                    enableStickyFooter
+                                    enableRowNumbers
+                                    state={{ isLoading: loadingTeachers }}
+                                    displayColumnDefOptions={{
+                                        'mrt-row-actions': {
+                                            header: 'Thao tác',
+                                            size: 20
+                                        },
+                                        'mrt-row-numbers': {
+                                            size: 5
+                                        }
+                                    }}
+                                    positionActionsColumn="last"
+                                    columns={columns_teacher}
+                                    data={teachers}
+                                    renderTopToolbarCustomActions={() => (
+                                        <Button
+                                            onClick={() => {
+                                                handleResetForm_2()
+                                            }}
+                                            color="success"
+                                            variant="contained"
+                                        >
+                                            <i className="bx bx-layer-plus"></i>
+                                            Thêm giảng viên
+                                        </Button>
+                                    )}
+                                    enableRowActions
+                                    renderRowActions={({ row, table }) => (
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexWrap: 'nowrap',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <IconButton
+                                                color="secondary"
+                                                onClick={() => {
+                                                    handleEditFrom_2(row)
+                                                }}
+                                            >
+                                                <EditIcon />
+                                            </IconButton>
+                                            {/* <IconButton
+                        color="info"
+                        onClick={() => {
+                          console.log(row.original.teacherId);
+                          // handelShowHistory(row.original.teacherId);
+                        }}
+                      >
+                        <IconEyeSearch />
+                      </IconButton> */}
+                                        </Box>
+                                    )}
+                                    muiTablePaginationProps={{
+                                        rowsPerPageOptions: [10, 20, 50, 100],
+                                        showFirstButton: true,
+                                        showLastButton: true
+                                    }}
+                                />
+                            </Tab>
+
+                            <Tab
+                                eventKey="Admin"
+                                title={<strong>Quản trị</strong>}
+                            >
+                                <MaterialReactTable
+                                    enableColumnResizing
+                                    enableGrouping
+                                    enableStickyHeader
+                                    enableStickyFooter
+                                    enableRowNumbers
+                                    state={{ isLoading: loadingAdmins }}
+                                    displayColumnDefOptions={{
+                                        'mrt-row-actions': {
+                                            header: 'Thao tác',
+                                            size: 20
+                                            // Something else here
+                                        },
+                                        'mrt-row-numbers': {
+                                            size: 5
+                                        }
+                                    }}
+                                    positionActionsColumn="last"
+                                    columns={columns_admin}
+                                    data={admins}
+                                    renderTopToolbarCustomActions={() => (
+                                        <Button
+                                            onClick={() => {
+                                                handleResetForm_3()
+                                            }}
+                                            color="success"
+                                            variant="contained"
+                                        >
+                                            <i className="bx bx-layer-plus"></i>
+                                            Thêm quản trị viên
+                                        </Button>
+                                    )}
+                                    enableRowActions
+                                    renderRowActions={({ row, table }) => (
+                                        <Box
+                                            sx={{
+                                                display: 'flex',
+                                                flexWrap: 'nowrap',
+                                                gap: '8px'
+                                            }}
+                                        >
+                                            <IconButton
+                                                color="secondary"
+                                                onClick={() => {
+                                                    handleEditFrom_3(row)
+                                                }}
+                                            >
+                                                <EditIcon />
+                                            </IconButton>
+                                            {/* <IconButton
+                        color="info"
+                        onClick={() => {
+                          console.log(row.original.teacherId);
+                          // handelShowHistory(row.original.teacherId);
+                        }}
+                      >
+                        <IconEyeSearch />
+                      </IconButton> */}
+                                        </Box>
+                                    )}
+                                    muiTablePaginationProps={{
+                                        rowsPerPageOptions: [10, 20, 50, 100],
+                                        showFirstButton: true,
+                                        showLastButton: true
+                                    }}
+                                />
+                            </Tab>
+                        </Tabs>
+
+                        {/* Model thông tin tài khoản học viên */}
+                        <Modal
+                            className="modal-dialog-centered  modal-lg "
+                            isOpen={showForm_1}
+                            backdrop="static"
+                            toggle={() => handleResetForm_1()}
+                        >
+                            <Form
+                                onSubmit={handleSubmitForm_1}
+                                encType="multipart/form-data"
+                            >
+                                <div className="modal-header">
+                                    <h3 className="mb-0">
+                                        Thông tin tài khoản
+                                    </h3>
+                                    <button
+                                        aria-label="Close"
+                                        className="close"
+                                        data-dismiss="modal"
+                                        type="button"
+                                        onClick={handleResetForm_1}
+                                    >
+                                        <span aria-hidden={true}>×</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="px-lg-2">
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Email
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Email tài khoản"
+                                                        type="text"
+                                                        onChange={
+                                                            handelOnChangeInput_1
+                                                        }
+                                                        name="email"
+                                                        readOnly={update}
+                                                        value={student.email}
+                                                    />
+                                                    {errors_1.email && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors_1.email}
+                                                        </div>
+                                                    )}
+                                                    <br />
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Password
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Password"
+                                                        type="password"
+                                                        onChange={
+                                                            handelOnChangeInput_1
+                                                        }
+                                                        name="password"
+                                                        readOnly={update}
+                                                        value={student.password}
+                                                    />
+                                                    {errors_1.password && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors_1.password}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="input-email"
+                                                >
+                                                    Trạng thái
+                                                </label>
+                                                <br></br>
+                                                <ButtonGroup>
+                                                    <Button
+                                                        color="success"
+                                                        outline
+                                                        onClick={() =>
+                                                            setStatus_1(true)
+                                                        }
+                                                        active={
+                                                            student.status ===
+                                                            true
+                                                        }
+                                                    >
+                                                        Mở khóa
+                                                    </Button>
+                                                    <Button
+                                                        color="danger"
+                                                        outline
+                                                        name="gender"
+                                                        onClick={() =>
+                                                            setStatus_1(false)
+                                                        }
+                                                        active={
+                                                            student.status ===
+                                                            false
+                                                        }
+                                                    >
+                                                        Khóa
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </Col>
+                                        </Row>
+                                        <hr />
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Tên học viên
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Tên giảng viên"
+                                                        type="text"
+                                                        onChange={
+                                                            handelOnChangeInput_1
+                                                        }
+                                                        name="fullname"
+                                                        value={
+                                                            student.student
+                                                                .fullname
+                                                        }
+                                                    />
+                                                    {errors_1.fullname && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors_1.fullname}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Số điện thoại
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-course-name"
+                                                                placeholder="Số điện thoại"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_1
+                                                                }
+                                                                name="phone"
+                                                                value={
+                                                                    student
+                                                                        .student
+                                                                        .phone
+                                                                }
+                                                            />
+                                                            {errors_1.phone && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors_1.phone
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Địa chỉ
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-courseDescription"
+                                                                name="address"
+                                                                placeholder="Địa chỉ..."
+                                                                value={
+                                                                    student
+                                                                        .student
+                                                                        .address
+                                                                }
+                                                                type="textarea"
+                                                                onChange={
+                                                                    handelOnChangeInput_1
+                                                                }
+                                                            />
+                                                            {errors_1.address && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors_1.address
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                            <Col sm={6}>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Giới tính
+                                                            </label>
+                                                            <br />
+                                                            <ButtonGroup>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    onClick={() =>
+                                                                        setGender_1(
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        student
+                                                                            .student
+                                                                            .gender ===
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    Nam
+                                                                </Button>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    name="gender"
+                                                                    onClick={() =>
+                                                                        setGender_1(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        student
+                                                                            .student
+                                                                            .gender ===
+                                                                        false
+                                                                    }
+                                                                >
+                                                                    Nữ
+                                                                </Button>
+                                                            </ButtonGroup>
+                                                            <br />
+                                                            <br />
+                                                            <Label
+                                                                htmlFor="exampleFile"
+                                                                className="form-control-label"
+                                                            >
+                                                                Ảnh đại diện
+                                                            </Label>
+                                                            <div className="custom-file">
+                                                                <input
+                                                                    type="file"
+                                                                    name="imageFile"
+                                                                    accept="image/*"
+                                                                    className="custom-file-input form-control-alternative"
+                                                                    id="customFile"
+                                                                    onChange={
+                                                                        onChangePicture
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor="customFile"
+                                                                >
+                                                                    Chọn hình
+                                                                    ảnh
+                                                                </label>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <div className="previewProfilePic px-3">
+                                                        {imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className="playerProfilePic_home_tile"
+                                                                src={imgData}
+                                                            />
+                                                        )}
+                                                        {!imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className=""
+                                                                src={
+                                                                    process.env
+                                                                        .REACT_APP_IMAGE_URL +
+                                                                    IMG_URL +
+                                                                    student
+                                                                        .student
+                                                                        .image
+                                                                }
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                    <hr className="my-4" />
+                                </div>
+                                <div className="modal-footer">
+                                    <Button
+                                        color="secondary"
+                                        data-dismiss="modal"
+                                        type="button"
+                                        onClick={handleResetForm_1}
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button
+                                        color="primary"
+                                        type="submit"
+                                        className="px-5"
+                                    >
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Modal>
+
+                        {/* Model thông tin giảng viên */}
+                        <Modal
+                            className="modal-dialog-centered  modal-lg "
+                            isOpen={showForm_2}
+                            backdrop="static"
+                            toggle={() => handleResetForm_2()}
+                        >
+                            <Form
+                                onSubmit={handleSubmitForm_2}
+                                encType="multipart/form-data"
+                            >
+                                <div className="modal-header">
+                                    <h3 className="mb-0">
+                                        Thông tin tài khoản
+                                    </h3>
+                                    <button
+                                        aria-label="Close"
+                                        className="close"
+                                        data-dismiss="modal"
+                                        type="button"
+                                        onClick={handleResetForm_2}
+                                    >
+                                        <span aria-hidden={true}>×</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="px-lg-2">
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Email
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Email tài khoản"
+                                                        type="text"
+                                                        onChange={
+                                                            handelOnChangeInput_2
+                                                        }
+                                                        name="email"
+                                                        readOnly={update}
+                                                        value={teacher.email}
+                                                    />
+                                                    {errors.email && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.email}
+                                                        </div>
+                                                    )}
+                                                    <br />
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Password
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Password"
+                                                        type="password"
+                                                        onChange={
+                                                            handelOnChangeInput_2
+                                                        }
+                                                        name="password"
+                                                        readOnly={update}
+                                                        value={teacher.password}
+                                                    />
+                                                    {errors.password && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.password}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="input-email"
+                                                >
+                                                    Trạng thái
+                                                </label>
+                                                <br></br>
+                                                <ButtonGroup>
+                                                    <Button
+                                                        color="success"
+                                                        outline
+                                                        onClick={() =>
+                                                            setStatus_2(true)
+                                                        }
+                                                        active={
+                                                            teacher.status ===
+                                                            true
+                                                        }
+                                                    >
+                                                        Mở khóa
+                                                    </Button>
+                                                    <Button
+                                                        color="danger"
+                                                        outline
+                                                        name="gender"
+                                                        onClick={() =>
+                                                            setStatus_2(false)
+                                                        }
+                                                        active={
+                                                            teacher.status ===
+                                                            false
+                                                        }
+                                                    >
+                                                        Khóa
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </Col>
+                                        </Row>
+                                        <br />
+                                        <h3>Thông tin giảng viên</h3>
+                                        <hr />
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Tên giảng viên
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Tên giảng viên"
+                                                        type="text"
+                                                        onChange={
+                                                            handelOnChangeInput_2
+                                                        }
+                                                        name="fullname"
+                                                        value={
+                                                            teacher.teacher
+                                                                .fullname
+                                                        }
+                                                    />
+                                                    {errors.fullname && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.fullname}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Trình độ học vấn
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-course-name"
+                                                                placeholder="Trình độ học vấn"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_2
+                                                                }
+                                                                name="levels"
+                                                                value={
+                                                                    teacher
+                                                                        .teacher
+                                                                        .levels
+                                                                }
+                                                            />
+                                                            {errors.levels && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.levels
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br></br>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Số điện thoại
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-course-name"
+                                                                placeholder="Số điện thoại"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_2
+                                                                }
+                                                                name="phone"
+                                                                value={
+                                                                    teacher
+                                                                        .teacher
+                                                                        .phone
+                                                                }
+                                                            />
+                                                            {errors.phone && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.phone
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br></br>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="citizenIdentification"
+                                                            >
+                                                                Số CCCD
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="citizenIdentification"
+                                                                placeholder="Số CCCD"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_2
+                                                                }
+                                                                name="citizenIdentification"
+                                                                value={
+                                                                    teacher
+                                                                        .teacher
+                                                                        .citizenIdentification
+                                                                }
+                                                            />
+                                                            {errors.citizenIdentification && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.citizenIdentification
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br></br>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Ngày sinh
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                // value={teacher.dateOfBirth}
+                                                                value={moment(
+                                                                    teacher
+                                                                        .teacher
+                                                                        .dateOfBirth
+                                                                ).format(
+                                                                    'YYYY-MM-DD'
+                                                                )}
+                                                                // pattern="yyyy-MM-dd"
+                                                                id="input-coursePrice"
+                                                                type="date"
+                                                                name="dateOfBirth"
+                                                                onChange={
+                                                                    handelOnChangeInput_2
+                                                                }
+                                                            />
+                                                            {errors.dateOfBirth && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.dateOfBirth
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br />
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Địa chỉ
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-courseDescription"
+                                                                name="address"
+                                                                placeholder="Địa chỉ..."
+                                                                value={
+                                                                    teacher
+                                                                        .teacher
+                                                                        .address
+                                                                }
+                                                                type="textarea"
+                                                                onChange={
+                                                                    handelOnChangeInput_2
+                                                                }
+                                                            />
+                                                            {errors.address && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.address
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                            <Col sm={6}>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            {/* <Col md={12}> */}
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Giới tính
+                                                            </label>
+                                                            <br />
+                                                            <ButtonGroup>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    onClick={() =>
+                                                                        setGender_2(
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        teacher
+                                                                            .teacher
+                                                                            .gender ===
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    Nam
+                                                                </Button>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    name="gender"
+                                                                    onClick={() =>
+                                                                        setGender_2(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        teacher
+                                                                            .teacher
+                                                                            .gender ===
+                                                                        false
+                                                                    }
+                                                                >
+                                                                    Nữ
+                                                                </Button>
+                                                            </ButtonGroup>
+                                                            {/* </Col> */}
+                                                            <br />
+                                                            <br></br>
+                                                            <Label
+                                                                htmlFor="exampleFile"
+                                                                className="form-control-label"
+                                                            >
+                                                                Ảnh đại diện
+                                                            </Label>
+                                                            <div className="custom-file">
+                                                                <input
+                                                                    type="file"
+                                                                    name="imageFile"
+                                                                    accept="image/*"
+                                                                    className="custom-file-input form-control-alternative"
+                                                                    id="customFile"
+                                                                    onChange={
+                                                                        onChangePicture
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor="customFile"
+                                                                >
+                                                                    Chọn hình
+                                                                    ảnh
+                                                                </label>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <div className="previewProfilePic px-3">
+                                                        {imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className="playerProfilePic_home_tile"
+                                                                src={imgData}
+                                                            />
+                                                        )}
+                                                        {!imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className=""
+                                                                src={
+                                                                    process.env
+                                                                        .REACT_APP_IMAGE_URL +
+                                                                    IMG_URL +
+                                                                    teacher
+                                                                        .teacher
+                                                                        .image
+                                                                }
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                    <hr className="my-4" />
+                                </div>
+                                <div className="modal-footer">
+                                    <Button
+                                        color="secondary"
+                                        data-dismiss="modal"
+                                        type="button"
+                                        onClick={handleResetForm_2}
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button
+                                        color="primary"
+                                        type="submit"
+                                        className="px-5"
+                                    >
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Modal>
+
+                        {/* Model thông tin quản trị viên */}
+                        <Modal
+                            className="modal-dialog-centered  modal-lg "
+                            isOpen={showForm_3}
+                            backdrop="static"
+                            toggle={() => handleResetForm_3()}
+                        >
+                            <Form
+                                onSubmit={handleSubmitForm_3}
+                                encType="multipart/form-data"
+                            >
+                                <div className="modal-header">
+                                    <h3 className="mb-0">
+                                        Thông tin tài khoản
+                                    </h3>
+                                    <button
+                                        aria-label="Close"
+                                        className="close"
+                                        data-dismiss="modal"
+                                        type="button"
+                                        onClick={handleResetForm_3}
+                                    >
+                                        <span aria-hidden={true}>×</span>
+                                    </button>
+                                </div>
+                                <div className="modal-body">
+                                    <div className="px-lg-2">
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Email
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Email tài khoản"
+                                                        type="text"
+                                                        onChange={
+                                                            handelOnChangeInput_3
+                                                        }
+                                                        name="email"
+                                                        readOnly={update}
+                                                        value={admin.email}
+                                                    />
+                                                    {errors.email && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.email}
+                                                        </div>
+                                                    )}
+                                                    <br />
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Password
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Password"
+                                                        type="password"
+                                                        onChange={
+                                                            handelOnChangeInput_3
+                                                        }
+                                                        name="password"
+                                                        readOnly={update}
+                                                        value={admin.password}
+                                                    />
+                                                    {errors.password && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.password}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                            </Col>
+                                            <Col md={6}>
+                                                <label
+                                                    className="form-control-label"
+                                                    htmlFor="input-email"
+                                                >
+                                                    Trạng thái
+                                                </label>
+                                                <br></br>
+                                                <ButtonGroup>
+                                                    <Button
+                                                        color="success"
+                                                        outline
+                                                        onClick={() =>
+                                                            setStatus_3(true)
+                                                        }
+                                                        active={
+                                                            admin.status ===
+                                                            true
+                                                        }
+                                                    >
+                                                        Mở khóa
+                                                    </Button>
+                                                    <Button
+                                                        color="danger"
+                                                        outline
+                                                        name="gender"
+                                                        onClick={() =>
+                                                            setStatus_3(false)
+                                                        }
+                                                        active={
+                                                            admin.status ===
+                                                            false
+                                                        }
+                                                    >
+                                                        Khóa
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </Col>
+                                        </Row>
+                                        <br />
+                                        <h3>Thông tin quản trị viên</h3>
+                                        <hr />
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Tên giảng viên
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-course-name"
+                                                        placeholder="Tên giảng viên"
+                                                        type="text"
+                                                        onChange={
+                                                            handelOnChangeInput_3
+                                                        }
+                                                        name="fullname"
+                                                        value={
+                                                            admin.admin.fullname
+                                                        }
+                                                    />
+                                                    {errors.fullname && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.fullname}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Trình độ học vấn
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-course-name"
+                                                                placeholder="Trình độ học vấn"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_3
+                                                                }
+                                                                name="levels"
+                                                                value={
+                                                                    admin.admin
+                                                                        .levels
+                                                                }
+                                                            />
+                                                            {errors.levels && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.levels
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br></br>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Số điện thoại
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-course-name"
+                                                                placeholder="Số điện thoại"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_3
+                                                                }
+                                                                name="phone"
+                                                                value={
+                                                                    admin.admin
+                                                                        .phone
+                                                                }
+                                                            />
+                                                            {errors.phone && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.phone
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br></br>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="citizenIdentification"
+                                                            >
+                                                                Số CCCD
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="citizenIdentification"
+                                                                placeholder="Số CCCD"
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput_3
+                                                                }
+                                                                name="citizenIdentification"
+                                                                value={
+                                                                    admin.admin
+                                                                        .citizenIdentification
+                                                                }
+                                                            />
+                                                            {errors.citizenIdentification && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.citizenIdentification
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br></br>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Ngày sinh
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                // value={teacher.dateOfBirth}
+                                                                value={moment(
+                                                                    admin.admin
+                                                                        .dateOfBirth
+                                                                ).format(
+                                                                    'YYYY-MM-DD'
+                                                                )}
+                                                                // pattern="yyyy-MM-dd"
+                                                                id="input-coursePrice"
+                                                                type="date"
+                                                                name="dateOfBirth"
+                                                                onChange={
+                                                                    handelOnChangeInput_3
+                                                                }
+                                                            />
+                                                            {errors.dateOfBirth && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.dateOfBirth
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <br />
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Địa chỉ
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-courseDescription"
+                                                                name="address"
+                                                                placeholder="Địa chỉ..."
+                                                                value={
+                                                                    admin.admin
+                                                                        .address
+                                                                }
+                                                                type="textarea"
+                                                                onChange={
+                                                                    handelOnChangeInput_3
+                                                                }
+                                                            />
+                                                            {errors.address && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.address
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
+                                            </Col>
+                                            <Col sm={6}>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            {/* <Col md={12}> */}
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Giới tính
+                                                            </label>
+                                                            <br />
+                                                            <ButtonGroup>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    onClick={() =>
+                                                                        setGender_3(
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        admin
+                                                                            .admin
+                                                                            .gender ===
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    Nam
+                                                                </Button>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    name="gender"
+                                                                    onClick={() =>
+                                                                        setGender_3(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        admin
+                                                                            .admin
+                                                                            .gender ===
+                                                                        false
+                                                                    }
+                                                                >
+                                                                    Nữ
+                                                                </Button>
+                                                            </ButtonGroup>
+                                                            {/* </Col> */}
+                                                            <br />
+                                                            <br></br>
+                                                            <Label
+                                                                htmlFor="exampleFile"
+                                                                className="form-control-label"
+                                                            >
+                                                                Ảnh đại diện
+                                                            </Label>
+                                                            <div className="custom-file">
+                                                                <input
+                                                                    type="file"
+                                                                    name="imageFile"
+                                                                    accept="image/*"
+                                                                    className="custom-file-input form-control-alternative"
+                                                                    id="customFile"
+                                                                    onChange={
+                                                                        onChangePicture
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor="customFile"
+                                                                >
+                                                                    Chọn hình
+                                                                    ảnh
+                                                                </label>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <div className="previewProfilePic px-3">
+                                                        {imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className="playerProfilePic_home_tile"
+                                                                src={imgData}
+                                                            />
+                                                        )}
+                                                        {!imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className=""
+                                                                src={
+                                                                    process.env
+                                                                        .REACT_APP_IMAGE_URL +
+                                                                    IMG_URL +
+                                                                    admin.admin
+                                                                        .image
+                                                                }
+                                                            />
+                                                        )}
+                                                    </div>
+                                                </Row>
+                                            </Col>
+                                        </Row>
+                                    </div>
+                                    <hr className="my-4" />
+                                </div>
+                                <div className="modal-footer">
+                                    <Button
+                                        color="secondary"
+                                        data-dismiss="modal"
+                                        type="button"
+                                        onClick={handleResetForm_3}
+                                    >
+                                        Hủy
+                                    </Button>
+                                    <Button
+                                        color="primary"
+                                        type="submit"
+                                        className="px-5"
+                                    >
+                                        Lưu
+                                    </Button>
+                                </div>
+                            </Form>
+                        </Modal>
+                    </CardBody>
+                </Card>
+            </Container>
+        </>
+    )
+}
+export default memo(Accounts)

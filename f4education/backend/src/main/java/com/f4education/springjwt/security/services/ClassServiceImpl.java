@@ -2,6 +2,7 @@ package com.f4education.springjwt.security.services;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -82,7 +83,11 @@ public class ClassServiceImpl implements ClassService {
 
 		classDTO.setRegisterCourses(classes.getRegisterCourses());
 		classDTO.setTeacher(classes.getTeacher());
+
 		if (classes.getRegisterCourses().size() > 0) {
+			List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
+					.collect(Collectors.toList());
+			classDTO.setStudents(lStudents);
 			classDTO.setCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
 		}
 		return classDTO;

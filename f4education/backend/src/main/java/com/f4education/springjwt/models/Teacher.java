@@ -35,6 +35,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Teacher")
+@Getter
+@Setter
 public class Teacher implements Serializable {
 	@Id
 	// @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -62,12 +64,13 @@ public class Teacher implements Serializable {
 
 	@OneToMany(mappedBy = "teacher")
 	List<Classes> classes;
+
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "account_id")
 	User user;
-	@JsonIgnore
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "teacher")
 	List<TeacherHistory> teacherHistory;
 
