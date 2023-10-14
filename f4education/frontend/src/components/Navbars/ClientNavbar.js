@@ -131,7 +131,13 @@ const ClientNavbar = () => {
   const fetchCart = async () => {
     try {
       const resp = await cartApi.getAllCart();
-      setCarts(resp.data);
+      
+      if(resp.status === 200 && resp.data.length > 0){
+        setCarts(resp.data);
+      }else{
+        console.log("Cannot get Data");
+      }
+
     } catch (error) {
       console.log(error);
     }

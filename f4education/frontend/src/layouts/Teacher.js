@@ -1,18 +1,19 @@
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { useEffect, React, useRef, useState } from "react";
+import { useLocation, Route, Routes, Navigate } from "react-router-dom";
 // reactstrap components
-import { useEffect, useRef } from "react";
 
 // core components
+import Sidebar from "components/Sidebar/Sidebar.js";
+
+// import "../assets/css/custom-admin-css/Index.css";
 
 import { routesTeacher } from "routes.js";
-import { Container } from "@mantine/core";
-import Sidebar from "components/Sidebar/Sidebar";
+import TeacherNavbar from "components/Navbars/TeacherNavbar";
 
-const Teacher = (props) => {
+const Admin = (props) => {
   const mainContent = useRef(null);
   const location = useLocation();
-
-  useEffect(() => {}, []);
+  const [adminName, setAdminName] = useState("");
 
   useEffect(() => {
     document.documentElement.scrollTop = 0;
@@ -32,32 +33,54 @@ const Teacher = (props) => {
     });
   };
 
+  const getAdminInfo = () => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    console.log("🚀 ~ file: Admin.js:66 ~ getAdminInfo ~ user:", user);
+    if (user) {
+      setAdminName(user.fullName);
+    }
+  };
+  useEffect(() => {
+    getAdminInfo();
+    console.log(
+      "🚀 ~ file: Admin.js:74 ~ useEffect ~ JSON.parse(localStorage.getItem('user') | '');:",
+      JSON.parse(localStorage.getItem("user"))
+    );
+  });
+
   return (
     <>
-      {/* Sidebar */}
       <Sidebar
-				{...props}
-				routes={routesTeacher}
-				logo={{
-					innerLink: '/teacher/*',
-					imgSrc: require('../assets/img/brand/argon-react.png'),
-					imgAlt: '...',
-				}}
-			/>
+        {...props}
+        routes={routesTeacher}
+        logo={{
+          innerLink: "/admin/index",
+          imgSrc: require("../assets/img/brand/argon-react.png"),
+          imgAlt: "...",
+        }}
+      />
       <div
-        className="main-content mt--5"
-        style={{ backgroundColor: "#fff", minHeight: "100vh" }}
+        className="main-content"
+        style={{ minHeight: "100vh" }}
         ref={mainContent}
       >
-        {/* Page content */}
-        <Container size="xl" px="xs" className="pb-5 pt-8">
+        <TeacherNavbar />
+
+        <div
+          className="m-2 p-5"
+          style={{ minHeight: "100vh", paddingTop: "100px" }}
+        >
           <Routes>
             {getRoutes(routesTeacher)}
+            <Route
+              path="/teacher/*/*"
+              element={<Navigate to="/teacher/information" replace />}
+            />
           </Routes>
-        </Container>
+        </div>
       </div>
     </>
   );
 };
 
-export default Teacher;
+export default Admin;

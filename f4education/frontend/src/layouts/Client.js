@@ -9,7 +9,7 @@ import ClientNavbar from "components/Navbars/ClientNavbar.js";
 import { routesClient } from "routes.js";
 import { Container } from "@mantine/core";
 
-import "../assets/css/custom-client-css/Index.css";
+// import "../assets/css/custom-client-css/Index.css";
 
 const Client = (props) => {
   const mainContent = useRef(null);

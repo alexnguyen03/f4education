@@ -30,8 +30,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     @Override
     public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
         List<RegisterCourse> registerCourses = registerCourseRepository.findAll();
-        List<RegisterCourseResponseDTO> responseDTOs = registerCourses.stream()
-                .map(this::convertToResponseDTO)
+        List<RegisterCourseResponseDTO> responseDTOs = registerCourses.stream().map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
 
         return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse", responseDTOs);
@@ -44,11 +43,47 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
             return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student ID cannot be found", null);
         }
 
-        List<RegisterCourseResponseDTO> responseDTOS = registerCourses.stream()
-                .map(this::convertToResponseDTO)
+        List<RegisterCourseResponseDTO> responseDTOS = registerCourses.stream().map(this::convertToResponseDTO)
                 .toList();
         return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse by Student ID", responseDTOS);
     }
+
+    //public List<ClassesByTeacher> getRegisterCourseWithTeacherAndClasses() {
+//        List<ClassesByTeacherGetData> dtos = new ArrayList<>();
+//        List<ClassesByTeacher> results = registerCourseRepository.getRegisterCourseWithTeacherAndClasses();
+//
+//        System.out.println("DATA HERE");
+//        System.out.println(results);
+//
+//		for (Object[] result : results) {
+//			TeacherClassResponse dto = new TeacherClassResponse((RegisterCourse) result[0], (Classes) result[1],
+//					(Teacher) result[2]);
+//			dtos.add(dto);
+//		}
+//
+//        for (Object[] result : results) {
+//            ClassesByTeacherGetData dto = new ClassesByTeacherGetData((Integer) result[0], (Integer) result[1],
+//                    (String) result[2]);
+//            dtos.add(dto);
+//        }
+//
+//        System.out.println(dtos);
+//
+//        List<TeacherClassResponse> list = new ArrayList<>();
+//        for (ClassesByTeacherGetData dto : dtos) {
+//            RegisterCourse rc = registerCourseRepository.findById(dto.getRegisterCourseId()).get();
+//            Classes c = classRepository.findById(dto.getClassId()).get();
+//            Teacher tc = teacherRepository.findById(dto.getTeacherId()).get();
+//
+//            TeacherClassResponse tcr = new TeacherClassResponse(rc, c, null);
+//
+//            list.add(tcr);
+//        }
+//
+//        System.out.println(list);
+//
+//        return results;
+//    }
 
     @Override
     public HandleResponseDTO<RegisterCourseResponseDTO> getRegisterCourseById(Integer registerCourseId) {
@@ -64,7 +99,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     }
 
     @Override
-    public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(RegisterCourseRequestDTO registerCourseRequestDTO) {
+    public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(
+            RegisterCourseRequestDTO registerCourseRequestDTO) {
         Optional<Student> student = studentRepository.findById(registerCourseRequestDTO.getStudentId());
         Optional<Course> course = courseRepository.findById(registerCourseRequestDTO.getCourseId());
 
@@ -92,7 +128,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     }
 
     @Override
-    public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId, RegisterCourseRequestDTO registerCourseRequestDTO) {
+    public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId,
+                                                                             RegisterCourseRequestDTO registerCourseRequestDTO) {
         Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
         if (registerCourseOptional.isEmpty()) {
             return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
@@ -159,7 +196,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
         return registerCourse;
     }
 
-    private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO, RegisterCourse registerCourse) {
+    private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO,
+                                        RegisterCourse registerCourse) {
         Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
         Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
 

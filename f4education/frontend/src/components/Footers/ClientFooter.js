@@ -6,9 +6,13 @@ import logo from "../../assets/img/brand/f4-white.png";
 const ClientFooter = () => {
   return (
     <>
-      <Container size="xl" px="xs" className="py-5" bg={"#25262B"}>
+      <Container
+        size="xl"
+        px="xs"
+        className="py-5"
+        bg={"#25262B"}
+      >
         <footer className="p-5">
-          
           <div className="d-flex justify-content-between flex-wrap text-start">
             {/* Item */}
             <div className="d-flex flex-column" style={{ maxWidth: "350px" }}>
@@ -170,7 +174,6 @@ const ClientFooter = () => {
             </span>
             <span className="font-weight-700 text-white">@2023, Inc</span>
           </div>
-          
         </footer>
       </Container>
     </>

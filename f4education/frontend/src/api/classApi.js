@@ -13,6 +13,10 @@ const classApi = {
 	updateClass: (body, classId) => {
 		const url = `/classs/${classId}`;
 		return axiosClient.put(url, body);
+	},
+	getAllClassByTeacherId: (teacherId)=>{
+		const url = `/classs/teacher/${teacherId}`;
+		return axiosClient.get(url);
 	}
 };
 
