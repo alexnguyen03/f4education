@@ -25,6 +25,7 @@ import Schedules from "views/admin/Schedules";
 
 import Icons from "views/examples/Icons";
 import ClassInformation from "views/teacher/ClassInformation";
+import ClassInformationDetail from "views/teacher/ClassInformationDetail";
 
 export var routes = [
   {
@@ -219,6 +220,11 @@ export const routesTeacher = [
     name: "Danh sách lớp học",
     icon: "ni ni-collection text-blue",
     component: <ClassInformation />,
+    layout: "/teacher",
+  },
+  {
+    path: "/classes-infor/:classId",
+    component: <ClassInformationDetail />,
     layout: "/teacher",
   },
 ];

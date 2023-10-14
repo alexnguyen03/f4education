@@ -279,7 +279,7 @@ const Home = () => {
         <Dots className={classHeroText.dots} style={{ left: 60, top: 0 }} />
         <Dots className={classHeroText.dots} style={{ left: 0, top: 140 }} />
         <Dots className={classHeroText.dots} style={{ right: 0, top: 60 }} />
-        <Dots className={classHeroText.dots} style={{ right: 0, top: 120 }} />
+        <Dots className={classHeroText.dots} style={{ right: 0, top: 200 }} />
 
         <Box mx={"auto"}>
           <Title

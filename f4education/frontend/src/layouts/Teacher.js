@@ -66,17 +66,16 @@ const Admin = (props) => {
       >
         <TeacherNavbar />
 
-        <div
-          className="m-2 p-5"
-          style={{ minHeight: "100vh", paddingTop: "100px" }}
-        >
-          <Routes>
-            {getRoutes(routesTeacher)}
-            <Route
-              path="/teacher/*/*"
-              element={<Navigate to="/teacher/information" replace />}
-            />
-          </Routes>
+        <div className="m-2 p-3" style={{ minHeight: "100vh" }}>
+          <div className="mt-xl-7 mt-lg-6">
+            <Routes>
+              {getRoutes(routesTeacher)}
+              <Route
+                path="/teacher/*/*"
+                element={<Navigate to="/teacher/information" replace />}
+              />
+            </Routes>
+          </div>
         </div>
       </div>
     </>
