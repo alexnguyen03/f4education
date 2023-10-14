@@ -134,7 +134,7 @@ public class CoursesController {
 	}
 	
 	@GetMapping("/course-register/{studentId}")
-	public List<CourseDTO> findCoursesByStudentId(@PathVariable("studentId") Integer studentId) {
+	public List<CourseDTO> findCoursesByStudentId(@PathVariable("studentId") String studentId) {
 		return courseService.findAllCourseDTOByStudentId(studentId);
 	}
 

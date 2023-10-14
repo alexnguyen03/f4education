@@ -444,20 +444,20 @@ const Resource = () => {
                 enableRowActions
                 renderRowActions={({ row, table }) => (
                   <Box sx={{ display: "flex", flexWrap: "nowrap", gap: "8px" }}>
-                    {/* <Link
-                      to={`/admin/resourceDetail/${
-                        row.original.course.courseName
-                      }/${getFolderId(row.original.link)}`}
-                    >
-                      <IconButton
-                        color="secondary"
-                        onClick={() => {
-                          handleEditRow(row);
-                        }}
+                    {row.original.course && row.original.course.courseName && (
+                      <Link
+                        to={`/admin/resourceDetail/${row.original.course.courseName}/${getFolderId(row.original.link)}`}
                       >
-                        <EditIcon />
-                      </IconButton>
-                    </Link> */}
+                        <IconButton
+                          color="secondary"
+                          onClick={() => {
+                            handleEditRow(row);
+                          }}
+                        >
+                          <EditIcon />
+                        </IconButton>
+                      </Link>
+                    )}
                     <IconButton
                       color="info"
                       onClick={() => {

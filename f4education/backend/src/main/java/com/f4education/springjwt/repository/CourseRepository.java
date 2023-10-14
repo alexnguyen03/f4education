@@ -27,7 +27,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 
 	@Query("SELECT c FROM Course c JOIN c.registerCourses r ON c.courseId = r.course.courseId JOIN r.student s ON s.studentId = r.student.studentId "
 			+ "WHERE s.studentId IN :studentId")
-	List<Course> findByStudentId(@Param("studentId") Integer studentId);
+	List<Course> findByStudentId(@Param("studentId") String studentId);
 
 	@Query("SELECT c FROM Course c ORDER BY c.courseId DESC LIMIT 10")
 	List<Course> findTop10LatestCourses();

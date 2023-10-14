@@ -154,7 +154,7 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<CourseDTO> findAllCourseDTOByStudentId(Integer studentId) {
+	public List<CourseDTO> findAllCourseDTOByStudentId(String studentId) {
 		List<CourseDTO> list = courseRepository.findByStudentId(studentId).stream().map(this::convertEntityToDTO).collect(Collectors.toList());
 		System.out.println(list);
 		return list;

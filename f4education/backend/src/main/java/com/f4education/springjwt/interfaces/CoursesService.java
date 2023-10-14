@@ -22,7 +22,7 @@ public interface CoursesService {
 
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
 
-	List<CourseDTO> findAllCourseDTOByStudentId(Integer studentId);
+	List<CourseDTO> findAllCourseDTOByStudentId(String studentId);
 
 	List<CourseDTO> getCourseBySubjectName(String subjectName);
 }
