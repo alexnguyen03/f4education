@@ -26,6 +26,10 @@ const classApi = {
       headers: { "Content-Type": "multipart/form-data" },
     });
   },
+  getTeacher: (id) => {
+		const url = `/teachers/${id}`;
+		return axiosClient.get(url);
+	},
 };
 
 export default classApi;

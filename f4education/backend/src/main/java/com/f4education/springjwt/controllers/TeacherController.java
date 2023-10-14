@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.TeacherService;
+import com.f4education.springjwt.models.Teacher;
+import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -25,52 +27,46 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/teachers")
 @RequiredArgsConstructor
 public class TeacherController {
-    @Autowired
-    TeacherService teacherService;
+	@Autowired
+	TeacherService teacherService;
 
-    @Autowired
-    XFile xfileService;
+	@Autowired
+	XFile xfileService;
 
-    @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> getAllTeachers() {
-        List<TeacherDTO> list = teacherService.getAllTeachersDTO();
-        return ResponseEntity.ok(list);
-    }
+	@GetMapping
+	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getAllTeachers() {
+		List<TeacherDTO> list = teacherService.getAllTeachersDTO();
+		return ResponseEntity.ok(list);
+	}
 
-    // @GetMapping("/{id}")
-    // @PreAuthorize("hasRole('ADMIN')")
-    // public TeacherDTO getTeacher(@PathVariable("id") String teacherID) {
-    // return teacherService.getTeacherDTOByID(teacherID);
-    // }
+	@GetMapping("/{id}")
+//	@PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+	public ResponseEntity<?> getTeacher(@PathVariable("id") String teacherID) {
+		TeacherDTO teacher = teacherService.getTeacherDTOByID(teacherID);
+		return ResponseEntity.ok(teacher);
+	}
 
-    // @PostMapping
-    // @PreAuthorize("hasRole('ADMIN')")
-    // public TeacherDTO createSubject(@RequestBody TeacherDTO teacherDTO) {
-    // return teacherService.createTeacher(teacherDTO);
-    // }
-
-    @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
-            @RequestParam("file") Optional<MultipartFile> file) {
-        ObjectMapper mapper = new ObjectMapper();
-        TeacherDTO teacherRequest = new TeacherDTO();
-        try {
-            teacherRequest = mapper.readValue(teacherRequestString,
-                    TeacherDTO.class);
-            if (file.isPresent()) {
-                if (!file.isEmpty()) {
-                    File savedFile = xfileService.save(file.get(), "/courses");
-                    teacherRequest.setImage(savedFile.getName());
-                }
-            }
-        } catch (JsonProcessingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        TeacherDTO teacherDTO = teacherService.updateTeacher(teacherRequest);
-        return ResponseEntity.ok(teacherDTO);
-    }
+	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+//	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
+			@RequestParam("file") Optional<MultipartFile> file) {
+		ObjectMapper mapper = new ObjectMapper();
+		TeacherDTO teacherRequest = new TeacherDTO();
+		try {
+			teacherRequest = mapper.readValue(teacherRequestString, TeacherDTO.class);
+			if (file.isPresent()) {
+				if (!file.isEmpty()) {
+					File savedFile = xfileService.save(file.get(), "/courses");
+					teacherRequest.setImage(savedFile.getName());
+				}
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		TeacherDTO teacherDTO = teacherService.updateTeacher(teacherRequest);
+		return ResponseEntity.ok(teacherDTO);
+	}
 }

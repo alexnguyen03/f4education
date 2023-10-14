@@ -199,7 +199,7 @@ export var routesClient = [
 
 export const routesTeacher = [
 	{
-		path: '/teacher-information',
+		path: '/information',
 		name: 'Thông tin tài khoản',
 		icon: 'ni ni-tv-2 text-primary',
 		component: <InformationTeacher />,
