@@ -55,7 +55,7 @@ public class TeacherController {
 			teacherRequest = mapper.readValue(teacherRequestString, TeacherDTO.class);
 			if (file.isPresent()) {
 				if (!file.isEmpty()) {
-					File savedFile = xfileService.save(file.orElse(null), "/courses");
+					File savedFile = xfileService.save(file.orElse(null), "/teachers");
 					teacherRequest.setImage(savedFile.getName());
 				}
 			}
