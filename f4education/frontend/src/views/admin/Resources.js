@@ -254,7 +254,9 @@ const Resource = () => {
   const getAllCourse = async () => {
     try {
       const resp = await courseApi.getAll();
-      setCourses(resp.data.reverse());
+	  if (resp.status === 200) {
+		setCourses(resp.data.reverse());
+	  }
     } catch (error) {
       console.log(error);
     }
