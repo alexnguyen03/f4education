@@ -240,6 +240,7 @@ const Information = () => {
                     resp
                 )
                 if (resp.status === 200) {
+                    getTeacher();
                     handleResetForm()
                     update_success()
                 } else {

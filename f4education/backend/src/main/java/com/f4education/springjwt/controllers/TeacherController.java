@@ -53,12 +53,12 @@ public class TeacherController {
 		TeacherDTO teacherRequest = new TeacherDTO();
 		try {
 			teacherRequest = mapper.readValue(teacherRequestString, TeacherDTO.class);
-			if (file.isPresent()) {
+//			if (file.isPresent()) {
 				if (!file.isEmpty()) {
 					File savedFile = xfileService.save(file.orElse(null), "/teachers");
 					teacherRequest.setImage(savedFile.getName());
 				}
-			}
+//			}
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
