@@ -2,6 +2,8 @@ package com.f4education.springjwt.models;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -34,10 +36,12 @@ public class Cart {
 
 	@ManyToOne
 	@JoinColumn(name = "student_id")
+	@JsonIgnore
 	Student student;
 
 	@ManyToOne
 	@JoinColumn(name = "course_id")
+	@JsonIgnore
 	Course course;
 
 	@Override

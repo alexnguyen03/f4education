@@ -177,6 +177,7 @@ const ClientNavbar = () => {
     window.addEventListener("scroll", function () {
       if (window.pageYOffset === 0) {
         navbar.style.boxShadow = "none";
+        navbar.style.top = 0;
       } else {
         navbar.style.boxShadow = "#63636333 2px 2px 8px 0px";
       }

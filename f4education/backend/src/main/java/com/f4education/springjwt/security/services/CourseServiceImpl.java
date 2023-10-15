@@ -45,11 +45,11 @@ public class CourseServiceImpl implements CoursesService {
 				.collect(Collectors.toList());
 	}
 
-	@Override
-	public List<CourseDTO> findTop10SoldCourse() {
-		return courseRepository.findTopSellingCourses().stream().map(this::convertEntityToDTO)
-				.collect(Collectors.toList());
-	}
+//	@Override
+//	public List<CourseDTO> findTop10SoldCourse() {
+//		return courseRepository.findTopSellingCourses().stream().map(this::convertEntityToDTO)
+//				.collect(Collectors.toList());
+//	}
 
     @Override
 	public CourseDTO findById(Integer id) {

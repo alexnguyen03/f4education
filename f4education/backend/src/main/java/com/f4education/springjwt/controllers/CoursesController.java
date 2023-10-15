@@ -54,11 +54,11 @@ public class CoursesController {
 		return ResponseEntity.ok(list);
 	}
 
-	@GetMapping("/top-selling")
-	public ResponseEntity<?> getTop10SoldCourse() {
-		List<CourseDTO> list = courseService.findTop10SoldCourse();
-		return ResponseEntity.ok(list);
-	}
+//	@GetMapping("/top-selling")
+//	public ResponseEntity<?> getTop10SoldCourse() {
+//		List<CourseDTO> list = courseService.findTop10SoldCourse();
+//		return ResponseEntity.ok(list);
+//	}
 
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody

@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 import com.f4education.springjwt.models.Student;
 
 @Repository
-public interface StudentRepository extends JpaRepository<Student, Integer> {
+public interface StudentRepository extends JpaRepository<Student, String> {
 }

@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -63,24 +65,30 @@ public class RegisterCourse {
     private String image;
 
     @OneToMany(mappedBy = "registerCourse")
+    @JsonIgnore
     List<Certificate> certificate;
 
     @OneToMany(mappedBy = "registerCourse")
+    @JsonIgnore
     List<Evaluate> evaluates;
 
     @OneToMany(mappedBy = "registerCourse")
+    @JsonIgnore
     List<Point> points;
 
     @ManyToOne
     @JoinColumn(name = "student_id")
+    @JsonIgnore
     Student student;
 
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @JsonIgnore
     Course course;
 
     @ManyToOne
     @JoinColumn(name = "class_id")
+    @JsonIgnore
     Classes classes;
 
     @Override

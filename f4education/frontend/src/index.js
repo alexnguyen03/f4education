@@ -26,6 +26,14 @@ root.render(
 				element={<AuthLayout />}
 			/>
 			<Route
+				path='/admin/*/:courseName'
+				element={<AdminLayout />}
+			/>
+			<Route
+				path='/admin/*/:courseName/:folderId'
+				element={<AdminLayout />}
+			/>
+			<Route
 				path='/admin'
 				element={
 					<Navigate
@@ -48,18 +56,14 @@ root.render(
 				path='/*/course-register-detail/:courseId'
 				element={<ClientLayout />}
 			/>
-			<Route
-				path='/admin/*/:courseName'
-				element={<AdminLayout />}
-			/>
-			<Route
-				path='/admin/*/:courseName/:folderId'
-				element={<AdminLayout />}
-			/>
 
 			{/* Teacher Route */}
 			<Route
 				path='/teacher/*'
+				element={<Teacher />}
+			/>
+			<Route
+				path='/*/classes-infor/:classId'
 				element={<Teacher />}
 			/>
 		</Routes>

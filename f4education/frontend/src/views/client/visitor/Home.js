@@ -273,17 +273,18 @@ const Home = () => {
 
   return (
     <>
-      {/* Mantine Hero Carousel */}
+      {/* Mantine Hero section */}
       <Group className={classHeroText.wrapper} size={1400} mb={rem("5rem")}>
         <Dots className={classHeroText.dots} style={{ left: 0, top: 0 }} />
         <Dots className={classHeroText.dots} style={{ left: 60, top: 0 }} />
         <Dots className={classHeroText.dots} style={{ left: 0, top: 140 }} />
         <Dots className={classHeroText.dots} style={{ right: 0, top: 60 }} />
+        <Dots className={classHeroText.dots} style={{ right: 0, top: 200 }} />
 
         <Box mx={"auto"}>
           <Title
             className={classHeroText.title}
-            maw={500}
+            maw={700}
             color="dark"
             align="center"
           >
