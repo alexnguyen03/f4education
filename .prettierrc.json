@@ -1,6 +1,5 @@
 {
     "prettier.jsxSingleQuote": true,
-
     "prettier.tabWidth": 4,
     "prettier.printWidth": 400,
     "prettier.useTabs": true,

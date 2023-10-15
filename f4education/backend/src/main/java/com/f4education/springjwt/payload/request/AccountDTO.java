@@ -1,6 +1,5 @@
 package com.f4education.springjwt.payload.request;
 
-import java.util.List;
 
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Student;

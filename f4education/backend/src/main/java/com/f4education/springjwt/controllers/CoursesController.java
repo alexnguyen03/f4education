@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -79,7 +81,7 @@ public class CoursesController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		CourseDTO courseDTO = courseService.saveCourse(courseRequest);
 		return ResponseEntity.ok(courseDTO);
 	}
@@ -90,6 +92,7 @@ public class CoursesController {
 			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
 		CourseRequest courseRequest = new CourseRequest();
+
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
@@ -102,7 +105,7 @@ public class CoursesController {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+
 		CourseDTO courseDTO = courseService.saveCourse(courseRequest);
 		return ResponseEntity.ok(courseDTO);
 	}
@@ -111,30 +114,31 @@ public class CoursesController {
 	@PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> findAllByAdminId(@PathVariable("adminId") String adminId) {
 		List<CourseDTO> courseDTO = courseService.findAllByAdminId(adminId);
-		return ResponseEntity.ok(courseDTO); 
+		return ResponseEntity.ok(courseDTO);
 	}
-	
+
 	@GetMapping("/{subjectName}")
-	public List<CourseDTO> getCourseBySubjectName(@PathVariable("subjectName") String subjectName){
+	public List<CourseDTO> getCourseBySubjectName(@PathVariable("subjectName") String subjectName) {
 		return courseService.getCourseBySubjectName(subjectName);
 	}
 
 	@GetMapping("/topic/{checkedSubjects}")
-	public ResponseEntity<?> findCoursesByCheckedSubjects(@PathVariable("checkedSubjects") List<String> checkedSubjects) {
+	public ResponseEntity<?> findCoursesByCheckedSubjects(
+			@PathVariable("checkedSubjects") List<String> checkedSubjects) {
 		System.out.println(checkedSubjects);
-		List<CourseDTO> courseDTO =courseService.findBySubjectNames(checkedSubjects);
-		return ResponseEntity.ok(courseDTO); 
+		List<CourseDTO> courseDTO = courseService.findBySubjectNames(checkedSubjects);
+		return ResponseEntity.ok(courseDTO);
 	}
 
 	@GetMapping("/duration/{checkedDurations}")
 	public ResponseEntity<?> findCoursesByCheckedDurations(
 			@PathVariable("checkedDurations") List<String> checkedDurations) {
-		List<CourseDTO> courseDTO =courseService.findByThoiLuongInRange(checkedDurations);
-		return ResponseEntity.ok(courseDTO);  
+		List<CourseDTO> courseDTO = courseService.findByThoiLuongInRange(checkedDurations);
+		return ResponseEntity.ok(courseDTO);
 	}
-	
+
 	@GetMapping("/course-register/{studentId}")
-	public List<CourseDTO> findCoursesByStudentId(@PathVariable("studentId") Integer studentId) {
+	public List<CourseDTO> findCoursesByStudentId(@PathVariable("studentId") String studentId) {
 		return courseService.findAllCourseDTOByStudentId(studentId);
 	}
 
