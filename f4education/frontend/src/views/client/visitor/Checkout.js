@@ -50,7 +50,7 @@ const Checkout = () => {
   const [bill, setBill] = useState({
     totalPrice: totalPrice,
     checkoutMethod: checkOutMethod,
-    studentId: 1,
+    studentId: "1",
   });
 
   //  *************** Action && Logic UI AREA
@@ -69,20 +69,20 @@ const Checkout = () => {
     if (checkOutMethod === "paypal") {
       setPayPalCheckout(true);
       setShowingPayPal(true);
-      return;
-    }
-    if (checkOutMethod === "") {
-      alert("Choose checkout method bro!");
+      setCheckOutMethod("paypal");
       return;
     } else {
-      // API direct to VNPay checkout
-      try {
-        const resp = await paymentApi.createPayment(bill);
-        const url = resp.url;
-        window.location.href = url;
-      } catch (error) {
-        console.log(error);
-      }
+      setCheckOutMethod("vnpay");
+    }
+
+    // API direct to VNPay checkout
+    try {
+      const resp = await paymentApi.createPayment(bill);
+      const url = resp.data.url;
+      console.log(url);
+      window.location.href = url;
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -157,7 +157,6 @@ const Checkout = () => {
     } else {
       return console.log("Other Error");
     }
-    // Xử lý dữ liệu từ thành phần con tại đây
   }, []);
 
   useEffect(() => {
@@ -221,9 +220,7 @@ const Checkout = () => {
     console.log(registerCourseRequest[0]);
 
     try {
-      const resp = await registerCourseApi.createRegisterCourse(
-        registerCourseRequest[0]
-      );
+      await registerCourseApi.createRegisterCourse(registerCourseRequest[0]);
     } catch (error) {
       console.log("RegisterCourse: " + error);
     }
@@ -231,7 +228,7 @@ const Checkout = () => {
 
   const handleCreateBillAndBillDetail = async (updateCartRequest) => {
     try {
-      const resp = await billApi.createBill(bill);
+      await billApi.createBill(bill);
     } catch (error) {
       console.log("Bill: " + error);
     }
@@ -246,7 +243,7 @@ const Checkout = () => {
 
     // Bill detail
     try {
-      const resp = await billApi.createBillDetail(billDetailRequest);
+      await billApi.createBillDetail(billDetailRequest);
     } catch (error) {
       console.log("BillDetail: " + error);
     }
@@ -256,7 +253,7 @@ const Checkout = () => {
   const handleUpdateCart = (updateCartRequest) => {
     updateCartRequest.map(async (request) => {
       try {
-        const resp = await cartApi.updateCart(request, request.cartId);
+        await cartApi.updateCart(request, request.cartId);
       } catch (error) {
         console.log("Cart: " + error);
       }

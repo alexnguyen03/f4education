@@ -37,7 +37,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     }
 
     @Override
-    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(Integer studentId) {
+    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(String studentId) {
         List<RegisterCourse> registerCourses = registerCourseRepository.findByStudentId(studentId);
         if (registerCourses.isEmpty()) {
             return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student ID cannot be found", null);

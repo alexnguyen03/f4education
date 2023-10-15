@@ -131,13 +131,7 @@ const ClientNavbar = () => {
   const fetchCart = async () => {
     try {
       const resp = await cartApi.getAllCart();
-      
-      if(resp.status === 200 && resp.data.length > 0){
-        setCarts(resp.data);
-      }else{
-        console.log("Cannot get Data");
-      }
-
+      setCarts(resp.data);
     } catch (error) {
       console.log(error);
     }
@@ -183,6 +177,7 @@ const ClientNavbar = () => {
     window.addEventListener("scroll", function () {
       if (window.pageYOffset === 0) {
         navbar.style.boxShadow = "none";
+        navbar.style.top = 0;
       } else {
         navbar.style.boxShadow = "#63636333 2px 2px 8px 0px";
       }

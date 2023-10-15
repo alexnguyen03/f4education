@@ -10,7 +10,7 @@ public interface CoursesService {
 
 	List<CourseDTO> findNewestCourse();
 
-	List<CourseDTO> findTop10SoldCourse();
+//	List<CourseDTO> findTop10SoldCourse();
 
 	CourseDTO findById(Integer id);
 

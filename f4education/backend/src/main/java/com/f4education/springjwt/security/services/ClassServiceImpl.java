@@ -48,7 +48,6 @@ public class ClassServiceImpl implements ClassService {
         return list.stream().map(this::convertToResponse).collect(Collectors.toList());
     }
 
-
     @Override
     public ClassDTO createClass(ClassDTO classDTO) {
         String action = "CREATE";
@@ -112,8 +111,19 @@ public class ClassServiceImpl implements ClassService {
             }
         }
 
+
+        // Get list course
+        List<String> courseName = new ArrayList<>();
+        for (RegisterCourse ct : lstRegisterCourse) {
+            if (ct != null) {
+                if (ct.getStatus().equalsIgnoreCase("Đã đăng ký")) {
+                    courseName.add(ct.getCourse().getCourseName());
+                }
+            }
+        }
+
         classResponse.setClasses(classes);
-        classResponse.setRegisterCourses(classes.getRegisterCourses());
+        classResponse.setCourseName(courseName);
         classResponse.setStudents(listStudent);
 
         return classResponse;

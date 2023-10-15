@@ -1,9 +1,7 @@
 import {
   Alert,
-  Badge,
   Box,
   Button,
-  Card,
   Flex,
   Grid,
   Group,
@@ -11,46 +9,53 @@ import {
   MediaQuery,
   Paper,
   rem,
+  Skeleton,
   Text,
   ThemeIcon,
   Title,
   Tooltip,
 } from "@mantine/core";
 import { IconColorSwatch, IconFilterSearch } from "@tabler/icons-react";
-import React, { useState } from "react";
+import moment from "moment";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
+// API
+import classApi from "../../api/classApi";
 
 // scss
 import styles from "../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss";
 
-const listClass = [
-  {
-    classId: 1,
-    className: "101",
-    courseName:
-      "RestAPI aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa eeeeeeeeeeeeeeeeeeeeeeee bbbbbbbbbbbbbbbbbbbbb",
-    startDate: "1/1/2021",
-    endDate: "2/2/2022",
-    status: "Đang hoạt động",
-    numberStudent: 30,
-  },
-  {
-    classId: 2,
-    className: "102",
-    courseName: "AngularJS",
-    startDate: "5/6/2021",
-    endDate: "2/2/2022",
-    status: "Nghĩ",
-    numberStudent: 40,
-  },
-];
+const teacherId = "nguyenhoainam121nTC";
 
 const ClassInformation = () => {
+  // ********** Param Variable
+  let navigate = useNavigate();
+
   // ********** Main Variable
+  const [listClasses, setListClasses] = useState([]);
 
   // ********** Action Variable
+  const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  let navigate = useNavigate();
+
+  //  ******** Fetch AREA
+  const fetchClassByTeacher = async () => {
+    try {
+      setLoading(true);
+      const resp = await classApi.getAllClassByTeacherId(teacherId);
+      if (resp.status === 200 && resp.data.length > 0) {
+        setListClasses(resp.data.reverse());
+      }
+      setLoading(false);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchClassByTeacher();
+  }, []);
 
   // ********** Action
   const handleChangeSearchClass = (e) => {
@@ -61,8 +66,14 @@ const ClassInformation = () => {
     navigate("/teacher/classes-infor/" + classId);
   };
 
-  const filteredClasses = listClass.filter((item) => {
-    const { className, startDate, endDate, courseName } = item;
+  const filteredClasses = listClasses.filter((item) => {
+    const className = item.classes.className;
+    const startDate = item.classes.startDate;
+    const endDate = item.classes.endDate;
+    const courseName = item.courseName[0];
+
+    // console.log(className, startDate, endDate, courseName);
+
     const lowerSearchTerm = searchTerm.toLowerCase();
 
     return (
@@ -75,39 +86,58 @@ const ClassInformation = () => {
 
   // ************** Render UI
   const classInformationList = filteredClasses.map((c) => (
-    <Grid.Col span={4} key={c.classId}>
-      <Paper
-        withBorder
-        radius="md"
-        className={styles.card}
-        onClick={() => navigateToClassInformationDetail(c.classId)}
-      >
-        <Flex justify={"space-between"} align="center">
-          <ThemeIcon
-            size="xl"
+    <Grid.Col span={4} key={c.classes.classId} >
+      {loading ? (
+        <>
+          <Skeleton
+            radius={"sm"}
+            mb="lg"
+            mt="md"
+            width={rem("3rem")}
+            height={rem("3rem")}
+          />
+          <Skeleton width={"100%"} height={rem("2rem")} mb="sm" />
+          <Skeleton width={"100%"} height={rem("1rem")} mb="sm" />
+          <Skeleton width={"100%"} height={rem("1rem")} mb="sm" />
+        </>
+      ) : (
+        <>
+          <Paper
+            withBorder
             radius="md"
-            variant="gradient"
-            gradient={{ deg: 0, from: "pink", to: "purple" }}
+            p={0}
+            className={styles.card}
+            onClick={() => navigateToClassInformationDetail(c.classes.classId)}
           >
-            <IconColorSwatch
-              style={{ width: rem(28), height: rem(28) }}
-              stroke={1.5}
-            />
-          </ThemeIcon>
-          <Tooltip label="Tổng số sinh viên" position="top">
-            <Alert title={c.numberStudent} color="indigo"></Alert>
-          </Tooltip>
-        </Flex>
-        <Text size="xl" fw={500} mt="md">
-          Tên Lớp: {c.className}
-        </Text>
-        <Text size="md" mt="sm" c="dimmed" lineClamp={2}>
-          Khóa học: {c.courseName}
-        </Text>
-        <Text size="md" mt="sm" c="dimmed">
-          Thời gian dạy: {c.startDate} - {c.endDate}
-        </Text>
-      </Paper>
+            <Flex justify={"space-between"} align="center" mt="md">
+              <ThemeIcon
+                size="xl"
+                radius="md"
+                variant="gradient"
+                gradient={{ deg: 0, from: "pink", to: "violet" }}
+              >
+                <IconColorSwatch
+                  style={{ width: rem(28), height: rem(28) }}
+                  stroke={1.5}
+                />
+              </ThemeIcon>
+              <Tooltip label="Tổng số sinh viên" position="top">
+                <Alert title={c.numberStudent} color="indigo"></Alert>
+              </Tooltip>
+            </Flex>
+            <Title order={3} fw={500} mt="md">
+              Tên Lớp: {c.classes.className}
+            </Title>
+            <Text size="lg" mt="sm" c="dimmed" lineClamp={2}>
+              Khóa học: {c.courseName}
+            </Text>
+            <Text size="lg" mt="sm" c="dimmed">
+              Thời gian dạy: {moment(c.classes.startDate).format("DD/mm/yyyy")}{" "}
+              - {moment(c.classes.endDate).format("DD/mm/yyyy")}
+            </Text>
+          </Paper>
+        </>
+      )}
     </Grid.Col>
   ));
 
@@ -124,12 +154,11 @@ const ClassInformation = () => {
               <Input
                 id="search-input"
                 icon={<IconFilterSearch />}
-                withAsterisk
                 size="md"
                 placeholder="Tìm lớp học"
                 onChange={(e) => handleChangeSearchClass(e)}
               />
-              <Button color="grape" size="md">
+              <Button color="violet" size="md">
                 Tìm kiếm
               </Button>
             </Group>

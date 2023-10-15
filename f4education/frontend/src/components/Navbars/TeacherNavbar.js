@@ -24,17 +24,17 @@ import {
 const AdminNavbar = (props) => {
   const [opened, { open, close }] = useDisclosure(false);
   const navigate = useNavigate();
-  console.log(
-    "🚀 ~ file: AdminNavbar.js:23 ~ AdminNavbar ~ props.adminName:",
-    props.adminName
-  );
+  // console.log(
+  //   "🚀 ~ file: AdminNavbar.js:23 ~ AdminNavbar ~ props.adminName:",
+  //   props.adminName
+  // );
   const handleLogout = async () => {
     const user = JSON.parse(localStorage.getItem("user"));
-    console.log("🚀 ~ file: AdminNavbar.js:10 ~ handleLogout ~ user:", user.id);
+    // console.log("🚀 ~ file: AdminNavbar.js:10 ~ handleLogout ~ user:", user.id);
 
     try {
       const resp = await userApi.signout(user.id);
-      console.log("🚀 ~ file: AdminNavbar.js:11 ~ handleLogout ~ resp:", resp);
+      // console.log("🚀 ~ file: AdminNavbar.js:11 ~ handleLogout ~ resp:", resp);
       if (resp.status === 200) {
         localStorage.removeItem("user");
         navigate("/");

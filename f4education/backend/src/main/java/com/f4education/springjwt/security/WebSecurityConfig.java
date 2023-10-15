@@ -118,8 +118,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/accounts/**",
 										"/api/teachers-history/**",
                                         "/api/payment-method/**",
-                                        "/api/register-course/**",
-                                        "/img/**")
+                                        "/api/register-course/**"
+                                        )
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

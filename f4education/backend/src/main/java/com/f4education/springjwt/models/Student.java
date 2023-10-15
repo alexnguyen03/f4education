@@ -26,7 +26,7 @@ public class Student {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "student_id")
-	private Integer studentId;
+	private String studentId;
 
 	@Column(name = "fullname")
 	private String fullname;
@@ -82,7 +82,7 @@ public class Student {
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
 
-	public Student(Integer studentId, String fullname, Boolean gender, String address, String phone, String image) {
+	public Student(String studentId, String fullname, Boolean gender, String address, String phone, String image) {
 		super();
 		this.studentId = studentId;
 		this.fullname = fullname;

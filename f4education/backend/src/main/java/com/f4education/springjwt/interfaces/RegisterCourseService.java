@@ -11,7 +11,7 @@ import java.util.List;
 public interface RegisterCourseService {
     HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse();
 
-    HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(Integer studentId);
+    HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(String studentId);
 
     HandleResponseDTO<RegisterCourseResponseDTO> getRegisterCourseById(Integer registerCourseId);
 

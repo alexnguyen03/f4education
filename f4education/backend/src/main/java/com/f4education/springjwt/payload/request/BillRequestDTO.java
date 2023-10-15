@@ -12,5 +12,5 @@ public class BillRequestDTO {
 
     private String checkoutMethod;
 
-    private Integer studentId;
+    private String studentId;
 }

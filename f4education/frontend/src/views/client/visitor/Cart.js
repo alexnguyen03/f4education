@@ -80,7 +80,7 @@ function Cart() {
     try {
       setLoading(true);
       const resp = await courseApi.getNewestCourse();
-      
+
       if (resp.status === 200 && resp.data.length > 0) {
         setNewestCourse(resp.data);
       } else {
@@ -146,9 +146,9 @@ function Cart() {
     fetchNewsetCourse();
   }, []);
 
-  const slides = newestCourse.map((course) => (
+  const slides = newestCourse.map((course, index) => (
     <Carousel.Slide
-      key={course.courseId}
+      key={index}
       style={{
         overflow: "visible",
       }}

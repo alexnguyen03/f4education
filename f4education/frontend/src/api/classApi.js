@@ -14,7 +14,11 @@ const classApi = {
 		const url = `/classs/${classId}`;
 		return axiosClient.put(url, body);
 	},
-	getAllClassByTeacherId: (teacherId)=>{
+	getByClassId: (classId)=>{
+		const url = `/classs/${classId}`;
+		return axiosClient.get(url);
+	}
+	,getAllClassByTeacherId: (teacherId)=>{
 		const url = `/classs/teacher/${teacherId}`;
 		return axiosClient.get(url);
 	}
