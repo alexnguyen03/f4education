@@ -10,16 +10,15 @@
 			"args": "",
 			"envFile": "${workspaceFolder}/.env"
 		},
-		// AE nào muốn vscode có icon cho dễ nhìn thì recomment line này + dowload vscode icons extension
-		// {
-		// 	"type": "java",
-		// 	"name": "Spring Boot-SpringBootSecurityJwtApplication<spring-boot-security-jwt>",
-		// 	"request": "launch",
-		// 	"cwd": "${workspaceFolder}",
-		// 	"mainClass": "com.f4education.springjwt.SpringBootSecurityJwtApplication",
-		// 	"projectName": "spring-boot-security-jwt",
-		// 	"args": "",
-		// 	"envFile": "${workspaceFolder}/.env"
-		// }
+		{
+			"type": "java",
+			"name": "Spring Boot-SpringBootSecurityJwtApplication<spring-boot-security-jwt>",
+			"request": "launch",
+			"cwd": "${workspaceFolder}",
+			"mainClass": "com.f4education.springjwt.SpringBootSecurityJwtApplication",
+			"projectName": "spring-boot-security-jwt",
+			"args": "",
+			"envFile": "${workspaceFolder}/.env"
+		}
 	]
 }

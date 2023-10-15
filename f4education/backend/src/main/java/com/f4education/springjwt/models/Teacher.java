@@ -52,18 +52,15 @@ public class Teacher implements Serializable {
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "teacher")
-	@JsonIgnore
 	List<Classes> classes;
 
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "account_id")
-	@JsonIgnore
 	User user;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "teacher")
-	@JsonIgnore
 	List<TeacherHistory> teacherHistory;
 
 	@Override
