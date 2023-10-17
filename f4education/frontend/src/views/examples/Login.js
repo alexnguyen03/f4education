@@ -13,7 +13,7 @@ import {
     Col,
     CardFooter
 } from 'reactstrap'
-import userApi from '../../api/userApi'
+import userApi from 'api/userApi'
 import { react, useState, useEffect, useRef } from 'react'
 import { Box, LoadingOverlay } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
@@ -34,7 +34,7 @@ const Login = () => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [account, setAccount] = useState({
-        username: 'namnguyen',
+        username: 'namnhpc03517',
         password: '123456789'
     })
     const [msgError, setMsgError] = useState({})
@@ -45,11 +45,6 @@ const Login = () => {
         }
         try {
             setLoading(true)
-            // const data = await fetch('http://localhost:8080/api/auth/signin', {
-            //     body: account,
-            //     method: 'POST'
-            // })
-            // console.log('🚀 ~ file: Login.js:51 ~ handleLogin ~ data:', data)
             const resp = await userApi.signin(account)
             console.log('🚀 ~ file: Login.js:35 ~ handleLogin ~ resp:', resp)
             if ((resp.status === 401 && resp.status) || resp.status === 404) {
@@ -63,10 +58,6 @@ const Login = () => {
 
             if (resp.status === 200 && resp.status) {
                 setUser(resp.data)
-                console.log(
-                    '🚀 ~ file: Login.js:44 ~ handleLogin ~ resp.data:',
-                    resp.data
-                )
                 storeUserInfo(resp.data)
                 const role = resp.data.roles[0]
                 if (role === 'ROLE_ADMIN') {
@@ -120,10 +111,6 @@ const Login = () => {
                 })
 
                 const role = response.data.roles[0]
-                console.log(
-                    '🚀 ~ file: Login.js:82 ~ responseGoogleSuccess ~ role:',
-                    role
-                )
                 if (role === 'ROLE_ADMIN') {
                     navigate('/admin')
                 } else if (role === 'ROLE_TEACHER') {
@@ -147,9 +134,10 @@ const Login = () => {
     }
     const responseGoogleError = (resp) => {}
     const storeUserInfo = (data) => {
+        console.log('🚀 ~ file: Login.js:137 ~ storeUserInfo ~ data:', data)
         localStorage.setItem('user', JSON.stringify(data))
-        localStorage.setItem('accessToken', JSON.stringify(data.accessToken))
-        localStorage.setItem('refreshToken', JSON.stringify(data.refreshToken))
+        localStorage.setItem('accessToken', data.accessToken)
+        localStorage.setItem('refreshToken', data.refreshToken)
     }
     const handeleOnChangeInput = (e) => {
         setAccount({ ...account, [e.target.name]: e.target.value })

@@ -18,6 +18,7 @@ import lombok.NoArgsConstructor;
 public class ClassDTO {
 	private Integer classId;
 	private String className;
+	private String courseName;
 	private Date startDate;
 	private Date endDate;
 	private Integer maximumQuantity;

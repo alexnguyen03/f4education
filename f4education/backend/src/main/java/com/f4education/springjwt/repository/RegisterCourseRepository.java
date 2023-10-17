@@ -13,4 +13,6 @@ public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, 
 	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.student.studentId = :studentId")
 	List<RegisterCourse> findByStudentId(@Param("studentId") Integer studentId);
 
+	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.course.courseId = :courseId")
+	List<RegisterCourse> findByCourseId(@Param("courseId") Integer courseId);
 }

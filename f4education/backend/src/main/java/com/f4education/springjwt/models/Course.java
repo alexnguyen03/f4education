@@ -1,6 +1,5 @@
 package com.f4education.springjwt.models;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

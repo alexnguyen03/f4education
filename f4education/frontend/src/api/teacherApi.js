@@ -24,6 +24,10 @@ const teacherApi = {
         return axiosClient.put(url, body, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
+    },
+    getTeacher: (id) => {
+        const url = `/teachers/${id}`
+        return axiosClient.get(url)
     }
 }
 

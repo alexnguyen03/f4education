@@ -85,9 +85,14 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	private CourseDTO convertEntityToDTO(Course course) {
-		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
-				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
-				course.getSubject(), course.getImage());
+		return new CourseDTO(course.getCourseId(),
+				course.getCourseName(),
+				course.getCoursePrice(),
+				course.getCourseDuration(),
+				course.getCourseDescription(),
+				course.getNumberSession(),
+				course.getSubject(),
+				course.getImage());
 	}
 
 	private Course convertRequestToEntity(CourseRequest courseRequest) {
@@ -154,8 +159,8 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<CourseDTO> findAllCourseDTOByAccountId(Integer accountId) {
-		List<CourseDTO> list = courseRepository.findByAccountId(accountId).stream().map(this::convertEntityToDTO)
+	public List<CourseDTO> findAllCourseDTOByStudentId(String studentId) {
+		List<CourseDTO> list = courseRepository.findByStudentId(studentId).stream().map(this::convertEntityToDTO)
 				.collect(Collectors.toList());
 		System.out.println(list);
 		return list;

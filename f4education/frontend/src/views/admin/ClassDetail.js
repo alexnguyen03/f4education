@@ -1,7 +1,8 @@
-import ClasssHeader from 'components/Headers/ClasssHeader'
+import ClasssDetailHeader from 'components/Headers/ClasssDetailHeader'
 import React, { useEffect } from 'react'
 import { useState } from 'react'
 import {
+    Alert,
     Badge,
     Button,
     Card,
@@ -10,6 +11,7 @@ import {
     Col,
     Container,
     Label,
+    Modal,
     Row
 } from 'reactstrap'
 import Select from 'react-select'
@@ -22,21 +24,32 @@ import ListItemText from '@material-ui/core/ListItemText'
 import ListItemIcon from '@material-ui/core/ListItemIcon'
 import Checkbox from '@material-ui/core/Checkbox'
 import Divider from '@material-ui/core/Divider'
-import { Avatar, Group, Text, TransferList } from '@mantine/core'
+import { Avatar, Group, Loader, Text, TransferList } from '@mantine/core'
 
+import 'react-toastify/dist/ReactToastify.css'
 import courseApi from '../../api/courseApi'
 import teacherApi from '../../api/teacherApi'
 import { useParams } from 'react-router-dom'
-import classApi from 'api/classApi'
-import registerCourseApi from 'api/registerCourseApi'
-const IMG_URL = process.env.REACT_APP_IMAGE_URL + '/courses/'
+import classApi from '../../api/classApi'
+import registerCourseApi from '../../api/registerCourseApi'
+import { ToastContainer, toast } from 'react-toastify'
+import { useRef } from 'react'
+import Notify from '../../utils/Notify'
+const IMG_TEACHER_URL = process.env.REACT_APP_IMAGE_URL + '/teachers/'
 const ClassDetail = () => {
     let { classIdParam } = useParams()
     const [listTeacher, setListTeacher] = useState([])
+    const [loadingTransfer, setLoadingTransfer] = useState(true)
+    const [showConfirmModal, setShowConfirmModal] = useState(false)
+    const [loadingGetClassDetail, setLoadingGetClassDetail] = useState(true)
+    const [allRegisterCourses, setAllRegisterCourse] = useState([])
+    const toastId = useRef(null)
 
     const [classDetail, setClassDetail] = useState({
         classId: 0,
         className: '',
+        courseName: '',
+        courseId: 0,
         startDate: '',
         endDate: '',
         maximumQuantity: 0,
@@ -57,29 +70,106 @@ const ClassDetail = () => {
             fullname: ''
         }
     })
+    const [classRequest, setClassRequest] = useState({
+        classId: '',
+        courseId: '',
+        teacherId: '',
+        listRegisterCourseId: [] //lay register course de cap nhat
+    })
     const [listCourse, setListCourse] = useState([])
-    const [listStudentInCourse, setListStudentInCourse] = useState([])
-    const [listStudentInClass, setListStudentInClass] = useState([
-        { value: 'sv', label: 'Svelte' },
-        { value: 'rw', label: 'Redwood' },
-        { value: 'np', label: 'NumPy' }
+    const [listStudentInCourse, setListStudentInCourse] = useState([{}])
+    const [listStudentInClass, setListStudentInClass] = useState([{}])
+    const [dataTransfer, setDataTransfer] = useState([
+        listStudentInCourse,
+        listStudentInClass
     ])
-    const [data, setData] = useState([listStudentInCourse, listStudentInClass])
-
-    // ! HANDLE FUNCTIONS
-    const handleSave = () => {
-        setListStudentInCourse(data[0])
-        setListStudentInClass([data[1]])
-        console.log(
-            '🚀 ~ file: ClassDetail.js:65 ~ handleSave ~ classDetail:',
-            classDetail
-        )
+    const notifi_loading = () => {
+        toast('Notify.msg.loading', {
+            type: toast.TYPE.DEFAULT,
+            position: 'top-right',
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            closeButton: true,
+            pauseOnHover: true,
+            theme: 'colored',
+            isLoading: true
+        })
     }
+    // ! HANDLE FUNCTIONS
+    const handleSave = async () => {
+        console.log(
+            '🚀 ~ file: ClassDetail.js:84 ~ handleSave ~ listCourse:',
+            convertStudentIdToRegisterCouserId(
+                dataTransfer[1].map((item) => {
+                    const { value } = { ...item }
+                    return value
+                })
+            )
+        )
+        setClassRequest((prev) => ({
+            ...prev,
+            classId: classDetail.classId,
+            courseId: classDetail.courseId,
+            teacherId: classDetail.teacher.teacherId,
+            listRegisterCourseId: convertStudentIdToRegisterCouserId(
+                dataTransfer[1].map((item) => {
+                    const { value } = { ...item }
+                    return value
+                })
+            )
+        }))
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        try {
+            const resp = await registerCourseApi.updateRegisterCourse(
+                JSON.stringify(classRequest)
+            )
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.createSuccess())
+            }
+        } catch (error) {
+            toast.update(id, Notify.options.updateError())
+            console.log(
+                '🚀 ~ file: ClassDetail.js:94 ~ handleSave ~ error:',
+                error
+            )
+        }
+    }
+    const convertStudentIdToRegisterCouserId = (studentId) => {
+        console.log(
+            '🚀 ~ file: ClassDetail.js:121 ~ convertStudentIdToRegisterCouserId ~ studentId:',
+            studentId
+        )
+        const matchingIds = []
+        for (const registration of allRegisterCourses) {
+            console.log(
+                '🚀 ~ file: ClassDetail.js:123 ~ convertStudentIdToRegisterCouserId ~ registration:',
+                registration
+            )
 
+            if (studentId.includes(registration.studentId)) {
+                matchingIds.push(registration.registerCourseId)
+            }
+        }
+        return matchingIds
+    }
     const handleOnChangeTransferList = (dataInList) => {
-        setData(dataInList)
-        setListStudentInCourse(data[0])
-        setListStudentInClass(data[1])
+        setShowConfirmModal(true)
+        setListStudentInCourse(dataInList[0])
+        setDataTransfer(dataInList)
+        setListStudentInClass(dataInList[1])
+        setClassRequest((prev) => ({
+            ...prev,
+            classId: classDetail.classId,
+            courseId: classDetail.courseId,
+            teacherId: classDetail.teacher.teacherId,
+            listRegisterCourseId: convertStudentIdToRegisterCouserId(
+                dataTransfer[1].map((item) => {
+                    const { value } = { ...item }
+                    return value
+                })
+            )
+        }))
     }
 
     //! CALL APIS
@@ -108,23 +198,50 @@ const ClassDetail = () => {
             )
         }
     }
+    const convertRegisterToStudentArray = (arr) => {
+        const convertedArray = arr.map((item) => ({
+            value: item.studentId,
+            label: item.studentName
+        }))
+        return convertedArray
+    }
     const getAllStudentInCourse = async () => {
+        setLoadingTransfer(true)
+        console.log('run getAll Student')
         try {
             const resp = await registerCourseApi.getAllRegisterCourse()
             console.log(
-                '🚀 ~ file: ClassDetail.js:93 ~ getAllStudentInCourse ~ resp:',
+                '🚀 ~ file: ClassDetail.js:171 ~ getAllStudentInCourse ~ resp:',
                 resp
             )
-            const listRegisterCourse = resp.data.data.filter(
-                (item) => item.courseId === classDetail.courseId
-            )
-            // console.log('🚀 ~ file: ClassDetail.js:95 ~ getAllStudentInCourse ~ listRegisterCourse:', listRegisterCourse.length);
-            // console.log('🚀 ~ file: ClassDetail.js:95 ~ getAllStudentInCourse ~ classDetail.courseId:', classDetail.courseId);
-            if (resp.status === 200 && resp.data.length > 0) {
-                console.log(
-                    '🚀 ~ file: ClassDetail.js:99 ~ getAllStudentInCourse ~ resp.data:',
-                    resp.data
+
+            if (resp.status === 200) {
+                setAllRegisterCourse(resp.data.data)
+                const listRegisterCourse = resp.data.data.filter((item) => {
+                    return item.courseId === classDetail.courseId
+                })
+                console.log(classDetail.courseId)
+                console.log(listRegisterCourse)
+                const studentInClass = listRegisterCourse.filter((item) => {
+                    return item.classId === parseInt(classIdParam)
+                })
+
+                const studentInCourse = listRegisterCourse.filter(
+                    (item) => item.classId !== parseInt(classIdParam)
                 )
+
+                // setListStudentInCourse(
+                //     convertRegisterToStudentArray(studentInCourse)
+                // )
+                // setListStudentInClass(
+                //     convertRegisterToStudentArray(studentInClass)
+                // )
+
+                setLoadingTransfer(false)
+                setDataTransfer([
+                    convertRegisterToStudentArray(studentInCourse),
+                    convertRegisterToStudentArray(studentInClass)
+                ])
             }
         } catch (error) {
             console.log(
@@ -137,9 +254,10 @@ const ClassDetail = () => {
         try {
             const resp = await teacherApi.getAllTeachers()
             console.log(
-                '🚀 ~ file: ClassDetail.js:63 ~ getAllTeachers ~ resp:',
+                '🚀 ~ file: ClassDetail.js:162 ~ getAllTeachers ~ resp:',
                 resp
             )
+
             if (resp.status === 200 && resp.data.length > 0) {
                 setListTeacher(
                     resp.data.map((item) => {
@@ -161,6 +279,8 @@ const ClassDetail = () => {
             )
         }
     }
+
+    //! HANDLE FUNCTIONS
     const handleOnChangeTeacher = (val) => {
         const { value, label } = { ...val }
         setClassDetail((prevState) => ({
@@ -171,33 +291,14 @@ const ClassDetail = () => {
                 fullname: label
             }
         }))
-        console.log(
-            '🚀 ~ file: ClassDetail.js:81 ~ handleOnChangeTeacher ~ e.target.value:',
-            value
-        )
     }
     const getClassByClassId = async () => {
+        setLoadingGetClassDetail(true)
         try {
             const resp = await classApi.getClassById(classIdParam)
-            console.log(
-                '🚀 ~ file: ClassDetail.js:135 ~ getClassByClassId ~ resp:',
-                resp
-            )
-            setClassDetail(resp.data)
-            const { students } = { ...resp.data.students }
 
-            setListStudentInClass(
-                students.map((student) => {
-                    return {
-                        studentId: student.studentId,
-                        fullname: student.fullname
-                    }
-                })
-            )
-            console.log(
-                '🚀 ~ file: ClassDetail.js:90 ~ getClassByClassId ~ resp:',
-                resp
-            )
+            setClassDetail(resp.data)
+            setLoadingGetClassDetail(false)
         } catch (error) {
             console.log(error)
         }
@@ -231,57 +332,108 @@ const ClassDetail = () => {
                 break
         }
     }
+    const renderTransferData = () => {
+        if (loadingTransfer) {
+            return (
+                <div
+                    className="d-flex justify-content-center pt-5"
+                    style={{ minHeight: '200px' }}
+                >
+                    <Loader color="blue" />
+                </div>
+            )
+        }
+        return (
+            <TransferList
+                className="mt-2"
+                value={dataTransfer}
+                itemComponent={React.memo(({ data, selected }) => (
+                    <Group noWrap>
+                        <Avatar src={data.image} radius="xl" size="lg" />
+                        <div style={{ flex: 1 }}>
+                            <Text size="sm" weight={500}>
+                                {data.label}
+                            </Text>
+                            <Text size="xs" color="dimmed" weight={400}>
+                                {data.description}
+                            </Text>
+                        </div>
+                        <Checkbox
+                            checked={selected}
+                            onChange={() => {}}
+                            tabIndex={-1}
+                            sx={{ pointerEvents: 'none' }}
+                        />
+                    </Group>
+                ))}
+                onChange={handleOnChangeTransferList}
+                searchPlaceholder={[
+                    'Tìm kiếm học viên để thêm vào lớp',
+                    'Tìm kiếm học viên trong lớp'
+                ]}
+                nothingFound={'Danh sách học viên trống'}
+                titles={[
+                    `Học viên đã đăng ký: ${dataTransfer[0].length}`,
+                    `Học viên trong lớp: ${dataTransfer[1].length}`
+                ]}
+                showTransferAll={false}
+                placeholder={[
+                    'Không còn học viên nào đã đăng ký',
+                    'Không còn học viên nào trong lớp'
+                ]}
+                transferAllMatchingFilter={true}
+                listHeight={450}
+            />
+        )
+    }
     useEffect(() => {
         getClassByClassId()
-        getRegisterCourse()
         getAllTeachers()
-        getAllStudentInCourse()
+        getRegisterCourse()
     }, [])
+    useEffect(() => {
+        if (!loadingGetClassDetail) {
+            console.log(
+                '🚀 ~ file: ClassDetail.js:317 ~ useEffect ~ loadingGetClassDetail:',
+                loadingGetClassDetail
+            )
+            getAllStudentInCourse()
+        }
+    }, [loadingGetClassDetail])
 
     return (
         <>
-            <ClasssHeader />
+            <ToastContainer />
+            <ClasssDetailHeader />
             <Container className="mt--7" fluid>
                 <Card>
                     <CardHeader>
-                        <Row>
+                        <Row className=" d-flex justify-content-between">
                             {
                                 <>
                                     <Col md={4}>
-                                        <Label>Chọn khóa học</Label>
-                                        <Select
-                                            options={listCourse}
-                                            placeholder="Chọn khóa học"
-                                            onChange={(e) => {
-                                                console.log(e)
-                                            }}
-                                            isSearchable={true}
-                                            className="form-control-alternative "
-                                            styles={{ outline: 'none' }}
-                                        />
-                                    </Col>
-                                    <Col md={4}>
                                         <Label>Chọn giáo viên phụ trách</Label>
+                                        <span>{listStudentInClass.length}</span>
                                         <Select
-                                            formatOptionLabel={(teacher) => (
-                                                <div className="d-flex">
-                                                    <div className="country-option ">
-                                                        <img
-                                                            width={'35'}
-                                                            height={'35'}
-                                                            className="rounded-circle"
-                                                            src={
-                                                                IMG_URL +
-                                                                teacher.image
-                                                            }
-                                                            alt="teacher-image"
-                                                        />
-                                                    </div>
-                                                    <div className="d-flex flex-column justify-content-center ml-3">
-                                                        {teacher.label}
-                                                    </div>
-                                                </div>
-                                            )}
+                                            // formatOptionLabel={(teacher) => (
+                                            //     <div className="d-flex">
+                                            //         <div className="country-option ">
+                                            //             <img
+                                            //                 width={'35'}
+                                            //                 height={'35'}
+                                            //                 className="rounded-circle"
+                                            //                 src={
+                                            //                     IMG_TEACHER_URL +
+                                            //                     teacher.image
+                                            //                 }
+                                            //                 alt="teacher-image"
+                                            //             />
+                                            //         </div>
+                                            //         <div className="d-flex flex-column justify-content-center ml-3">
+                                            //             {teacher.label}
+                                            //         </div>
+                                            //     </div>
+                                            // )}
                                             options={listTeacher}
                                             placeholder="Chọn môn học"
                                             onChange={(val) => {
@@ -294,9 +446,12 @@ const ClassDetail = () => {
                                     </Col>
                                 </>
                             }
-                            <Col md={4} className="mt-4 pt-1">
+                            <Col
+                                md={4}
+                                className="mt-4 pt-1 d-flex flex-column-revert"
+                            >
                                 <Button
-                                    className="btn-icon btn-3"
+                                    className="btn-icon ml-auto btn-3"
                                     color="primary"
                                     type="button"
                                     onClick={handleSave}
@@ -334,8 +489,9 @@ const ClassDetail = () => {
                                                 className="font-weight-bold"
                                                 color="info"
                                             >
-                                                {classDetail.maximumQuantity -
-                                                    data[1].length}
+                                                {dataTransfer[1] &&
+                                                    classDetail.maximumQuantity -
+                                                        dataTransfer[1].length}
                                             </Badge>
                                         </div>
                                     </div>
@@ -372,55 +528,7 @@ const ClassDetail = () => {
                                 </Col>
                             </Row>
                         </Row>
-
-                        <TransferList
-                            className="mt-2"
-                            value={data}
-                            itemComponent={React.memo(({ data, selected }) => (
-                                <Group noWrap>
-                                    <Avatar
-                                        src={data.image}
-                                        radius="xl"
-                                        size="lg"
-                                    />
-                                    <div style={{ flex: 1 }}>
-                                        <Text size="sm" weight={500}>
-                                            {data.label}
-                                        </Text>
-                                        <Text
-                                            size="xs"
-                                            color="dimmed"
-                                            weight={400}
-                                        >
-                                            {data.description}
-                                        </Text>
-                                    </div>
-                                    <Checkbox
-                                        checked={selected}
-                                        onChange={() => {}}
-                                        tabIndex={-1}
-                                        sx={{ pointerEvents: 'none' }}
-                                    />
-                                </Group>
-                            ))}
-                            onChange={handleOnChangeTransferList}
-                            searchPlaceholder={[
-                                'Tìm kiếm học viên để thêm vào lớp',
-                                'Tìm kiếm học viên trong lớp'
-                            ]}
-                            nothingFound={'Danh sách học viên trống'}
-                            titles={[
-                                `Học viên đã đăng ký: ${data[0].length}`,
-                                `Học viên trong lớp: ${data[1].length}`
-                            ]}
-                            showTransferAll={false}
-                            placeholder={[
-                                'Không còn học viên nào đã đăng ký',
-                                'Không còn học viên nào trong lớp'
-                            ]}
-                            transferAllMatchingFilter={true}
-                            listHeight={450}
-                        />
+                        {renderTransferData()}
                     </CardBody>
                 </Card>
             </Container>

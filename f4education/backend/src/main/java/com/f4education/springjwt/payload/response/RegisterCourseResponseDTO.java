@@ -39,4 +39,6 @@ public class RegisterCourseResponseDTO {
     private String studentId;
 
     private Integer courseId;
+
+    private Integer classId;
 }

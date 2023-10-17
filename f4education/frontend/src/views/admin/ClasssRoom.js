@@ -26,9 +26,6 @@ import classRoomApi from "api/classRoomApi";
 // gọi API từ classRoomHistoryApi
 import classRoomHistoryApi from "api/classRoomHistoryApi";
 
-// CSS Module
-// import styles from "../../../assets/css/customClientCss/Toast.module.css";
-
 const ClasssRoom = () => {
   const [classRooms, setClassRooms] = useState([]);
   const [classRoomHistories, setClassRoomHistories] = useState([]);
@@ -157,9 +154,7 @@ const ClasssRoom = () => {
       if (resp.status === 200 && resp.data.length > 0) {
         setClassRooms(resp.data);
       } else if (resp.data.isEmpty) {
-        console.log("Dữ liệu rỗng");
-      } else {
-        console.log("Lỗi");
+        notification("warn", "Chưa có phòng học !!!");
       }
     } catch (error) {
       console.log(error);
@@ -176,11 +171,11 @@ const ClasssRoom = () => {
       try {
         const resp = await classRoomApi.createClassRoom(classRoom);
         if (resp.status === 200) {
-          notification("success", "Thêm phòng học thành công !!!");
+          notification("success", "Thêm thành công !!!");
           getDataClassRoom();
           handleResetForm();
         } else {
-          notification("error", "Thêm phòng học thất bại !!!");
+          notification("error", "Thêm thất bại !!!");
         }
       } catch (error) {
         console.log("Thêm thất bại", error);
@@ -201,11 +196,11 @@ const ClasssRoom = () => {
           classRoom.classroomId
         );
         if (resp.status === 200) {
-          notification("success", "Cập nhật phòng học thành công !!!");
+          notification("success", "Cập nhật thành công !!!");
           getDataClassRoom();
           handleResetForm();
         } else {
-          notification("error", "Cập nhật phòng học thất bại !!!");
+          notification("error", "Cập nhật thất bại !!!");
         }
       } catch (error) {
         console.log("Cập nhật thất bại", error);
@@ -378,7 +373,13 @@ const ClasssRoom = () => {
                 positionActionsColumn="last"
                 renderTopToolbarCustomActions={() => (
                   <Button
-                    onClick={() => setShowForm((pre) => !pre)}
+                    onClick={() => {
+                      setClassRoom({
+                        ...classRoom,
+                        status: "Hoạt động",
+                      });
+                      setShowForm((pre) => !pre);
+                    }}
                     color="success"
                   >
                     Thêm phòng học

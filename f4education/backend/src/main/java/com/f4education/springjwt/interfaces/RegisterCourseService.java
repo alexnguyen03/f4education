@@ -22,5 +22,10 @@ public interface RegisterCourseService {
         HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId,
                         RegisterCourseRequestDTO registerCourseRequestDTO);
 
+        List<RegisterCourseResponseDTO> updateRegisterCourseInClass(
+                        RegisterCourseRequestDTO registerCourseRequestDTO);// cap nhat lai classId trong register course
+                                                                           // khi xep hoc vien vao lop
+
         List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName();
+
 }

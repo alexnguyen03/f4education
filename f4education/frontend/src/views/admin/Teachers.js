@@ -35,7 +35,7 @@ import {
 } from 'reactstrap'
 import Select from 'react-select'
 
-const IMG_URL = '/courses/'
+const IMG_URL = '/teachers/'
 const Teachers = () => {
     const user = JSON.parse(localStorage.getItem('user') | '')
     const [imgData, setImgData] = useState(null)
@@ -296,6 +296,7 @@ const Teachers = () => {
         // hide form
         setShowForm((pre) => !pre)
         setImgData(null)
+        setImage(null)
         setUpdate(false)
         setTeacher({
             // subjectName: '',

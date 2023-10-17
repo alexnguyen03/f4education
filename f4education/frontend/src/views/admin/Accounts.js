@@ -90,7 +90,7 @@ const Accounts = () => {
             type: toast.TYPE.ERROR,
             render: mess,
             position: 'top-right',
-            autoClose: 5000,
+            // autoClose: false,
             hideProgressBar: false,
             closeOnClick: true,
             closeButton: true,
@@ -124,7 +124,7 @@ const Accounts = () => {
         password: '',
         email: '',
         roles: 1,
-        status: false,
+        status: true,
         student: {
             studentId: 0,
             fullname: '',
@@ -142,7 +142,7 @@ const Accounts = () => {
         password: '',
         email: '',
         roles: 2,
-        status: false,
+        status: true,
         teacher: {
             teacherId: 0,
             fullname: '',
@@ -163,7 +163,7 @@ const Accounts = () => {
         password: '',
         email: '',
         roles: 3,
-        status: false,
+        status: true,
         admin: {
             adminId: '',
             fullname: '',
@@ -283,8 +283,24 @@ const Accounts = () => {
         })
     }
 
+    const onChangePicture_1 = (e) => {
+        setImage(null)
+        if (e.target.files[0]) {
+            setImage(e.target.files[0])
+            const reader = new FileReader()
+            reader.addEventListener('load', () => {
+                setImgData(reader.result)
+            })
+            reader.readAsDataURL(e.target.files[0])
+            setTeacher((preStudent) => ({
+                ...preStudent,
+                image: e.target.files[0].name
+            }))
+        }
+    }
+
     // Cập nhật hình ảnh
-    const onChangePicture = (e) => {
+    const onChangePicture_2 = (e) => {
         setImage(null)
         if (e.target.files[0]) {
             setImage(e.target.files[0])
@@ -300,6 +316,22 @@ const Accounts = () => {
         }
     }
 
+    const onChangePicture_3 = (e) => {
+        setImage(null)
+        if (e.target.files[0]) {
+            setImage(e.target.files[0])
+            const reader = new FileReader()
+            reader.addEventListener('load', () => {
+                setImgData(reader.result)
+            })
+            reader.readAsDataURL(e.target.files[0])
+            setTeacher((preAdmin) => ({
+                ...preAdmin,
+                image: e.target.files[0].name
+            }))
+        }
+    }
+
     const columns_student = useMemo(
         () => [
             {
@@ -310,7 +342,7 @@ const Accounts = () => {
             {
                 accessorKey: 'email',
                 header: 'Email',
-                size: 75
+                size: 85
             },
             {
                 accessorKey: 'student.fullname',
@@ -338,8 +370,51 @@ const Accounts = () => {
                         )
                     }
                 },
-                header: 'Tên người dùng',
+                header: 'Tên học viên',
                 size: 70
+            },
+            {
+                accessorKey: 'student.phone',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.student.phone === null ||
+                            row.student.phone === ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.student.phone}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin
+                            </span>
+                        )
+                    }
+                },
+                header: 'SĐT',
+                size: 50
+            },
+            {
+                accessorKey: 'status',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.status === false) {
+                        return <span className="text-danger">Đã khóa</span>
+                    } else {
+                        return <span className="text-success">Đã mở khóa</span>
+                    }
+                },
+                header: 'Trạng thái',
+                size: 30
             }
         ],
         []
@@ -383,8 +458,51 @@ const Accounts = () => {
                         )
                     }
                 },
-                header: 'Tên người dùng',
+                header: 'Tên giảng viên',
                 size: 70
+            },
+            {
+                accessorKey: 'teacher.phone',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.teacher.phone === null ||
+                            row.teacher.phone === ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.teacher.phone}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin
+                            </span>
+                        )
+                    }
+                },
+                header: 'SĐT',
+                size: 50
+            },
+            {
+                accessorKey: 'status',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.status === false) {
+                        return <span className="text-danger">Đã khóa</span>
+                    } else {
+                        return <span className="text-success">Đã mở khóa</span>
+                    }
+                },
+                header: 'Trạng thái',
+                size: 30
             }
         ],
         []
@@ -428,8 +546,51 @@ const Accounts = () => {
                         )
                     }
                 },
-                header: 'Tên người dùng',
+                header: 'Tên quản trị viên',
                 size: 70
+            },
+            {
+                accessorKey: 'admin.phone',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    try {
+                        if (
+                            row.admin.phone === null ||
+                            row.admin.phone === ''
+                        ) {
+                            return (
+                                <span className="text-danger">
+                                    Chưa có thông tin
+                                </span>
+                            )
+                        } else {
+                            return <span>{row.admin.phone}</span>
+                        }
+                    } catch (error) {
+                        return (
+                            <span className="text-danger">
+                                Chưa có thông tin
+                            </span>
+                        )
+                    }
+                },
+                header: 'SĐT',
+                size: 50
+            },
+            {
+                accessorKey: 'status',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.status === false) {
+                        return <span className="text-danger">Đã khóa</span>
+                    } else {
+                        return <span className="text-success">Đã mở khóa</span>
+                    }
+                },
+                header: 'Trạng thái',
+                size: 30
             }
         ],
         []
@@ -495,6 +656,10 @@ const Accounts = () => {
                 selectedSutdent.student.image
         )
 
+        console.log(
+            '🚀 ~ file: Accounts.js:496 ~ Accounts ~ selectedSutdent.student.image:',
+            selectedSutdent.student.image
+        )
         setStudent({ ...selectedSutdent })
         setRSelected(selectedSutdent.student.gender)
     }
@@ -538,13 +703,14 @@ const Accounts = () => {
         setShowForm_1((pre) => !pre)
         setUpdate(false)
         setImgData(null)
+        setImage(null)
         setStudent({
             id: 0,
             username: '',
             password: '',
             email: '',
             roles: 1,
-            status: false,
+            status: true,
             student: {
                 studentId: 0,
                 fullname: '',
@@ -563,13 +729,14 @@ const Accounts = () => {
         setShowForm_2((pre) => !pre)
         setUpdate(false)
         setImgData(null)
+        setImage(null)
         setTeacher({
             id: 0,
             username: '',
             password: '',
             email: '',
             roles: 0,
-            status: false,
+            status: true,
             teacher: {
                 teacherId: 0,
                 fullname: '',
@@ -590,12 +757,13 @@ const Accounts = () => {
         setShowForm_3((pre) => !pre)
         setUpdate(false)
         setImgData(null)
+        setImage(null)
         setAdmin({
             id: 0,
             username: '',
             password: '',
             email: '',
-            status: false,
+            status: true,
             roles: 3,
             admin: {
                 adminId: '',
@@ -1038,6 +1206,10 @@ const Accounts = () => {
             // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
             try {
                 const resp = await accountApi.addAccount(formData)
+                console.log(
+                    '🚀 ~ file: Accounts.js:1192 ~ getAllTeacher ~ resp:',
+                    resp
+                )
                 if (resp.status === 200) {
                     handleResetForm_3()
                     getAllAdmin()
@@ -1061,15 +1233,14 @@ const Accounts = () => {
     //gọi API lấy data với vai trò giảng viên
     const getAllTeacher = async () => {
         console.log('getAllTeacher ~ teachers:', teachers)
-
-        // if (teachers.length > 0) {
-        //   setLoadingTeachers(false);
-        //   return;
-        // }
-
         try {
             setLoadingTeachers(true)
             const resp = await accountApi.getAllAccountsByRole(2)
+            console.log(
+                '🚀 ~ file: Accounts.js:1196 ~ getAllTeacher ~ resp:',
+                resp
+            )
+
             if (resp.status === 200) {
                 setTeachers(resp.data.reverse())
             } else {
@@ -1079,6 +1250,8 @@ const Accounts = () => {
             setLoadingTeachers(false)
         } catch (error) {
             console.log('failed to load data', error)
+            setTeachers([])
+            setLoadingTeachers(false)
             notifi('Lỗi kết nối server', 'ERROR')
         }
     }
@@ -1093,6 +1266,10 @@ const Accounts = () => {
         try {
             setLoadingStudents(true)
             const resp = await accountApi.getAllAccountsByRole(1)
+            console.log(
+                '🚀 ~ file: Accounts.js:1226 ~ getAllStudent ~ resp:',
+                resp
+            )
             if (resp.status === 200) {
                 setStudents(resp.data.reverse())
             } else {
@@ -1101,6 +1278,8 @@ const Accounts = () => {
             setLoadingStudents(false)
         } catch (error) {
             console.log('failed to load data', error)
+            setStudents([])
+            setLoadingStudents(false)
             notifi('Lỗi kết nối server', 'ERROR')
         }
     }
@@ -1115,6 +1294,11 @@ const Accounts = () => {
         try {
             setLoadingAdmins(true)
             const resp = await accountApi.getAllAccountsByRole(3)
+            console.log(
+                '🚀 ~ file: Accounts.js:1250 ~ getAllAdmin ~ resp:',
+                resp
+            )
+
             if (resp.status === 200) {
                 setAdmins(resp.data.reverse())
             } else {
@@ -1123,6 +1307,8 @@ const Accounts = () => {
             setLoadingAdmins(false)
         } catch (error) {
             console.log('failed to load data', error)
+            setAdmins([])
+            setLoadingAdmins(false)
             notifi('Lỗi kết nối server', 'ERROR')
         }
     }
@@ -1598,6 +1784,7 @@ const Accounts = () => {
                                                     )}
                                                     <br />
                                                     <label
+                                                        hidden={update}
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
@@ -1613,7 +1800,7 @@ const Accounts = () => {
                                                             handelOnChangeInput_1
                                                         }
                                                         name="password"
-                                                        readOnly={update}
+                                                        hidden={update}
                                                         value={student.password}
                                                     />
                                                     {errors_1.password && (
@@ -1676,7 +1863,7 @@ const Accounts = () => {
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-course-name"
-                                                        placeholder="Tên giảng viên"
+                                                        placeholder="Tên học viên"
                                                         type="text"
                                                         onChange={
                                                             handelOnChangeInput_1
@@ -1821,7 +2008,7 @@ const Accounts = () => {
                                                                     className="custom-file-input form-control-alternative"
                                                                     id="customFile"
                                                                     onChange={
-                                                                        onChangePicture
+                                                                        onChangePicture_1
                                                                     }
                                                                 />
                                                                 <label
@@ -1858,6 +2045,22 @@ const Accounts = () => {
                                                                 }
                                                             />
                                                         )}
+                                                        {!student.student
+                                                            .image &&
+                                                            !imgData && (
+                                                                <img
+                                                                    alt=""
+                                                                    width={350}
+                                                                    className=""
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .REACT_APP_IMAGE_URL +
+                                                                        IMG_URL +
+                                                                        'defaultImgUser.jpg'
+                                                                    }
+                                                                />
+                                                            )}
                                                     </div>
                                                 </Row>
                                             </Col>
@@ -1941,6 +2144,7 @@ const Accounts = () => {
                                                     )}
                                                     <br />
                                                     <label
+                                                        hidden={update}
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
@@ -1956,7 +2160,7 @@ const Accounts = () => {
                                                             handelOnChangeInput_2
                                                         }
                                                         name="password"
-                                                        readOnly={update}
+                                                        hidden={update}
                                                         value={teacher.password}
                                                     />
                                                     {errors.password && (
@@ -2262,7 +2466,7 @@ const Accounts = () => {
                                                                     className="custom-file-input form-control-alternative"
                                                                     id="customFile"
                                                                     onChange={
-                                                                        onChangePicture
+                                                                        onChangePicture_2
                                                                     }
                                                                 />
                                                                 <label
@@ -2299,6 +2503,22 @@ const Accounts = () => {
                                                                 }
                                                             />
                                                         )}
+                                                        {!teacher.teacher
+                                                            .image &&
+                                                            !imgData && (
+                                                                <img
+                                                                    alt=""
+                                                                    width={350}
+                                                                    className=""
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .REACT_APP_IMAGE_URL +
+                                                                        IMG_URL +
+                                                                        'defaultImgUser.jpg'
+                                                                    }
+                                                                />
+                                                            )}
                                                     </div>
                                                 </Row>
                                             </Col>
@@ -2382,6 +2602,7 @@ const Accounts = () => {
                                                     )}
                                                     <br />
                                                     <label
+                                                        hidden={update}
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
@@ -2397,7 +2618,7 @@ const Accounts = () => {
                                                             handelOnChangeInput_3
                                                         }
                                                         name="password"
-                                                        readOnly={update}
+                                                        hidden={update}
                                                         value={admin.password}
                                                     />
                                                     {errors.password && (
@@ -2456,13 +2677,13 @@ const Accounts = () => {
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
-                                                        Tên giảng viên
+                                                        Tên quản trị viên
                                                     </label>
 
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-course-name"
-                                                        placeholder="Tên giảng viên"
+                                                        placeholder="Tên quản trị viên"
                                                         type="text"
                                                         onChange={
                                                             handelOnChangeInput_3
@@ -2697,7 +2918,7 @@ const Accounts = () => {
                                                                     className="custom-file-input form-control-alternative"
                                                                     id="customFile"
                                                                     onChange={
-                                                                        onChangePicture
+                                                                        onChangePicture_3
                                                                     }
                                                                 />
                                                                 <label
@@ -2733,6 +2954,21 @@ const Accounts = () => {
                                                                 }
                                                             />
                                                         )}
+                                                        {!admin.admin.image &&
+                                                            !imgData && (
+                                                                <img
+                                                                    alt=""
+                                                                    width={350}
+                                                                    className=""
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .REACT_APP_IMAGE_URL +
+                                                                        IMG_URL +
+                                                                        'defaultImgUser.jpg'
+                                                                    }
+                                                                />
+                                                            )}
                                                     </div>
                                                 </Row>
                                             </Col>

@@ -1,4 +1,3 @@
-import axios from 'axios'
 import axiosClient from './axiosClient'
 
 // api/productApi.js
@@ -14,6 +13,10 @@ const registerCourseApi = {
     getAllRegisterCourse: () => {
         const url = '/register-course'
         return axiosClient.get(url)
+    },
+    updateRegisterCourse: (body) => {
+        const url = '/register-course'
+        return axiosClient.put(url, body)
     }
 }
 

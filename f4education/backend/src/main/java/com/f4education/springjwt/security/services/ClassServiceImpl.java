@@ -88,6 +88,7 @@ public class ClassServiceImpl implements ClassService {
 			List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
 					.collect(Collectors.toList());
 			classDTO.setStudents(lStudents);
+			classDTO.setCourseName(classes.getRegisterCourses().get(0).getCourse().getCourseName());
 			classDTO.setCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
 		}
 		return classDTO;

@@ -56,8 +56,9 @@ public class AccountController {
 
     @GetMapping("/{role}")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<AccountDTO> getByRole(@PathVariable("role") Integer role) {
-        return accountService.getAllAccountsDTOByRole(role);
+    public ResponseEntity<?> getByRole(@PathVariable("role") Integer role) {
+        List<AccountDTO> list = accountService.getAllAccountsDTOByRole(role);
+        return ResponseEntity.ok(list);
     }
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
