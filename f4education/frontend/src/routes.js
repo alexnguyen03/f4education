@@ -17,8 +17,8 @@ import Checkout from "views/client/visitor/Checkout";
 import Login from "views/examples/Login";
 import CourseDetailClient from "views/client/visitor/CourseDetailClient";
 import CourseRegisterClient from "views/client/visitor/CourseRegisterClient";
-import CourseRegisterDetailClient from "views/client/visitor/CourseRegisterDetailClient";
 import InformationTeacher from "views/teacher/information";
+import StudentInformation from "views/client/visitor/StudentInformation";
 
 import Accounts from "views/admin/Accounts";
 import Schedules from "views/admin/Schedules";
@@ -199,10 +199,10 @@ export var routesClient = [
     layout: "/client",
   },
   {
-    path: "/course-register-detail/:courseId",
-    name: "khóa học đăng ký chi tiết",
+    path: "/student-information",
+    name: "Thông tin học viên",
     icon: "ni ni-planet text-blue",
-    component: <CourseRegisterDetailClient />,
+    component: <StudentInformation />,
     layout: "/client",
   },
 ];

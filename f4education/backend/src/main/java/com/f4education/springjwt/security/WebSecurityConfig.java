@@ -41,6 +41,7 @@ import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
 // prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
+	@Autowired
     @Value("${f4education.app.jwtSecret}")
     private String key;
     @Autowired
@@ -107,6 +108,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/sessions/**",
                                         "/api/classhistory/**",
                                         "/api/teachers/**",
+                                        "/api/students/**",
                                         "/api/sessions-history/**",
                                         "/api/resource/**",
                                         "/api/questions/**",
@@ -119,8 +121,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/teachers-history/**",
                                         "/api/payment-method/**",
                                         "/api/register-course/**",
-                                        "/api/accounts/**",
-                                        "/img/**")
+                                        "/api/accounts/**")
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
