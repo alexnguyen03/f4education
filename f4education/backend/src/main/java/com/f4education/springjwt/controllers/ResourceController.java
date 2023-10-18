@@ -67,7 +67,7 @@ public class ResourceController {
 			CourseDTO course = coursesService.findById(resourceRequest.getCourseId());
 			resourceService.uploadFile(files, course.getCourseName(), type);
 		}
-		
+
 		ResourcesDTO resourcesDTO = resourceService.createResource(resourceRequest);
 		return ResponseEntity.ok(resourcesDTO);
 	}
@@ -75,8 +75,8 @@ public class ResourceController {
 	@GetMapping("/file/{folderId}")
 	public ResponseEntity<?> getAllFilesByFolder(@PathVariable("folderId") String folderId) throws Exception {
 		List<GoogleDriveFileDTO> lists = new ArrayList<>();
-	    lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
-	    lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
+		lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
+		lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
 		return ResponseEntity.ok(lists);
 	}
 

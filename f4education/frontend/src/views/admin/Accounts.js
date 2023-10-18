@@ -6,7 +6,7 @@ import {
 import { Box, IconButton } from '@mui/material'
 import Tab from 'react-bootstrap/Tab'
 import Tabs from 'react-bootstrap/Tabs'
-import accountApi from 'api/accountApi'
+import accountApi from '../../api/accountApi'
 import moment from 'moment'
 import AccountHeader from 'components/Headers/AccountHeader'
 import { MaterialReactTable } from 'material-react-table'

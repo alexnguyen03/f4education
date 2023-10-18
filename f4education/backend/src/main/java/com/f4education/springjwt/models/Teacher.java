@@ -49,7 +49,7 @@ public class Teacher implements Serializable {
 	private String phone;
 
 	private String image;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "teacher")
 	List<Classes> classes;
@@ -69,4 +69,5 @@ public class Teacher implements Serializable {
 				+ dateOfBirth + ", citizenIdentification=" + citizenIdentification + ", levels=" + levels + ", address="
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
+
 }
