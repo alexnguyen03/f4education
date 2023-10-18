@@ -10,77 +10,82 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class BillDetailServiceImp implements BillDetailService {
-    @Autowired
-    private BillDetailRepository billDetailRepository;
+	@Autowired
+	private BillDetailRepository billDetailRepository;
 
-    @Autowired
-    private BillRepository billRepository;
+	@Autowired
+	private BillRepository billRepository;
 
-    @Autowired
-    private CourseRepository courseRepository;
+	@Autowired
+	private CourseRepository courseRepository;
 
-    @Override
-    public List<BillDetailResponseDTO> getAllBillDetail() {
-        List<BillDetail> billDetails = billDetailRepository.findAll();
-        return billDetails.stream().map(this::convertToListReponseDTO).collect(Collectors.toList());
-    }
+	@Override
+	public List<BillDetailResponseDTO> getAllBillDetail() {
+		return billDetailRepository.findAll().stream().map(this::convertToListReponseDTO).collect(Collectors.toList());
+	}
 
-    @Override
-    public BillDetailResponseDTO getBillDetailById(Integer billId) {
-        return null;
-    }
+	@Override
+	public BillDetailResponseDTO getBillDetailById(Integer billDetailId) {
+		Optional<BillDetail> billDetailOptional = billDetailRepository.findById(billDetailId);
+		if (billDetailOptional.isPresent()) {
+			BillDetail billDetail = billDetailOptional.get();
+			return this.convertToListReponseDTO(billDetail);
+		}
+		return null;
+	}
 
-    @Override
-    public BillDetailRequestDTO createBillDetail(BillDetailRequestDTO billDetailRequestDTO) {
-        BillDetail billDetail = this.convertRequestToEntity(billDetailRequestDTO);
+	@Override
+	public BillDetailResponseDTO createBillDetail(BillDetailRequestDTO billDetailRequestDTO) {
+		BillDetail billDetail = this.convertRequestToEntity(billDetailRequestDTO);
 
-        Integer billId = billRepository.getMaxBillId();
-        Bill bill = billRepository.findById(billId).get();
+		Integer billId = billRepository.getMaxBillId();
+		Bill bill = billRepository.findById(billId).get();
 
-        billDetail.setBill(bill);
+		billDetail.setBill(bill);
 
-        BillDetail newBill = billDetailRepository.save(billDetail);
-        return convertToResponseDTO(newBill);
-    }
+		BillDetail newBill = billDetailRepository.save(billDetail);
+		return this.convertToListReponseDTO(newBill);
+	}
 
-    private BillDetailResponseDTO convertToListReponseDTO(BillDetail bill) {
-        BillDetailResponseDTO billDetailResponseDTO = new BillDetailResponseDTO();
+	private BillDetailResponseDTO convertToListReponseDTO(BillDetail bill) {
+		BillDetailResponseDTO billDetailResponseDTO = new BillDetailResponseDTO();
 
-        BeanUtils.copyProperties(bill, billDetailResponseDTO);
+		BeanUtils.copyProperties(bill, billDetailResponseDTO);
 
-        billDetailResponseDTO.setBillDetailId(bill.getDetailInvoiceId());
-        billDetailResponseDTO.setCourse(bill.getCourse());
-        billDetailResponseDTO.setTotalPrice(bill.getTotalPrice());
+		billDetailResponseDTO.setBillDetailId(bill.getBillDetailId());
+		billDetailResponseDTO.setCourse(bill.getCourse());
+		billDetailResponseDTO.setTotalPrice(bill.getTotalPrice());
 
-        return billDetailResponseDTO;
-    }
+		return billDetailResponseDTO;
+	}
 
-    private BillDetailRequestDTO convertToResponseDTO(BillDetail bill) {
-        BillDetailRequestDTO billDetailResponseDTO = new BillDetailRequestDTO();
+//	private BillDetailResponseDTO convertToResponseDTO(BillDetail bill) {
+//		BillDetailRequestDTO billDetailResponseDTO = new BillDetailRequestDTO();
+//
+//		BeanUtils.copyProperties(bill, billDetailResponseDTO);
+//
+//		billDetailResponseDTO.setCourseId(bill.getCourse().getCourseId());
+//		billDetailResponseDTO.setTotalPrice(bill.getTotalPrice());
+//
+//		return billDetailResponseDTO;
+//	}
 
-        BeanUtils.copyProperties(bill, billDetailResponseDTO);
+	private BillDetail convertRequestToEntity(BillDetailRequestDTO billDetailRequestDTO) {
+		BillDetail billDetail = new BillDetail();
 
-        billDetailResponseDTO.setCourseId(bill.getCourse().getCourseId());
-        billDetailResponseDTO.setTotalPrice(bill.getTotalPrice());
+		Course course = courseRepository.findById(billDetailRequestDTO.getCourseId()).get();
 
-        return billDetailResponseDTO;
-    }
+		BeanUtils.copyProperties(billDetailRequestDTO, billDetail);
 
-    private BillDetail convertRequestToEntity(BillDetailRequestDTO billDetailRequestDTO) {
-        BillDetail billDetail = new BillDetail();
+		billDetail.setTotalPrice(billDetailRequestDTO.getTotalPrice());
+		billDetail.setCourse(course);
+		billDetail.setPrice(Double.valueOf(course.getCoursePrice()));
 
-        Course course = courseRepository.findById(billDetailRequestDTO.getCourseId()).get();
-
-        BeanUtils.copyProperties(billDetailRequestDTO, billDetail);
-
-        billDetail.setTotalPrice(billDetailRequestDTO.getTotalPrice());
-        billDetail.setCourse(course);
-        billDetail.setPrice(Double.valueOf(course.getCoursePrice()));
-
-        return billDetail;
-    }
+		return billDetail;
+	}
 }

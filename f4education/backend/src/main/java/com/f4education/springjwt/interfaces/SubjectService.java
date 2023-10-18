@@ -1,12 +1,11 @@
 package com.f4education.springjwt.interfaces;
 
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 
-import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.payload.request.SubjectRequest;
 
 @Service
 public interface SubjectService {
@@ -14,7 +13,7 @@ public interface SubjectService {
 
 	SubjectDTO getSubjectById(Integer subjectId);
 
-	SubjectDTO createSubject(SubjectDTO subjectDTO);
+	SubjectDTO createSubject(SubjectRequest subjectRequest);
 
-	SubjectDTO updateSubject(Integer subjectId, SubjectDTO subjectDTO);
+	SubjectDTO updateSubject(Integer subjectId, SubjectRequest subjectRequest);
 }

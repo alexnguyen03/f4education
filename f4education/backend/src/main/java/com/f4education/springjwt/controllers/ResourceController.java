@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.interfaces.ResourceService;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
@@ -42,12 +44,13 @@ public class ResourceController {
 	CoursesService coursesService;
 
 	@GetMapping
-	public List<ResourcesDTO> getAll() {
-		return resourceService.findAll();
+	public ResponseEntity<?> getAll() {
+		List<ResourcesDTO> list = resourceService.findAll();
+		return ResponseEntity.ok(list);
 	}
 
 	@PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
-	public ResourcesDTO createResource(@RequestParam("file") MultipartFile[] file,
+	public ResponseEntity<?> createResource(@RequestParam("file") MultipartFile[] file,
 			@RequestPart("resourceRequest") String resourceRequestClient, @RequestParam("type") String type) {
 
 		ObjectMapper mapper = new ObjectMapper();
@@ -61,18 +64,20 @@ public class ResourceController {
 		}
 
 		for (MultipartFile files : file) {
-			Course course = coursesService.findById(resourceRequest.getCourseId());
+			CourseDTO course = coursesService.findById(resourceRequest.getCourseId());
 			resourceService.uploadFile(files, course.getCourseName(), type);
 		}
-		return resourceService.createResource(resourceRequest);
+
+		ResourcesDTO resourcesDTO = resourceService.createResource(resourceRequest);
+		return ResponseEntity.ok(resourcesDTO);
 	}
 
 	@GetMapping("/file/{folderId}")
-	public List<GoogleDriveFileDTO> getAllFilesByFolder(@PathVariable("folderId") String folderId) throws Exception {
+	public ResponseEntity<?> getAllFilesByFolder(@PathVariable("folderId") String folderId) throws Exception {
 		List<GoogleDriveFileDTO> lists = new ArrayList<>();
-	    lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
-	    lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
-		return lists;
+		lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
+		lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
+		return ResponseEntity.ok(lists);
 	}
 
 	@GetMapping("/delete/file/{id}")

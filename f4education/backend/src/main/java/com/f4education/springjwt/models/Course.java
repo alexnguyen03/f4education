@@ -1,6 +1,5 @@
 package com.f4education.springjwt.models;
 
-import jakarta.persistence.Column;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -30,8 +29,8 @@ public class Course implements Serializable {
     @Column(name = "course_price")
     private Float coursePrice;
 
-	@Column(name = "course_duration")
-	private Integer courseDuration;
+    @Column(name = "course_duration")
+    private Integer courseDuration;
 
     @Column(name = "course_description")
     private String courseDescription;
@@ -57,30 +56,35 @@ public class Course implements Serializable {
     @OneToMany(mappedBy = "course")
     List<Resources> resources;
 
-	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "subject_id")
-	Subject subject;
+    @JsonIgnore
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    Subject subject;
 
     @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "admin_id")
     Admin admin;
 
-	public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
-			Integer numberSession, String image) {
-		this.courseName = courseName;
-		this.coursePrice = coursePrice;
-		this.courseDuration = courseDuration;
-		this.courseDescription = courseDescription;
-		this.numberSession = numberSession;
-		this.image = image;
-	}
+    @JsonIgnore
+    @OneToMany(mappedBy = "course")
+    List<BillDetail> billDetails;
 
-	@Override
-	public String toString() {
-		return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
-				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-				+ numberSession + ", image=" + image + "]";
-	}
+    public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
+            Integer numberSession, String image) {
+        this.courseName = courseName;
+        this.coursePrice = coursePrice;
+        this.courseDuration = courseDuration;
+        this.courseDescription = courseDescription;
+        this.numberSession = numberSession;
+        this.image = image;
+    }
+
+    @Override
+    public String toString() {
+        return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
+                + numberSession + ", image=" + image + ", subject=" + subject + "]";
+    }
+
 }

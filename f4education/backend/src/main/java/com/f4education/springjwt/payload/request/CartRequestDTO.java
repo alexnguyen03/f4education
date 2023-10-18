@@ -14,5 +14,5 @@ public class CartRequestDTO {
 	
 	private Integer courseId;
 	
-	private Integer studentId;
+	private String studentId;
 }

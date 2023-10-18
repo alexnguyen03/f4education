@@ -7,8 +7,13 @@ import com.f4education.springjwt.payload.response.BillResponseDTO;
 import com.f4education.springjwt.security.services.BillDetailServiceImp;
 import com.f4education.springjwt.security.services.BillServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,20 +21,54 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bill-detail")
 public class BillDetailController {
-    @Autowired
-    BillDetailServiceImp billDetailServiceImp;
+	@Autowired
+	BillDetailServiceImp billDetailServiceImp;
 
-    @GetMapping
-    public List<BillDetailResponseDTO> findAll() {
-        return billDetailServiceImp.getAllBillDetail();
-    }
+	@GetMapping
+	public ResponseEntity<?> findAll() {
+		List<BillDetailResponseDTO> lst = billDetailServiceImp.getAllBillDetail();
+		return ResponseEntity.ok(lst);
+	}
 
-    @PostMapping
-    public List<BillDetailRequestDTO> createBill(@RequestBody List<BillDetailRequestDTO> billRequest) {
-        List<BillDetailRequestDTO> billDTOList = new ArrayList<>();
-        for (BillDetailRequestDTO billRequestDTO : billRequest) {
-            billDetailServiceImp.createBillDetail(billRequestDTO);
-        }
-        return billDTOList;
-    }
+	@GetMapping("/{id}")
+	public ResponseEntity<?> findByBillDetailId(@PathVariable("id") Integer id) {
+		if (id == null) {
+			return ResponseEntity.badRequest().build();
+		} else {
+			BillDetailResponseDTO bill = billDetailServiceImp.getBillDetailById(id);
+
+			if (bill == null) {
+				return ResponseEntity.noContent().build();
+			}
+
+			return ResponseEntity.ok(bill);
+		}
+	}
+
+	@PostMapping
+	public ResponseEntity<?> createBillDetail(@RequestBody List<BillDetailRequestDTO> billRequest) {
+
+		if (billRequest == null) {
+			return ResponseEntity.badRequest().body("Invalid request data");
+		}
+
+		List<BillDetailResponseDTO> billDetailResp = new ArrayList<>();
+		List<URI> uriList = new ArrayList<>();
+		for (BillDetailRequestDTO billRequestDTO : billRequest) {
+			BillDetailResponseDTO billDetail = billDetailServiceImp.createBillDetail(billRequestDTO);
+			billDetailResp.add(billDetail);
+			URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{billDetailId}")
+					.buildAndExpand(billDetail.getBillDetailId()).toUri();
+			uriList.add(uri);
+		}
+
+		if (uriList.isEmpty()) {
+			return ResponseEntity.badRequest().build();
+		}
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setLocation(uriList.get((uriList.size() - 1)));
+
+		return new ResponseEntity<>(billDetailResp, headers, HttpStatus.CREATED);
+	}
 }

@@ -4,6 +4,7 @@ import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@ import org.springframework.security.web.authentication.rememberme.JdbcTokenRepos
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.TokenBasedRememberMeServices.RememberMeTokenAlgorithm;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 
 import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
 import com.f4education.springjwt.security.jwt.AuthTokenFilter;
@@ -41,18 +43,19 @@ import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
 // prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
-	@Value("${f4education.app.jwtSecret}")
-	private String key;
 	@Autowired
-	UserDetailsServiceImpl userDetailsService;
+    @Value("${f4education.app.jwtSecret}")
+    private String key;
+    @Autowired
+    UserDetailsServiceImpl userDetailsService;
 
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
-	@Bean
-	public AuthTokenFilter authenticationJwtTokenFilter() {
-		return new AuthTokenFilter();
-	}
+    @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -61,18 +64,18 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
 
-		return authProvider;
-	}
+        return authProvider;
+    }
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
-	@Bean
-	public BCryptPasswordEncoder passwordEncoder() {
-		return new BCryptPasswordEncoder();
-	}
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -81,17 +84,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(
                         auth -> auth
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers(
                                         "/api/auth/**",
                                         "/api/subjects/**",
-                                        "/api/classs/**",
+                                        "/api/classes/**",
                                         "/api/classhistory/**",
                                         "/api/classroom/**",
                                         "/api/classroomhistory/**",
                                         "/api/sessions-history/**",
                                         "/api/resource/**",
                                         "/api/cart/**",
-                                        "/api/payment/**",
                                         "/api/bills/**",
                                         "api/bill-detail/**",
                                         "/api/payment-method/**",
@@ -104,12 +107,13 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/subjects/**",
                                         "/api/classs/**",
                                         "/api/courses-history/**",
-                                        "/api/subjectHistory/**",
+                                        "/api/subject-history/**",
                                         "/api/courses/**",
                                         "/api/classroom/**",
                                         "/api/sessions/**",
                                         "/api/classhistory/**",
                                         "/api/teachers/**",
+                                        "/api/students/**",
                                         "/api/sessions-history/**",
                                         "/api/resource/**",
                                         "/api/questions/**",
@@ -119,15 +123,14 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/bills",
                                         "/api/bill-detail/**",
                                         "/api/accounts/**",
-										"/api/teachers-history/**",
+                                        "/api/teachers-history/**",
                                         "/api/payment-method/**",
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
-                                        "/img/**")
+                                        "/api/accounts/**")
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

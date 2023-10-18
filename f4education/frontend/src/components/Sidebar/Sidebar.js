@@ -43,7 +43,7 @@ const Sidebar = (props) => {
 	// creates the links that appear in the left menu / Sidebar
 	const createLinks = (routes) => {
 		return routes.map((prop, key) => {
-			if (prop.path != '/login' && prop.path != '/resourceDetail/:courseName/:folderId' && prop.path != '/questionDetail/:courseName') {
+			if (prop.path != '/login' && prop.path != '/resourceDetail/:classId/:folderId' && prop.path != '/questionDetail/:classId') {
 				return (
 					<NavItem key={key}>
 						<NavLink

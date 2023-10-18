@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -22,11 +23,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Student")
-public class Student {
+public class Student implements Serializable {
+
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "student_id")
-	private Integer studentId;
+	private String studentId;
 
 	@Column(name = "fullname")
 	private String fullname;
@@ -63,6 +64,10 @@ public class Student {
 	@OneToMany(mappedBy = "student")
 	List<RegisterCourse> registerCourses;
 
+	@JsonIgnore
+	@OneToMany(mappedBy = "student")
+	List<Cart> carts;
+
 	// @JsonIgnore
 	// @OneToMany(mappedBy = "student")
 	// List<Schedule> schedules;
@@ -78,7 +83,7 @@ public class Student {
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
 
-	public Student(Integer studentId, String fullname, Boolean gender, String address, String phone, String image) {
+	public Student(String studentId, String fullname, Boolean gender, String address, String phone, String image) {
 		super();
 		this.studentId = studentId;
 		this.fullname = fullname;

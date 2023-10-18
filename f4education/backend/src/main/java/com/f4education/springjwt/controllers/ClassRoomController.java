@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,23 +27,27 @@ public class ClassRoomController {
 	ClassRoomService classRoomService;
 	
 	@GetMapping
-	public List<ClassRoomDTO> getAll() {
-		return classRoomService.findAll();
+	public ResponseEntity<?> getAll() {
+		List<ClassRoomDTO> list = classRoomService.findAll();
+		return ResponseEntity.ok(list);
 	}
 	
 	@GetMapping("/{id}")
-	public ClassRoomDTO findById(@PathVariable("id") Integer classroomId) {
-		return classRoomService.getClassById(classroomId);
+	public ResponseEntity<?> findById(@PathVariable("id") Integer classroomId) {
+		ClassRoomDTO findByIdClassRoom = classRoomService.getClassById(classroomId);
+		return ResponseEntity.ok(findByIdClassRoom);
 	}
 
 	@PostMapping
-	public ClassRoomDTO createSubject(@RequestBody ClassRoomDTO classRoomDTO) {
-		return classRoomService.createClass(classRoomDTO);
+	public ResponseEntity<?> createSubject(@RequestBody ClassRoomDTO classRoomDTO) {
+		ClassRoomDTO createdClassRoom = classRoomService.createClass(classRoomDTO);
+		return ResponseEntity.ok(createdClassRoom);
 	}
 
 	@PutMapping("/{id}")
-	public ClassRoomDTO updateSubject(@PathVariable("id") Integer classroomId, 
+	public ResponseEntity<?> updateSubject(@PathVariable("id") Integer classroomId, 
 			@RequestBody ClassRoomDTO classRoomDTO) {
-		return classRoomService.updateClass(classroomId, classRoomDTO);
+		ClassRoomDTO updateClassRoom = classRoomService.updateClass(classroomId, classRoomDTO);
+		return ResponseEntity.ok(updateClassRoom);
 	}
 }

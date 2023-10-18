@@ -9,5 +9,5 @@ import com.f4education.springjwt.models.Subject;
 @Repository
 public interface SubjectRepository extends JpaRepository<Subject, Integer> {
 	@Query("SELECT MAX(s.subjectId) FROM Subject s")
-    Integer getMaxSubjectId();
+	Integer getMaxSubjectId();
 }

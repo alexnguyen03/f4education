@@ -1,7 +1,5 @@
 package com.f4education.springjwt.payload.request;
 
-import java.util.Date;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,5 +12,5 @@ public class BillRequestDTO {
 
     private String checkoutMethod;
 
-    private Integer studentId;
+    private String studentId;
 }

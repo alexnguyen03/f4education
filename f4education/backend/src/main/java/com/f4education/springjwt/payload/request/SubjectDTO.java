@@ -1,6 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
 import java.util.Date;
+import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,7 +15,7 @@ public class SubjectDTO {
 
 	private String subjectName;
 	
-	private String adminId;
+	private String adminName;
 	
 	private Date createDate;
 }
