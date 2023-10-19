@@ -26,6 +26,7 @@ import Schedules from "views/admin/Schedules";
 import Icons from "views/examples/Icons";
 import ClassInformation from "views/teacher/ClassInformation";
 import ClassInformationDetail from "views/teacher/ClassInformationDetail";
+import CourseProgress from "views/client/student/CourseProgress";
 
 export var routes = [
   {
@@ -203,6 +204,11 @@ export var routesClient = [
     name: "khóa học đăng ký chi tiết",
     icon: "ni ni-planet text-blue",
     component: <CourseRegisterDetailClient />,
+    layout: "/client",
+  },
+  {
+    path: "/course-progress",
+    component: <CourseProgress />,
     layout: "/client",
   },
 ];

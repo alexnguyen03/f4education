@@ -94,7 +94,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/bills/**",
                                         "api/bill-detail/**",
                                         "/api/register-course/**",
-                                        "/img/**")
+                                        "/img/**"
+                                        )
                                 .permitAll()
                                 .requestMatchers(
                                         "/api/test/**",
@@ -119,8 +120,9 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/teachers-history/**",
                                         "/api/payment-method/**",
                                         "/api/register-course/**",
-                                        "/api/accounts/**",
-                                        "/img/**")
+                                        "/api/accounts/**"
+//                                        "/img/**"
+                                        )
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

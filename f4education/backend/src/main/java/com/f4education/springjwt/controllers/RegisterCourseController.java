@@ -1,8 +1,10 @@
 package com.f4education.springjwt.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,10 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.payload.HandleResponseDTO;
+import com.f4education.springjwt.payload.request.CourseProgressRequestDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
 
@@ -29,12 +35,19 @@ public class RegisterCourseController {
 		return registerCourseService.getAllRegisterCourse();
 	}
 
-//	@GetMapping("/teacher")
-//	public ResponseEntity<?> findAllClassByTeacherId() {
-//		List<ClassesByTeacher> lst = registerCourseService
-//				.getRegisterCourseWithTeacherAndClasses();
-//		return ResponseEntity.ok(lst);
-//	}
+	@GetMapping("/student/{studentId}")
+	public ResponseEntity<?> findAllCourseProgressByStudentId(@PathVariable String studentId) {
+		List<CourseProgressResponseDTO> lst = registerCourseService.getCourseProgressByStudentID(studentId);
+		return ResponseEntity.ok(lst);
+	}
+
+	@GetMapping("/student/progress/{classId}")
+	public ResponseEntity<?> findCourseProgressByclassId(@PathVariable Integer classId,
+			CourseProgressRequestDTO courseProgressRequest) {
+		Integer totalCountRegister = registerCourseService.getTotalClassIdProgressByclassID(classId,
+				courseProgressRequest);
+		return ResponseEntity.ok(totalCountRegister);
+	}
 
 	@GetMapping("/{studentId}")
 	public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllByStudentId(@PathVariable String studentId) {

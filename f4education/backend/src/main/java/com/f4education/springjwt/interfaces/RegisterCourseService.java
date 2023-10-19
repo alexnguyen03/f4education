@@ -1,6 +1,8 @@
 package com.f4education.springjwt.interfaces;
 
+import com.f4education.springjwt.payload.request.CourseProgressRequestDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import org.springframework.stereotype.Service;
@@ -18,4 +20,8 @@ public interface RegisterCourseService {
     HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(RegisterCourseRequestDTO registerCourseRequestDTO);
 
     HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId, RegisterCourseRequestDTO registerCourseRequestDTO);
+
+    List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId);
+    
+    Integer getTotalClassIdProgressByclassID(Integer classId, CourseProgressRequestDTO courseProgressRequest);
 }

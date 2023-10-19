@@ -32,8 +32,8 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	@Query("SELECT c FROM Course c ORDER BY c.courseId DESC LIMIT 10")
 	List<Course> findTop10LatestCourses();
 
-//	@Query("SELECT c FROM Course c JOIN c.billDetails bd GROUP BY c.courseId, c.courseName, "
-//			+ "c.admin.adminId, c.courseDescription ORDER BY COUNT(bd.billDetailId) DESC")
+//	@Query("SELECT c FROM Course c JOIN c.billDetail bd GROUP BY c.courseId,c.admin.adminId "
+//			+ "c.courseDescription")
 //	List<Course> findTopSellingCourses();
 
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName = :subjectName")

@@ -76,16 +76,16 @@ function Cart() {
         }
     }
 
-  const fetchNewsetCourse = async () => {
-    try {
-      setLoading(true);
-      const resp = await courseApi.getNewestCourse();
+    const fetchNewsetCourse = async () => {
+        try {
+            setLoading(true)
+            const resp = await courseApi.getNewestCourse()
 
-      if (resp.status === 200 && resp.data.length > 0) {
-        setNewestCourse(resp.data);
-      } else {
-        console.log("loi fetch newestcourse ba con oi");
-      }
+            if (resp.status === 200 && resp.data.length > 0) {
+                setNewestCourse(resp.data)
+            } else {
+                console.log('loi fetch newestcourse ba con oi')
+            }
 
             setLoading(false)
         } catch (error) {
@@ -342,7 +342,6 @@ function Cart() {
                                                 <Grid key={index}>
                                                     <Grid.Col span={2}>
                                                         <Link
-                                                            Link
                                                             to={`/course/${cart.course.courseId}`}
                                                         >
                                                             <img
@@ -369,7 +368,6 @@ function Cart() {
                                                                 sm="12"
                                                             >
                                                                 <Link
-                                                                    Link
                                                                     to={`/course/${cart.course.courseId}`}
                                                                     key={index}
                                                                 >
