@@ -1,5 +1,6 @@
 import Index from 'views/Index.js'
 import Register from 'views/examples/Register.js'
+import ClientRegister from 'views/client/visitor/Register.js'
 import Subjects from 'views/admin/Subjects'
 import Sessions from 'views/admin/Sessions'
 import Courses from 'views/admin/Courses.js'
@@ -12,7 +13,9 @@ import Questions from 'views/admin/Questions'
 import QuestionDetail from 'views/admin/QuestionDetail'
 import Home from 'views/client/visitor/Home'
 import CourseClient from 'views/client/visitor/CourseClient'
+import TeacherResources from 'views/teacher/TeacherResources'
 import Cart from 'views/client/visitor/Cart'
+import CheckMail from 'views/client/visitor/CheckMail'
 import Checkout from 'views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
 import Login from 'views/examples/Login'
@@ -213,6 +216,20 @@ export var routesClient = [
         icon: 'ni ni-planet text-blue',
         component: <StudentInformation />,
         layout: '/client'
+    },
+    {
+        path: '/check-mail',
+        name: 'Thông tin email',
+        icon: 'ni ni-planet text-blue',
+        component: <CheckMail />,
+        layout: '/client'
+    },
+    {
+        path: '/client-register/:email',
+        name: 'Thông tin tài khoản',
+        icon: 'ni ni-planet text-blue',
+        component: <ClientRegister />,
+        layout: '/client'
     }
 ]
 
@@ -229,6 +246,13 @@ export const routesTeacher = [
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
+        layout: '/teacher'
+    },
+    {
+        path: '/resources',
+        name: 'Tài nguyên',
+        icon: 'ni ni-collection text-blue',
+        component: <TeacherResources />,
         layout: '/teacher'
     },
     {

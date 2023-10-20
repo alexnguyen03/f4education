@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.MailerService;
 import com.f4education.springjwt.models.MailInfo;
@@ -15,6 +16,7 @@ import com.f4education.springjwt.models.MailInfo;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 
+@Service
 public class MailerServiceImpl implements MailerService {
     List<MailInfo> list = new ArrayList<>();
 
@@ -64,13 +66,13 @@ public class MailerServiceImpl implements MailerService {
 
     @Override
     public void queue(String to, String subject, String body) {
-        String link = "http://localhost:8080/user/home/index";
+        String link = "http://localhost:3000/client-register/" + to;
         body = "" +
                 "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
                 +
                 "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n" +
                 "    <div style=\"border-bottom:1px solid #eee\">\n" +
-                "      <a href='" + link
+                "      <a href='" + link //! Linh website
                 + "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">LOVE CAKE</a>\n"
                 +
                 "    </div>\n" +
@@ -99,6 +101,7 @@ public class MailerServiceImpl implements MailerService {
             MailInfo mail = list.remove(0);
             try {
                 this.send(mail);
+                System.out.println("Đã gửi mail");
             } catch (Exception e) {
                 e.printStackTrace();
             }
