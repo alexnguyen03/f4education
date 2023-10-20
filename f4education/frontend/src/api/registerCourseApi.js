@@ -10,9 +10,9 @@ const registerCourseApi = {
         const url = `/register-course/student/${studentId}`
         return axiosClient.get(url)
     },
-    getCourseProgressByClassId: (classId) => {
+    getCourseProgressByClassId: (classId,body) => {
         const url = `/register-course/student/progress/${classId}`
-        return axiosClient.get(url)
+        return axiosClient.post(url,body)
     },
 }
 

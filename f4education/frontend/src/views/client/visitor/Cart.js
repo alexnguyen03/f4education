@@ -447,7 +447,7 @@ function Cart() {
                                                                             )
                                                                         }}
                                                                     >
-                                                                        Remove
+                                                                        Xóa khóa học
                                                                     </Link>
                                                                 </div>
                                                             </Grid.Col>

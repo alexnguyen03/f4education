@@ -13,4 +13,5 @@ import lombok.NoArgsConstructor;
 public class CourseProgressResponseDTO {
     private Course course;
     private Classes classes;
+    private String teacherName;
 }

@@ -52,6 +52,7 @@ const ClassInformation = () => {
             if (resp.status === 200 && resp.data.length > 0) {
                 setListClasses(resp.data.reverse())
             }
+            console.log(resp.data)
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -91,7 +92,7 @@ const ClassInformation = () => {
 
     // ************** Render UI
     const classInformationList = filteredClasses.map((c) => (
-        <Grid.Col span={4} key={c.classes.classId}>
+        <Grid.Col xl={3} lg={4} md={4} sm={6} key={c.classes.classId}>
             {loading ? (
                 <>
                     <Skeleton
@@ -143,18 +144,25 @@ const ClassInformation = () => {
                             Tên Lớp: {c.classes.className}
                         </Title>
                         <Text size="lg" mt="sm" c="dimmed" lineClamp={2}>
-                            Khóa học: {c.courseName}
+                            Khóa học: {c.courseName[0]}
                         </Text>
                         <Text size="lg" mt="sm" c="dimmed">
                             Thời gian dạy:{' '}
-                            {moment(c.classes.startDate).format('DD/mm/yyyy')} -{' '}
-                            {moment(c.classes.endDate).format('DD/mm/yyyy')}
+                            <strong>
+                                {moment(c.classes.startDate).format(
+                                    'DD/mm/yyyy'
+                                )}{' '}
+                                -{' '}
+                                {moment(c.classes.endDate).format('DD/mm/yyyy')}
+                            </strong>
                         </Text>
-                        <Flex justify="start" align="center" gap={5}>
+                        <Flex justify="start" align="center" gap={5} mb={10}>
                             <Text size="lg" mt="sm" c="dimmed">
                                 Trạng thái:
                             </Text>
-                            <Badge color="indigo" mt={12}>{c.classes.status}</Badge>
+                            <Badge color="indigo" mt={12}>
+                                {c.classes.status}
+                            </Badge>
                         </Flex>
                     </Paper>
                 </>
@@ -221,6 +229,7 @@ const ClassInformation = () => {
                                                 id="search-input"
                                                 icon={<IconFilterSearch />}
                                                 size="md"
+                                                maw={270}
                                                 placeholder="Tìm lớp học"
                                                 onChange={(e) =>
                                                     handleChangeSearchClass(e)

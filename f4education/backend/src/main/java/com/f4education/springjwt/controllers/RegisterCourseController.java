@@ -41,12 +41,12 @@ public class RegisterCourseController {
 		return ResponseEntity.ok(lst);
 	}
 
-	@GetMapping("/student/progress/{classId}")
+	@PostMapping("/student/progress/{classId}")
 	public ResponseEntity<?> findCourseProgressByclassId(@PathVariable Integer classId,
-			CourseProgressRequestDTO courseProgressRequest) {
-		Integer totalCountRegister = registerCourseService.getTotalClassIdProgressByclassID(classId,
-				courseProgressRequest);
-		return ResponseEntity.ok(totalCountRegister);
+	        @RequestBody CourseProgressRequestDTO courseProgressRequest) {
+	    Integer totalCountRegister = registerCourseService.getTotalClassIdProgressByclassID(classId,
+	            courseProgressRequest);
+	    return ResponseEntity.ok(totalCountRegister);
 	}
 
 	@GetMapping("/{studentId}")

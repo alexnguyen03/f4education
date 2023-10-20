@@ -16,7 +16,8 @@ import {
     Stack,
     Text,
     Title,
-    Tooltip
+    Tooltip,
+    Transition
 } from '@mantine/core'
 
 import { Link } from 'react-router-dom'
@@ -36,6 +37,13 @@ const user = JSON.parse(localStorage.getItem('user'))
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
+// NOTES: GET DATA FROM DB
+//  ClassID is unique
+//  GET from Schedule select from current day to the back By ClassId = ?
+// EXP: currentDay-20-08-2023 => startDate 27-07-2023 
+// Count by classId 
+//  WE got totalClassId => ngay da hoc.
+
 const CourseProgress = () => {
     // Schedule insert data: Khác ngày, content,notes
     // *********** Main variable
@@ -43,13 +51,19 @@ const CourseProgress = () => {
     const [selectedCourse, setSelectedCourse] = useState({})
     const [showingDetail, setShowingDetail] = useState(false)
     const [totalCountCourseProgress, setTotalCountCourseProgress] = useState(0)
-    // const [lastestCourseProgresses, setLastestCourseProgresses] = useState([])
     const [newestCourse, setNewestCourse] = useState([])
 
     // *********** Action variable
     const [loading, setLoading] = useState(false)
 
     // *********** FETCH AREA
+
+    /**
+     * *Fetch CourseProgress AND
+     * *Run loop to insert totalCountClass In Schedule to list CourseProgress
+     * @param classId the param for get all progress by classId
+     * @param progressCourseRequest the param for get all progress by startDate and endDate
+     */
     const fetchCourseProgress = async () => {
         try {
             setLoading(true)
@@ -63,8 +77,19 @@ const CourseProgress = () => {
             const newCourseProgresses = []
             for (let i = 0; i < reversedData.length; i++) {
                 const element = reversedData[i]
+                const startDate = element.classes.startDate
+                const endDate = element.classes.endDate
+
+                const progressCourseRequest = {
+                    startDate,
+                    endDate
+                }
+
+                console.log(progressCourseRequest)
+
                 const totalProgress = await fetchCourseProgressByClassId(
-                    element.classes.classId
+                    element.classes.classId,
+                    progressCourseRequest
                 )
                 const newCourse = {
                     ...element,
@@ -72,8 +97,8 @@ const CourseProgress = () => {
                 }
                 newCourseProgresses.push(newCourse)
             }
-            
-            console.log(newCourseProgresses);
+
+            console.log(newCourseProgresses)
             setCourseProgresses(newCourseProgresses)
 
             setLoading(false)
@@ -82,10 +107,20 @@ const CourseProgress = () => {
         }
     }
 
-    const fetchCourseProgressByClassId = async (classId) => {
+    /**
+     * *CallBack function that return value
+     * TODO: function return a totalCountCourseProgress by classId
+     * @param classId the param for get all progress by classId
+     * @param progressCourseRequest the param for get all progress by startDate and endDate
+     */
+    const fetchCourseProgressByClassId = async (
+        classId,
+        progressCourseRequest
+    ) => {
         try {
             const resp = await registerCoursecAPI.getCourseProgressByClassId(
-                classId
+                classId,
+                progressCourseRequest
             )
             // setSelectedCourse(resp.data)
             setTotalCountCourseProgress(resp.data)
@@ -143,6 +178,9 @@ const CourseProgress = () => {
             </Box>
 
             {/* Hero banner */}
+            {/* <Transition transition="slide-up" mounted={scroll.y > 0}>
+                {(transitionStyles) => <div></div>}
+            </Transition> */}
             <Box
                 pos={'relative'}
                 p={rem('3.5rem')}
@@ -166,10 +204,8 @@ const CourseProgress = () => {
                                     -
                                     <Text c="dimmed" fz="xl">
                                         <strong>
-                                            {
-                                                selectedCourse.course
-                                                    .courseDuration
-                                            }
+                                            {selectedCourse.course
+                                                .courseDuration / 2}
                                         </strong>{' '}
                                         buổi học
                                     </Text>
@@ -208,6 +244,17 @@ const CourseProgress = () => {
                                     fz="lg"
                                     lineClamp={3}
                                 >
+                                    Giáo viên hướng dẫn:
+                                    <strong className="ml-2">
+                                        {selectedCourse.teacherName}
+                                    </strong>
+                                </Text>
+                                <Text
+                                    color="dimmed"
+                                    fw={500}
+                                    fz="lg"
+                                    lineClamp={3}
+                                >
                                     Mô tả khóa học:
                                     <strong className="ml-2">
                                         {
@@ -221,17 +268,19 @@ const CourseProgress = () => {
                                         illo porro. Totam, libero!
                                     </strong>
                                 </Text>
-                                <Link to="/course-progress">
-                                    <Button
-                                        variant="outline"
-                                        color="indigo"
-                                        size="lg"
-                                        leftIcon={<IconArrowBack />}
-                                        mt={10}
-                                    >
-                                        Trở về trang tổng quan
-                                    </Button>
-                                </Link>
+                                <Button
+                                    variant="outline"
+                                    color="indigo"
+                                    size="lg"
+                                    leftIcon={<IconArrowBack />}
+                                    mt={10}
+                                    onClick={() => {
+                                        fetchCourseProgress()
+                                        // fetchNewestCourse();
+                                    }}
+                                >
+                                    Trở về trang tổng quan
+                                </Button>
                             </Stack>
                         </>
                     ) : (
@@ -262,7 +311,7 @@ const CourseProgress = () => {
                             ) : (
                                 <>
                                     <Title order={2} fw={500} color="dark">
-                                        Xin chào, "{studentId}"
+                                        Xin chào, "{user.fullName}"
                                     </Title>
                                     <Text c="dimmed" fz="lg">
                                         Chào mừng bạn đến với phần "Tiến độ học
@@ -297,11 +346,11 @@ const CourseProgress = () => {
                                                     color="dark"
                                                     radius={8}
                                                     p={15}
-                                                    maw={300}
+                                                    maw={'100%'}
                                                     fz={'lg'}
                                                     size="lg"
                                                 >
-                                                    Tiếp tục học "
+                                                    Khóa học mới nhất"
                                                     {courseProgresses.length > 0
                                                         ? courseProgresses[0]
                                                               .course.courseName
@@ -331,12 +380,16 @@ const CourseProgress = () => {
 
                 {showingDetail ? (
                     <>
-                        <Card className={styles['floating-result']} mt={40}>
+                        <Card
+                            className={styles['floating-result']}
+                            mt={40}
+                            style={{ minHeight: '570px' }}
+                        >
                             <Card.Section>
                                 <Image
                                     // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
                                     src={`${PUBLIC_IMAGE}/course/${selectedCourse.course.image}`}
-                                    height={230}
+                                    height={250}
                                     alt="Norway"
                                     withPlaceholder
                                 />
@@ -362,8 +415,9 @@ const CourseProgress = () => {
                                     >
                                         {(
                                             (totalCountCourseProgress /
-                                                selectedCourse.course
-                                                    .courseDuration) *
+                                                (selectedCourse.course
+                                                    .courseDuration /
+                                                    2)) *
                                             2 *
                                             100
                                         ).toFixed(1)}
@@ -372,8 +426,9 @@ const CourseProgress = () => {
                                     <Progress
                                         value={(
                                             (totalCountCourseProgress /
-                                                selectedCourse.course
-                                                    .courseDuration) *
+                                                (selectedCourse.course
+                                                    .courseDuration /
+                                                    2)) *
                                             2 *
                                             100
                                         ).toFixed(1)}
@@ -391,13 +446,25 @@ const CourseProgress = () => {
                                         m={0}
                                         p={0}
                                     >
-                                        Số bài đã học:{' '}
+                                        Số buổi đã học:{' '}
                                         <strong className="ml-2">
                                             {selectedCourse.totalProgress} /{' '}
-                                            {
-                                                selectedCourse.course
-                                                    .courseDuration
-                                            }
+                                            {selectedCourse.course
+                                                .courseDuration / 2}
+                                        </strong>
+                                    </Text>
+                                    <Text
+                                        color="dimmed"
+                                        fw={500}
+                                        fz="xl"
+                                        m={0}
+                                        p={0}
+                                    >
+                                        Số buổi vắng:{' '}
+                                        <strong className="ml-2">
+                                            {selectedCourse.totalProgress} /{' '}
+                                            {selectedCourse.course
+                                                .courseDuration / 2}
                                         </strong>
                                     </Text>
                                 </Stack>
@@ -529,9 +596,10 @@ const CourseProgress = () => {
                 <Grid>
                     {courseProgresses.map((progress, index) => (
                         <Grid.Col
-                            xl="3"
-                            lg="3"
-                            md="4"
+                            xl={3}
+                            lg={3}
+                            md={4}
+                            sm={6}
                             onClick={() => handleShowCourseProgress(progress)}
                             key={index}
                         >
@@ -567,7 +635,7 @@ const CourseProgress = () => {
                                     <strong>{totalCountCourseProgress}</strong>{' '}
                                     trên{' '}
                                     <strong>
-                                        {progress.course.courseDuration}
+                                        {progress.course.courseDuration / 2}
                                     </strong>{' '}
                                     bài đã học.
                                 </Text>
@@ -585,8 +653,9 @@ const CourseProgress = () => {
                                     >
                                         {(
                                             (totalCountCourseProgress /
-                                                progress.course
-                                                    .courseDuration) *
+                                                (progress.course
+                                                    .courseDuration /
+                                                    2)) *
                                             2 *
                                             100
                                         ).toFixed(1)}
@@ -595,8 +664,9 @@ const CourseProgress = () => {
                                     <Progress
                                         value={(
                                             (totalCountCourseProgress /
-                                                progress.course
-                                                    .courseDuration) *
+                                                (progress.course
+                                                    .courseDuration /
+                                                    2)) *
                                             2 *
                                             100
                                         ).toFixed(1)}
@@ -642,8 +712,8 @@ const CourseProgress = () => {
                     </Group>
                 </Group>
                 <Grid>
-                    {newestCourse.map((course,index) => (
-                        <Grid.Col xl="3" lg="3" md="4">
+                    {newestCourse.map((course, index) => (
+                        <Grid.Col xl={3} lg={3} md={4} sm={6} key={index}>
                             <Card
                                 shadow="sm"
                                 padding="lg"
@@ -654,7 +724,6 @@ const CourseProgress = () => {
                                 style={{ height: '340px' }}
                                 component="a"
                                 href={`/course/${course.courseId}`}
-                                key={index}
                             >
                                 <Card.Section>
                                     <Image

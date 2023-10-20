@@ -71,25 +71,20 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public Integer getTotalClassIdProgressByclassID(Integer classId, CourseProgressRequestDTO courseProgressRequest) {
-		SimpleDateFormat inputFormat = new SimpleDateFormat("dd-MM-yyyy");
-
 		Date startDate = null;
 		Date endDate = null;
-		
-		DateFormat outputEndDateFormat = new SimpleDateFormat("dd-MM-yyyy");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
 		try {
-			String convertedStartDateStr = outputEndDateFormat.format(courseProgressRequest.getStartDate());
-			String convertedEndDateStr = outputEndDateFormat.format(courseProgressRequest.getEndDate());
-
-			System.out.println(convertedStartDateStr);
-			System.out.println(convertedEndDateStr);
-
-			startDate = inputFormat.parse("20-08-2023");
-			endDate = inputFormat.parse("26-10-2023");
+			startDate = courseProgressRequest.getStartDate();
+			endDate = courseProgressRequest.getEndDate();
+			
+//			startDate = dateFormat.parse("20-08-2023");
+//			endDate = dateFormat.parse("26-10-2023");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		
 		Integer totalScheduleCount = scheduleRepository.findTotalClassInSchedule(classId, startDate, endDate);
 
 		System.out.println(totalScheduleCount);
@@ -101,6 +96,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
 		courseResponse.setCourse(registerCourse.getCourse());
 		courseResponse.setClasses(registerCourse.getClasses());
+		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
 		return courseResponse;
 	}
 
