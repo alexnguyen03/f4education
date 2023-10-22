@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from 'react'
 import {
     Badge,
     Box,
@@ -16,20 +15,20 @@ import {
     Stack,
     Text,
     Title,
-    Tooltip,
-    Transition
+    Tooltip
 } from '@mantine/core'
+import { useEffect, useState } from 'react'
 
-import { Link } from 'react-router-dom'
 import { IconArrowBack, IconArrowRight } from '@tabler/icons-react'
+import { Link, useRoutes, useSearchParams } from 'react-router-dom'
 
 // Scss
 import styles from '../../../assets/scss/custom-module-scss/client-custom/course-progress/CourseProgress.module.scss'
 
 // API
-import registerCoursecAPI from '../../../api/registerCourseApi'
-import courseApi from '../../../api/courseApi'
 import moment from 'moment'
+import courseApi from '../../../api/courseApi'
+import registerCoursecAPI from '../../../api/registerCourseApi'
 
 const studentId = 'loinvpc04549'
 const user = JSON.parse(localStorage.getItem('user'))
@@ -40,11 +39,16 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 // NOTES: GET DATA FROM DB
 //  ClassID is unique
 //  GET from Schedule select from current day to the back By ClassId = ?
-// EXP: currentDay-20-08-2023 => startDate 27-07-2023 
-// Count by classId 
+// EXP: currentDay-20-08-2023 => startDate 27-07-2023
+// Count by classId
 //  WE got totalClassId => ngay da hoc.
 
 const CourseProgress = () => {
+    //  ***********Route
+    const route = useRoutes()
+    const searchParam = useSearchParams()
+    const classIdParam = searchParam.get('classId')
+
     // Schedule insert data: Khác ngày, content,notes
     // *********** Main variable
     const [courseProgresses, setCourseProgresses] = useState([])
@@ -167,6 +171,12 @@ const CourseProgress = () => {
     useEffect(() => {
         setTotalCountCourseProgress(totalCountCourseProgress)
     }, [totalCountCourseProgress])
+
+    useEffect(() => {
+        route.push(`?classId=${selectedCourse.classId}`, {
+            scroll: false
+        })
+    }, [route, selectedCourse])
 
     return (
         <>
@@ -600,6 +610,8 @@ const CourseProgress = () => {
                             lg={3}
                             md={4}
                             sm={6}
+                            // component='a'
+                            // href={`?classId=${progress.classId}`}
                             onClick={() => handleShowCourseProgress(progress)}
                             key={index}
                         >

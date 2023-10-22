@@ -1,10 +1,14 @@
 package com.f4education.springjwt.security.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.f4education.springjwt.models.QuestionDetail;
+import com.f4education.springjwt.repository.QuestionDetailReposotory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.AnswerService;
@@ -16,63 +20,86 @@ import com.f4education.springjwt.repository.QuestionReposotory;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
-	@Autowired
-	private AnswerReposotory answerReposotory;
+    @Autowired
+    private AnswerReposotory answerReposotory;
 
-	@Autowired
-	private QuestionReposotory questionRepository;
+    @Autowired
+    private QuestionDetailReposotory questionDetailReposotory;
 
-	@Override
-	public List<AnswerDTO> getAllAnswer() {
-		List<Answer> answer = answerReposotory.findAll();
-		return answer.stream().map(this::convertToDto).collect(Collectors.toList());
-	}
+    @Override
+    public List<AnswerDTO> getAllAnswer() {
+        List<Answer> answers = answerReposotory.findAll();
+        return answers.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    }
 
-	@Override
-	public AnswerDTO getAnswerById(Integer questionId) {
+    @Override
+    public List<AnswerDTO> getAnsweByQuestionDetailId(Integer questionDetailId) {
+        List<Answer> answers = answerReposotory.getAllAnswerByQuestionDetailId(questionDetailId);
+        return answers.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    }
 
-		return null;
-	}
+    @Override
+    public AnswerDTO getAnswerByAnswerId(Integer answerId) {
+        return null;
+    }
 
-	@Override
-	public AnswerDTO createAnswer(AnswerDTO answerDTO) {
-		Answer answer = new Answer();
+    @Override
+    public AnswerDTO createAnswer(AnswerDTO answerDTO) {
+        Answer answer = this.convertToEntity(answerDTO);
+        System.out.println("ANSWER CREATE: " + answer);
 
-		convertToEntity(answerDTO, answer);
+        Answer newAnswer = answerReposotory.save(answer);
 
-		Answer newAnswer = answerReposotory.save(answer);
-		return convertToDto(newAnswer);
-	}
+        return convertToResponseDTO(newAnswer);
+    }
 
-	@Override
-	public AnswerDTO updateAnswer(Integer answerId, AnswerDTO answerDTO) {
-		Answer exitAnswer = answerReposotory.findById(answerId).get();
+    @Override
+    public AnswerDTO updateAnswer(Integer answerId, AnswerDTO answerDTO) {
+        Optional<Answer> exitAnswer = answerReposotory.findById(answerId);
 
-		convertToEntity(answerDTO, exitAnswer);
+        if (exitAnswer.isPresent()) {
+            Answer existingAnswer = exitAnswer.get();
 
-		Answer updateAnswer = answerReposotory.save(exitAnswer);
-		return convertToDto(updateAnswer);
-	}
+            this.convertToEntity(answerDTO, existingAnswer);
 
-	private AnswerDTO convertToDto(Answer answer) {
-		AnswerDTO answerDTO = new AnswerDTO();
+            Answer savedAnswer = answerReposotory.save(existingAnswer);
 
-		answerDTO.setIsCorrect(answer.getIsCorrect());
-		answerDTO.setQuestionId(answer.getQuestion().getQuestionId());
+            return convertToResponseDTO(savedAnswer);
+        }
+        return null;
+    }
 
-		BeanUtils.copyProperties(answer, answerDTO);
-		return answerDTO;
-	}
+    @Override
+    public void deleteAnswer(Integer answerId) {
+        answerReposotory.deleteById(answerId);
+    }
 
-	private void convertToEntity(AnswerDTO answerDTO, Answer answer) {
-		Question question = new Question();
-		
-		if (answerDTO.getQuestionId() == null) {
-			Integer questionId = questionRepository.getMaxQuestionId();
-			question = questionRepository.findById(questionId).get();
-		}
-		answer.setIsCorrect(answerDTO.getIsCorrect());
-		answer.setQuestion(question);
-		answer.setText(answerDTO.getText());
-	}
+    private AnswerDTO convertToResponseDTO(Answer answer) {
+        AnswerDTO answerDTO = new AnswerDTO();
+
+        BeanUtils.copyProperties(answer, answerDTO);
+
+        answerDTO.setQuestionDetailId(answer.getQuestionDetail().getQuestionDetailId());
+
+        return answerDTO;
+    }
+
+    private Answer convertToEntity(AnswerDTO answerDTO) {
+        Answer answer = new Answer();
+        QuestionDetail questionDetail = questionDetailReposotory.findById(answerDTO.getQuestionDetailId()).get();
+
+        BeanUtils.copyProperties(answerDTO, answer);
+
+        answer.setQuestionDetail(questionDetail);
+        answer.setAnswerContent(answer.getAnswerContent());
+        return answer;
+    }
+
+    private void convertToEntity(AnswerDTO answerDTO, Answer answer) {
+        QuestionDetail questionDetail = questionDetailReposotory.findById(answerDTO.getQuestionDetailId()).get();
+
+        answer.setAnswerContent(answerDTO.getAnswerContent());
+        answer.setIsCorrect(answerDTO.getIsCorrect());
+        answer.setQuestionDetail(questionDetail);
+    }
 }

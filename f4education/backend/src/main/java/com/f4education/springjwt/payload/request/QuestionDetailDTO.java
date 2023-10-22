@@ -1,28 +1,24 @@
 package com.f4education.springjwt.payload.request;
 
-import java.util.Date;
-import java.util.List;
-
 import com.f4education.springjwt.models.Answer;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Date;
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDTO {
-    private Integer questionId;
+public class QuestionDetailDTO {
+    private Integer questionDetailId;
 
-    private String subjectName;
-
-    private String courseName;
+    private String questionTitle;
 
     private Date createDate;
 
-    private Boolean status;
+    private Integer questionId;
 
-    private String adminName;
-
+    private List<Answer> answers;
 }
