@@ -26,13 +26,16 @@ public class CourseRequest {
 	private Float coursePrice;
 
 	@JsonProperty("courseDuration")
-	private String courseDuration;
+	private Integer courseDuration;
 
 	@JsonProperty("courseDescription")
 	private String courseDescription;
 
 	@JsonProperty("numberSession")
 	private Integer numberSession;
+
+	@JsonProperty("hourPerSession")
+	private Integer hourPerSession;
 
 	@JsonProperty("image")
 	private String image;

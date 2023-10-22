@@ -48,9 +48,6 @@ public class Academic {
 	@OneToMany(mappedBy = "academic")
 	List<Attendance> attendance;
 
-	@OneToMany(mappedBy = "academic")
-	List<Schedule> schedules;
-
 	@Override
 	public String toString() {
 		return "Academic{" +

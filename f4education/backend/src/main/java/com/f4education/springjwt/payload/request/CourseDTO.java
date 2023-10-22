@@ -18,20 +18,20 @@ public class CourseDTO {
 
     private Float coursePrice;
 
-    private String courseDuration;
+    private Integer courseDuration;
 
     private String courseDescription;
 
     private Integer numberSession;
 
     private Subject subject;
+
     private String image;
 
     @Override
     public String toString() {
-        return "CourseDTO{" +
-                "courseId=" + courseId +
-                ", courseName='" + courseName + '\'' +
-                '}';
+        return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
+                + numberSession + "]";
     }
 }

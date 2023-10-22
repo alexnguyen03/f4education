@@ -7,5 +7,8 @@ import com.f4education.springjwt.payload.request.ClassDTO;
 import com.f4education.springjwt.payload.request.ClassHistoryDTO;
 
 public interface ClassHistoryService {
+	
     List<ClassHistoryDTO> findAll();
+    
+    List<ClassHistoryDTO> getClassHistoryByClassId(Integer classId);
 }

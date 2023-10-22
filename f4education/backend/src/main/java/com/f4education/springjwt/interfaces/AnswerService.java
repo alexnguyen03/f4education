@@ -9,9 +9,13 @@ import java.util.List;
 public interface AnswerService {
 	List<AnswerDTO> getAllAnswer();
 
-	AnswerDTO getAnswerById(Integer questionId);
+	List<AnswerDTO> getAnsweByQuestionDetailId(Integer questionDetailId);
+
+	AnswerDTO getAnswerByAnswerId(Integer answerId);
 
 	AnswerDTO createAnswer(AnswerDTO AnswerDTO);
 
-	AnswerDTO updateAnswer(Integer questionId, AnswerDTO AnswerDTO);
+	AnswerDTO updateAnswer(Integer questionDetailId, AnswerDTO AnswerDTO);
+
+	void deleteAnswer(Integer answerId);
 }

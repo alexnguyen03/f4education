@@ -1,0 +1,133 @@
+:root {
+    --smoothTransition: all 0.3s linear;
+}
+
+.navbar-animate {
+    clear: both;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: #fff;
+    box-shadow: #63636333 2px 2px 8px 0px;
+    z-index: 1000;
+    transition: var(--smoothTransition);
+}
+
+.custom-nav-link {
+    position: relative;
+    color: #555555 !important;
+    font-size: 18px;
+    font-weight: 600 !important;
+    transition: var(--smoothTransition);
+}
+
+@media (max-width:991px) {
+    .custom-nav-link {
+        position: relative;
+        color: #555555 !important;
+        font-size: 18px;
+        margin-bottom: 10px;
+        font-weight: 600 !important;
+        transition: var(--smoothTransition);
+    }
+}
+
+.custom-nav-link.active.custom-nav-link::after {
+    display: block;
+}
+
+.custom-nav-link::after {
+    position: absolute;
+    content: '';
+    left: 0;
+    bottom: -58%;
+    background: #333;
+    height: 4px;
+    width: 100%;
+    display: none;
+    transition: var(--smoothTransition);
+}
+
+.custom-nav-link:hover.custom-nav-link::after {
+    display: block;
+    transition: var(--smoothTransition);
+}
+
+@media (max-width:991px) {
+    .custom-nav-link::after {
+        position: absolute;
+        content: '';
+        left: 50%;
+        transform: translateX(-50%);
+        right: 0;
+        bottom: 0;
+        background: #333;
+        height: 5px;
+        width: 100px;
+        text-align: center;
+        transition: var(--smoothTransition);
+    }
+}
+
+.cart {
+    position: relative;
+    transition: var(--smoothTransition);
+}
+
+.cart-detail {
+    position: absolute;
+    /* bottom: -580%; */
+    top: 105%;
+    right: 0;
+    width: 400px;
+    height: auto;
+    max-height: 85vh;
+    border-radius: 5px;
+    background-color: #fff;
+    box-shadow: rgba(99, 99, 99, 0.2) 2px 2px 8px 0px;
+    display: none;
+    z-index: 100;
+    overflow-y: auto;
+    transition: var(--smoothTransition);
+}
+
+.cart-content-overflow {
+    height: auto;
+    max-height: 500px;
+    padding-bottom: 110px;
+    overflow-y: auto;
+}
+
+.cart-detail::after {
+    position: absolute;
+    content: '';
+    top: -15px;
+    left: 0;
+    right: 0;
+    height: 15px;
+    opacity: 0;
+}
+
+.cart-footer {
+    position: absolute;
+    bottom: 0;
+    background: #fff;
+    box-shadow: rgba(99, 99, 99, 0.2) 8px 8px 8px 8px;
+    z-index: 200;
+    transition: var(--smoothTransition);
+}
+
+.cart:hover .cart-detail {
+    display: block;
+    transition: var(--smoothTransition);
+}
+
+.header-cart {
+    position: absolute;
+    top: -25%;
+    right: -25%;
+    border-radius: 50%;
+    color: #fff;
+    background-color: #333;
+}

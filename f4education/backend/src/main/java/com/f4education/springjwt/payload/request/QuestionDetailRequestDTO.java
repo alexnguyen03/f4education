@@ -18,9 +18,5 @@ public class QuestionDetailRequestDTO {
 
     private Integer courseId;
 
-    private String questionTitle;
-
     private String adminId;
-    
-    private List<Answer> answers;
 }

@@ -33,4 +33,9 @@ public class ClassHistoryController {
 	public List<ClassHistoryDTO> getAll() {
 		return classHistoryService.findAll();
 	}
+	
+	@GetMapping("/{id}")
+	public List<ClassHistoryDTO> findByClassId(@PathVariable("id") Integer classId) {
+		return classHistoryService.getClassHistoryByClassId(classId);
+	}
 }

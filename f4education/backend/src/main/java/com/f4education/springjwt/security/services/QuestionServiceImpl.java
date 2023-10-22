@@ -1,17 +1,18 @@
 package com.f4education.springjwt.security.services;
 
-import com.f4education.springjwt.interfaces.QuestionDetailService;
 import com.f4education.springjwt.interfaces.QuestionService;
-import com.f4education.springjwt.models.*;
-import com.f4education.springjwt.payload.request.QuestionDetailRequestDTO;
-import com.f4education.springjwt.payload.request.QuestionRequestDTO;
-import com.f4education.springjwt.payload.response.QuestionDetailResponseDTO;
-import com.f4education.springjwt.payload.response.QuestionResponseDTO;
-import com.f4education.springjwt.repository.*;
+import com.f4education.springjwt.models.Admin;
+import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.Question;
+import com.f4education.springjwt.models.Subject;
+import com.f4education.springjwt.payload.request.QuestionDTO;
+import com.f4education.springjwt.payload.request.QuestionDTORequest;
+import com.f4education.springjwt.repository.AdminRepository;
+import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.QuestionReposotory;
+import com.f4education.springjwt.repository.SubjectRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -22,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionServiceImpl implements QuestionService {
     @Autowired
-    QuestionReposotory questionRepository;
+    QuestionReposotory questionReposotory;
 
     @Autowired
     AdminRepository adminRepository;
@@ -34,70 +35,64 @@ public class QuestionServiceImpl implements QuestionService {
     SubjectRepository subjectRepository;
 
     @Override
-    public List<QuestionResponseDTO> getAllQuestion() {
-        List<Question> questions = questionRepository.findDistinctByCourseName();
-        return questions.stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+    public List<QuestionDTO> getAllQuestion() {
+        List<Question> question = questionReposotory.findAll();
+        return question.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
     }
 
     @Override
-    public QuestionResponseDTO createQuestion(QuestionRequestDTO questionDTO) {
+    public QuestionDTO createQuestion(QuestionDTORequest questionDTO) {
         Question question = this.convertRequestToEntity(questionDTO);
-
         question.setCreateDate(new Date());
+        question.setStatus(true);
 
-        Question createQuestion = questionRepository.save(question);
+        Question saveQuestion = questionReposotory.save(question);
 
-        return convertToResponseDTO(createQuestion);
+        return convertToQuestionResponse(saveQuestion);
     }
 
     @Override
-    public QuestionResponseDTO updateQuestion(Integer id, QuestionRequestDTO questionDTO) {
-        Question question = questionRepository.findById(id).get();
+    public QuestionDTO updateQuestion(Integer questionId, QuestionDTORequest questionDTO) {
+        Optional<Question> exitQuestion = questionReposotory.findById(questionId);
 
-        convertRequestToEntity(questionDTO, question);
-        question.setCreateDate(new Date());
+        if (exitQuestion.isEmpty()) {
+            return null;
+        }
 
-        Question updateQuestion = questionRepository.save(question);
-        return convertToResponseDTO(updateQuestion);
+        exitQuestion.get().setStatus(false);
+
+        Question updateQuestion = questionReposotory.save(exitQuestion.get());
+
+        return convertToQuestionResponse(updateQuestion);
     }
 
-
-    private QuestionResponseDTO convertToResponseDTO(Question question) {
-        QuestionResponseDTO questionDTO = new QuestionResponseDTO();
+    private QuestionDTO convertToQuestionResponse(Question question) {
+        QuestionDTO questionDTO = new QuestionDTO();
 
         BeanUtils.copyProperties(question, questionDTO);
 
         questionDTO.setAdminName(question.getAdmin().getFullname());
+        questionDTO.setQuestionId(question.getQuestionId());
+        questionDTO.setSubjectName(question.getSubject().getSubjectName());
+        questionDTO.setCourseName(question.getCourse().getCourseName());
 
         return questionDTO;
     }
 
-    private void convertRequestToEntity(QuestionRequestDTO questionDTO, Question question) {
-        Admin admin = adminRepository.findById(questionDTO.getAdminId()).get();
-        Subject subject = subjectRepository.findById(questionDTO.getSubjectId()).get();
-        Course course = courseRepository.findById(questionDTO.getCourseId()).get();
-
-        BeanUtils.copyProperties(questionDTO, question);
-
-        question.setSubjectName(subject.getSubjectName());
-        question.setCourseName(course.getCourseName());
-        question.setAdmin(admin);
-    }
-
-    private Question convertRequestToEntity(QuestionRequestDTO questionDTO) {
+    private Question convertRequestToEntity(QuestionDTORequest questionDTORequest) {
         Question question = new Question();
 
-        Admin admin = adminRepository.findById(questionDTO.getAdminId()).get();
-        Subject subject = subjectRepository.findById(questionDTO.getSubjectId()).get();
-        Course course = courseRepository.findById(questionDTO.getCourseId()).get();
+        Admin admin = adminRepository.findById(questionDTORequest.getAdminId()).get();
+        Subject subject = subjectRepository.findById(questionDTORequest.getSubjectId()).get();
+        Course course = courseRepository.findById(questionDTORequest.getCourseId()).get();
 
-        BeanUtils.copyProperties(questionDTO, question);
+        BeanUtils.copyProperties(questionDTORequest, question);
 
-        question.setSubjectName(subject.getSubjectName());
-
+        question.setCourse(course);
+        question.setSubject(subject);
         question.setAdmin(admin);
-        question.setCourseName(course.getCourseName());
 
         return question;
     }
+
 }

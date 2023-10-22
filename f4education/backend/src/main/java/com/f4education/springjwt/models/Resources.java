@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -37,25 +39,28 @@ public class Resources {
 	@Column(name = "resources_id")
 	private Integer resourcesId;
 
-	@Column(name = "resources_name")
-	private String resourcesName;
-
 	private String link;
 	
+	@JsonIgnore
+	@Column(name = "create_date")
+	private Date createDate;
+	
+	@JsonIgnore
 	@OneToMany(mappedBy = "resources")
 	List<ResourcesHistory> resourcesHistories;
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "course_id")
 	Course course; 
 	
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	Admin admin;
 
 	@Override
 	public String toString() {
-		return "Resources [resourcesId=" + resourcesId + ", resourcesName=" + resourcesName + ", link=" + link + "]";
-	} 
-	
+		return "Resources [resourcesId=" + resourcesId + ", link=" + link + ", createDate=" + createDate + "]";
+	}
 }

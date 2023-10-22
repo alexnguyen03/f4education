@@ -16,7 +16,7 @@ public class SubjectHistoryDTO {
 
 	private Date modifyDate;
 
-	private String adminId;
+	private String adminName;
 	
 	private String subjectName;
 

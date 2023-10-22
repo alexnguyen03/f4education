@@ -10,6 +10,14 @@ const userApi = {
 		const url = '/auth';
 		return axiosClient.post(url, {params});
 	},
+	signout: (id) => {
+		const url = `/auth/signout/${id}`;
+		return axiosClient.post(url);
+	},
+	getRole: (email) => {
+		const url = `/auth/${email}`;
+		return axiosClient.get(url);
+	},
 };
 
 export default userApi;

@@ -117,10 +117,28 @@ const AdminNavbar = () => {
 							<NavItem>
 								<NavLink
 									className='nav-link-icon'
+									to='/admin/classsroom'
+									tag={Link}>
+									<i className='ni ni-key-25' />
+									<span className='nav-link-inner--text'>ClassRoom</span>
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink
+									className='nav-link-icon'
 									to='/admin/classs'
 									tag={Link}>
 									<i className='ni ni-single-02' />
 									<span className='nav-link-inner--text'>Classs</span>
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink
+									className='nav-link-icon'
+									to='/admin/resources'
+									tag={Link}>
+									<i className='ni ni-single-02' />
+									<span className='nav-link-inner--text'>Resources</span>
 								</NavLink>
 							</NavItem>
 						</Nav>

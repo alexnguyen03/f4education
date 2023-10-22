@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
-import java.util.List;
 
 @Data
 @Entity
@@ -20,29 +19,37 @@ public class Question {
     @Column(name = "question_id")
     private Integer questionId;
 
-    @Column(name = "subject_name")
-    private String subjectName;
-
-    @Column(name = "course_name")
-    private String courseName;
-
     @Column(name = "create_date")
     private Date createDate;
 
-    @OneToMany(mappedBy = "question")
-    List<QuestionDetail> questionDetail;
+    @Column(name = "status")
+    private Boolean status;
+
+    @ManyToOne
+    @JoinColumn(name = "subject_id")
+    @JsonIgnore
+    Subject subject;
+
+    @ManyToOne
+    @JoinColumn(name = "course_id")
+    @JsonIgnore
+    Course course;
 
     @ManyToOne
     @JoinColumn(name = "admin_id")
+    @JsonIgnore
     Admin admin;
+
+   @OneToMany(mappedBy = "question")
+   @JsonIgnore
+   List<QuestionDetail> questionDetail;
 
     @Override
     public String toString() {
         return "Question{" +
                 "questionId=" + questionId +
-                ", subjectName='" + subjectName + '\'' +
-                ", courseName='" + courseName + '\'' +
                 ", createDate=" + createDate +
+                ", status=" + status +
                 '}';
     }
 }

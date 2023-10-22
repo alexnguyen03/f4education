@@ -1,9 +1,7 @@
 package com.f4education.springjwt.interfaces;
 
-import com.f4education.springjwt.payload.request.QuestionDetailRequestDTO;
-import com.f4education.springjwt.payload.request.QuestionRequestDTO;
-import com.f4education.springjwt.payload.response.QuestionDetailResponseDTO;
-import com.f4education.springjwt.payload.response.QuestionResponseDTO;
+import com.f4education.springjwt.payload.request.QuestionDTO;
+import com.f4education.springjwt.payload.request.QuestionDTORequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +10,7 @@ import java.util.List;
 public interface QuestionService {
     List<QuestionResponseDTO> getAllQuestion();
 
-    QuestionResponseDTO createQuestion(QuestionRequestDTO questionDTO);
+	QuestionDTO createQuestion(QuestionDTORequest questionDTO);
 
-    QuestionResponseDTO updateQuestion(Integer questionId, QuestionRequestDTO questionDTO);
+	QuestionDTO updateQuestion(Integer questionId, QuestionDTORequest questionDTO);
 }
