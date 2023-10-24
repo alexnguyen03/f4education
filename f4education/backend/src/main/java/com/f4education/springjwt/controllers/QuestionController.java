@@ -11,7 +11,7 @@ import java.util.List;
 
 @CrossOrigin("*")
 @RestController
-@RequestMapping("/api/question")
+@RequestMapping("/api/questions")
 public class QuestionController {
     @Autowired
     QuestionService questionService;
@@ -23,6 +23,12 @@ public class QuestionController {
         return ResponseEntity.ok(question);
     }
 
+    @GetMapping("/{questionId}")
+//	@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> findById(@PathVariable Integer questionId) {
+        QuestionDTO question = questionService.findQuestionById(questionId);
+        return ResponseEntity.ok(question);
+    }
 
     @PostMapping
     public ResponseEntity<?> createQuestion(@RequestBody QuestionDTORequest questionDTO) {

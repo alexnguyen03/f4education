@@ -1,11 +1,10 @@
 package com.f4education.springjwt.interfaces;
 
-import com.f4education.springjwt.payload.request.QuestionDTO;
-import com.f4education.springjwt.payload.request.QuestionDTORequest;
-import com.f4education.springjwt.payload.request.QuestionDetailDTO;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
 @Service
 public interface QuestionDetailService {

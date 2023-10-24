@@ -26,7 +26,7 @@ root.render(
 				element={<AuthLayout />}
 			/>
 			<Route
-				path='/admin/*/:courseName'
+				path='/admin/*/:questionId'
 				element={<AdminLayout />}
 			/>
 			<Route

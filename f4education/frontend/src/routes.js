@@ -147,7 +147,7 @@ export var routes = [
     layout: "/admin",
   },
   {
-    path: "/question-detail/:courseName",
+    path: "/question-detail/:questionId",
     component: <QuestionDetail />,
     layout: "/admin",
   },

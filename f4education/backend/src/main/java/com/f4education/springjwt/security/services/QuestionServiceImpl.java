@@ -22,77 +22,83 @@ import java.util.stream.Collectors;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
-    @Autowired
-    QuestionReposotory questionReposotory;
+	@Autowired
+	QuestionReposotory questionReposotory;
 
-    @Autowired
-    AdminRepository adminRepository;
+	@Autowired
+	AdminRepository adminRepository;
 
-    @Autowired
-    CourseRepository courseRepository;
+	@Autowired
+	CourseRepository courseRepository;
 
-    @Autowired
-    SubjectRepository subjectRepository;
+	@Autowired
+	SubjectRepository subjectRepository;
 
-    @Override
-    public List<QuestionDTO> getAllQuestion() {
-        List<Question> question = questionReposotory.findAll();
-        return question.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
-    }
+	@Override
+	public List<QuestionDTO> getAllQuestion() {
+		List<Question> question = questionReposotory.findAll();
+		return question.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
+	}
 
-    @Override
-    public QuestionDTO createQuestion(QuestionDTORequest questionDTO) {
-        Question question = this.convertRequestToEntity(questionDTO);
-        question.setCreateDate(new Date());
-        question.setStatus(true);
+	@Override
+	public QuestionDTO findQuestionById(Integer questionId) {
+		Question question = questionReposotory.findById(questionId).get();
+		return question != null ? this.convertToQuestionResponse(question) : null;
+	}
 
-        Question saveQuestion = questionReposotory.save(question);
+	@Override
+	public QuestionDTO createQuestion(QuestionDTORequest questionDTO) {
+		Question question = this.convertRequestToEntity(questionDTO);
+		question.setCreateDate(new Date());
+		question.setStatus(true);
 
-        return convertToQuestionResponse(saveQuestion);
-    }
+		Question saveQuestion = questionReposotory.save(question);
 
-    @Override
-    public QuestionDTO updateQuestion(Integer questionId, QuestionDTORequest questionDTO) {
-        Optional<Question> exitQuestion = questionReposotory.findById(questionId);
+		return convertToQuestionResponse(saveQuestion);
+	}
 
-        if (exitQuestion.isEmpty()) {
-            return null;
-        }
+	@Override
+	public QuestionDTO updateQuestion(Integer questionId, QuestionDTORequest questionDTO) {
+		Optional<Question> exitQuestion = questionReposotory.findById(questionId);
 
-        exitQuestion.get().setStatus(false);
+		if (exitQuestion.isEmpty()) {
+			return null;
+		}
 
-        Question updateQuestion = questionReposotory.save(exitQuestion.get());
+		exitQuestion.get().setStatus(false);
 
-        return convertToQuestionResponse(updateQuestion);
-    }
+		Question updateQuestion = questionReposotory.save(exitQuestion.get());
 
-    private QuestionDTO convertToQuestionResponse(Question question) {
-        QuestionDTO questionDTO = new QuestionDTO();
+		return convertToQuestionResponse(updateQuestion);
+	}
 
-        BeanUtils.copyProperties(question, questionDTO);
+	private QuestionDTO convertToQuestionResponse(Question question) {
+		QuestionDTO questionDTO = new QuestionDTO();
 
-        questionDTO.setAdminName(question.getAdmin().getFullname());
-        questionDTO.setQuestionId(question.getQuestionId());
-        questionDTO.setSubjectName(question.getSubject().getSubjectName());
-        questionDTO.setCourseName(question.getCourse().getCourseName());
+		BeanUtils.copyProperties(question, questionDTO);
 
-        return questionDTO;
-    }
+		questionDTO.setAdminName(question.getAdmin().getFullname());
+		questionDTO.setQuestionId(question.getQuestionId());
+		questionDTO.setSubjectName(question.getSubject().getSubjectName());
+		questionDTO.setCourseName(question.getCourse().getCourseName());
 
-    private Question convertRequestToEntity(QuestionDTORequest questionDTORequest) {
-        Question question = new Question();
+		return questionDTO;
+	}
 
-        Admin admin = adminRepository.findById(questionDTORequest.getAdminId()).get();
-        Subject subject = subjectRepository.findById(questionDTORequest.getSubjectId()).get();
-        Course course = courseRepository.findById(questionDTORequest.getCourseId()).get();
+	private Question convertRequestToEntity(QuestionDTORequest questionDTORequest) {
+		Question question = new Question();
 
-        BeanUtils.copyProperties(questionDTORequest, question);
+		Admin admin = adminRepository.findById(questionDTORequest.getAdminId()).get();
+		Subject subject = subjectRepository.findById(questionDTORequest.getSubjectId()).get();
+		Course course = courseRepository.findById(questionDTORequest.getCourseId()).get();
 
-        question.setCourse(course);
-        question.setSubject(subject);
-        question.setAdmin(admin);
+		BeanUtils.copyProperties(questionDTORequest, question);
 
-        return question;
-    }
+		question.setCourse(course);
+		question.setSubject(subject);
+		question.setAdmin(admin);
+
+		return question;
+	}
 
 }
