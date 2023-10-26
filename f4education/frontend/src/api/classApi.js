@@ -2,6 +2,10 @@ import axiosClient from './axiosClient'
 
 // api/classApi.js
 const classApi = {
+    getAllClassActive: () => {
+        const url = '/classes/actived'
+        return axiosClient.get(url)
+    },
     getAllClass: () => {
         const url = '/classes'
         return axiosClient.get(url)

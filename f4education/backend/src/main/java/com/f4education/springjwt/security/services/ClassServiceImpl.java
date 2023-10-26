@@ -88,7 +88,11 @@ public class ClassServiceImpl implements ClassService {
         classDTO.setAdmin(adminDTO);
         classDTO.setRegisterCourses(classes.getRegisterCourses());
         classDTO.setTeacher(classes.getTeacher());
-
+        classDTO.setHasSchedule(false);
+        System.out.println(classes.getSchedules().size());
+        if (!classes.getSchedules().isEmpty()) {
+            classDTO.setHasSchedule(true);
+        }
         if (classes.getRegisterCourses().size() > 0) {
             List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
                     .collect(Collectors.toList());
@@ -143,5 +147,21 @@ public class ClassServiceImpl implements ClassService {
         classResponse.setStudents(listStudent);
 
         return classResponse;
+    }
+
+    @Override
+    public List<ClassDTO> findAllActiveClasses() {
+        List<Classes> list = classRepository.findAll();
+        List<Classes> filteredList = list.stream()
+                .filter(obj -> {
+                    if (obj instanceof Classes) {
+                        Classes item = (Classes) obj;
+                        return item.getTeacher() != null;
+                    }
+
+                    return false;
+                })
+                .collect(Collectors.toList());
+        return filteredList.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 }

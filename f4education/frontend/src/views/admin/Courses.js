@@ -5,7 +5,7 @@ import {
     Search
 } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
-import courseApi from 'api/courseApi'
+import courseApi from '../../api/courseApi'
 import moment from 'moment'
 import CoursesHeader from 'components/Headers/CoursesHeader'
 import { MaterialReactTable } from 'material-react-table'

@@ -52,4 +52,9 @@ public class ClassController {
 		return classService.updateClass(classId, classDTO);
 	}
 
+	@GetMapping("/actived")
+	public ResponseEntity<?> getAllClassActive() {
+		return ResponseEntity.ok(classService.findAllActiveClasses());
+	}
+
 }

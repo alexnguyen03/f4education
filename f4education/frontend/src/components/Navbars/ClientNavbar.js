@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Badge, Col, Row } from 'reactstrap'
 import logo from '../../assets/img/brand/f4.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
@@ -117,6 +117,7 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 // `;
 
 const ClientNavbar = () => {
+    const navigate = useNavigate()
     const ref = useElementSize()
     const [login, setLogin] = useState(false)
     const [cartEmpty, setCartEmpty] = useState(true)
@@ -167,7 +168,8 @@ const ClientNavbar = () => {
     }
 
     const handleLogin = (prev) => {
-        setLogin(!prev)
+        // setLogin(!prev)
+        navigate('/auth/login')
     }
 
     const handleCartEmpty = (prev) => {
@@ -177,25 +179,26 @@ const ClientNavbar = () => {
     window.addEventListener('scroll', function () {
         const navbar = this.document.querySelector('#navbar-animate')
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        if (navbar) {
+            window.addEventListener('scroll', function () {
+                if (window.pageYOffset === 0) {
+                    navbar.style.boxShadow = 'none'
+                    navbar.style.top = 0
+                } else {
+                    navbar.style.boxShadow = '#63636333 2px 2px 8px 0px'
+                }
+            })
 
-        window.addEventListener('scroll', function () {
-            if (window.pageYOffset === 0) {
-                navbar.style.boxShadow = 'none'
+            if (scrollTop === 0) {
                 navbar.style.top = 0
-            } else {
-                navbar.style.boxShadow = '#63636333 2px 2px 8px 0px'
             }
-        })
-
-        if (scrollTop === 0) {
-            navbar.style.top = 0
+            if (scrollTop > lastScrollTop) {
+                navbar.style.top = '-80px'
+            } else {
+                navbar.style.top = 0
+            }
+            setLastScrollTop(scrollTop)
         }
-        if (scrollTop > lastScrollTop) {
-            navbar.style.top = '-80px'
-        } else {
-            navbar.style.top = 0
-        }
-        setLastScrollTop(scrollTop)
     })
 
     return (
