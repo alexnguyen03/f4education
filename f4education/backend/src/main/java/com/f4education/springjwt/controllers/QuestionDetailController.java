@@ -1,15 +1,22 @@
 package com.f4education.springjwt.controllers;
 
-import com.f4education.springjwt.interfaces.AnswerService;
-import com.f4education.springjwt.interfaces.QuestionDetailService;
-import com.f4education.springjwt.models.Answer;
-import com.f4education.springjwt.payload.request.AnswerDTO;
-import com.f4education.springjwt.payload.request.QuestionDetailDTO;
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
+import com.f4education.springjwt.interfaces.AnswerService;
+import com.f4education.springjwt.interfaces.QuestionDetailService;
+import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
 @CrossOrigin("*")
 @RestController

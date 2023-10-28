@@ -28,7 +28,6 @@ import { Link } from 'react-router-dom'
 
 // ************* Get LocalStorage
 const user = JSON.parse(localStorage.getItem('user' | ''))
-console.log(user)
 
 const Questions = () => {
     // ************* Main variable
@@ -45,6 +44,7 @@ const Questions = () => {
     const [selectedSubjectId, setSelectedSubjectId] = useState(null)
     const [selectedCourseId, setSelectedCourseId] = useState(null)
     const [msgForm, setMsgForm] = useState({})
+    console.log(user)
 
     const [question] = useState({
         subjectId: selectedSubjectId,

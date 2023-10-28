@@ -30,7 +30,6 @@ import {
 // API
 import questionApi from '../../api/questionApi'
 import answerApi from '../../api/answersApi'
-import answersApi from '../../api/answersApi'
 
 // ************* Get LocalStorage
 // const userDetail = JSON.parse(localStorage.getItem('user'))
@@ -52,7 +51,7 @@ const QuestionDetail = () => {
     const [isUpdate, setIsUpdate] = useState(false)
 
     // ************* Form variable
-    const [questionTitle, setQuestionTitle] = useState(null)
+    const [questionTitle, setQuestionTitle] = useState('')
     const [msgError, setMsgError] = useState({})
     const [questionRequest, setQuestionRequest] = useState({
         questionTitle: '',
@@ -168,7 +167,7 @@ const QuestionDetail = () => {
 
             await Promise.all(
                 questionRequest.answers.map(async (answer) => {
-                    await answersApi.updateAnswer(answer.answerId, answer)
+                    await answerApi.updateAnswer(answer.answerId, answer)
                 })
             )
 
@@ -362,7 +361,7 @@ const QuestionDetail = () => {
     }
 
     const validateForm = () => {
-        if (questionTitle === null) {
+        if (questionTitle === '') {
             setMsgError((preErr) => ({
                 ...preErr,
                 msg: 'Không để trống tên câu hỏi'

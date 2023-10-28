@@ -4,11 +4,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.f4education.springjwt.models.QuestionDetail;
-import com.f4education.springjwt.repository.QuestionDetailReposotory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.AnswerService;
