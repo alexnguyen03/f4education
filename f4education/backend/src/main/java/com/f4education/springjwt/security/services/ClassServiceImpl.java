@@ -3,6 +3,7 @@ package com.f4education.springjwt.security.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import com.f4education.springjwt.models.*;
@@ -12,8 +13,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.models.Admin;
+import com.f4education.springjwt.models.ClassHistory;
+import com.f4education.springjwt.models.Classes;
+import com.f4education.springjwt.models.RegisterCourse;
+import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.AdminDTO;
 import com.f4education.springjwt.payload.request.ClassDTO;
+import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.ClassHistoryRepository;
 import com.f4education.springjwt.repository.ClassRepository;
@@ -79,6 +86,20 @@ public class ClassServiceImpl implements ClassService {
         AdminDTO adminDTO = new AdminDTO();
         BeanUtils.copyProperties(admin, adminDTO);
         classDTO.setAdmin(adminDTO);
+        classDTO.setRegisterCourses(classes.getRegisterCourses());
+        classDTO.setTeacher(classes.getTeacher());
+        classDTO.setHasSchedule(false);
+        System.out.println(classes.getSchedules().size());
+        if (!classes.getSchedules().isEmpty()) {
+            classDTO.setHasSchedule(true);
+        }
+        if (classes.getRegisterCourses().size() > 0) {
+            List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
+                    .collect(Collectors.toList());
+            classDTO.setStudents(lStudents);
+            classDTO.setCourseName(classes.getRegisterCourses().get(0).getCourse().getCourseName());
+            classDTO.setCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
+        }
         return classDTO;
     }
 
@@ -111,7 +132,6 @@ public class ClassServiceImpl implements ClassService {
             }
         }
 
-
         // Get list course
         List<String> courseName = new ArrayList<>();
         for (RegisterCourse ct : lstRegisterCourse) {
@@ -127,5 +147,21 @@ public class ClassServiceImpl implements ClassService {
         classResponse.setStudents(listStudent);
 
         return classResponse;
+    }
+
+    @Override
+    public List<ClassDTO> findAllActiveClasses() {
+        List<Classes> list = classRepository.findAll();
+        List<Classes> filteredList = list.stream()
+                .filter(obj -> {
+                    if (obj instanceof Classes) {
+                        Classes item = (Classes) obj;
+                        return item.getTeacher() != null;
+                    }
+
+                    return false;
+                })
+                .collect(Collectors.toList());
+        return filteredList.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 }

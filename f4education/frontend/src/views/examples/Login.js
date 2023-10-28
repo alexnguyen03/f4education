@@ -134,6 +134,7 @@ const Login = () => {
     }
     const responseGoogleError = (resp) => {}
     const storeUserInfo = (data) => {
+        console.log('🚀 ~ file: Login.js:137 ~ storeUserInfo ~ data:', data)
         localStorage.setItem('user', JSON.stringify(data))
         localStorage.setItem('accessToken', data.accessToken)
         localStorage.setItem('refreshToken', data.refreshToken)

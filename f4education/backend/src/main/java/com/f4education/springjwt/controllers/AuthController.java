@@ -76,7 +76,8 @@ public class AuthController {
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
     String jwt = jwtUtils.generateJwtToken(userDetails);
-    List<String> roles = userDetails.getAuthorities().stream()
+    List<String> roles = userDetails.getAuthorities()
+        .stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
     RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);

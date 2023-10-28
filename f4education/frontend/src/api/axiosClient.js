@@ -12,11 +12,7 @@ const axiosClient = axios.create({
 axiosClient.interceptors.request.use(async (config) => {
     var accessToken = localStorage.getItem('accessToken')
 
-    if (accessToken) {
-        console.log(
-            '🚀 ~ file: axiosClient.js:15 ~ axiosClient.interceptors.request.use ~ accessToken:',
-            accessToken
-        )
+    if (accessToken !== undefined) {
         config.headers.Authorization = `Bearer ${accessToken}`
     }
 
@@ -41,15 +37,15 @@ axiosClient.interceptors.response.use(
                         '/auth/refresh-token',
                         refreshToken
                     )
+                    console.log('🚀 ~ file: axiosClient.js:40 ~ rs:', rs)
                     const { accessToken } = rs.data
-                    console.log(
-                        '🚀 ~ file: axiosClient.js:37 ~ accessToken:',
-                        accessToken
-                    )
-                    localStorage.setItem('accessToken', accessToken)
+
+                    if (accessToken !== undefined) {
+                        localStorage.setItem('accessToken', accessToken)
+                        originalConfig.headers.Authorization = `Bearer ${accessToken}`
+                    }
                     axiosClient.defaults.headers.common['x-access-token'] =
                         accessToken
-                    originalConfig.headers.Authorization = `Bearer ${accessToken}`
                     return axiosClient(originalConfig)
                 } catch (_error) {
                     console.log(

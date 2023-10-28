@@ -9,10 +9,13 @@ import {
     Grid,
     Group,
     HoverCard,
-    Image, Rating,
+    Image,
+    Rating,
     rem,
     SimpleGrid,
-    Skeleton, Text, ThemeIcon,
+    Skeleton,
+    Text,
+    ThemeIcon,
     Title,
     Transition
 } from '@mantine/core'
@@ -20,9 +23,11 @@ import { useWindowScroll } from '@mantine/hooks'
 import { breakpoints } from '@mui/system'
 import {
     IconArrowAutofitRight,
-    IconArrowUp, IconCalendarTime,
+    IconArrowUp,
+    IconCalendarTime,
     IconCertificate,
-    IconCoin, IconShoppingCartPlus
+    IconCoin,
+    IconShoppingCartPlus
 } from '@tabler/icons-react'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
@@ -33,8 +38,8 @@ import classes from '../../../assets/scss/custom-module-scss/client-custom/home/
 import classHeroText from '../../../assets/scss/custom-module-scss/client-custom/home/HeroText.module.scss'
 
 // API
-import { Link } from 'react-router-dom'
 import courseApi from '../../../api/courseApi'
+import { Link } from 'react-router-dom'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -114,8 +119,8 @@ const Home = () => {
     }
 
     // learnext course Carousel
-    const LearnNextSlides = newestCourse.map((learn) => (
-        <Carousel.Slide key={learn.courseId}>
+    const LearnNextSlides = newestCourse.map((learn, index) => (
+        <Carousel.Slide key={index}>
             <HoverCard width={'95%'} shadow="md" position="bottom">
                 {/* Target Hover */}
                 {loading ? (
@@ -206,8 +211,8 @@ const Home = () => {
     ))
 
     // recommentTopic
-    const recommentTopicSlides = recommentTopic.map((learn) => (
-        <Carousel.Slide key={learn.id}>
+    const recommentTopicSlides = recommentTopic.map((learn, index) => (
+        <Carousel.Slide key={index}>
             <Card className="card-hover-overlay">
                 <Card.Section>
                     <Flex direction="column" wrap="wrap">

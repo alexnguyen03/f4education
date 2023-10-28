@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,27 +34,27 @@ import lombok.ToString;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name = "Resources")
-public class Resources {
+public class Resources implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "resources_id")
 	private Integer resourcesId;
 
 	private String link;
-	
+
 	@JsonIgnore
 	@Column(name = "create_date")
 	private Date createDate;
-	
+
 	@JsonIgnore
 	@OneToMany(mappedBy = "resources")
 	List<ResourcesHistory> resourcesHistories;
-	
+
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "course_id")
-	Course course; 
-	
+	Course course;
+
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")

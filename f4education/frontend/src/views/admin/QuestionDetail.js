@@ -234,6 +234,8 @@ const QuestionDetail = () => {
             { checkBoxValue: false, inputValue: '' }
         ])
 
+        setQuestionTitle('')
+
         setEditQuestionId(null)
     }
 
@@ -446,25 +448,25 @@ const QuestionDetail = () => {
                         </div>
                         <InputGroup
                             className="ml-2"
-                            style={{
-                                border: `${
-                                    group.inputValue === ''
-                                        ? '1.5px solid red'
-                                        : ''
-                                }`
-                            }}
+                            // style={{
+                            //     border: `${
+                            //         group.inputValue === ''
+                            //             ? '1.5px solid red'
+                            //             : ''
+                            //     }`
+                            // }}
                         >
                             <InputGroupAddon addonType="prepend">
                                 <InputGroupText>
                                     <i
                                         className="ni ni-fat-delete"
-                                        style={{
-                                            color: `${
-                                                group.inputValue === ''
-                                                    ? 'red'
-                                                    : ''
-                                            }`
-                                        }}
+                                        // style={{
+                                        //     color: `${
+                                        //         group.inputValue === ''
+                                        //             ? 'red'
+                                        //             : ''
+                                        //     }`
+                                        // }}
                                     />
                                 </InputGroupText>
                             </InputGroupAddon>
@@ -687,7 +689,7 @@ const QuestionDetail = () => {
     const renderGroupAnswerIntoQuestion = (questionDetail) => {
         return answers.map((subjectArray) => (
             <>
-                {subjectArray.map((answer) => (
+                {subjectArray.map((answer,index) => (
                     <>
                         {answer.questionDetailId ===
                         questionDetail.questionDetailId ? (
@@ -696,7 +698,7 @@ const QuestionDetail = () => {
                                 xl={12}
                                 md={12}
                                 sm={12}
-                                key={answer.answerId}
+                                key={index}
                             >
                                 <div className="d-flex">
                                     {/* Checkbox button */}
@@ -881,7 +883,7 @@ const QuestionDetail = () => {
                                                 {moment(
                                                     questionPrev.createDate
                                                 ).format(
-                                                    'DD-MM-yyyy, h:mm:ss a'
+                                                    'DD-MM-yyyy, h:mm:ss A'
                                                 )}
                                             </h5>
                                         </div>

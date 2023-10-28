@@ -1,28 +1,31 @@
-import axiosClient from './axiosClient';
+import axiosClient from './axiosClient'
 
 // api/classApi.js
 const classApi = {
-	getAllClass: () => {
-		const url = '/classs';
-		return axiosClient.get(url);
-	},
-	createClass: (body) => {
-		const url = '/classs';
-		return axiosClient.post(url, body);
-	},
-	updateClass: (body, classId) => {
-		const url = `/classs/${classId}`;
-		return axiosClient.put(url, body);
-	},
-	getByClassId: (classId)=>{
-		const url = `/classs/${classId}`;
-		return axiosClient.get(url);
-	}
-	,getAllClassByTeacherId: (teacherId)=>{
-		const url = `/classs/teacher/${teacherId}`;
-		return axiosClient.get(url);
-	}
-};
+    getAllClassActive: () => {
+        const url = '/classes/actived'
+        return axiosClient.get(url)
+    },
+    getAllClass: () => {
+        const url = '/classes'
+        return axiosClient.get(url)
+    },
+    createClass: (body) => {
+        const url = '/classes'
+        return axiosClient.post(url, body)
+    },
+    updateClass: (body, classId) => {
+        const url = `/classes/${classId}`
+        return axiosClient.put(url, body)
+    },
+    getByClassId: (classId) => {
+        const url = `/classes/${classId}`
+        return axiosClient.get(url)
+    },
+    getAllClassByTeacherId: (teacherId) => {
+        const url = `/classes/teacher/${teacherId}`
+        return axiosClient.get(url)
+    }
+}
 
-
-export default classApi;
+export default classApi

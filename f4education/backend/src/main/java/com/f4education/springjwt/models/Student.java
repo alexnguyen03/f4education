@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "Student")
 public class Student implements Serializable {
-	
+
 	@Id
 	@Column(name = "student_id")
 	private String studentId;

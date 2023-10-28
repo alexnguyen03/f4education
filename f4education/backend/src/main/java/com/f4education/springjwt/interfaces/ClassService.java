@@ -12,7 +12,10 @@ public interface ClassService {
 
 	List<ClassesByTeacherResponse> getAllClassesByTeacherId(String teacherId);
 
+	List<ClassDTO> findAllActiveClasses();
+
 	ClassDTO createClass(ClassDTO classDTO);
 
 	ClassDTO updateClass(Integer classId, ClassDTO classDTO);
+
 }
