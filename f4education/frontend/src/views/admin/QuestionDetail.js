@@ -29,14 +29,15 @@ import {
 
 // API
 import questionApi from '../../api/questionApi'
+import answerApi from '../../api/answersApi'
+import answersApi from '../../api/answersApi'
 
 // ************* Get LocalStorage
-// const userDetail = JSON.parse(localStorage.getItem('user') | '')
+// const userDetail = JSON.parse(localStorage.getItem('user'))
 
 const QuestionDetail = () => {
     // ************* Route and Params
     const params = useParams()
-    console.log(params.courseName)
 
     // ************* Main variable
     const [questionPrev, setQuestionPrev] = useState({})
@@ -45,22 +46,30 @@ const QuestionDetail = () => {
 
     // ************* Action variable
     const [loading, setLoading] = useState(false)
-    const [editAnswer, setEditAnswer] = useState(false)
+    const [editQuestion, setEditQuestion] = useState(false)
     const [showModal, setShowModal] = useState(false)
     const [editQuestionId, setEditQuestionId] = useState(null)
     const [isUpdate, setIsUpdate] = useState(false)
 
     // ************* Form variable
-    const [
-        questionRequestCreateNewQuestion,
-        setQuestionRequestCreateNewQuestion
-    ] = useState({
+    const [questionTitle, setQuestionTitle] = useState('')
+    const [msgError, setMsgError] = useState({})
+    const [questionRequest, setQuestionRequest] = useState({
         questionTitle: '',
         questionId: params.courseName,
-        answer: []
+        answers: []
     })
 
-    // ************* API AREA
+    const [answerRequest, setAnswerRequest] = useState([
+        {
+            answerId: '',
+            answerContent: '',
+            isCorrect: false,
+            questionDetailId: ''
+        }
+    ])
+
+    // ************* API - FETCH AREA
     const fetchQuestionDetail = async () => {
         try {
             setLoading(true)
@@ -70,10 +79,8 @@ const QuestionDetail = () => {
 
             if (resp.status === 200 || resp.data.length > 0) {
                 setQuestions(resp.data)
-                console.log(resp.data)
 
                 const newQuestions = resp.data
-                console.log(newQuestions)
 
                 const updatedQuestion = newQuestions.map((item) => {
                     const updatedAnswers = item.answers.map((answer) => {
@@ -82,7 +89,6 @@ const QuestionDetail = () => {
                             questionDetailId: item.questionDetailId
                         }
                     })
-
                     return {
                         ...item,
                         answers: updatedAnswers
@@ -108,7 +114,7 @@ const QuestionDetail = () => {
 
             if (resp.status === 200 || resp.data.length > 0) {
                 setQuestionPrev(resp.data)
-                console.log(resp.data)
+                // console.log(resp.data)
             } else {
                 console.log('error fetch QuestionDetail')
             }
@@ -119,49 +125,91 @@ const QuestionDetail = () => {
         }
     }
 
-    useEffect(() => {
-        fetchQuestionDetail()
-        fetchQuestionPrev()
-    }, [])
-
-    // + API > CRUD
-    // Lúc thêm question thì sẽ thêm luôn cái answers json sẽ giống với cái QuestionVsAnswerData;
-    // Lúc cập nhật cũng giống như lúc thêm
-
-    // *************** Form action area - START
-    const handleStoreQuestions = async () => {
+    // *************** FORM AREA ACTION - START
+    // ====================== QUESTION ======================
+    const handleStoreNewQuestions = async () => {
         try {
-            questionRequestCreateNewQuestion.answer = handleDataTranferAnswers()
-            console.log(questionRequestCreateNewQuestion)
+            questionRequest.answers = handleDataTranferAnswers()
+            console.log(questionRequest)
 
-            // const body = question;
-            // const resp = await questionApi.createQuestion(body);
-            // console.log(resp.status);
+            const body = questionRequest
+            const resp = await questionApi.createQuestionDetail(body)
+            console.log(resp.status)
+
+            if (resp.status === 200) {
+                // setShowModal(false)
+                fetchQuestionDetail()
+                setShowModal(false)
+                return console.log('toast here')
+            } else {
+                return console.log('certainly error toast here')
+            }
         } catch (error) {
             console.log(error)
         }
-
-        setShowModal(false)
     }
 
     // + Function update when click update
-    const handleUpdateQuestion = () => {
+    const handleUpdateQuestion = async () => {
         // Set change action render UI
         setEditQuestionId(null)
-        setEditAnswer(false)
-        // setIsEditing(false);
+        setEditQuestion(false)
 
-        // questionRequest[0].answer = answerRequest
-        console.log('UPDATE REQUEST DATA')
-        // console.log(questionRequest[0])
+        questionRequest.answers = answerRequest
+        console.log(questionRequest)
 
-        // questionRequest[0].answer = answerRequest;
-        // const lastAnswerIndex = (questionRequest[0].answer = answerRequest);
-        // console.log(lastAnswerIndex[lastAnswerIndex.length - 1].answerId);
-        // lastAnswerIndex[lastAnswerIndex.length - 1].answerId = "";\
+        try {
+            const resp = await questionApi.updateQuestionDetail(
+                editQuestionId,
+                questionRequest
+            )
 
-        // console.log(question);
-        // Handle Change Data
+            await Promise.all(
+                questionRequest.answers.map(async (answer) => {
+                    await answersApi.updateAnswer(answer.answerId, answer)
+                })
+            )
+
+            if (resp.status === 200) {
+                console.log('updated')
+                fetchQuestionDetail()
+            } else {
+                console.log('update fail')
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const handleDeleteQuestion = async (questionDetail) => {
+        // Delete answer
+        questionDetail.answers.forEach(async (as) => {
+            try {
+                const resp = await answerApi.deleteAnswer(as.answerId)
+
+                if (resp.status === 204) {
+                    console.log('Xóa answer rồi')
+                }
+                console.log('lỗi answer gòi')
+            } catch (error) {
+                console.log(error)
+            }
+        })
+
+        // Delete Question
+        try {
+            const resp = await questionApi.deleteQuestionDetail(
+                questionDetail.questionDetailId
+            )
+
+            if (resp.status === 204) {
+                console.log('Xóa question rồi')
+                fetchQuestionDetail()
+            }
+            console.log('lỗi question gòi')
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     // + Tranfer Data from state to request
@@ -172,9 +220,166 @@ const QuestionDetail = () => {
         }))
         return newAnswers
     }
-    // *************** Form action area - END
 
-    // *************** CREATE NEW QUESTION - ANSWER SECTION - START - DONE
+    const handleClearForm = () => {
+        setQuestionRequest({
+            questionTitle: '',
+            questionId: params.courseName,
+            answers: []
+        })
+
+        setCreateNewAnswergroups([
+            { checkBoxValue: false, inputValue: '' },
+            { checkBoxValue: false, inputValue: '' }
+        ])
+
+        setEditQuestionId(null)
+    }
+
+    // Handle onchange quetsion title
+    const handleOnchangeInputQuestionTitle = (value, questionIdValue) => {
+        setQuestionRequest((prev) => ({
+            ...prev,
+            questionTitle: value
+        }))
+
+        const updatedQuestionDetail = questions.map((questionDetail) => {
+            if (questionDetail.questionDetailId === questionIdValue) {
+                return {
+                    ...questionDetail,
+                    questionTitle: value
+                }
+            }
+            return questionDetail
+        })
+        setQuestions(updatedQuestionDetail)
+    }
+
+    // ====================== ANSWER ======================
+    const handleAddNewAnswerForEachQuestion = async (questionDetail) => {
+        setEditQuestionId(questionDetail.questionDetailId)
+
+        if (validateForm()) {
+            try {
+                const answers = [
+                    {
+                        answerContent: '',
+                        isCorrect: false,
+                        questionDetailId: questionDetail.questionDetailId
+                    }
+                ]
+                const resp = await answerApi.createAnswer(answers)
+
+                if (resp.status === 200) {
+                    console.log('ok')
+                    fetchQuestionDetail()
+                } else console.log('lỗi')
+            } catch (error) {
+                console.log(error)
+            }
+        } else console.log('error in validate')
+    }
+
+    const handleDeleteSingleAnswer = async (answerId) => {
+        try {
+            const resp = await answerApi.deleteAnswer(answerId)
+            resp.status === 204 ? console.log('ok') : console.log('!ok')
+            fetchQuestionDetail()
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // get value onchange Answer Input for update
+    const handleOnchangeInputAnswersValue = (value, answerIdValue) => {
+        // Update UI
+        const updatedGroupAnswer = answers.map((answerArray) => {
+            return answerArray.map((answer) => {
+                if (answer.answerId === answerIdValue) {
+                    return {
+                        ...answer,
+                        answerContent: value
+                    }
+                }
+                return answer
+            })
+        })
+        setAnswers(updatedGroupAnswer)
+
+        // Update Data
+        const updateRequest = updatedGroupAnswer.filter((answerArray) => {
+            return answerArray.some((answer) => {
+                return answer.questionDetailId === editQuestionId
+            })
+        })
+        setAnswerRequest(updateRequest[0])
+    }
+
+    // get value onchange Answer radio for update
+    const handleOnChangeCheckboxAnswerValue = (answerIdValue) => {
+        // Update UI
+        const updatedGroupAnswer = answers.map((answerArray) => {
+            return answerArray.map((answer) => {
+                if (answer.answerId === answerIdValue) {
+                    return {
+                        ...answer,
+                        isCorrect: !answer.isCorrect
+                    }
+                }
+                return answer
+            })
+        })
+        setAnswers(updatedGroupAnswer)
+
+        // Update Data
+        const updateRequest = updatedGroupAnswer.filter((answerArray) => {
+            return answerArray.some((answer) => {
+                return answer.questionDetailId === editQuestionId
+            })
+        })
+        setAnswerRequest(updateRequest[0])
+    }
+
+    // edit question when click
+    const handleEditQuestionDetailByQuestionDetailId = (qs) => {
+        setQuestionRequest(qs)
+        handleEditQuestion(qs)
+    }
+
+    // + function set Edit when click edit button
+    const handleEditQuestion = (qs) => {
+        handlesetEditAbleInput(editQuestion)
+        setEditQuestionId(qs.questionDetailId)
+    }
+
+    // +  Change span to input and get value
+    const handlesetEditAbleInput = (prev) => {
+        setEditQuestion(!prev)
+    }
+
+    const handleOnChangeInputAnswerInCreateNewQuestion = (e) => {
+        setQuestionTitle(e.target.value)
+    }
+
+    const validateForm = () => {
+        if (questionTitle === '') {
+            setMsgError((prev) => {
+                return { ...prev, msg: 'Không để trống tên câu hỏi' }
+            })
+            return false
+        } else {
+            setMsgError((prev) => ({ ...prev, msg: '' }))
+        }
+
+        if (msgError.msg !== '') {
+            return false
+        }
+
+        return true
+    }
+    // *************** FORM AREA ACTION - END
+
+    // *************** CREATE NEW QUESTION - ANSWER - START
     const [createNewAnswergroups, setCreateNewAnswergroups] = useState([
         { checkBoxValue: false, inputValue: '' },
         { checkBoxValue: false, inputValue: '' }
@@ -182,7 +387,7 @@ const QuestionDetail = () => {
 
     const handleCheckboxChange = (index) => {
         const updatedGroups = [...createNewAnswergroups]
-        updatedGroups[index].checkBoxValue = true
+        updatedGroups[index].checkBoxValue = !updatedGroups[index].checkBoxValue
         setCreateNewAnswergroups(updatedGroups)
     }
 
@@ -239,10 +444,28 @@ const QuestionDetail = () => {
                                 />
                             </label>
                         </div>
-                        <InputGroup className="ml-2">
+                        <InputGroup
+                            className="ml-2"
+                            style={{
+                                border: `${
+                                    group.inputValue === ''
+                                        ? '1.5px solid red'
+                                        : ''
+                                }`
+                            }}
+                        >
                             <InputGroupAddon addonType="prepend">
                                 <InputGroupText>
-                                    <i className="ni ni-fat-delete" />
+                                    <i
+                                        className="ni ni-fat-delete"
+                                        style={{
+                                            color: `${
+                                                group.inputValue === ''
+                                                    ? 'red'
+                                                    : ''
+                                            }`
+                                        }}
+                                    />
                                 </InputGroupText>
                             </InputGroupAddon>
                             <Input
@@ -256,27 +479,38 @@ const QuestionDetail = () => {
                             />
                         </InputGroup>
                     </div>
+                    {group.inputValue === '' ? (
+                        <span className="text-danger ml-4">
+                            Không được để trống câu trả lời
+                        </span>
+                    ) : (
+                        ''
+                    )}
                 </FormGroup>
             </Col>
         ))
     }
+    // *************** CREATE NEW QUESTION - ANSWER - END
 
-    const handleOnChangeInputAnswerInCreateNewQuestion = (e) => {
-        setQuestionRequestCreateNewQuestion((prevQuestion) => ({
-            ...prevQuestion,
-            [e.target.name]: e.target.value
-        }))
-    }
-
-    // *************** CREATE NEW QUESTION - ANSWER SECTION - END
-
-    // *************** Render question and answer AREA
+    // *************** RENDER QUESTION AND ANSWER - START
     // + render UI questions
     const renderGroupsQuestion = () => {
         return questions.map((questionDetail, index) => (
             <>
-                <Col lg={6} xl={6} md={12} sm={12} key={index} className="mb-3">
-                    <Card style={{ minWidth: '380px', minHeight: '365px' }}>
+                <Col
+                    lg={12}
+                    xl={12}
+                    md={12}
+                    sm={12}
+                    key={index}
+                    className="mb-3"
+                >
+                    <Card
+                        style={{
+                            minWidth: '380px',
+                            minHeight: '400px'
+                        }}
+                    >
                         <CardBody>
                             {/* Title Question */}
                             <h4
@@ -289,33 +523,25 @@ const QuestionDetail = () => {
                                 }}
                             >
                                 {/* Display question title */}
-                                {editAnswer &&
-                                questionDetail.questionId === editQuestionId ? (
+                                {editQuestion &&
+                                questionDetail.questionDetailId ===
+                                    editQuestionId ? (
                                     <Textarea
                                         label={`Câu hỏi: ${index + 1}`}
                                         className="w-100"
                                         autosize
                                         minRows={2}
-                                        onChange={(e) =>
+                                        onChange={(e) => {
+                                            questionRequest.questionTitle =
+                                                questionDetail.questionTitle
                                             handleOnchangeInputQuestionTitle(
                                                 e.target.value,
-                                                questionDetail.questionId
+                                                questionDetail.questionDetailId
                                             )
-                                        }
-                                        value={questionDetail.questionTitle}
+                                        }}
+                                        value={questionRequest.questionTitle}
                                     />
                                 ) : (
-                                    /* <Input
-                      className="pl-2"
-                      type="text"
-                      onChange={(e) =>
-                        handleOnchangeInputQuestionTitle(
-                          e.target.value,
-                          questionDetail.questionId
-                        )
-                      }
-                      value={questionDetail.questionTitle}
-                    /> */
                                     <span className="text-dark font-weight-600">
                                         <strong>Question {index + 1}: </strong>
                                         <span className="text-muted">
@@ -327,11 +553,17 @@ const QuestionDetail = () => {
                             {/* Answer Display Area */}
                             <div
                                 className="mt-3"
-                                style={{ height: '220px', overflowY: 'auto' }}
+                                style={{
+                                    height: editQuestion ? 'auto' : '220px',
+                                    overflowY: 'auto'
+                                }}
                             >
                                 <Row className="w-100">
                                     {/* if answer.questionId === qs.questionId */}
-                                    {handleRenderAnswerByQuestionId(
+                                    {/* {handleRenderAnswerByQuestionId(
+                                        questionDetail
+                                    )} */}
+                                    {renderGroupAnswerIntoQuestion(
                                         questionDetail
                                     )}
                                 </Row>
@@ -340,8 +572,9 @@ const QuestionDetail = () => {
                         {/* Action Area */}
                         <CardFooter>
                             {/* Update button */}
-                            {editAnswer &&
-                            questionDetail.questionId === editQuestionId ? (
+                            {editQuestion &&
+                            questionDetail.questionDetailId ===
+                                editQuestionId ? (
                                 <Button
                                     color="dark"
                                     role="button"
@@ -366,7 +599,7 @@ const QuestionDetail = () => {
 
                             {/* Add button */}
                             <Tooltip
-                                label="Thêm ? Chưa làm được bạn ơi, này hơi khó!"
+                                label="Thêm câu hỏi"
                                 color="teal"
                                 withArrow
                                 arrowPosition="center"
@@ -378,7 +611,7 @@ const QuestionDetail = () => {
                                         handleAddNewAnswerForEachQuestion(
                                             questionDetail
                                         )
-                                        // handleEditQuestionByQuestionId(questionDetail);
+                                        // handleEditQuestionDetailByQuestionDetailId(questionDetail);
                                     }}
                                 >
                                     <i className="bx bx-plus-circle"></i>
@@ -396,7 +629,7 @@ const QuestionDetail = () => {
                                     color="secondary"
                                     className="float-right"
                                     onClick={() => {
-                                        handleEditQuestionByQuestionId(
+                                        handleEditQuestionDetailByQuestionDetailId(
                                             questionDetail
                                         )
                                     }}
@@ -407,8 +640,9 @@ const QuestionDetail = () => {
 
                             {/* Delete button */}
 
-                            {editAnswer &&
-                            questionDetail.questionId === editQuestionId ? (
+                            {editQuestion &&
+                            questionDetail.questionDetailId ===
+                                editQuestionId ? (
                                 <Tooltip
                                     label="Xóa câu hỏi ?"
                                     color="red"
@@ -432,7 +666,11 @@ const QuestionDetail = () => {
                                     >
                                         <IconButton
                                             className="float-right text-danger"
-                                            onClick={() => alert('deleted')}
+                                            onClick={() =>
+                                                handleDeleteQuestion(
+                                                    questionDetail
+                                                )
+                                            }
                                         >
                                             <DeleteIcon />
                                         </IconButton>
@@ -446,302 +684,135 @@ const QuestionDetail = () => {
         ))
     }
 
-    // +++++++++ ACTION QUESTION AND ANSWERS AREA
-    // edit question when click
-    const handleEditQuestionByQuestionId = (qs) => {
-        handleEditQuestion(qs)
-        handleFilterByQuestionIdAnswer()
-    }
-
-    // + function set Edit when click edit button
-    const handleEditQuestion = (qs) => {
-        // set action render UI
-        // answer.id = qs.answerId
-        // answer.questionId = qs.questionId
-
-        handlesetEditAbleInput(editAnswer)
-        setEditQuestionId(qs.questionId)
-        // setIsEditngFunction(isEditing);
-    }
-
-    // +  Change span to input and get value
-    const handlesetEditAbleInput = (prev) => {
-        setEditAnswer(!prev)
-    }
-
-    // ++++++++++++++ ANSWER AREA ++++++++++++++++
-    // Create a Group Answer base on answers State
-    // const [groupAnswers, setGroupAnswers] = useState(
-    //   answers.map((answer) => ({
-    //     answerId: answer.answerId,
-    //     text: answer.text,
-    //     isCorrect: answer.isCorrect,
-    //     questionId: answer.questionId,
-    //   }))
-    // );
-
-    // Filter Answer variable
-    const [filterGroupAnswerByQuestionId, setFilterGroupAnswerByQuestionId] =
-        useState([])
-
-    // Filter Answer base on Question ID for display UI
-    const handleFilterByQuestionIdAnswer = () => {
-        setFilterGroupAnswerByQuestionId(
-            groupsAnswerRender.filter(
-                (answer) => answer.questionId === editQuestionId
-            )
-        )
-    }
-
-    // get value onchange Answer Input for update
-    const handleOnchangeInputAnswersValue = (value, answerIdValue) => {
-        const updatedGroupAnswer = groupsAnswerRender.map((answer) => {
-            if (answer.answerId === answerIdValue) {
-                const newAnswer = {
-                    ...answer,
-                    text: value
-                }
-
-                return newAnswer
-            }
-            return answer
-        })
-
-        // *Notes: why using groupanswers instead use answersi
-        // use group answer have advantage which can be restore when use click edit second time;
-        // Set Answer For render UI
-        // setGroupAnswers(updatedGroupAnswer);
-        setAnswers(updatedGroupAnswer)
-        setGroupAnswerRender(updatedGroupAnswer)
-
-        // Set Answer for Update Request
-        // setAnswerRequest(
-        //     updatedGroupAnswer.filter(
-        //         (answer) => answer.questionId === editQuestionId
-        //     )
-        // )
-    }
-
-    // get value onchange Answer radio for update
-    const handleOnChangeRadioAnswerValue = (answerIdValue) => {
-        const updatedGroupAnswer = groupsAnswerRender.map((answer) => {
-            if (answer.answerId === answerIdValue) {
-                const newAnswer = {
-                    ...answer,
-                    isCorrect: true
-                }
-
-                return newAnswer
-            } else if (answer.questionId === editQuestionId) {
-                return {
-                    ...answer,
-                    isCorrect: false
-                }
-            }
-            return answer
-        })
-
-        // Set Answer For render UI
-        // setGroupAnswers(updatedGroupAnswer);
-        setAnswers(updatedGroupAnswer)
-        setGroupAnswerRender(updatedGroupAnswer)
-
-        // Set Answer for Update Request
-        // setAnswerRequest(
-        //     updatedGroupAnswer.filter(
-        //         (answer) => answer.questionId === editQuestionId
-        //     )
-        // )
-    }
-
-    // ++++++++++++++ QUESTION AREA ++++++++++++++++
-    // Create a Group Questions base on questions State
-    const [groupQuestions, setGroupQuestions] = useState(
-        questions.map((question) => ({
-            questionId: question.questionId,
-            questionTitle: question.questionTitle,
-            subjectName: question.subjectName,
-            courseName: question.courseName,
-            adminId: question.adminName,
-            createDate: question.createDate,
-            answer: question.answer
-        }))
-    )
-
-    // Handle onchange quetsion title
-    const handleOnchangeInputQuestionTitle = (value, questionIdValue) => {
-        const updatedGroupQuestions = groupQuestions.map((question) => {
-            if (question.questionId === questionIdValue) {
-                const newQuestion = {
-                    ...question,
-                    questionTitle: value
-                }
-                return newQuestion
-            }
-            return question
-        })
-
-        // *Notes: why using groupQuestins instead use questions
-        // use group question has advantage which can be restore when use click edit second time;
-        setGroupQuestions(updatedGroupQuestions)
-        setQuestions(updatedGroupQuestions)
-
-        // Set Question for Update Request
-        // setQuestionRequest(
-        //   updatedGroupQuestions.filter(
-        //     (question) => question.questionId === editQuestionId
-        //   )
-        // );
-
-        // setQuestionRequest(
-        //     updatedGroupQuestions.filter(
-        //         (question) => question.questionId === editQuestionId
-        //     )
-        // )
-    }
-
-    // Render new ANSWER
-    const [groupsAnswerRender, setGroupAnswerRender] = useState(
-        answers
-            // .filter((answer) => answer.questionId === editQuestionId)
-            .map((answer) => {
-                return {
-                    answerId: answer.answerId,
-                    answerContent: answer.answerContent,
-                    isCorrect: answer.isCorrect,
-                    questionId: answer.questionDetailId
-                }
-            })
-    )
-
-    const handleRenderAnswerByQuestionId = (question) => {
-        return groupsAnswerRender.map((answerDetail) => (
+    const renderGroupAnswerIntoQuestion = (questionDetail) => {
+        return answers.map((subjectArray) => (
             <>
-                {answerDetail.questionId === question.questionId ? (
-                    <Col
-                        lg={12}
-                        xl={12}
-                        md={12}
-                        sm={12}
-                        key={answerDetail.answerId}
-                    >
-                        <div className="d-flex">
-                            {/* Radio button */}
-                            {editAnswer &&
-                            question.questionId === editQuestionId ? (
-                                <div className="d-flex align-items-center mb-2 mr-4">
-                                    <label>
-                                        {/* <input
-                      type="radio"
-                      name={`radio_${answerDetail.questionId}`}
-                      checked={answerDetail.isCorrect}
-                      onChange={() =>
-                        handleOnChangeRadioAnswerValue(answerDetail.answerId)
-                      }
-                    /> */}
-                                        <Checkbox
-                                            color="cyan"
-                                            name={`radio_${answerDetail.questionId}`}
-                                            checked={answerDetail.isCorrect}
-                                            onChange={() =>
-                                                handleOnChangeRadioAnswerValue(
-                                                    answerDetail.answerId
-                                                )
-                                            }
-                                        />
-                                    </label>
-                                </div>
-                            ) : (
-                                <>
-                                    <div
-                                        style={{
-                                            width: '40px',
-                                            height: '40px'
-                                        }}
-                                    >
-                                        {answerDetail.isCorrect ? (
-                                            <i className="bx bx-check-circle text-success"></i>
-                                        ) : (
-                                            <i className="bx bx-x-circle text-danger"></i>
-                                        )}
-                                    </div>
-                                </>
-                            )}
+                {subjectArray.map((answer) => (
+                    <>
+                        {answer.questionDetailId ===
+                        questionDetail.questionDetailId ? (
+                            <Col
+                                lg={12}
+                                xl={12}
+                                md={12}
+                                sm={12}
+                                key={answer.answerId}
+                            >
+                                <div className="d-flex">
+                                    {/* Checkbox button */}
+                                    {editQuestion &&
+                                    answer.questionDetailId ===
+                                        editQuestionId ? (
+                                        <div className="d-flex align-items-center mb-2 mr-4">
+                                            <label>
+                                                <Checkbox
+                                                    color="cyan"
+                                                    name={`radio_${answer.questionDetailId}`}
+                                                    checked={answer.isCorrect}
+                                                    onChange={() =>
+                                                        handleOnChangeCheckboxAnswerValue(
+                                                            answer.answerId
+                                                        )
+                                                    }
+                                                />
+                                            </label>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div
+                                                style={{
+                                                    width: '40px',
+                                                    height: '40px'
+                                                }}
+                                                onClick={() => {
+                                                    console.log(
+                                                        answer.questionDetailId
+                                                    )
+                                                    console.log(
+                                                        questionDetail.questionDetailId
+                                                    )
+                                                }}
+                                            >
+                                                {answer.isCorrect ? (
+                                                    <i className="bx bx-check-circle text-success"></i>
+                                                ) : (
+                                                    <i className="bx bx-x-circle text-danger"></i>
+                                                )}
+                                            </div>
+                                        </>
+                                    )}
 
-                            {/* Answer Input */}
-                            {editAnswer &&
-                            question.questionId === editQuestionId ? (
-                                // <input
-                                //   className="answer-input w-100 text-dark ml--2 pl-2 mb-1"
-                                //   onChange={(e) => {
-                                //     handleOnchangeInputAnswersValue(
-                                //       e.target.value,
-                                //       answerDetail.answerId
-                                //     );
-                                //   }}
-                                //   name="text"
-                                //   value={answerDetail.text}
-                                // />
-                                <Textarea
-                                    autosize
-                                    minRows={2}
-                                    onChange={(e) => {
-                                        handleOnchangeInputAnswersValue(
-                                            e.target.value,
-                                            answerDetail.answerId
-                                        )
-                                    }}
-                                    className="w-100 mb-2"
-                                    name="text"
-                                    value={answerDetail.text}
-                                />
-                            ) : (
-                                <p
-                                    className="text-dark
-                      d-flex align-items-center flex-wrap"
-                                >
-                                    {answerDetail.text}
-                                </p>
-                            )}
-                        </div>
-                    </Col>
-                ) : (
-                    <></>
-                )}
+                                    {/* Answer Input */}
+                                    {editQuestion &&
+                                    answer.questionDetailId ===
+                                        editQuestionId ? (
+                                        <Textarea
+                                            autosize
+                                            minRows={2}
+                                            onChange={(e) => {
+                                                handleOnchangeInputAnswersValue(
+                                                    e.target.value,
+                                                    answer.answerId
+                                                )
+                                            }}
+                                            className="w-100 mb-2"
+                                            name="text"
+                                            value={answer.answerContent}
+                                        />
+                                    ) : (
+                                        <p className="text-dark d-flex align-items-center flex-wrap">
+                                            {answer.answerContent}
+                                        </p>
+                                    )}
+
+                                    {editQuestion &&
+                                    answer.questionDetailId ===
+                                        editQuestionId ? (
+                                        <Tooltip
+                                            label="Xóa câu trả lời ?"
+                                            color="red"
+                                            withArrow
+                                            arrowPosition="center"
+                                        >
+                                            <IconButton
+                                                className="float-right text-danger"
+                                                onClick={() =>
+                                                    handleDeleteSingleAnswer(
+                                                        answer.answerId
+                                                    )
+                                                }
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ) : (
+                                        <></>
+                                    )}
+                                </div>
+                            </Col>
+                        ) : (
+                            <></>
+                        )}
+                    </>
+                ))}
             </>
         ))
     }
-
-    const handleAddNewAnswer = (question) => {
-        const newAnswerId =
-            Math.max(...groupsAnswerRender.map((answer) => answer.answerId)) + 1
-
-        if (question.questionId === editQuestionId) {
-            const newGroup = {
-                answerId: newAnswerId,
-                text: 'new answer',
-                isCorrect: false,
-                questionId: question.questionId
-            }
-
-            setGroupAnswerRender([...groupsAnswerRender, newGroup])
-            console.log(groupsAnswerRender)
-        }
-    }
-
-    const handleAddNewAnswerForEachQuestion = (questionDetail) => {
-        setEditQuestionId(questionDetail.questionId)
-        handleAddNewAnswer(questionDetail)
-    }
+    // *************** RENDER QUESTION AND ANSWER - END
 
     // *************** UseEffect AREA
     useEffect(() => {
-        handleFilterByQuestionIdAnswer()
+        fetchQuestionDetail()
+        fetchQuestionPrev()
+    }, [])
+
+    useEffect(() => {
+        setEditQuestionId(editQuestionId)
     }, [editQuestionId])
 
     useEffect(() => {
-        setAnswers(groupsAnswerRender)
-    }, [groupsAnswerRender])
+        console.log(editQuestionId)
+    }, [editQuestionId])
 
     return (
         <>
@@ -829,7 +900,10 @@ const QuestionDetail = () => {
                                 <>
                                     <Button
                                         color={isUpdate ? 'primary' : 'success'}
-                                        onClick={() => setShowModal(true)}
+                                        onClick={() => {
+                                            handleClearForm()
+                                            setShowModal(true)
+                                        }}
                                         variant="contained"
                                         id="addSubjects"
                                     >
@@ -857,7 +931,14 @@ const QuestionDetail = () => {
                             </div>
                         </>
                     ) : (
-                        <>{renderGroupsQuestion()}</>
+                        <>
+                            {renderGroupsQuestion()}
+                            {questions.length === 0 && (
+                                <h2 className="mx-auto">
+                                    Chưa có câu hỏi nào được tạo!
+                                </h2>
+                            )}
+                        </>
                     )}
                 </Row>
             </main>
@@ -903,16 +984,15 @@ const QuestionDetail = () => {
                                         handleOnChangeInputAnswerInCreateNewQuestion
                                     }
                                     name="questionTitle"
-                                    value={
-                                        questionRequestCreateNewQuestion.questionTitle
-                                    }
+                                    value={questionTitle}
+                                    error={msgError.msg}
                                 />
                             </Col>
                             <Col xl={12} lg={12} md={12} sm={12}>
                                 <hr />
                                 <h4 className="font-weight-600">Câu trả lời</h4>
                                 <Blockquote
-                                    cite="Chọn vào radio để đánh dấu câu trả lời đúng!"
+                                    cite="Chọn vào checkbox để đánh dấu câu trả lời đúng!"
                                     icon={null}
                                     className="mt--4 p-0"
                                 ></Blockquote>
@@ -947,13 +1027,14 @@ const QuestionDetail = () => {
                         Trở lại
                     </Button>
                     <Button
+                        // color="success"
                         color="success"
                         type="button"
                         onClick={() => {
-                            handleStoreQuestions()
+                            handleStoreNewQuestions()
                         }}
                     >
-                        Thêm môn học
+                        Thêm câu hỏi
                     </Button>
                 </div>
             </Modal>

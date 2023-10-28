@@ -1,106 +1,139 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import com.f4education.springjwt.interfaces.QuestionDetailService;
+import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.Question;
 import com.f4education.springjwt.models.QuestionDetail;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 import com.f4education.springjwt.repository.AnswerReposotory;
 import com.f4education.springjwt.repository.QuestionDetailReposotory;
 import com.f4education.springjwt.repository.QuestionReposotory;
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class QuestionDetailServiceImpl implements QuestionDetailService {
-    @Autowired
-    QuestionDetailReposotory questionDetailReposotory;
+	@Autowired
+	QuestionDetailReposotory questionDetailReposotory;
 
-    @Autowired
-    AnswerReposotory answerReposotory;
+	@Autowired
+	QuestionReposotory questionReposotory;
 
-    @Autowired
-    QuestionReposotory questionReposotory;
+	@Autowired
+	AnswerReposotory answerReposotory;
 
-    @Override
-    public List<QuestionDetailDTO> getAllQuestionDetailByQuestionId(Integer questionId) {
-        List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
-        return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
-    }
+	@Override
+	public List<QuestionDetailDTO> findAll() {
+		List<QuestionDetail> questionDetail = questionDetailReposotory.findAll();
+		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
+	}
 
-    @Override
-    public QuestionDetailDTO getQuestionDetailById(Integer questionDetailId) {
-        QuestionDetail questionDetail = questionDetailReposotory.findById(questionDetailId).get();
-        return this.convertToQuestionDetailResponse(questionDetail);
-    }
+	@Override
+	public List<QuestionDetailDTO> getAllQuestionDetailByQuestionId(Integer questionId) {
+		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
+		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
+	}
 
-    @Override
-    public QuestionDetailDTO createQuestionDetail(QuestionDetailDTO questionDetailDTO) {
-        QuestionDetail questionDetail = this.convertDTOtoEntity(questionDetailDTO);
-        questionDetail.setCreateDate(new Date());
-        questionDetail.setAnswer(null);
+	@Override
+	public QuestionDetailDTO getQuestionDetailById(Integer questionDetailId) {
+		QuestionDetail questionDetail = questionDetailReposotory.findById(questionDetailId).get();
+		return this.convertToQuestionDetailResponse(questionDetail);
+	}
 
-        QuestionDetail saveQuestionDetail = questionDetailReposotory.save(questionDetail);
+	@Override
+	public QuestionDetailDTO createQuestionDetail(QuestionDetailDTO questionDetailDTO) {
+		QuestionDetail questionDetail = this.convertDTOtoEntity(questionDetailDTO);
+		questionDetail.setCreateDate(new Date());
 
-//        if (saveQuestion.getAnswer().size() > 0) {
-//            for (Answer as : saveQuestion.getAnswer()) {
-//                as.setQuestion(saveQuestion);
-//                answerReposotory.save(as);
-//            }
-//        }
+		QuestionDetail saveQuestionDetail = questionDetailReposotory.save(questionDetail);
+		System.out.println(saveQuestionDetail);
 
-        return convertToQuestionDetailResponse(saveQuestionDetail);
-    }
+		if (questionDetailDTO.getAnswers().size() > 0) {
+			for (Answer as : questionDetailDTO.getAnswers()) {
+				as.setQuestionDetail(saveQuestionDetail);
+				answerReposotory.save(as);
+			}
+		}
 
-    @Override
-    public QuestionDetailDTO updateQuestionDetail(Integer questionDetailId, QuestionDetailDTO questionDetailDTO) {
-        Optional<QuestionDetail> questionDetail = questionDetailReposotory.findById(questionDetailId);
+		return convertToQuestionDetailResponse(saveQuestionDetail);
+	}
 
-        if (questionDetail.isPresent()) {
-            QuestionDetail exitQuestionDetail = questionDetail.get();
+	@Override
+	public QuestionDetailDTO updateQuestionDetail(Integer questionDetailId, QuestionDetailDTO questionDetailDTO) {
+		Optional<QuestionDetail> questionDetail = questionDetailReposotory.findById(questionDetailId);
 
-            this.convertDTOtoEntity(questionDetailDTO, exitQuestionDetail);
+		if (questionDetail.isPresent()) {
+			QuestionDetail exitQuestionDetail = questionDetail.get();
 
-            QuestionDetail updateQuestionDetail = questionDetailReposotory.save(exitQuestionDetail);
-            return convertToQuestionDetailResponse(updateQuestionDetail);
-        }
-        return null;
-    }
+			this.convertDTOtoEntity(questionDetailDTO, exitQuestionDetail);
 
-    private QuestionDetail convertDTOtoEntity(QuestionDetailDTO questionDetailDTO) {
-        QuestionDetail questionDetail = new QuestionDetail();
+//			List<Answer> answers = questionDetailDTO.getAnswers();
+//			for (Answer as : answers) {
+//				Optional<Answer> exitAnswer = answerReposotory.findById(as.getAnswerId());
+//
+//				if (exitAnswer.isPresent()) {
+//		            Answer existingAnswer = exitAnswer.get();
+//		            System.out.println(existingAnswer);
+//		            
+//		            answerReposotory.save(existingAnswer);
+//		        }
+//			}
 
-        Optional<Question> question = questionReposotory.findById(questionDetailDTO.getQuestionId());
+			QuestionDetail updateQuestionDetail = questionDetailReposotory.save(exitQuestionDetail);
 
-        BeanUtils.copyProperties(questionDetailDTO, questionDetail);
+			return convertToQuestionDetailResponse(updateQuestionDetail);
+		}
+		return null;
+	}
 
-        question.ifPresent(questionDetail::setQuestion);
+	@Override
+	public QuestionDetailDTO deleteQuestion(Integer questionDetailId) {
+		QuestionDetail questionDetail = questionDetailReposotory.findById(questionDetailId).get();
 
-        return questionDetail;
-    }
+		if (questionDetail == null) {
+			return null;
+		}
 
-    private void convertDTOtoEntity(QuestionDetailDTO questionDetailDTO, QuestionDetail questionDetail) {
-        Optional<Question> question = questionReposotory.findById(questionDetailDTO.getQuestionId());
+		questionDetailReposotory.deleteById(questionDetailId);
+		return this.convertToQuestionDetailResponse(questionDetail);
+	}
 
-        question.ifPresent(questionDetail::setQuestion);
-        questionDetail.setQuestionTitle(questionDetail.getQuestionTitle());
-        questionDetail.setAnswer(questionDetailDTO.getAnswers());
-        questionDetail.setCreateDate(questionDetailDTO.getCreateDate());
-    }
+	private QuestionDetail convertDTOtoEntity(QuestionDetailDTO questionDetailDTO) {
+		QuestionDetail questionDetail = new QuestionDetail();
 
-    private QuestionDetailDTO convertToQuestionDetailResponse(QuestionDetail questionDetail) {
-        QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
+		Optional<Question> question = questionReposotory.findById(questionDetailDTO.getQuestionId());
 
-        BeanUtils.copyProperties(questionDetail, questionDetailDTO);
+		BeanUtils.copyProperties(questionDetailDTO, questionDetail);
 
-        questionDetailDTO.setQuestionId(questionDetail.getQuestion().getQuestionId());
-        questionDetailDTO.setAnswers(questionDetail.getAnswer());
+		question.ifPresent(questionDetail::setQuestion);
 
-        return questionDetailDTO;
-    }
+		return questionDetail;
+	}
+
+	private void convertDTOtoEntity(QuestionDetailDTO questionDetailDTO, QuestionDetail questionDetail) {
+		Optional<Question> question = questionReposotory.findById(questionDetailDTO.getQuestionId());
+
+		question.ifPresent(questionDetail::setQuestion);
+		questionDetail.setQuestionTitle(questionDetailDTO.getQuestionTitle());
+		questionDetail.setAnswer(questionDetailDTO.getAnswers());
+		questionDetail.setCreateDate(questionDetailDTO.getCreateDate());
+	}
+
+	private QuestionDetailDTO convertToQuestionDetailResponse(QuestionDetail questionDetail) {
+		QuestionDetailDTO questionDetailDTO = new QuestionDetailDTO();
+
+		BeanUtils.copyProperties(questionDetail, questionDetailDTO);
+
+		questionDetailDTO.setQuestionId(questionDetail.getQuestion().getQuestionId());
+		questionDetailDTO.setAnswers(questionDetail.getAnswer());
+
+		return questionDetailDTO;
+	}
 }

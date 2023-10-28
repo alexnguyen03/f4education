@@ -8,6 +8,8 @@ import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
 @Service
 public interface QuestionDetailService {
+	List<QuestionDetailDTO> findAll();
+	
 	List<QuestionDetailDTO> getAllQuestionDetailByQuestionId(Integer QuestionId);
 
 	QuestionDetailDTO getQuestionDetailById(Integer questionDetailId);
@@ -15,4 +17,6 @@ public interface QuestionDetailService {
 	QuestionDetailDTO createQuestionDetail(QuestionDetailDTO questionDetailDTO);
 
 	QuestionDetailDTO updateQuestionDetail(Integer questionDetailId, QuestionDetailDTO questionDetailDTO);
+
+	QuestionDetailDTO deleteQuestion(Integer questionDetailId);
 }

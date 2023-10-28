@@ -367,7 +367,7 @@ const Questions = () => {
                                         >
                                             <div className="d-flex justify-content-between align-items-center">
                                                 <span>Khóa học</span>
-                                                <span class="badge badge-success">
+                                                <span className="badge badge-success">
                                                     {filteredCourse.length > 0
                                                         ? filteredCourse.length
                                                         : 0}{' '}

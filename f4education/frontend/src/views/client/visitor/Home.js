@@ -9,31 +9,20 @@ import {
     Grid,
     Group,
     HoverCard,
-    Image,
-    Input,
-    Rating,
+    Image, Rating,
     rem,
     SimpleGrid,
-    Skeleton,
-    Stack,
-    Text,
-    Textarea,
-    ThemeIcon,
+    Skeleton, Text, ThemeIcon,
     Title,
     Transition
 } from '@mantine/core'
 import { useWindowScroll } from '@mantine/hooks'
 import { breakpoints } from '@mui/system'
 import {
-    IconArrowUp,
-    IconAt,
-    IconCalendarTime,
+    IconArrowAutofitRight,
+    IconArrowUp, IconCalendarTime,
     IconCertificate,
-    IconCoin,
-    IconLocationBolt,
-    IconPhoneCall,
-    IconShoppingCartPlus,
-    IconSun
+    IconCoin, IconShoppingCartPlus
 } from '@tabler/icons-react'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
@@ -611,215 +600,7 @@ const Home = () => {
             </Box>
 
             <Box my={rem('5rem')} p={rem('2rem')}>
-                <Box
-                    mx={'auto'}
-                    maw={1100}
-                    className={classes['contact-section']}
-                >
-                    <Grid>
-                        <Grid.Col xl={5} lg={5} md={6}>
-                            <Card
-                                style={{
-                                    backgroundImage:
-                                        'url("https://ui.mantine.dev/_next/static/media/bg.daf91204.svg")',
-                                    backgroundRepeat: 'no-repeat',
-                                    objectFit: 'cover',
-                                    backgroundSize: 'cover'
-                                }}
-                            >
-                                <Card.Section>
-                                    <Stack p={rem('2rem')} align='center'>
-                                        <Text
-                                            color={'#fff'}
-                                            fz="xl"
-                                            fw={700}
-                                            mb="xl"
-                                        >
-                                            Thông tin liên lạc
-                                        </Text>
-                                        <Stack mt={10}>
-                                            <Group
-                                                position="start"
-                                                color="#fff"
-                                                mb={15}
-                                            >
-                                                <IconAt color="#cecece" />
-                                                <Stack align={'start'}>
-                                                    <Text
-                                                        color="#f1f1f1"
-                                                        fz="lg"
-                                                    >
-                                                        Email
-                                                    </Text>
-                                                    <Text
-                                                        color="#fff"
-                                                        fz="lg"
-                                                        fw={700}
-                                                    >
-                                                        f4education.@gmail.com
-                                                    </Text>
-                                                </Stack>
-                                            </Group>
-                                            <Group
-                                                position="start"
-                                                color="#fff"
-                                                mb={15}
-                                            >
-                                                <IconPhoneCall color="#cecece" />
-                                                <Stack align={'start'}>
-                                                    <Text
-                                                        color="#f1f1f1"
-                                                        fz="lg"
-                                                    >
-                                                        Phone
-                                                    </Text>
-                                                    <Text
-                                                        color="#fff"
-                                                        fz="lg"
-                                                        fw={700}
-                                                    >
-                                                        +84 0706802119
-                                                    </Text>
-                                                </Stack>
-                                            </Group>
-                                            <Group
-                                                position="start"
-                                                color="#fff"
-                                                mb={15}
-                                            >
-                                                <IconLocationBolt color="#cecece" />
-                                                <Stack align={'start'}>
-                                                    <Text
-                                                        color="#f1f1f1"
-                                                        fz="lg"
-                                                    >
-                                                        Địa chỉ
-                                                    </Text>
-                                                    <Text
-                                                        color="#fff"
-                                                        fz="lg"
-                                                        fw={700}
-                                                    >
-                                                        Ninh kieu, Can Tho,
-                                                    </Text>
-                                                </Stack>
-                                            </Group>
-                                            <Group
-                                                position="start"
-                                                color="#fff"
-                                                mb={15}
-                                            >
-                                                <IconSun color="#cecece" />
-                                                <Stack align={'start'}>
-                                                    <Text
-                                                        color="#f1f1f1"
-                                                        fz="lg"
-                                                    >
-                                                        Giờ làm việc
-                                                    </Text>
-                                                    <Text
-                                                        color="#fff"
-                                                        fz="lg"
-                                                        fw={700}
-                                                    >
-                                                        8 a.m - 11 p.m
-                                                    </Text>
-                                                </Stack>
-                                            </Group>
-                                        </Stack>
-                                    </Stack>
-                                </Card.Section>
-                            </Card>
-                        </Grid.Col>
-                        <Grid.Col xl={7} lg={7} md={6}>
-                            <Card>
-                                <Card.Section>
-                                    <Stack p={rem('2rem')}>
-                                        <Text
-                                            color={'#fff'}
-                                            fz="xl"
-                                            fw={700}
-                                            mb="xl"
-                                        >
-                                            Liên lạc ngay với chúng tôi
-                                        </Text>
-                                        <Grid>
-                                            <Grid.Col
-                                                xl={6}
-                                                lg={6}
-                                                md={6}
-                                                xs={12}
-                                            >
-                                                <Input.Wrapper
-                                                    size="xl"
-                                                    label="Họ tên"
-                                                    required
-                                                    mx="auto"
-                                                >
-                                                    <Input
-                                                        mask="+7 (000) 000-00-00"
-                                                        size="xl"
-                                                        placeholder="Họ và tên"
-                                                    />
-                                                </Input.Wrapper>
-                                            </Grid.Col>
-                                            <Grid.Col
-                                                xl={6}
-                                                lg={6}
-                                                md={6}
-                                                xs={12}
-                                            >
-                                                <Input.Wrapper
-                                                    size="xl"
-                                                    label="Email"
-                                                    required
-                                                    mx="auto"
-                                                >
-                                                    <Input
-                                                        mask="+7 (000) 000-00-00"
-                                                        size="xl"
-                                                        placeholder="...@gmail.com"
-                                                    />
-                                                </Input.Wrapper>
-                                            </Grid.Col>
-                                            <Grid.Col>
-                                                <Input.Wrapper
-                                                    size="xl"
-                                                    label="Tiêu đề"
-                                                    required
-                                                    mx="auto"
-                                                >
-                                                    <Input
-                                                        mask="+7 (000) 000-00-00"
-                                                        size="xl"
-                                                        placeholder="tiêu đề"
-                                                    />
-                                                </Input.Wrapper>
-                                            </Grid.Col>
-                                            <Grid.Col>
-                                                <Textarea
-                                                    size="xl"
-                                                    placeholder="Comment"
-                                                    label="Comment"
-                                                    withAsterisk
-                                                />
-                                            </Grid.Col>
-                                            <Button
-                                                color="indigo"
-                                                size="lg"
-                                                ml="auto"
-                                                mt={30}
-                                            >
-                                                Gửi tin nhắn
-                                            </Button>
-                                        </Grid>
-                                    </Stack>
-                                </Card.Section>
-                            </Card>
-                        </Grid.Col>
-                    </Grid>
-                </Box>
-                {/* <Flex direction={'column'} justify="center" align={'center'}>
+                <Flex direction={'column'} justify="center" align={'center'}>
                     <Text
                         color="dimmed"
                         align="center"
@@ -838,7 +619,7 @@ const Home = () => {
                     >
                         F4 Education <IconArrowAutofitRight />
                     </Title>
-                </Flex> */}
+                </Flex>
             </Box>
 
             {/* Affix Button */}

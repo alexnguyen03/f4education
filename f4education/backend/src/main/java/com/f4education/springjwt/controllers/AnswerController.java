@@ -56,7 +56,7 @@ public class AnswerController {
 
     @DeleteMapping("/{answerId}")
 //	@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateAnswer(@PathVariable("answerId") Integer answerId) {
+    public ResponseEntity<?> deleteAnswer(@PathVariable("answerId") Integer answerId) {
 
         Optional<Answer> answer = answerReposotory.findById(answerId);
 

@@ -61,6 +61,7 @@ public class AnswerServiceImpl implements AnswerService {
             Answer existingAnswer = exitAnswer.get();
 
             this.convertToEntity(answerDTO, existingAnswer);
+            System.out.println(existingAnswer);
 
             Answer savedAnswer = answerReposotory.save(existingAnswer);
 
