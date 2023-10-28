@@ -52,7 +52,7 @@ const QuestionDetail = () => {
     const [isUpdate, setIsUpdate] = useState(false)
 
     // ************* Form variable
-    const [questionTitle, setQuestionTitle] = useState('')
+    const [questionTitle, setQuestionTitle] = useState(null)
     const [msgError, setMsgError] = useState({})
     const [questionRequest, setQuestionRequest] = useState({
         questionTitle: '',
@@ -128,25 +128,27 @@ const QuestionDetail = () => {
     // *************** FORM AREA ACTION - START
     // ====================== QUESTION ======================
     const handleStoreNewQuestions = async () => {
-        try {
-            questionRequest.answers = handleDataTranferAnswers()
-            console.log(questionRequest)
+        if (validateForm()) {
+            try {
+                questionRequest.questionTitle = questionTitle
+                questionRequest.answers = handleDataTranferAnswers()
+                console.log(questionRequest)
 
-            const body = questionRequest
-            const resp = await questionApi.createQuestionDetail(body)
-            console.log(resp.status)
+                const body = questionRequest
+                const resp = await questionApi.createQuestionDetail(body)
+                console.log(resp.status)
 
-            if (resp.status === 200) {
-                // setShowModal(false)
-                fetchQuestionDetail()
-                setShowModal(false)
-                return console.log('toast here')
-            } else {
-                return console.log('certainly error toast here')
+                if (resp.status === 200) {
+                    fetchQuestionDetail()
+                    setShowModal(false)
+                    return console.log('toast here')
+                } else {
+                    return console.log('certainly error toast here')
+                }
+            } catch (error) {
+                console.log(error)
             }
-        } catch (error) {
-            console.log(error)
-        }
+        } else console.log('error in validate')
     }
 
     // + Function update when click update
@@ -259,25 +261,23 @@ const QuestionDetail = () => {
     const handleAddNewAnswerForEachQuestion = async (questionDetail) => {
         setEditQuestionId(questionDetail.questionDetailId)
 
-        if (validateForm()) {
-            try {
-                const answers = [
-                    {
-                        answerContent: '',
-                        isCorrect: false,
-                        questionDetailId: questionDetail.questionDetailId
-                    }
-                ]
-                const resp = await answerApi.createAnswer(answers)
+        try {
+            const answers = [
+                {
+                    answerContent: '',
+                    isCorrect: false,
+                    questionDetailId: questionDetail.questionDetailId
+                }
+            ]
+            const resp = await answerApi.createAnswer(answers)
 
-                if (resp.status === 200) {
-                    console.log('ok')
-                    fetchQuestionDetail()
-                } else console.log('lỗi')
-            } catch (error) {
-                console.log(error)
-            }
-        } else console.log('error in validate')
+            if (resp.status === 200) {
+                console.log('ok')
+                fetchQuestionDetail()
+            } else console.log('lỗi')
+        } catch (error) {
+            console.log(error)
+        }
     }
 
     const handleDeleteSingleAnswer = async (answerId) => {
@@ -362,10 +362,11 @@ const QuestionDetail = () => {
     }
 
     const validateForm = () => {
-        if (questionTitle === '') {
-            setMsgError((prev) => {
-                return { ...prev, msg: 'Không để trống tên câu hỏi' }
-            })
+        if (questionTitle === null) {
+            setMsgError((preErr) => ({
+                ...preErr,
+                msg: 'Không để trống tên câu hỏi'
+            }))
             return false
         } else {
             setMsgError((prev) => ({ ...prev, msg: '' }))
@@ -985,8 +986,14 @@ const QuestionDetail = () => {
                                     }
                                     name="questionTitle"
                                     value={questionTitle}
-                                    error={msgError.msg}
                                 />
+                                {msgError.msg ? (
+                                    <span className="text-danger ml-1">
+                                        Không được để trống tiêu đề câu hỏi
+                                    </span>
+                                ) : (
+                                    ''
+                                )}
                             </Col>
                             <Col xl={12} lg={12} md={12} sm={12}>
                                 <hr />

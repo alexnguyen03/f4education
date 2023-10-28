@@ -102,6 +102,7 @@ const Questions = () => {
                 }
                 setQuestionLoading(false)
 
+                setShowModal(false)
                 fetchQuestions()
             } catch (error) {
                 console.log(error)
