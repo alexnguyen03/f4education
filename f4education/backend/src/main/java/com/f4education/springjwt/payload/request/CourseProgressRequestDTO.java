@@ -1,5 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
+import java.util.Date;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -7,12 +9,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDTORequest {
-    private Integer questionId;
-
-    private Integer subjectId;
-
-    private Integer courseId;
-
-    private String adminId;
+public class CourseProgressRequestDTO {
+	private Date startDate;
+	private Date endDate;
 }

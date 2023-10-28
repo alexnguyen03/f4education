@@ -71,8 +71,8 @@ public class CartServiceImp implements CartService {
 	@Override
 	public CartResponseDTO updateCart(Integer cartId, CartRequestDTO cartRequestDTO) {
 		Cart exitCart = cartRepository.findById(cartId).get();
-
-		exitCart.setStatus(true);
+		System.out.println(exitCart);
+		exitCart.setStatus(false);
 
 		convertRequestToEntity(cartRequestDTO, exitCart);
 

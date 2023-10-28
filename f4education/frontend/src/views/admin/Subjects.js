@@ -18,13 +18,16 @@ import {
     Container,
     Input,
     Modal,
-    Row
+    Row,
+    UncontrolledTooltip
 } from 'reactstrap'
 
 // Axios
 import subjectApi from '../../api/subjectApi'
 import subjectHistoryApi from '../../api/subjectHistoryApi'
 import courseApi from '../../api/courseApi'
+
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const Subjects = () => {
     // Main variable
@@ -96,9 +99,11 @@ const Subjects = () => {
             console.log(error)
         }
     }
+
     const reverseArray = (arr) => {
         return arr.reverse()
     }
+
     const fetchSubjectHistoryPerSubject = async (row) => {
         try {
             setLoadingPopupHistory(true)
@@ -125,9 +130,11 @@ const Subjects = () => {
                 subjectName.trim()
             )
 
-            if (resp.status === 200 && resp.data.length > 0) {
+            if (resp.status === 200) {
                 console.log(resp.data)
                 setCoursePerSubjectName(resp.data)
+            } else {
+                console.log('error')
             }
 
             setLoadingPopupHistory(false)
@@ -327,7 +334,11 @@ const Subjects = () => {
             // },
             {
                 accessorFn: (row) =>
-                    moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A'),
+                    row.createDate
+                        ? moment(row.createDate).format(
+                              'DD/MM/yyyy, h:mm:ss A'
+                          )
+                        : 'Không có ngày khả dụng',
                 header: 'Ngày Tạo',
                 size: 120
             }
@@ -336,17 +347,7 @@ const Subjects = () => {
     )
 
     const displaySubjectName = (row) => {
-        return (
-            <div
-                onClick={() => {
-                    handleShowCourseBySubjectName(row.original)
-                }}
-                className="text-dark font-weight-600"
-                style={{ cursor: 'pointer' }}
-            >
-                {row.subjectName}
-            </div>
-        )
+        return <span>{row.subjectName}</span>
     }
 
     const columnSubjectHistory = useMemo(
@@ -554,6 +555,7 @@ const Subjects = () => {
                                         </IconButton>
                                         <IconButton
                                             color="primary"
+                                            id="tooltip611234743"
                                             onClick={() => {
                                                 handleShowCourseBySubjectName(
                                                     row.original
@@ -562,6 +564,13 @@ const Subjects = () => {
                                         >
                                             <IconListDetails />
                                         </IconButton>
+                                        <UncontrolledTooltip
+                                            delay={0}
+                                            placement="top"
+                                            target="tooltip611234743"
+                                        >
+                                            Các khóa học theo môn học
+                                        </UncontrolledTooltip>
                                     </Box>
                                 )}
                                 // Top Add new Subject button
@@ -831,7 +840,8 @@ const Subjects = () => {
                                                                 <Card className="mb-2">
                                                                     <CardBody>
                                                                         <img
-                                                                            src="https://images.pexels.com/photos/1671436/pexels-photo-1671436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                                                            // src="https://images.pexels.com/photos/1671436/pexels-photo-1671436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                                                            src={`${PUBLIC_IMAGE}/courses/${course.image}`}
                                                                             className="img-fluid"
                                                                             alt=""
                                                                             style={{

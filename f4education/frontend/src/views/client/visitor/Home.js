@@ -12,28 +12,25 @@ import {
     Image,
     Rating,
     rem,
-    Text,
-    Title,
-    Transition,
     SimpleGrid,
+    Skeleton,
+    Text,
     ThemeIcon,
-    Skeleton
+    Title,
+    Transition
 } from '@mantine/core'
-import React, { useEffect, useState } from 'react'
-
-import {
-    IconArrowAutofitRight,
-    IconArrowUp,
-    IconShoppingCartPlus
-} from '@tabler/icons-react'
 import { useWindowScroll } from '@mantine/hooks'
 import { breakpoints } from '@mui/system'
 import {
+    IconArrowAutofitRight,
+    IconArrowUp,
     IconCalendarTime,
     IconCertificate,
-    IconCoin
+    IconCoin,
+    IconShoppingCartPlus
 } from '@tabler/icons-react'
 import PropTypes from 'prop-types'
+import { useEffect, useState } from 'react'
 import Dots from '../../../utils/Dots'
 
 // scss import
@@ -122,8 +119,8 @@ const Home = () => {
     }
 
     // learnext course Carousel
-    const LearnNextSlides = newestCourse.map((learn) => (
-        <Carousel.Slide key={learn.courseId}>
+    const LearnNextSlides = newestCourse.map((learn, index) => (
+        <Carousel.Slide key={index}>
             <HoverCard width={'95%'} shadow="md" position="bottom">
                 {/* Target Hover */}
                 {loading ? (
@@ -214,8 +211,8 @@ const Home = () => {
     ))
 
     // recommentTopic
-    const recommentTopicSlides = recommentTopic.map((learn) => (
-        <Carousel.Slide key={learn.id}>
+    const recommentTopicSlides = recommentTopic.map((learn, index) => (
+        <Carousel.Slide key={index}>
             <Card className="card-hover-overlay">
                 <Card.Section>
                     <Flex direction="column" wrap="wrap">
@@ -315,6 +312,7 @@ const Home = () => {
                         maw={700}
                         color="dark"
                         align="center"
+                        order={1}
                     >
                         Tham gia cùng với
                         <Text
@@ -416,14 +414,14 @@ const Home = () => {
                         slideGap="lg"
                         controlsOffset="xs"
                         align="start"
-                        loop
                         dragFree
+                        controlSize={35}
                         slidesToScroll={breakpoints ? 3 : 1}
                         styles={{
                             control: {
                                 background: '#212121',
                                 color: '#fff',
-                                fontSize: rem(25),
+                                fontSize: rem(35),
                                 '&[data-inactive]': {
                                     opacity: 0,
                                     cursor: 'default'
@@ -458,14 +456,14 @@ const Home = () => {
                         slideGap="lg"
                         controlsOffset="xs"
                         align="start"
-                        loop
                         dragFree
+                        controlSize={35}
                         slidesToScroll={breakpoints ? 3 : 1}
                         styles={{
                             control: {
                                 background: '#212121',
                                 color: '#fff',
-                                fontSize: rem(25),
+                                fontSize: rem(35),
                                 '&[data-inactive]': {
                                     opacity: 0,
                                     cursor: 'default'

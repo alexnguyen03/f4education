@@ -7,9 +7,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class QuestionDTORequest {
-    private Integer questionId;
-
+public class QuestionRequestDTO {
     private Integer subjectId;
 
     private Integer courseId;

@@ -28,6 +28,7 @@ import Schedules from 'views/admin/Schedules'
 import Icons from 'views/examples/Icons'
 import ClassInformation from 'views/teacher/ClassInformation'
 import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
+import CourseProgress from 'views/client/student/CourseProgress'
 
 export var routes = [
     {
@@ -127,13 +128,13 @@ export var routes = [
         component: <QuestionDetail />,
         layout: '/admin'
     },
-    // {
-    //     path: '/classsroom',
-    //     name: 'Phòng học',
-    //     icon: 'fa-solid fa-grip-vertical text-primary',
-    //     component: <ClasssRoom />,
-    //     layout: '/admin'
-    // },
+    {
+        path: '/classsroom',
+        name: 'Phòng học',
+        icon: 'fa-solid fa-grip-vertical text-primary',
+        component: <ClasssRoom />,
+        layout: '/admin'
+    },
     {
         path: '/resources',
         name: 'Tài nguyên',
@@ -155,7 +156,7 @@ export var routes = [
         layout: '/admin'
     },
     {
-        path: '/question-detail/:courseName',
+        path: '/question-detail/:questionId',
         component: <QuestionDetail />,
         layout: '/admin'
     },
@@ -207,11 +208,23 @@ export var routesClient = [
         component: <CourseRegisterClient />,
         layout: '/client'
     },
+    // {
+    //   path: "/course-register-detail/:courseId",
+    //   name: "khóa học đăng ký chi tiết",
+    //   icon: "ni ni-planet text-blue",
+    //   component: <CourseRegisterDetailClient />,
+    //   layout: "/client",
+    // },
     {
         path: '/student-information',
         name: 'Thông tin học viên',
         icon: 'ni ni-planet text-blue',
         component: <StudentInformation />,
+        layout: '/client'
+    },
+    {
+        path: '/course-progress',
+        component: <CourseProgress />,
         layout: '/client'
     }
 ]

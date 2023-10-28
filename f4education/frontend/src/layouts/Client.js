@@ -47,7 +47,9 @@ const Client = (props) => {
         ref={mainContent}
       >
         {/* Client header */}
-        <ClientNavbar />
+        {/* <Container size="xl" px="xs"> */}
+          <ClientNavbar />
+        {/* </Container> */}
 
         {/* Page content */}
         <Container size="xl" px="xs" className="pb-5 pt-8">

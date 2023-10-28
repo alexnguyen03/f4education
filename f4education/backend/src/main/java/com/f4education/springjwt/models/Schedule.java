@@ -25,7 +25,7 @@ import lombok.ToString;
 public class Schedule implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "schedule_id")
+	@Column(name = "schedule_id") 
 	private Integer scheduleId;
 	@Column(name = "study_date")
 	private Date studyDate;
