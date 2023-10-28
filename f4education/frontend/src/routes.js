@@ -10,17 +10,17 @@ import Resources from 'views/admin/Resources.js'
 import ResourceDetail from 'views/admin/ResourceDetail'
 import Questions from 'views/admin/Questions'
 import QuestionDetail from 'views/admin/QuestionDetail'
-import Home from 'views/client/visitor/Home'
-import CourseClient from 'views/client/visitor/CourseClient'
-import Cart from 'views/client/visitor/Cart'
-import Checkout from 'views/client/visitor/Checkout'
+import Home from '../../../f4education/frontend/src/views/client/visitor/Home'
+import CourseClient from '../../../f4education/frontend/src/views/client/visitor/CourseClient'
+import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
+import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
 import Login from 'views/examples/Login'
-import CourseDetailClient from 'views/client/visitor/CourseDetailClient'
-import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient'
-// import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient'/
+import CourseDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseDetailClient'
+import CourseRegisterClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterClient'
+// import CourseRegisterDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from 'views/teacher/information'
-import StudentInformation from 'views/client/visitor/StudentInformation'
+import StudentInformation from '../../../f4education/frontend/src/views/client/visitor/StudentInformation'
 
 import Accounts from 'views/admin/Accounts'
 import Schedules from 'views/admin/Schedules'
@@ -127,13 +127,13 @@ export var routes = [
         component: <QuestionDetail />,
         layout: '/admin'
     },
-    {
-        path: '/classsroom',
-        name: 'Phòng học',
-        icon: 'fa-solid fa-grip-vertical text-primary',
-        component: <ClasssRoom />,
-        layout: '/admin'
-    },
+    // {
+    //     path: '/classsroom',
+    //     name: 'Phòng học',
+    //     icon: 'fa-solid fa-grip-vertical text-primary',
+    //     component: <ClasssRoom />,
+    //     layout: '/admin'
+    // },
     {
         path: '/resources',
         name: 'Tài nguyên',

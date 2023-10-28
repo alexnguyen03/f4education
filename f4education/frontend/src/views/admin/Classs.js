@@ -25,6 +25,7 @@ import classApi from 'api/classApi'
 // gọi API từ classHistoryApi
 import classHistoryApi from 'api/classHistoryApi'
 import { Link } from 'react-router-dom'
+import { formatDate } from '../../utils/formater'
 
 const Classs = () => {
     const [classses, setClassses] = useState([])
@@ -240,8 +241,7 @@ const Classs = () => {
             },
             {
                 accessorKey: 'startDate',
-                accessorFn: (row) =>
-                    moment(row.startDate).format('DD/MM/yyyy, h:mm:ss A'),
+                accessorFn: (row) => formatDate(row.startDate),
                 header: 'Ngày bắt đầu',
                 size: 90
             },
@@ -251,13 +251,7 @@ const Classs = () => {
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
                     if (row.endDate !== null) {
-                        return (
-                            <span>
-                                {moment(row.endDate).format(
-                                    'DD/MM/yyyy, h:mm:ss A'
-                                )}
-                            </span>
-                        )
+                        return <span>{formatDate(row.endDate)}</span>
                     } else {
                         return <span>Chưa kết thúc</span>
                     }
@@ -304,8 +298,7 @@ const Classs = () => {
             },
             {
                 accessorKey: 'startDate',
-                accessorFn: (row) =>
-                    moment(row.startDate).format('DD/MM/yyyy, h:mm:ss A'),
+                accessorFn: (row) => formatDate(row.startDate),
                 header: 'Ngày bắt đầu',
                 size: 105
             },
@@ -315,13 +308,7 @@ const Classs = () => {
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
                     if (row.endDate !== null) {
-                        return (
-                            <span>
-                                {moment(row.endDate).format(
-                                    'DD/MM/yyyy, h:mm:ss A'
-                                )}
-                            </span>
-                        )
+                        return <span>{formatDate(row.endDate)}</span>
                     } else {
                         return <span>Chưa kết thúc</span>
                     }
@@ -490,7 +477,7 @@ const Classs = () => {
                                             <IconButton color="primary">
                                                 <i className="fa-solid fa-bars-progress"></i>
                                             </IconButton>
-                                            Xếp lớp | {row.row.original.classId}
+                                            Xếp lớp
                                         </Link>
                                     </MenuItem>
                                 ]}

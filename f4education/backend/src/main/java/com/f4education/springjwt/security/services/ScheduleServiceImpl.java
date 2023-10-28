@@ -50,7 +50,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         try {
             listSchedules = scheduleRepository.saveAll(listSchedulesAdded);
             Date endDate = listSchedules.get(listSchedules.size() - 1).getStudyDate();
+            Date startDate = listSchedules.get(0).getStudyDate();
+            classes.setStartDate(startDate);
             classes.setEndDate(endDate);
+
             classesRepository.save(classes);
         } catch (Exception e) {
             e.printStackTrace();
