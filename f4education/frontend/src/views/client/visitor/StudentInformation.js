@@ -5,7 +5,8 @@ import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ContentEditable from 'react-contenteditable'
 
-import studentApi from 'api/studentApi'
+import studentApi from '../../../api/studentApi'
+import Schedule from '../student/Schedule'
 const IMG_URL = '/students/'
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -57,7 +58,6 @@ const StudentInformation = () => {
         try {
             setLoading(true)
             const resp = await studentApi.getStudent(user.username)
-            console.log(resp.data)
 
             if (resp.status === 200) {
                 setStudent(resp.data)
@@ -234,15 +234,18 @@ const StudentInformation = () => {
                 defaultValue="gallery"
                 orientation="vertical"
             >
-                <div className="container">
+                <div className="container-fluid">
                     <div className="row">
                         <div className="col-lg-12 p-0">
                             <h1 className="my-3 text-dark">
                                 Cài đặt tài khoản
                             </h1>
                         </div>
-                        <div className="col-lg-3 border">
-                            <Tabs.List>
+                        <div
+                            className="col-lg-3 "
+                            style={{ minHeight: '700px' }}
+                        >
+                            <Tabs.List className="shadow px-3 pb-3 rounded">
                                 <Tabs.Tab
                                     value="gallery"
                                     className="d-flex justify-content-center text-lg mt-4 font-weight-bold"
@@ -250,13 +253,13 @@ const StudentInformation = () => {
                                     Thông tin của tôi
                                 </Tabs.Tab>
                                 <Tabs.Tab
-                                    value="messages"
+                                    value="schedule"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
                                     Thời khóa biểu
                                 </Tabs.Tab>
                                 <Tabs.Tab
-                                    value="settings"
+                                    value="attendence"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
                                     Điểm danh
@@ -282,18 +285,20 @@ const StudentInformation = () => {
                                         <div className="col-lg-12 shadow">
                                             <div className="container">
                                                 <div className="row">
-                                                    <div className="col-lg-3">
+                                                    <div className="col-lg-3 my-2">
                                                         {imgData && (
                                                             <img
-                                                                className="rounded-circle p-3 w-100"
-                                                                height={180}
+                                                                className="rounded-circle  shadow p-2 "
+                                                                height={'247px'}
+                                                                width={'247px'}
                                                                 src={imgData}
                                                             />
                                                         )}
                                                         {!imgData && (
                                                             <img
-                                                                className="rounded-circle p-3 w-100"
-                                                                height={180}
+                                                                className="rounded-circle  shadow p-2"
+                                                                height={'247px'}
+                                                                width={'247px'}
                                                                 src={
                                                                     process.env
                                                                         .REACT_APP_IMAGE_URL +
@@ -490,8 +495,8 @@ const StudentInformation = () => {
                             <Tabs.Panel value="messages">
                                 Messages tab content
                             </Tabs.Panel>
-                            <Tabs.Panel value="settings">
-                                Settings tab content
+                            <Tabs.Panel value="schedule">
+                                <Schedule />
                             </Tabs.Panel>
                         </div>
                     </div>

@@ -232,7 +232,6 @@ function Schedules() {
         ],
         []
     )
-    console.log('re-render')
     //!  HANDLE FUNCTIONS
     const handleSetupSchedule = () => {
         toggleModal('choiceSessionModal')
