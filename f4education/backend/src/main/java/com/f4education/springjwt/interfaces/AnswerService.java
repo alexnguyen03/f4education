@@ -7,11 +7,11 @@ import java.util.List;
 
 @Service
 public interface AnswerService {
-	List<AnswerDTO> getAllAnswer();
-
-	AnswerDTO getAnswerById(Integer questionId);
-
-	AnswerDTO createAnswer(AnswerDTO AnswerDTO);
-
-	AnswerDTO updateAnswer(Integer questionId, AnswerDTO AnswerDTO);
+//	List<AnswerDTO> getAllAnswer();
+//
+//	AnswerDTO getAnswerById(Integer questionId);
+//
+//	AnswerDTO createAnswer(AnswerDTO AnswerDTO);
+//
+//	AnswerDTO updateAnswer(Integer questionId, AnswerDTO AnswerDTO);
 }

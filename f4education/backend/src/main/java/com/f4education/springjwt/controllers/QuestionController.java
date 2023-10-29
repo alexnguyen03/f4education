@@ -23,27 +23,27 @@ public class QuestionController {
     @Autowired
     QuestionServiceImpl questionService;
 
-    @GetMapping
-//	@PreAuthorize("hasRole('ADMIN')")
-    public List<QuestionDTO> findAll() {
-        return questionService.getAllQuestion();
-    }
-
-    @GetMapping("/{courseName}")
-//	@PreAuthorize("hasRole('ADMIN')")
-    public List<QuestionDTO> findByCourseName(@PathVariable("courseName") String courseName) {
-        return questionService.getQuestionByCourseName(courseName);
-    }
-
-    @PostMapping
-    public QuestionDTORequest createQuestion(@RequestBody QuestionDTORequest questionDTO) {
-        return questionService.createQuestion(questionDTO);
-    }
-
-    @PutMapping("/{questionId}")
-//	@PreAuthorize("hasRole('ADMIN')")
-    public QuestionDTORequest updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDTORequest questionDTO) {
-        return questionService.updateQuestion(questionId, questionDTO);
-    }
+//    @GetMapping
+////	@PreAuthorize("hasRole('ADMIN')")
+//    public List<QuestionDTO> findAll() {
+//        return questionService.getAllQuestion();
+//    }
+//
+//    @GetMapping("/{courseName}")
+////	@PreAuthorize("hasRole('ADMIN')")
+//    public List<QuestionDTO> findByCourseName(@PathVariable("courseName") String courseName) {
+//        return questionService.getQuestionByCourseName(courseName);
+//    }
+//
+//    @PostMapping
+//    public QuestionDTORequest createQuestion(@RequestBody QuestionDTORequest questionDTO) {
+//        return questionService.createQuestion(questionDTO);
+//    }
+//
+//    @PutMapping("/{questionId}")
+////	@PreAuthorize("hasRole('ADMIN')")
+//    public QuestionDTORequest updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDTORequest questionDTO) {
+//        return questionService.updateQuestion(questionId, questionDTO);
+//    }
 
 }

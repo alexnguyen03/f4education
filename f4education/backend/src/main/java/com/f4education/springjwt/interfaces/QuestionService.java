@@ -9,11 +9,11 @@ import com.f4education.springjwt.payload.request.QuestionDTO;
 
 @Service
 public interface QuestionService {
-	List<QuestionDTO> getAllQuestion();
-
-	QuestionDTO getQuestionById(Integer questionId);
-
-	QuestionDTORequest createQuestion(QuestionDTORequest questionDTO);
-
-	QuestionDTORequest updateQuestion(Integer questionId, QuestionDTORequest questionDTO);
+//	List<QuestionDTO> getAllQuestion();
+//
+//	QuestionDTO getQuestionById(Integer questionId);
+//
+//	QuestionDTORequest createQuestion(QuestionDTORequest questionDTO);
+//
+//	QuestionDTORequest updateQuestion(Integer questionId, QuestionDTORequest questionDTO);
 }

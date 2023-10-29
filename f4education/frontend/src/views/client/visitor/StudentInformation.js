@@ -4,6 +4,7 @@ import { Button, Label, ButtonGroup } from 'reactstrap'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ContentEditable from 'react-contenteditable'
+import { Link } from 'react-router-dom'
 
 import studentApi from 'api/studentApi'
 const IMG_URL = '/students/'
@@ -253,13 +254,13 @@ const StudentInformation = () => {
                                     value="messages"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
-                                    Thời khóa biểu
+                                    Lớp học của tôi
                                 </Tabs.Tab>
                                 <Tabs.Tab
                                     value="settings"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
-                                    Điểm danh
+                                    Thời khóa biểu
                                 </Tabs.Tab>
                             </Tabs.List>
                         </div>
@@ -488,7 +489,15 @@ const StudentInformation = () => {
                                 </div>
                             </Tabs.Panel>
                             <Tabs.Panel value="messages">
-                                Messages tab content
+                                <Link to='/quizz'>
+                                    <Button
+                                        color="dark"
+                                        role="button"
+                                        className="my-3"
+                                    >
+                                        Lớp học
+                                    </Button>
+                                </Link>
                             </Tabs.Panel>
                             <Tabs.Panel value="settings">
                                 Settings tab content

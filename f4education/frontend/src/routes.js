@@ -21,6 +21,7 @@ import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient'
 // import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from 'views/teacher/information'
 import StudentInformation from 'views/client/visitor/StudentInformation'
+import QuizzClient from 'views/client/visitor/QuizzClient';
 
 import Accounts from 'views/admin/Accounts'
 import Schedules from 'views/admin/Schedules'
@@ -212,6 +213,13 @@ export var routesClient = [
         name: 'Thông tin học viên',
         icon: 'ni ni-planet text-blue',
         component: <StudentInformation />,
+        layout: '/client'
+    },
+    {
+        path: '/quizz',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <QuizzClient />,
         layout: '/client'
     }
 ]

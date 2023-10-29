@@ -24,25 +24,25 @@ public class AnswerController {
 	@Autowired
 	AnswerServiceImpl answerService;
 
-	@GetMapping
-//	@PreAuthorize("hasRole('ADMIN')")
-	public List<AnswerDTO> findAll() {
-		return answerService.getAllAnswer();
-	} 
-
-	@PostMapping
-	public List<AnswerDTO> createAnswer(@RequestBody List<AnswerDTO> answerDTOList) {
-		List<AnswerDTO> createdAnswers = new ArrayList<>();
-		for (AnswerDTO answerDTO : answerDTOList) {
-			answerService.createAnswer(answerDTO);
-			createdAnswers.add(answerService.createAnswer(answerDTO));
-		}
-		return createdAnswers;
-	}
-
-	@PutMapping("/{answerId}")
-//	@PreAuthorize("hasRole('ADMIN')")
-	public AnswerDTO updateAnswer(@PathVariable("answerId") Integer answerId, @RequestBody AnswerDTO answerDTO) {
-		return answerService.updateAnswer(answerId, answerDTO);
-	}
+//	@GetMapping
+////	@PreAuthorize("hasRole('ADMIN')")
+//	public List<AnswerDTO> findAll() {
+//		return answerService.getAllAnswer();
+//	} 
+//
+//	@PostMapping
+//	public List<AnswerDTO> createAnswer(@RequestBody List<AnswerDTO> answerDTOList) {
+//		List<AnswerDTO> createdAnswers = new ArrayList<>();
+//		for (AnswerDTO answerDTO : answerDTOList) {
+//			answerService.createAnswer(answerDTO);
+//			createdAnswers.add(answerService.createAnswer(answerDTO));
+//		}
+//		return createdAnswers;
+//	}
+//
+//	@PutMapping("/{answerId}")
+////	@PreAuthorize("hasRole('ADMIN')")
+//	public AnswerDTO updateAnswer(@PathVariable("answerId") Integer answerId, @RequestBody AnswerDTO answerDTO) {
+//		return answerService.updateAnswer(answerId, answerDTO);
+//	}
 }
