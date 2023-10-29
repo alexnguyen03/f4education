@@ -373,7 +373,7 @@ function QuizzClient() {
                                     )}
                                 </div>
                                 <Button
-                                    className="float-right"
+                                    className="float-right mb-5"
                                     variant="gradient"
                                     gradient={{
                                         from: 'blue',

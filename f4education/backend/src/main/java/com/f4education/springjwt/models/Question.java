@@ -45,11 +45,6 @@ public class Question implements Serializable {
 	@JoinColumn(name = "course_id")
 	@JsonIgnore
 	Course course;
-
-	@ManyToOne
-	@JsonIgnore
-	@JoinColumn(name = "subject_id")
-	Subject subject;
 	
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
