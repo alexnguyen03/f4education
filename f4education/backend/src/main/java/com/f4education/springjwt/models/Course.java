@@ -55,6 +55,10 @@ public class Course implements Serializable {
     @JsonIgnore
     @OneToMany(mappedBy = "course")
     List<Resources> resources;
+    
+    @JsonIgnore
+    @OneToMany(mappedBy = "course")
+    List<QuizResult> quizResults;
 
     @JsonIgnore
     @ManyToOne

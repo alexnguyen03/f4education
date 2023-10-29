@@ -22,7 +22,7 @@ public class AnswerController {
     @Autowired
     private AnswerReposotory answerReposotory;
 
-    @GetMapping
+	@GetMapping
 //	@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> findAll() {
         List<AnswerDTO> answers = answerService.getAllAnswer();

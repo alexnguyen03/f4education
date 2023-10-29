@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -23,45 +22,37 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Question")
-public class Question implements Serializable {
+@Table(name = "Quizzresult")
+public class QuizResult implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "question_id")
-	private Integer questionId;
+	@Column(name = "quizz_id")
+	private Integer quizzId;
 
-	@Column(name = "create_date")
-	private Date createDate;
+	private Integer score;
 
-	@Column(name = "status")
-	private Boolean status;
+	private String duration;
+
+	@Column(name = "quizz_date")
+	private Date quizzDate;
 
 	@ManyToOne
-	@JoinColumn(name = "subject_id")
 	@JsonIgnore
-	Subject subject;
-
-	@ManyToOne
 	@JoinColumn(name = "course_id")
-	@JsonIgnore
 	Course course;
 
 	@ManyToOne
 	@JsonIgnore
-	@JoinColumn(name = "subject_id")
-	Subject subject;
-	
-	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	@JsonIgnore
-	Admin admin;
+	@JoinColumn(name = "class_id")
+	Classes classes;
 
-	@OneToMany(mappedBy = "question")
-	@JsonIgnore
-	List<QuestionDetail> questionDetail;
+	@ManyToOne
+	@JoinColumn(name = "student_id")
+	Student student;
 
 	@Override
 	public String toString() {
-		return "Question{" + "questionId=" + questionId + ", createDate=" + createDate + ", status=" + status + '}';
+		return "QuizResult [quizzId=" + quizzId + ", score=" + score + ", duration=" + duration + ", quizzDate="
+				+ quizzDate + "]";
 	}
 }
