@@ -273,7 +273,7 @@ const StudentInformation = () => {
                                     zIndex={1000}
                                     color="rgba(46, 46, 46, 1)"
                                     size={50}
-                                    overlayProps={{ radius: 'sm', blur: 2 }}
+                                    // overlayProps={{ radius: 'sm', blur: 2 }}
                                 />
                                 <div className="container px-4">
                                     <div className="row">
@@ -356,7 +356,7 @@ const StudentInformation = () => {
                                                         </p>
                                                     </div>
                                                     <div className="col-lg-6">
-                                                        <p class="text-dark font-weight-bold mb-2">
+                                                        <p className="text-dark font-weight-bold mb-2">
                                                             Họ và tên
                                                         </p>
                                                         <ContentEditable
@@ -376,7 +376,7 @@ const StudentInformation = () => {
                                                                 }
                                                             </div>
                                                         )}
-                                                        <p class="text-dark font-weight-bold mb-2 mt-3">
+                                                        <p className="text-dark font-weight-bold mb-2 mt-3">
                                                             Địa chỉ
                                                         </p>
                                                         <ContentEditable
@@ -398,7 +398,7 @@ const StudentInformation = () => {
                                                         )}
                                                     </div>
                                                     <div className="col-lg-6">
-                                                        <p class="text-dark font-weight-bold mb-2">
+                                                        <p className="text-dark font-weight-bold mb-2">
                                                             Số điện thoại
                                                         </p>
                                                         <ContentEditable
@@ -418,7 +418,7 @@ const StudentInformation = () => {
                                                                 }
                                                             </div>
                                                         )}
-                                                        <p class="text-dark font-weight-bold mb-2 mt-3">
+                                                        <p className="text-dark font-weight-bold mb-2 mt-3">
                                                             Giới tính
                                                         </p>
                                                         {isEditing ? (

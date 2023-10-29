@@ -46,7 +46,7 @@ const ClientNavbar = () => {
     const [cartEmpty, setCartEmpty] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const [activeItems, setActiveItems] = useState([false, false, false])
-    const [opened, { toggle }] = useDisclosure(false)
+    const [opened, { toggle }] = useDisclosure(true)
 
     // *************** CART VARIABLE - AREA START
     const [carts, setCarts] = useState([])
@@ -134,7 +134,7 @@ const ClientNavbar = () => {
                 <Link to={'/'} className="navbar-brand">
                     <img src={logo} className="img-fluid" alt="" />
                 </Link>
-                <button
+                <div
                     className="navbar-toggler"
                     type="button"
                     data-toggle="collapse"
@@ -144,8 +144,8 @@ const ClientNavbar = () => {
                     aria-label="Toggle navigation"
                     style={{ zIndex: '99999' }}
                 >
-                    <Burger opened={opened} onClick={toggle} />
-                </button>
+                    <Burger opened={!opened} onClick={toggle} />
+                </div>
 
                 {/* Content */}
                 <div
@@ -153,10 +153,10 @@ const ClientNavbar = () => {
                     id="navbarSupportedContent"
                 >
                     <ul
-                        className="navbar-nav mr-auto text-center d-md-flex d-sm-flex
-                        justify-content-md-center justify-content-sm-center"
+                        className="navbar-nav mr-sm-auto ml-sm-auto text-center d-md-flex d-sm-flex
+                        justify-content-md-center  justify-content-sm-center"
                     >
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                             <Link
                                 to={'/'}
                                 className={`
@@ -171,7 +171,7 @@ const ClientNavbar = () => {
                             >
                                 Trang chủ
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="nav-item">
                             <Link
                                 to={'/course'}
@@ -188,23 +188,8 @@ const ClientNavbar = () => {
                                 Khóa học
                             </Link>
                         </li>
-                        <li className="nav-item">
-                            <Link
-                                to={'/cart'}
-                                className={`
-                ${
-                    activeItems[2]
-                        ? 'nav-link custom-nav-link active'
-                        : 'nav-link custom-nav-link'
-                }
-                ${styles['custom-nav-link']}
-                `}
-                                onClick={() => handleItemClick(2)}
-                            >
-                                Giỏ hàng
-                            </Link>
-                        </li>
-                        <li className="nav-item">
+
+                        <li className="nav-item d-flex justify-content-center">
                             <HoverCard
                                 width={'75vw'}
                                 position="bottom"

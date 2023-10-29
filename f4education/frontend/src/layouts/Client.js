@@ -3,7 +3,7 @@ import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 // import {Container} from 'reactstrap';
 import { useEffect, useRef } from 'react'
 // core components
-import ClientFooter from 'components/Footers/ClientFooter.js'
+import ClientFooter from '../../../frontend/src/components/Footers/ClientFooter'
 import ClientNavbar from 'components/Navbars/ClientNavbar.js'
 
 import { routesClient } from 'routes.js'
@@ -48,7 +48,7 @@ const Client = (props) => {
         <>
             <div
                 className="main-content mt--5"
-                style={{ backgroundColor: '#fff', minHeight: '100vh' }}
+                style={{ backgroundColor: '#fff' }}
                 ref={mainContent}
             >
                 {/* Client header */}
@@ -57,7 +57,7 @@ const Client = (props) => {
                 {/* </Container> */}
 
                 {/* Page content */}
-                <Container fluid size="xl" px="xs" className="pb-5 pt-8">
+                <Container fluid size="xl">
                     <Routes>
                         {getRoutes(routesClient)}
                         <Route path="*" element={<Navigate to="/" replace />} />
@@ -66,7 +66,9 @@ const Client = (props) => {
             </div>
 
             {/* Footer */}
-            <ClientFooter />
+            <Container fluid bg={'#25262B'}>
+                <ClientFooter />
+            </Container>
         </>
     )
 }
