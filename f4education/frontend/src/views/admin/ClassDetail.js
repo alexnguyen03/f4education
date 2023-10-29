@@ -421,7 +421,7 @@ const ClassDetail = () => {
                                             //     </div>
                                             // )}
                                             options={listTeacher}
-                                            placeholder="Chọn môn học"
+                                            placeholder="Chọn giáo viên"
                                             onChange={(val) => {
                                                 handleOnChangeTeacher(val)
                                             }}
