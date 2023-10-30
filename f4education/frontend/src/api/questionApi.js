@@ -28,6 +28,12 @@ const questionApi = {
     deleteQuestionDetail: (questionDetailId) => {
         const url = `/question-detail/${questionDetailId}`
         return axiosClient.delete(url)
+    },
+    uploadExcel: (file) => {
+        const url = `/question-detail/upload-excel`
+        return axiosClient.post(url, file, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
     }
 }
 

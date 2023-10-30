@@ -43,7 +43,6 @@ public class AnswerServiceImpl implements AnswerService {
     @Override
     public AnswerDTO createAnswer(AnswerDTO answerDTO) {
         Answer answer = this.convertToEntity(answerDTO);
-        System.out.println("ANSWER CREATE: " + answer);
 
         Answer newAnswer = answerReposotory.save(answer);
 
@@ -58,7 +57,6 @@ public class AnswerServiceImpl implements AnswerService {
             Answer existingAnswer = exitAnswer.get();
 
             this.convertToEntity(answerDTO, existingAnswer);
-            System.out.println(existingAnswer);
 
             Answer savedAnswer = answerReposotory.save(existingAnswer);
 
