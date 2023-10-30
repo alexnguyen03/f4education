@@ -1,10 +1,14 @@
 import {
     Blockquote,
     Checkbox,
+    Group,
     Loader,
+    rem,
     Skeleton,
+    Text,
     Textarea,
-    Tooltip
+    Tooltip,
+    useMantineTheme
 } from '@mantine/core'
 import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
@@ -21,16 +25,15 @@ import {
     FormGroup,
     Input,
     InputGroup,
-    InputGroupAddon,
-    InputGroupText,
     Modal,
     Row
 } from 'reactstrap'
 
 // API
 import questionApi from '../../api/questionApi'
-import answerApi from '../../api/answersApi'
 import answersApi from '../../api/answersApi'
+import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
+import { IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
 
 // ************* Get LocalStorage
 // const userDetail = JSON.parse(localStorage.getItem('user'))
@@ -38,11 +41,13 @@ import answersApi from '../../api/answersApi'
 const QuestionDetail = () => {
     // ************* Route and Params
     const params = useParams()
+    const theme = useMantineTheme()
 
     // ************* Main variable
     const [questionPrev, setQuestionPrev] = useState({})
     const [questions, setQuestions] = useState([])
     const [answers, setAnswers] = useState([])
+    const [selectedFile, setSelectedFile] = useState(null)
 
     // ************* Action variable
     const [loading, setLoading] = useState(false)
@@ -50,6 +55,7 @@ const QuestionDetail = () => {
     const [showModal, setShowModal] = useState(false)
     const [editQuestionId, setEditQuestionId] = useState(null)
     const [isUpdate, setIsUpdate] = useState(false)
+    const [upLoadExcel, setUploadExcel] = useState(false)
 
     // ************* Form variable
     const [questionTitle, setQuestionTitle] = useState(null)
@@ -59,7 +65,6 @@ const QuestionDetail = () => {
         questionId: params.courseName,
         answers: []
     })
-
     const [answerRequest, setAnswerRequest] = useState([
         {
             answerId: '',
@@ -68,6 +73,7 @@ const QuestionDetail = () => {
             questionDetailId: ''
         }
     ])
+    const [deleteAnsers, setDeleteAnswer] = useState([])
 
     // ************* API - FETCH AREA
     const fetchQuestionDetail = async () => {
@@ -151,6 +157,34 @@ const QuestionDetail = () => {
         } else console.log('error in validate')
     }
 
+    const handleExcelFileUpload = async () => {
+        const formData = new FormData()
+        formData.append('excelFile', selectedFile)
+
+        console.log(selectedFile)
+
+        // console log excel file with formData
+        for (let pair of formData.entries()) {
+            console.log(
+                pair[0] +
+                    ': ' +
+                    (pair[1] instanceof File ? pair[1].name : pair[1])
+            )
+        }
+
+        try {
+            const resp = await questionApi.uploadExcel(formData)
+
+            if (resp.status === 200) {
+                console.log('File uploaded successfully.')
+                setUploadExcel(false)
+                setShowModal(false)
+            }
+        } catch (error) {
+            console.error('Failed to upload file.', error)
+        }
+    }
+
     // + Function update when click update
     const handleUpdateQuestion = async () => {
         // Set change action render UI
@@ -158,36 +192,94 @@ const QuestionDetail = () => {
         setEditQuestion(false)
 
         questionRequest.answers = answerRequest
-        console.log(questionRequest)
 
+        // Lấy list answer mới vừa tạo
+        let newAnswers = []
+        questionRequest.answers.map((answer) => {
+            if (answer.isNew === true) {
+                console.log(answer)
+                const newAnswer = {
+                    answerContent: answer.answerContent,
+                    isCorrect: answer.isCorrect,
+                    questionDetailId: answer.questionDetailId
+                }
+                newAnswers.push(newAnswer)
+            }
+            return answer
+        })
+
+        // Cập nhật lại request bỏ ra những item vừa tạo
+        questionRequest.answers = questionRequest.answers.filter((answer) => {
+            if (answer.isNew === true) {
+                return false // Loại bỏ mục đã được push khỏi questionRequest.answers
+            }
+            return true // Giữ lại các mục không có thuộc tính isNew
+        })
+
+        console.log(questionRequest)
+        console.log(questionRequest.answers)
         try {
+            // UPDATE QUESTION
             const resp = await questionApi.updateQuestionDetail(
                 editQuestionId,
                 questionRequest
             )
 
+            // CREATE NEW ANSWER
+            if (newAnswers.length > 0) {
+                const respAnswer = await answersApi.createAnswer(newAnswers)
+                if (respAnswer.status === 200) {
+                    console.log('ok')
+                } else console.log('lỗi')
+            } else {
+                console.log('no new answer')
+            }
+
+            // UPDATE PREV ANSWER
             await Promise.all(
                 questionRequest.answers.map(async (answer) => {
-                    await answersApi.updateAnswer(answer.answerId, answer)
+                    if (answer.answerId !== '') {
+                        await answersApi.updateAnswer(answer.answerId, answer)
+                    }
                 })
             )
 
+            // cập nhật lại list xóa bỏ ra những item vừa tạo
+            // DELETE ANSWER
+            if (deleteAnsers.length > 0) {
+                const newDelete = deleteAnsers.filter((subArray) => {
+                    const item = subArray[0]
+                    if (item.isNew === true) {
+                        return false
+                    }
+                    return true
+                })
+
+                newDelete.forEach((item) => {
+                    handleDeleteSingleAnswer(parseInt(item[0].answerId))
+                })
+            } else {
+                console.log('no delete')
+            }
+
             if (resp.status === 200) {
                 console.log('updated')
-                fetchQuestionDetail()
             } else {
                 console.log('update fail')
             }
         } catch (error) {
             console.log(error)
         }
+        newAnswers = []
+        setDeleteAnswer([])
+        fetchQuestionDetail()
     }
 
     const handleDeleteQuestion = async (questionDetail) => {
         // Delete answer
         questionDetail.answers.forEach(async (as) => {
             try {
-                const resp = await answerApi.deleteAnswer(as.answerId)
+                const resp = await answersApi.deleteAnswer(as.answerId)
 
                 if (resp.status === 204) {
                     console.log('Xóa answer rồi')
@@ -235,6 +327,7 @@ const QuestionDetail = () => {
             { checkBoxValue: false, inputValue: '' }
         ])
 
+        setQuestionTitle('')
         setEditQuestionId(null)
     }
 
@@ -258,36 +351,82 @@ const QuestionDetail = () => {
     }
 
     // ====================== ANSWER ======================
-    const handleAddNewAnswerForEachQuestion = async (questionDetail) => {
-        setEditQuestionId(questionDetail.questionDetailId)
+    const handleAddAnswer = () => {
+        const maxAnswerId = getMaxAnswerId(answers)
 
-        try {
-            const answers = [
-                {
-                    answerContent: '',
-                    isCorrect: false,
-                    questionDetailId: questionDetail.questionDetailId
-                }
-            ]
-            const resp = await answerApi.createAnswer(answers)
-
-            if (resp.status === 200) {
-                console.log('ok')
-                fetchQuestionDetail()
-            } else console.log('lỗi')
-        } catch (error) {
-            console.log(error)
+        const newAnswer = {
+            answerId: maxAnswerId + 1,
+            answerContent: '',
+            isCorrect: false,
+            isNew: true,
+            questionDetailId: editQuestionId
         }
+
+        const updatedAnswers = [...answers]
+
+        const matchingSubArray = updatedAnswers.find(
+            (subArray) => subArray[0]?.questionDetailId === editQuestionId
+        )
+
+        if (matchingSubArray) {
+            matchingSubArray.push(newAnswer)
+        } else {
+            updatedAnswers.push([
+                { questionDetailId: editQuestionId },
+                newAnswer
+            ])
+        }
+
+        setAnswers(updatedAnswers)
+    }
+
+    const deleteAnswerById = (answerId) => {
+        const updatedAnswers = answers.map((subArray) => {
+            if (subArray[0].questionDetailId === editQuestionId) {
+                const filteredSubArray = subArray.filter(
+                    (answer) => answer.answerId !== answerId
+                )
+
+                if (filteredSubArray.length >= 2) {
+                    const item = subArray.filter(
+                        (answer) => answer.answerId === answerId
+                    )
+                    setDeleteAnswer((prevDeleteAnswers) => [
+                        ...prevDeleteAnswers,
+                        item
+                    ])
+                    return filteredSubArray
+                }
+
+                alert('Mỗi Câu hỏi phải có ít nhất 2 câu trả lời')
+                return subArray
+            }
+            return subArray
+        })
+        setAnswers(updatedAnswers)
+    }
+
+    const getMaxAnswerId = (answers) => {
+        let maxId = 0
+
+        for (const subArray of answers) {
+            const subArrayMaxId = subArray.reduce((subMaxId, answer) => {
+                return Math.max(subMaxId, answer.answerId)
+            }, 0)
+
+            maxId = Math.max(maxId, subArrayMaxId)
+        }
+        return maxId
     }
 
     const handleDeleteSingleAnswer = async (answerId) => {
         try {
-            const resp = await answerApi.deleteAnswer(answerId)
-            resp.status === 204 ? console.log('ok') : console.log('!ok')
-            fetchQuestionDetail()
+            const resp = await answersApi.deleteAnswer(answerId)
+            resp.status === 204 ? console.log('ok') : console.log('error')
         } catch (error) {
             console.log(error)
         }
+        fetchQuestionDetail()
     }
 
     // get value onchange Answer Input for update
@@ -343,7 +482,16 @@ const QuestionDetail = () => {
     // edit question when click
     const handleEditQuestionDetailByQuestionDetailId = (qs) => {
         setQuestionRequest(qs)
+        setAnswerRequest([
+            {
+                answerId: '',
+                answerContent: '',
+                isCorrect: false,
+                questionDetailId: ''
+            }
+        ])
         handleEditQuestion(qs)
+        setDeleteAnswer([])
     }
 
     // + function set Edit when click edit button
@@ -362,14 +510,27 @@ const QuestionDetail = () => {
     }
 
     const validateForm = () => {
-        if (questionTitle === null) {
+        if (questionTitle === '') {
             setMsgError((preErr) => ({
                 ...preErr,
                 msg: 'Không để trống tên câu hỏi'
             }))
-            return false
         } else {
             setMsgError((prev) => ({ ...prev, msg: '' }))
+        }
+
+        let hasError = false
+        createNewAnswergroups.forEach((group, index) => {
+            if (group.inputValue === '') {
+                hasError = true
+                const updatedGroups = [...createNewAnswergroups]
+                updatedGroups[index].error = 'Không được để trống câu trả lời'
+                setCreateNewAnswergroups(updatedGroups)
+            }
+        })
+
+        if (hasError) {
+            return false
         }
 
         if (msgError.msg !== '') {
@@ -382,8 +543,8 @@ const QuestionDetail = () => {
 
     // *************** CREATE NEW QUESTION - ANSWER - START
     const [createNewAnswergroups, setCreateNewAnswergroups] = useState([
-        { checkBoxValue: false, inputValue: '' },
-        { checkBoxValue: false, inputValue: '' }
+        { checkBoxValue: false, inputValue: '', error: '' },
+        { checkBoxValue: false, inputValue: '', error: '' }
     ])
 
     const handleCheckboxChange = (index) => {
@@ -395,6 +556,11 @@ const QuestionDetail = () => {
     const handleInputChange = (index, value) => {
         const updatedGroups = [...createNewAnswergroups]
         updatedGroups[index].inputValue = value
+
+        if (value !== '') {
+            updatedGroups[index].error = ''
+        }
+
         setCreateNewAnswergroups(updatedGroups)
     }
 
@@ -405,7 +571,14 @@ const QuestionDetail = () => {
 
     const handleSliceDeleteFromGroup = (index) => {
         const newGroup = [...createNewAnswergroups]
-        newGroup.splice(index, 1)
+        if (createNewAnswergroups.length > 2) {
+            newGroup.splice(index, 1)
+            setMsgError((prev) => ({ ...prev, msgAnswer: '' }))
+        } else
+            setMsgError((preErr) => ({
+                ...preErr,
+                msgAnswer: 'Phải có ít nhất 2 câu trả lời'
+            }))
         setCreateNewAnswergroups(newGroup)
     }
 
@@ -449,13 +622,11 @@ const QuestionDetail = () => {
                             className="ml-2"
                             style={{
                                 border: `${
-                                    group.inputValue === ''
-                                        ? '1.5px solid red'
-                                        : ''
+                                    group.error !== '' ? '1px solid red' : ''
                                 }`
                             }}
                         >
-                            <InputGroupAddon addonType="prepend">
+                            {/* <InputGroupAddon addonType="prepend">
                                 <InputGroupText>
                                     <i
                                         className="ni ni-fat-delete"
@@ -468,7 +639,7 @@ const QuestionDetail = () => {
                                         }}
                                     />
                                 </InputGroupText>
-                            </InputGroupAddon>
+                            </InputGroupAddon> */}
                             <Input
                                 className="pl-2"
                                 placeholder="câu trả lời"
@@ -480,12 +651,8 @@ const QuestionDetail = () => {
                             />
                         </InputGroup>
                     </div>
-                    {group.inputValue === '' ? (
-                        <span className="text-danger ml-4">
-                            Không được để trống câu trả lời
-                        </span>
-                    ) : (
-                        ''
+                    {group.error !== '' && (
+                        <span className="text-danger ml-4">{group.error}</span>
                     )}
                 </FormGroup>
             </Col>
@@ -567,6 +734,25 @@ const QuestionDetail = () => {
                                     {renderGroupAnswerIntoQuestion(
                                         questionDetail
                                     )}
+                                    {editQuestion &&
+                                    questionDetail.questionDetailId ===
+                                        editQuestionId ? (
+                                        <Button
+                                            color="dark"
+                                            outline
+                                            className="mt-2 ml-3"
+                                            onClick={() =>
+                                                handleAddAnswer(
+                                                    questionDetail.answers
+                                                )
+                                            }
+                                        >
+                                            <i className="bx bx-list-plus"></i>{' '}
+                                            Thêm câu trả lời
+                                        </Button>
+                                    ) : (
+                                        <></>
+                                    )}
                                 </Row>
                             </div>
                         </CardBody>
@@ -577,7 +763,7 @@ const QuestionDetail = () => {
                             questionDetail.questionDetailId ===
                                 editQuestionId ? (
                                 <Button
-                                    color="dark"
+                                    color="primary"
                                     role="button"
                                     className="float-left"
                                     onClick={handleUpdateQuestion}
@@ -599,8 +785,8 @@ const QuestionDetail = () => {
                             )}
 
                             {/* Add button */}
-                            <Tooltip
-                                label="Thêm câu hỏi"
+                            {/* <Tooltip
+                                label="Thêm đáp án"
                                 color="teal"
                                 withArrow
                                 arrowPosition="center"
@@ -617,7 +803,7 @@ const QuestionDetail = () => {
                                 >
                                     <i className="bx bx-plus-circle"></i>
                                 </IconButton>
-                            </Tooltip>
+                            </Tooltip> */}
 
                             {/* Edit button */}
                             <Tooltip
@@ -686,19 +872,13 @@ const QuestionDetail = () => {
     }
 
     const renderGroupAnswerIntoQuestion = (questionDetail) => {
-        return answers.map((subjectArray) => (
+        return answers.map((subjectArray, index) => (
             <>
                 {subjectArray.map((answer) => (
                     <>
                         {answer.questionDetailId ===
                         questionDetail.questionDetailId ? (
-                            <Col
-                                lg={12}
-                                xl={12}
-                                md={12}
-                                sm={12}
-                                key={answer.answerId}
-                            >
+                            <Col lg={12} xl={12} md={12} sm={12} key={index}>
                                 <div className="d-flex">
                                     {/* Checkbox button */}
                                     {editQuestion &&
@@ -778,7 +958,10 @@ const QuestionDetail = () => {
                                             <IconButton
                                                 className="float-right text-danger"
                                                 onClick={() =>
-                                                    handleDeleteSingleAnswer(
+                                                    // handleDeleteSingleAnswer(
+                                                    //     answer.answerId
+                                                    // )
+                                                    deleteAnswerById(
                                                         answer.answerId
                                                     )
                                                 }
@@ -911,6 +1094,16 @@ const QuestionDetail = () => {
                                         <i className="bx bx-layer-plus"></i>{' '}
                                         Thêm câu hỏi
                                     </Button>
+                                    <Button
+                                        color="primary"
+                                        outline
+                                        onClick={() => {
+                                            setUploadExcel(true)
+                                            setShowModal(true)
+                                        }}
+                                    >
+                                        Upload EXCEL
+                                    </Button>
                                 </>
                             )}
                         </div>
@@ -953,7 +1146,7 @@ const QuestionDetail = () => {
             >
                 <div className="modal-header">
                     <h3 className="modal-title" id="modal-title-default">
-                        {isUpdate ? 'Cập nhật câu hỏi' : 'Thêm câu hỏi mới'}
+                        Thêm câu hỏi mới
                     </h3>
                     <button
                         aria-label="Close"
@@ -971,54 +1164,140 @@ const QuestionDetail = () => {
                     </button>
                 </div>
                 <div className="modal-body">
-                    <form method="post" className="mt--4">
-                        <Row>
-                            <Col xl={12} lg={12} md={12} sm={12}>
-                                <Textarea
-                                    placeholder="Câu hỏi?"
-                                    label="Tiêu đề câu hỏi"
-                                    className="w-100"
-                                    withAsterisk
-                                    autosize
-                                    minRows={3}
-                                    onChange={
-                                        handleOnChangeInputAnswerInCreateNewQuestion
-                                    }
-                                    name="questionTitle"
-                                    value={questionTitle}
-                                />
-                                {msgError.msg ? (
-                                    <span className="text-danger ml-1">
-                                        Không được để trống tiêu đề câu hỏi
-                                    </span>
-                                ) : (
-                                    ''
-                                )}
-                            </Col>
-                            <Col xl={12} lg={12} md={12} sm={12}>
-                                <hr />
-                                <h4 className="font-weight-600">Câu trả lời</h4>
-                                <Blockquote
-                                    cite="Chọn vào checkbox để đánh dấu câu trả lời đúng!"
-                                    icon={null}
-                                    className="mt--4 p-0"
-                                ></Blockquote>
-                                <div className="container">
-                                    <Row>{renderInputs()}</Row>
-                                </div>
-                            </Col>
-                            <div className="container">
-                                <Button
-                                    color="dark"
-                                    className="mt-3 float-left"
-                                    onClick={handleAddGroup}
+                    {upLoadExcel ? (
+                        <>
+                            <Dropzone
+                                onDrop={(files) => {
+                                    console.log('accepted files', files)
+                                    setSelectedFile(files[0])
+                                }}
+                                onReject={(files) =>
+                                    console.log('rejected files', files)
+                                }
+                                maxSize={3 * 1024 ** 2}
+                                accept={[MIME_TYPES.xls, MIME_TYPES.xlsx]}
+                                name="excelFile"
+                            >
+                                <Group
+                                    position="center"
+                                    spacing="xl"
+                                    style={{
+                                        minHeight: rem(220),
+                                        pointerEvents: 'none'
+                                    }}
                                 >
-                                    <i className="bx bx-list-plus"></i> Thêm câu
-                                    trả lời
-                                </Button>
-                            </div>
-                        </Row>
-                    </form>
+                                    <Dropzone.Accept>
+                                        <IconUpload
+                                            size="3.2rem"
+                                            stroke={1.5}
+                                            color={
+                                                theme.colors[
+                                                    theme.primaryColor
+                                                ][
+                                                    theme.colorScheme === 'dark'
+                                                        ? 4
+                                                        : 6
+                                                ]
+                                            }
+                                        />
+                                    </Dropzone.Accept>
+                                    <Dropzone.Reject>
+                                        <IconX
+                                            size="3.2rem"
+                                            stroke={1.5}
+                                            color={
+                                                theme.colors.red[
+                                                    theme.colorScheme === 'dark'
+                                                        ? 4
+                                                        : 6
+                                                ]
+                                            }
+                                        />
+                                    </Dropzone.Reject>
+                                    <Dropzone.Idle>
+                                        <IconPhoto size="3.2rem" stroke={1.5} />
+                                    </Dropzone.Idle>
+
+                                    <div>
+                                        <Text size="xl" inline>
+                                            Thả files excel vào đây hoặc click
+                                            vào để chọn files
+                                        </Text>
+                                        <Text
+                                            size="sm"
+                                            color="dimmed"
+                                            inline
+                                            mt={7}
+                                        >
+                                            Thả mỗi lần một file, lưu ý dung
+                                            lượng file phải dưới 5MB
+                                        </Text>
+                                    </div>
+                                </Group>
+                            </Dropzone>
+                        </>
+                    ) : (
+                        <>
+                            <form method="post" className="mt--4">
+                                <Row>
+                                    <Col xl={12} lg={12} md={12} sm={12}>
+                                        <Textarea
+                                            placeholder="Câu hỏi?"
+                                            label="Tiêu đề câu hỏi"
+                                            className="w-100"
+                                            withAsterisk
+                                            autosize
+                                            minRows={3}
+                                            onChange={
+                                                handleOnChangeInputAnswerInCreateNewQuestion
+                                            }
+                                            name="questionTitle"
+                                            value={questionTitle}
+                                        />
+                                        {msgError.msg ? (
+                                            <span className="text-danger ml-1">
+                                                Không được để trống tiêu đề câu
+                                                hỏi
+                                            </span>
+                                        ) : (
+                                            ''
+                                        )}
+                                    </Col>
+                                    <Col xl={12} lg={12} md={12} sm={12}>
+                                        <hr />
+                                        <h4 className="font-weight-600">
+                                            Câu trả lời
+                                        </h4>
+                                        <Blockquote
+                                            cite="Chọn vào checkbox để đánh dấu câu trả lời đúng!"
+                                            icon={null}
+                                            className="mt--3 p-0"
+                                        ></Blockquote>
+                                        <Blockquote icon={null} className="p-0">
+                                            <span className="text-danger">
+                                                {msgError.msgAnswer
+                                                    ? msgError.msgAnswer
+                                                    : ''}
+                                            </span>
+                                        </Blockquote>
+                                        <div className="container">
+                                            <Row>{renderInputs()}</Row>
+                                        </div>
+                                    </Col>
+                                    <div className="container">
+                                        <Button
+                                            color="dark"
+                                            className="mt-3 float-left"
+                                            onClick={handleAddGroup}
+                                        >
+                                            <i className="bx bx-list-plus"></i>{' '}
+                                            Thêm câu trả lời
+                                        </Button>
+                                    </div>
+                                </Row>
+                            </form>
+                        </>
+                    )}
                 </div>
                 <div className="modal-footer">
                     <Button
@@ -1029,16 +1308,19 @@ const QuestionDetail = () => {
                         onClick={() => {
                             setShowModal(false)
                             setIsUpdate(false)
+                            setUploadExcel(false)
                         }}
                     >
                         Trở lại
                     </Button>
                     <Button
                         // color="success"
-                        color="success"
+                        color={upLoadExcel ? 'primary' : 'success'}
                         type="button"
                         onClick={() => {
-                            handleStoreNewQuestions()
+                            upLoadExcel
+                                ? handleExcelFileUpload()
+                                : handleStoreNewQuestions()
                         }}
                     >
                         Thêm câu hỏi

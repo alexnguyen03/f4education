@@ -6,10 +6,14 @@ import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.payload.request.AnswerDTO;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.util.List;
+import java.util.Optional;
 
 @CrossOrigin("*")
 @RestController
@@ -58,6 +62,36 @@ public class QuestionDetailController {
 		}
 
 		return ResponseEntity.noContent().build();
+	}
+
+	@PostMapping(value = "/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") Optional<MultipartFile> file) {
+		try {
+			Workbook workbook = WorkbookFactory.create(file.getInputStream());
+			Sheet sheet = workbook.getSheetAt(0); // Lấy sheet đầu tiên
+
+			Iterator<Row> rowIterator = sheet.iterator();
+			rowIterator.next(); // Bỏ qua dòng tiêu đề
+
+			while (rowIterator.hasNext()) {
+				Row row = rowIterator.next();
+
+				String questionTitle = row.getCell(0).getStringCellValue();
+				int questionId = (int) row.getCell(1).getNumericCellValue();
+				String answerContent = row.getCell(2).getStringCellValue();
+				boolean isCorrect = row.getCell(3).getBooleanCellValue();
+
+				// Tiếp tục xử lý dữ liệu và lưu câu hỏi và đáp án vào cơ sở dữ liệu
+				// ...
+			}
+
+			workbook.close();
+
+			return ResponseEntity.ok("Upload Successfully");
+		} catch (Exception e) {
+			return ResponseEntity.badRequest().body("Error");
+		}
+
 	}
 
 }
