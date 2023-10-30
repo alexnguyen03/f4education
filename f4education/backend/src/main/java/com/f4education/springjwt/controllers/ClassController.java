@@ -57,4 +57,9 @@ public class ClassController {
 		return ResponseEntity.ok(classService.findAllActiveClasses());
 	}
 
+	@GetMapping("/student/{studentId}")
+	public ResponseEntity<?> getClassByStudentId(@PathVariable("studentId") String studentId) {
+		return ResponseEntity.ok(classService.getClassByStudentId(studentId));
+	}
+
 }

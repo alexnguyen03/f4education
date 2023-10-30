@@ -25,6 +25,10 @@ const classApi = {
     getAllClassByTeacherId: (teacherId) => {
         const url = `/classes/teacher/${teacherId}`
         return axiosClient.get(url)
+    },
+    getAllClassByStudentId: (studentId) => {
+        const url = `/classes/student/${studentId}`
+        return axiosClient.get(url)
     }
 }
 

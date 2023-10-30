@@ -22,32 +22,37 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Questiondetail")
-public class QuestionDetail implements Serializable {
+@Table(name = "Quizzresult")
+public class QuizResult implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "question_detail_id")
-	private Integer questionDetailId;
-	
-	@Column(name = "question_title")
-	private String questionTitle;
-	
-	@Column(name = "create_date")
-	private Date createDate;
-	
-	private String levels;
+	@Column(name = "quizz_id")
+	private Integer quizzId;
 
-	@OneToMany(mappedBy = "questionDetail")
-	List<Answer> answers;
+	private Integer score;
+
+	private String duration;
+
+	@Column(name = "quizz_date")
+	private Date quizzDate;
 
 	@ManyToOne
 	@JsonIgnore
-	@JoinColumn(name = "question_id")
-	Question question;
+	@JoinColumn(name = "course_id")
+	Course course;
+
+	@ManyToOne
+	@JsonIgnore
+	@JoinColumn(name = "class_id")
+	Classes classes;
+
+	@ManyToOne
+	@JoinColumn(name = "student_id")
+	Student student;
 
 	@Override
 	public String toString() {
-		return "QuestionDetail [questionDetailId=" + questionDetailId + ", questionTitle=" + questionTitle
-				+ ", createDate=" + createDate + ", levels=" + levels + "]";
+		return "QuizResult [quizzId=" + quizzId + ", score=" + score + ", duration=" + duration + ", quizzDate="
+				+ quizzDate + "]";
 	}
 }

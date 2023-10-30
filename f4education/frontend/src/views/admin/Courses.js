@@ -47,6 +47,7 @@ import { IconEyeSearch } from '@tabler/icons-react'
 import ReactLoading from 'react-loading'
 import { Timeline, Event } from 'react-timeline-scribble'
 import { Warning } from '@material-ui/icons'
+import { formatDate } from '../../utils/formater'
 const IMG_URL = '/courses/'
 const Courses = () => {
     const user = JSON.parse(localStorage.getItem('user') | '')
@@ -991,10 +992,8 @@ const Courses = () => {
                                             <Event
                                                 interval={
                                                     <span className="fw-bold fs-3">
-                                                        {moment(
+                                                        {formatDate(
                                                             item.modifyDate
-                                                        ).format(
-                                                            'DD/MM/yyyy, h:mm A'
                                                         )}
                                                     </span>
                                                 }

@@ -10,25 +10,26 @@ import Resources from 'views/admin/Resources.js'
 import ResourceDetail from 'views/admin/ResourceDetail'
 import Questions from 'views/admin/Questions'
 import QuestionDetail from 'views/admin/QuestionDetail'
-import Home from 'views/client/visitor/Home'
-import CourseClient from 'views/client/visitor/CourseClient'
-import Cart from 'views/client/visitor/Cart'
-import Checkout from 'views/client/visitor/Checkout'
+import Home from '../../../f4education/frontend/src/views/client/visitor/Home'
+import CourseClient from '../../../f4education/frontend/src/views/client/visitor/CourseClient'
+import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
+import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
 import Login from 'views/examples/Login'
-import CourseDetailClient from 'views/client/visitor/CourseDetailClient'
-import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient'
-// import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient'/
+import CourseDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseDetailClient'
+import CourseRegisterClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterClient'
+// import CourseRegisterDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from 'views/teacher/information'
 import StudentInformation from 'views/client/visitor/StudentInformation'
+import QuizzClient from 'views/client/visitor/QuizzClient';
 
 import Accounts from 'views/admin/Accounts'
 import Schedules from 'views/admin/Schedules'
 
-import Icons from "views/examples/Icons";
-import ClassInformation from "views/teacher/ClassInformation";
-import ClassInformationDetail from "views/teacher/ClassInformationDetail";
-import CourseProgress from "views/client/student/CourseProgress";
+import Icons from 'views/examples/Icons'
+import ClassInformation from 'views/teacher/ClassInformation'
+import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
+import CourseProgress from 'views/client/student/CourseProgress'
 
 export var routes = [
     {
@@ -123,111 +124,118 @@ export var routes = [
         layout: '/admin'
     },
 
-  {
-    path: "/question-detail/:courseName",
-    component: <QuestionDetail />,
-    layout: "/admin",
-  },
-  {
-    path: "/classsroom",
-    name: "Phòng học",
-    icon: "fa-solid fa-grip-vertical text-primary",
-    component: <ClasssRoom />,
-    layout: "/admin",
-  },
-  {
-    path: "/resources",
-    name: "Tài nguyên",
-    icon: "fa-solid fa-folder-open text-success",
-    component: <Resources />,
-    layout: "/admin",
-  },
-  {
-    name: "login",
-    path: "/login",
-    component: <Login />,
-    layout: "/auth",
-  },
-  {
-    path: "/questions",
-    name: "Câu hỏi",
-    icon: "ni ni-ui-04 text-primary",
-    component: <Questions />,
-    layout: "/admin",
-  },
-  {
-    path: "/question-detail/:questionId",
-    component: <QuestionDetail />,
-    layout: "/admin",
-  },
-  {
-    path: "/resourceDetail/:courseName/:folderId",
-    component: <ResourceDetail />,
-    layout: "/admin",
-  },
-];
+    {
+        path: '/question-detail/:courseName',
+        component: <QuestionDetail />,
+        layout: '/admin'
+    },
+    {
+        path: '/classsroom',
+        name: 'Phòng học',
+        icon: 'fa-solid fa-grip-vertical text-primary',
+        component: <ClasssRoom />,
+        layout: '/admin'
+    },
+    {
+        path: '/resources',
+        name: 'Tài nguyên',
+        icon: 'fa-solid fa-folder-open text-success',
+        component: <Resources />,
+        layout: '/admin'
+    },
+    {
+        name: 'login',
+        path: '/login',
+        component: <Login />,
+        layout: '/auth'
+    },
+    {
+        path: '/questions',
+        name: 'Câu hỏi',
+        icon: 'ni ni-ui-04 text-primary',
+        component: <Questions />,
+        layout: '/admin'
+    },
+    {
+        path: '/question-detail/:questionId',
+        component: <QuestionDetail />,
+        layout: '/admin'
+    },
+    {
+        path: '/resourceDetail/:courseName/:folderId',
+        component: <ResourceDetail />,
+        layout: '/admin'
+    }
+]
 
 export var routesClient = [
-  {
-    path: "/",
-    name: "Trang chủ",
-    icon: "ni ni-tv-2 text-primary",
-    component: <Home />,
-    layout: "/client",
-  },
-  {
-    path: "/course",
-    name: "Khóa học",
-    icon: "ni ni-planet text-blue",
-    component: <CourseClient />,
-    layout: "/client",
-  },
-  {
-    path: "/cart",
-    name: "Giỏ hàng",
-    icon: "ni ni-planet text-blue",
-    component: <Cart />,
-    layout: "/client",
-  },
-  {
-    path: "/payment/checkout",
-    component: <Checkout />,
-    layout: "/client",
-  },
-  {
-    path: "/course/:courseId",
-    name: "Khóa học chi tiết",
-    icon: "ni ni-planet text-blue",
-    component: <CourseDetailClient />,
-    layout: "/client",
-  },
-  {
-    path: "/course-register",
-    name: "khóa học đăng ký",
-    icon: "ni ni-planet text-blue",
-    component: <CourseRegisterClient />,
-    layout: "/client",
-  },
-  // {
-  //   path: "/course-register-detail/:courseId",
-  //   name: "khóa học đăng ký chi tiết",
-  //   icon: "ni ni-planet text-blue",
-  //   component: <CourseRegisterDetailClient />,
-  //   layout: "/client",
-  // },
-  {
-    path: '/student-information',
-    name: 'Thông tin học viên',
-    icon: 'ni ni-planet text-blue',
-    component: <StudentInformation />,
-    layout: '/client'
-  },
-  {
-    path: "/course-progress",
-    component: <CourseProgress />,
-    layout: "/client",
-  },
-];
+    {
+        path: '/',
+        name: 'Trang chủ',
+        icon: 'ni ni-tv-2 text-primary',
+        component: <Home />,
+        layout: '/client'
+    },
+    {
+        path: '/course',
+        name: 'Khóa học',
+        icon: 'ni ni-planet text-blue',
+        component: <CourseClient />,
+        layout: '/client'
+    },
+    {
+        path: '/cart',
+        name: 'Giỏ hàng',
+        icon: 'ni ni-planet text-blue',
+        component: <Cart />,
+        layout: '/client'
+    },
+    {
+        path: '/payment/checkout',
+        component: <Checkout />,
+        layout: '/client'
+    },
+    {
+        path: '/course/:courseId',
+        name: 'Khóa học chi tiết',
+        icon: 'ni ni-planet text-blue',
+        component: <CourseDetailClient />,
+        layout: '/client'
+    },
+    {
+        path: '/course-register',
+        name: 'khóa học đăng ký',
+        icon: 'ni ni-planet text-blue',
+        component: <CourseRegisterClient />,
+        layout: '/client'
+    },
+    // {
+    //   path: "/course-register-detail/:courseId",
+    //   name: "khóa học đăng ký chi tiết",
+    //   icon: "ni ni-planet text-blue",
+    //   component: <CourseRegisterDetailClient />,
+    //   layout: "/client",
+    // },
+    {
+        path: '/student-information',
+        name: 'Thông tin học viên',
+        icon: 'ni ni-planet text-blue',
+        component: <StudentInformation />,
+        layout: '/client'
+    },
+    {
+        path: '/quizz',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <QuizzClient />,
+        layout: '/client'
+    },
+    {
+        path: '/course-progress',
+        component: <CourseProgress />,
+        layout: '/client'
+    }
+]
 
 export const routesTeacher = [
     {

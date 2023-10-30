@@ -71,6 +71,10 @@ public class Classes implements Serializable {
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<RegisterCourse> registerCourses;
+    
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<QuizResult> quizResults;
 
     @ManyToOne
     @JoinColumn(name = "admin_id")

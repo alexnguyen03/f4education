@@ -232,7 +232,6 @@ function Schedules() {
         ],
         []
     )
-    console.log('re-render')
     //!  HANDLE FUNCTIONS
     const handleSetupSchedule = () => {
         toggleModal('choiceSessionModal')
@@ -290,7 +289,8 @@ function Schedules() {
 
         const numberOfLessons =
             classSelected.registerCourses[0].courseDuration / 2 -
-            oldSchedule.length
+            oldSchedule.length +
+            1
 
         const lsScheduleUpdate = generateTimetable(startDate, numberOfLessons)
 

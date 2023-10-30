@@ -4,8 +4,10 @@ import { Button, Label, ButtonGroup } from 'reactstrap'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import ContentEditable from 'react-contenteditable'
+import { Link } from 'react-router-dom'
 
-import studentApi from 'api/studentApi'
+import studentApi from '../../../api/studentApi'
+import Schedule from '../student/Schedule'
 const IMG_URL = '/students/'
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -57,7 +59,6 @@ const StudentInformation = () => {
         try {
             setLoading(true)
             const resp = await studentApi.getStudent(user.username)
-            console.log(resp.data)
 
             if (resp.status === 200) {
                 setStudent(resp.data)
@@ -234,15 +235,18 @@ const StudentInformation = () => {
                 defaultValue="gallery"
                 orientation="vertical"
             >
-                <div className="container">
+                <div className="container-fluid">
                     <div className="row">
                         <div className="col-lg-12 p-0">
                             <h1 className="my-3 text-dark">
                                 Cài đặt tài khoản
                             </h1>
                         </div>
-                        <div className="col-lg-3 border">
-                            <Tabs.List>
+                        <div
+                            className="col-lg-3 "
+                            style={{ minHeight: '700px' }}
+                        >
+                            <Tabs.List className="shadow px-3 pb-3 rounded">
                                 <Tabs.Tab
                                     value="gallery"
                                     className="d-flex justify-content-center text-lg mt-4 font-weight-bold"
@@ -250,16 +254,16 @@ const StudentInformation = () => {
                                     Thông tin của tôi
                                 </Tabs.Tab>
                                 <Tabs.Tab
-                                    value="messages"
+                                    value="schedule"
+                                    className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
+                                >
+                                    Lớp học của tôi
+                                </Tabs.Tab>
+                                <Tabs.Tab
+                                    value="attendence"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
                                     Thời khóa biểu
-                                </Tabs.Tab>
-                                <Tabs.Tab
-                                    value="settings"
-                                    className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
-                                >
-                                    Điểm danh
                                 </Tabs.Tab>
                             </Tabs.List>
                         </div>
@@ -270,7 +274,7 @@ const StudentInformation = () => {
                                     zIndex={1000}
                                     color="rgba(46, 46, 46, 1)"
                                     size={50}
-                                    overlayProps={{ radius: 'sm', blur: 2 }}
+                                    // overlayProps={{ radius: 'sm', blur: 2 }}
                                 />
                                 <div className="container px-4">
                                     <div className="row">
@@ -282,18 +286,20 @@ const StudentInformation = () => {
                                         <div className="col-lg-12 shadow">
                                             <div className="container">
                                                 <div className="row">
-                                                    <div className="col-lg-3">
+                                                    <div className="col-lg-3 my-2">
                                                         {imgData && (
                                                             <img
-                                                                className="rounded-circle p-3 w-100"
-                                                                height={180}
+                                                                className="rounded-circle  shadow p-2 "
+                                                                height={'247px'}
+                                                                width={'247px'}
                                                                 src={imgData}
                                                             />
                                                         )}
                                                         {!imgData && (
                                                             <img
-                                                                className="rounded-circle p-3 w-100"
-                                                                height={180}
+                                                                className="rounded-circle  shadow p-2"
+                                                                height={'247px'}
+                                                                width={'247px'}
                                                                 src={
                                                                     process.env
                                                                         .REACT_APP_IMAGE_URL +
@@ -351,7 +357,7 @@ const StudentInformation = () => {
                                                         </p>
                                                     </div>
                                                     <div className="col-lg-6">
-                                                        <p class="text-dark font-weight-bold mb-2">
+                                                        <p className="text-dark font-weight-bold mb-2">
                                                             Họ và tên
                                                         </p>
                                                         <ContentEditable
@@ -371,7 +377,7 @@ const StudentInformation = () => {
                                                                 }
                                                             </div>
                                                         )}
-                                                        <p class="text-dark font-weight-bold mb-2 mt-3">
+                                                        <p className="text-dark font-weight-bold mb-2 mt-3">
                                                             Địa chỉ
                                                         </p>
                                                         <ContentEditable
@@ -393,7 +399,7 @@ const StudentInformation = () => {
                                                         )}
                                                     </div>
                                                     <div className="col-lg-6">
-                                                        <p class="text-dark font-weight-bold mb-2">
+                                                        <p className="text-dark font-weight-bold mb-2">
                                                             Số điện thoại
                                                         </p>
                                                         <ContentEditable
@@ -413,7 +419,7 @@ const StudentInformation = () => {
                                                                 }
                                                             </div>
                                                         )}
-                                                        <p class="text-dark font-weight-bold mb-2 mt-3">
+                                                        <p className="text-dark font-weight-bold mb-2 mt-3">
                                                             Giới tính
                                                         </p>
                                                         {isEditing ? (
@@ -488,10 +494,18 @@ const StudentInformation = () => {
                                 </div>
                             </Tabs.Panel>
                             <Tabs.Panel value="messages">
-                                Messages tab content
+                                <Link to='/quizz'>
+                                    <Button
+                                        color="dark"
+                                        role="button"
+                                        className="my-3"
+                                    >
+                                        Lớp học
+                                    </Button>
+                                </Link>
                             </Tabs.Panel>
-                            <Tabs.Panel value="settings">
-                                Settings tab content
+                            <Tabs.Panel value="schedule">
+                                <Schedule />
                             </Tabs.Panel>
                         </div>
                     </div>
