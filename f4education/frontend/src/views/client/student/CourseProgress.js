@@ -4,6 +4,7 @@ import {
     Button,
     Card,
     Center,
+    Container,
     Grid,
     Group,
     Image,
@@ -166,7 +167,7 @@ const CourseProgress = () => {
     // }, [route, selectedCourse])
 
     return (
-        <>
+        <Container size="xl" px="xs">
             {/* Title */}
             <Box>
                 <Title order={1} fw={700} mt={rem('2rem')} color="dark">
@@ -875,7 +876,7 @@ const CourseProgress = () => {
                     </Stack>
                 </Box>
             </Box>
-        </>
+        </Container>
     )
 }
 

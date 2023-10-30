@@ -57,7 +57,7 @@ const Client = (props) => {
                 {/* </Container> */}
 
                 {/* Page content */}
-                <Container fluid size="xl">
+                <Container fluid size="xl" className="pb-5 pt-8">
                     <Routes>
                         {getRoutes(routesClient)}
                         <Route path="*" element={<Navigate to="/" replace />} />

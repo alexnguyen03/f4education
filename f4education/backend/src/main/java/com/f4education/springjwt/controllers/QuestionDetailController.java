@@ -40,6 +40,48 @@ public class QuestionDetailController {
 	@Autowired
 	QuestionDetailService questionDetailService;
 
+	@Autowired
+	AnswerService answerService;
+
+	@GetMapping
+//	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> findAll() {
+		List<QuestionDetailDTO> questionDetail = questionDetailService.findAll();
+		return ResponseEntity.ok(questionDetail);
+	}
+
+	@GetMapping("/{questionId}")
+//	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> findAllByQuestionID(@PathVariable Integer questionId) {
+		List<QuestionDetailDTO> questionDetail = questionDetailService.getAllQuestionDetailByQuestionId(questionId);
+		return ResponseEntity.ok(questionDetail);
+	}
+
+	@PostMapping
+	public ResponseEntity<?> createQuestion(@RequestBody QuestionDetailDTO questionDetailDTO) {
+		QuestionDetailDTO questionDetail = questionDetailService.createQuestionDetail(questionDetailDTO);
+		return ResponseEntity.ok(questionDetail);
+	}
+
+	@PutMapping("/{questionDetailId}")
+	public ResponseEntity<?> updateQuestion(@PathVariable("questionDetailId") Integer questionDetailId,
+			@RequestBody QuestionDetailDTO questionDetailDTO) {
+		QuestionDetailDTO questionDetail = questionDetailService.updateQuestionDetail(questionDetailId,
+				questionDetailDTO);
+		return ResponseEntity.ok(questionDetail);
+	}
+
+	@DeleteMapping("{questionDetailId}")
+	public ResponseEntity<?> deleteQuestion(@PathVariable Integer questionDetailId) {
+		QuestionDetailDTO questionDetail = questionDetailService.deleteQuestion(questionDetailId);
+
+		if (questionDetail == null) {
+			return ResponseEntity.badRequest().body("Question does not exist");
+		}
+
+		return ResponseEntity.noContent().build();
+	}
+
 	@PostMapping(value = "/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") Optional<MultipartFile> file) {
 		try {

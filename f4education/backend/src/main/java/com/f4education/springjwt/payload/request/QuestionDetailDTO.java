@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import com.f4education.springjwt.models.Answer;
-import com.f4education.springjwt.models.Course;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,19 +16,10 @@ public class QuestionDetailDTO {
     private Integer questionDetailId;
 
     private String questionTitle;
-    
+
     private Date createDate;
-    
-    private String levels;
-    
-    private Integer courseId;
-    
-    private String courseName;
-    
-    private Integer classId;
-    
-    private String className;
 
-    private List<Answer> answer;
+    private Integer questionId;
 
+    private List<Answer> answers;
 }

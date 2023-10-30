@@ -29,12 +29,14 @@ import {
     Modal,
     Row
 } from 'reactstrap'
+import Notify from '../../utils/Notify'
 
 // API
 import questionApi from '../../api/questionApi'
 import answersApi from '../../api/answersApi'
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import { IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
+import { toast } from 'react-toastify'
 
 // ************* Get LocalStorage
 // const userDetail = JSON.parse(localStorage.getItem('user'))
@@ -277,22 +279,16 @@ const QuestionDetail = () => {
     }
 
     const handleDeleteQuestion = async (questionDetail) => {
-        // Delete answer
-        questionDetail.answers.forEach(async (as) => {
-            try {
+        // Delete Question
+        try {
+            questionDetail.answers.forEach(async (as) => {
                 const resp = await answersApi.deleteAnswer(as.answerId)
 
                 if (resp.status === 204) {
                     console.log('Xóa answer rồi')
                 }
-                console.log('lỗi answer gòi')
-            } catch (error) {
-                console.log(error)
-            }
-        })
+            })
 
-        // Delete Question
-        try {
             const resp = await questionApi.deleteQuestionDetail(
                 questionDetail.questionDetailId
             )
@@ -301,7 +297,6 @@ const QuestionDetail = () => {
                 console.log('Xóa question rồi')
                 fetchQuestionDetail()
             }
-            console.log('lỗi question gòi')
         } catch (error) {
             console.log(error)
         }
@@ -620,11 +615,11 @@ const QuestionDetail = () => {
                         </div>
                         <InputGroup
                             className="ml-2"
-                            style={{
-                                border: `${
-                                    group.error !== '' ? '1px solid red' : ''
-                                }`
-                            }}
+                            // style={{
+                            //     border: `${
+                            //         group.error !== '' ? '1px solid red' : ''
+                            //     }`
+                            // }}
                         >
                             {/* <InputGroupAddon addonType="prepend">
                                 <InputGroupText>
@@ -831,7 +826,7 @@ const QuestionDetail = () => {
                             questionDetail.questionDetailId ===
                                 editQuestionId ? (
                                 <Tooltip
-                                    label="Xóa câu hỏi ?"
+                                    label="Xóa câu hỏi"
                                     color="red"
                                     withArrow
                                     arrowPosition="center"
@@ -874,17 +869,11 @@ const QuestionDetail = () => {
     const renderGroupAnswerIntoQuestion = (questionDetail) => {
         return answers.map((subjectArray, index) => (
             <>
-                {subjectArray.map((answer,index) => (
+                {subjectArray.map((answer, index) => (
                     <>
                         {answer.questionDetailId ===
                         questionDetail.questionDetailId ? (
-                            <Col
-                                lg={12}
-                                xl={12}
-                                md={12}
-                                sm={12}
-                                key={index}
-                            >
+                            <Col lg={12} xl={12} md={12} sm={12} key={index}>
                                 <div className="d-flex">
                                     {/* Checkbox button */}
                                     {editQuestion &&
