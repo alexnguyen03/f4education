@@ -45,9 +45,9 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
     //  ***********Route
-    const route = useRoutes()
-    const searchParam = useSearchParams()
-    const classIdParam = searchParam.get('classId')
+    // const route = useRoutes()
+    // const searchParam = useSearchParams()
+    // const classIdParam = searchParam.get('classId')
 
     // Schedule insert data: Khác ngày, content,notes
     // *********** Main variable
@@ -159,11 +159,11 @@ const CourseProgress = () => {
         setTotalCountCourseProgress(totalCountCourseProgress)
     }, [totalCountCourseProgress])
 
-    useEffect(() => {
-        route.push(`?classId=${selectedCourse.classId}`, {
-            scroll: false
-        })
-    }, [route, selectedCourse])
+    // useEffect(() => {
+    //     route.push(`?classId=${selectedCourse.classId}`, {
+    //         scroll: false
+    //     })
+    // }, [route, selectedCourse])
 
     return (
         <>

@@ -1,6 +1,7 @@
 import {
     Blockquote,
     Checkbox,
+    Container,
     Group,
     Loader,
     rem,
