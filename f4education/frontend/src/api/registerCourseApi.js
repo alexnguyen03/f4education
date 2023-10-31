@@ -22,10 +22,10 @@ const registerCourseApi = {
         const url = `/register-course/student/${studentId}`
         return axiosClient.get(url)
     },
-    getCourseProgressByClassId: (classId,body) => {
+    getCourseProgressByClassId: (classId) => {
         const url = `/register-course/student/progress/${classId}`
-        return axiosClient.post(url,body)
-    },
+        return axiosClient.get(url)
+    }
 }
 
 export default registerCourseApi

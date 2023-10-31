@@ -5,8 +5,6 @@ import logo from '../../assets/img/brand/f4.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
 // reactstrap components
 
-// API
-import cartApi from '../../api/cartApi'
 import {
     Autocomplete,
     Avatar,
@@ -32,16 +30,27 @@ import {
     IconSearch,
     IconUserBolt
 } from '@tabler/icons-react'
-import { useDisclosure, useElementSize } from '@mantine/hooks'
+import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks'
 
 // css module
 import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 
+// API
+import cartApi from '../../api/cartApi'
+import courseApi from '../../api/courseApi'
+
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
+const category_1 = ['Java', 'C#', 'PHP', 'JavaScript']
+const category_2 = ['NextJS', 'ReactJS', 'AngularJS', 'NodeJS']
+const category_3 = ['SQL Server', 'MySQL', 'Xampp']
+
 const ClientNavbar = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     const ref = useElementSize()
     const navigate = useNavigate()
+    const smallScreen = useMediaQuery('(max-width: 500px)')
 
     const [login, setLogin] = useState(false)
     const [cartEmpty, setCartEmpty] = useState(true)
@@ -52,11 +61,30 @@ const ClientNavbar = () => {
     // *************** CART VARIABLE - AREA START
     const [carts, setCarts] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
+    const [listCourse, setListCourse] = useState([])
 
     const fetchCart = async () => {
+        if (user !== null) {
+            try {
+                const resp = await cartApi.getAllCart()
+                if (resp.status === 200 && resp.data.length > 0) {
+                    setCarts(resp.data)
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            setCarts([])
+        }
+    }
+
+    const fetchCourse = async () => {
         try {
-            const resp = await cartApi.getAllCart()
-            setCarts(resp.data)
+            const resp = await courseApi.getAll()
+
+            if (resp.status === 200 && resp.data.length > 0) {
+                setListCourse(resp.data)
+            }
         } catch (error) {
             console.log(error)
         }
@@ -73,7 +101,12 @@ const ClientNavbar = () => {
 
     useEffect(() => {
         fetchCart()
+        fetchCourse()
     }, [])
+
+    useEffect(() => {
+        fetchCart()
+    }, [user])
 
     // *************** CART VARIABLE - AREA END
     const handleItemClick = (index) => {
@@ -92,6 +125,10 @@ const ClientNavbar = () => {
         navigate('auth/login')
     }
 
+    const handleLogout = () => {
+        localStorage.removeItem('user')
+    }
+
     const handleCartEmpty = (prev) => {
         setCartEmpty(!prev)
     }
@@ -99,15 +136,16 @@ const ClientNavbar = () => {
     window.addEventListener('scroll', function () {
         const navbar = this.document.querySelector('#navbar-animate')
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop
+
         if (scrollTop && navbar) {
-            // window.addEventListener("scroll", function () {
-            //   if (window.pageYOffset === 0) {
-            //     navbar.style.boxShadow = "none";
-            //     navbar.style.top = 0;
-            //   } else {
-            //     navbar.style.boxShadow = "#63636333 2px 2px 8px 0px";
-            //   }
-            // });
+            window.addEventListener('scroll', function () {
+                if (window.pageYOffset === 0) {
+                    navbar.style.boxShadow = 'none'
+                    navbar.style.top = 0
+                } else {
+                    navbar.style.boxShadow = '#63636333 2px 2px 8px 0px'
+                }
+            })
 
             // if (scrollTop === 0) {
             //   navbar.style.top = 0;
@@ -122,8 +160,6 @@ const ClientNavbar = () => {
     })
 
     return (
-        // <Container size="30rem" px={0}>
-        // <Container size="xl" px="xs">
         <nav
             className={`navbar navbar-expand-lg ${styles['navbar-animate']}`}
             id="navbar-animate"
@@ -154,10 +190,10 @@ const ClientNavbar = () => {
                     id="navbarSupportedContent"
                 >
                     <ul
-                        className="navbar-nav mr-sm-auto ml-sm-auto text-center d-md-flex d-sm-flex
-                        justify-content-md-center  justify-content-sm-center"
+                        className="navbar-nav text-center d-md-flex d-sm-flex 
+                        justify-content-start "
                     >
-                        {/* <li className="nav-item">
+                        <li className="nav-item">
                             <Link
                                 to={'/'}
                                 className={`
@@ -172,7 +208,7 @@ const ClientNavbar = () => {
                             >
                                 Trang chủ
                             </Link>
-                        </li> */}
+                        </li>
                         <li className="nav-item">
                             <Link
                                 to={'/course'}
@@ -190,7 +226,7 @@ const ClientNavbar = () => {
                             </Link>
                         </li>
 
-                        <li className="nav-item d-flex justify-content-center">
+                        <li className="nav-item">
                             <HoverCard
                                 width={'75vw'}
                                 position="bottom"
@@ -201,22 +237,22 @@ const ClientNavbar = () => {
                                 <HoverCard.Target>
                                     <Link
                                         to="#"
-                                        className="nav-link custom-nav-link d-flex align-items-center"
+                                        className={`
+                ${
+                    activeItems[1]
+                        ? 'nav-link custom-nav-link active'
+                        : 'nav-link custom-nav-link'
+                }
+                ${styles['custom-nav-link']}
+                `}
+                                        onClick={() => handleItemClick(1)}
                                     >
-                                        <Text
-                                            style={{
-                                                fontSize: '18px',
-                                                color: '#212121'
-                                            }}
-                                        >
-                                            Danh mục
-                                        </Text>
+                                        Danh mục
                                         <IconChevronDown
                                             style={{
                                                 width: rem(16),
                                                 height: rem(16),
-                                                marginLeft: '5px',
-                                                marginTop: '5px'
+                                                marginLeft: '5px'
                                             }}
                                             // color={theme.colors.black[6]}
                                         />
@@ -224,10 +260,13 @@ const ClientNavbar = () => {
                                 </HoverCard.Target>
 
                                 <HoverCard.Dropdown
-                                    style={{ overflow: 'hidden' }}
+                                    style={{
+                                        overflow: 'hidden',
+                                        maxWidth: '1000px'
+                                    }}
                                     mt="xl"
                                 >
-                                    <Group position="apart" p={rem('1.5rem')}>
+                                    <Group position="apart" px={rem('1.5rem')}>
                                         <Text fw={500}>Khóa học</Text>
                                         <Link to="/course" fz="xs">
                                             Tất cả khóa học
@@ -237,27 +276,35 @@ const ClientNavbar = () => {
                                     <Divider my="sm" />
 
                                     <Grid gutter="xl" p={rem('1.5rem')}>
-                                        <Grid.Col xl={4} lg={4} md={12} sm={12}>
-                                            <Title
-                                                order={3}
-                                                fw={700}
-                                                color="dark"
-                                            >
-                                                Các chủ đề khóa học phổ biến
-                                            </Title>
-                                            <Text color="dimmed">
-                                                Khám phá các khóa học miễn phí
-                                                hoặc trả phí về các chủ đề mà
-                                                bạn quan tâm.
-                                            </Text>
+                                        <Grid.Col
+                                            xl={4}
+                                            lg={4}
+                                            md={12}
+                                            sm={12}
+                                            style={{ height: '100%' }}
+                                        >
+                                            <div className="mb-auto">
+                                                <Title
+                                                    order={3}
+                                                    fw={700}
+                                                    color="dark"
+                                                >
+                                                    Các chủ đề khóa học phổ biến
+                                                </Title>
+                                                <Text color="dimmed">
+                                                    Khám phá các khóa học miễn
+                                                    phí hoặc trả phí về các chủ
+                                                    đề mà bạn quan tâm.
+                                                </Text>
+                                            </div>
                                             <Link
                                                 to="/course"
                                                 className="w-100"
                                             >
                                                 <Button
                                                     color="violet"
-                                                    mt="auto"
                                                     w="100%"
+                                                    mt="xl"
                                                 >
                                                     Khám phá khóa học
                                                 </Button>
@@ -266,66 +313,84 @@ const ClientNavbar = () => {
                                         {/* <Divider orientation="vertical" size="sm" /> */}
                                         <Grid.Col xl={8} lg={8} md={12} sm={12}>
                                             <SimpleGrid
-                                                cols={3}
+                                                cols={smallScreen ? 1 : 3}
                                                 spacing="xl"
                                                 verticalSpacing="sm"
                                             >
                                                 <Flex
                                                     justify={'center'}
-                                                    align={'start'}
+                                                    align={
+                                                        smallScreen
+                                                            ? 'center'
+                                                            : 'flex-start'
+                                                    }
                                                     direction={'column'}
                                                     gap={'xl'}
+                                                    ml="md"
                                                 >
-                                                    <Text color="dark" fw={700}>
-                                                        Java
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        C#
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        PHP
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        JavaScript
-                                                    </Text>
+                                                    {category_1.map(
+                                                        (c, index) => (
+                                                            <Link
+                                                                to={`/course`}
+                                                                key={index}
+                                                            >
+                                                                <Text
+                                                                    color="dark"
+                                                                    fw={700}
+                                                                >
+                                                                    {c}
+                                                                </Text>
+                                                            </Link>
+                                                        )
+                                                    )}
                                                 </Flex>
                                                 <Flex
                                                     justify={'center'}
-                                                    align={'start'}
+                                                    align={'center'}
                                                     direction={'column'}
                                                     gap={'xl'}
                                                 >
-                                                    <Text color="dark" fw={700}>
-                                                        NextJS
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        ReactJS
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        Angular
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        NodeJS
-                                                    </Text>
+                                                    {category_2.map(
+                                                        (c, index) => (
+                                                            <Link
+                                                                to={`/course`}
+                                                                key={index}
+                                                            >
+                                                                <Text
+                                                                    color="dark"
+                                                                    fw={700}
+                                                                >
+                                                                    {c}
+                                                                </Text>
+                                                            </Link>
+                                                        )
+                                                    )}
                                                 </Flex>
                                                 <Flex
                                                     justify={'center'}
-                                                    align={'start'}
+                                                    align={
+                                                        smallScreen
+                                                            ? 'center'
+                                                            : 'flex-end'
+                                                    }
                                                     direction={'column'}
                                                     gap={'xl'}
                                                 >
-                                                    <Text color="dark" fw={700}>
-                                                        SQL Server
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        My SQL
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        Porto...
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        Xampp
-                                                    </Text>
+                                                    {category_3.map(
+                                                        (c, index) => (
+                                                            <Link
+                                                                to={`/course`}
+                                                                key={index}
+                                                            >
+                                                                <Text
+                                                                    color="dark"
+                                                                    fw={700}
+                                                                >
+                                                                    {c}
+                                                                </Text>
+                                                            </Link>
+                                                        )
+                                                    )}
                                                 </Flex>
                                             </SimpleGrid>
                                         </Grid.Col>
@@ -333,11 +398,32 @@ const ClientNavbar = () => {
                                 </HoverCard.Dropdown>
                             </HoverCard>
                         </li>
+
+                        {user === null && (
+                            <>
+                                <li className="nav-item">
+                                    <Link
+                                        to={'/cart'}
+                                        className={`
+                ${
+                    activeItems[1]
+                        ? 'nav-link custom-nav-link active'
+                        : 'nav-link custom-nav-link'
+                }
+                ${styles['custom-nav-link']}
+                `}
+                                        onClick={() => handleItemClick(1)}
+                                    >
+                                        Giỏ hàng
+                                    </Link>
+                                </li>
+                            </>
+                        )}
                     </ul>
 
                     <div
-                        className="d-flex justify-content-between
-              justify-content-md-center justify-content-sm-center text-center text-dark"
+                        className="d-flex justify-content-between justify-content-md-center 
+                        justify-content-sm-center text-center text-dark ml-auto"
                     >
                         <Autocomplete
                             placeholder="Tìm khóa học.."
@@ -345,14 +431,9 @@ const ClientNavbar = () => {
                             ref={ref}
                             style={{ width: rem(300) }}
                             icon={<IconSearch />}
-                            data={[
-                                'NextJS',
-                                'ReactJS',
-                                'PHP, Laravel',
-                                'Spring boot'
-                            ]}
+                            data={listCourse.map((c) => c.courseName)}
                         />
-                        {login ? (
+                        {user !== null ? (
                             <>
                                 <Link
                                     to="/cart"
@@ -544,35 +625,27 @@ const ClientNavbar = () => {
                                                     size={14}
                                                 />
                                             }
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
                                         >
                                             Hệ thống học tập
                                         </Menu.Item>
-                                        <Menu.Item
+                                        <Link to="/course-progress">
+                                            <Menu.Item
                                                 icon={
-                                                    <IconProgressAlert size={14} />
+                                                    <IconProgressAlert
+                                                        size={14}
+                                                    />
                                                 }
-                                                component="a"
-                                                href="/course-progress"
-                                                target="_blank"
                                             >
-                                                tiến độ
+                                                Tiến độ học tập
                                             </Menu.Item>
+                                        </Link>
                                         <Menu.Item
                                             icon={<IconUserBolt size={14} />}
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
                                         >
                                             Tài khoản
                                         </Menu.Item>
                                         <Menu.Item
                                             icon={<IconSchoolBell size={14} />}
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
                                         >
                                             Lịch học
                                         </Menu.Item>
@@ -583,6 +656,7 @@ const ClientNavbar = () => {
                                         <Menu.Item
                                             color="red"
                                             icon={<IconLogout2 size={14} />}
+                                            onClick={() => handleLogout()}
                                         >
                                             Đăng xuất
                                         </Menu.Item>
@@ -597,8 +671,6 @@ const ClientNavbar = () => {
                                     className="mt-1 ml-2 font-weight-700"
                                     onClick={() => handleLogin(login)}
                                     style={{ borderRadius: '2px' }}
-                                    // component="a"
-                                    // href="/auth/login"
                                 >
                                     Đăng nhập
                                 </Button>
