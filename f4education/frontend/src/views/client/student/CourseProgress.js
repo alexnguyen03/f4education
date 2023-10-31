@@ -4,6 +4,7 @@ import {
     Button,
     Card,
     Center,
+    Container,
     Grid,
     Group,
     Image,
@@ -45,9 +46,9 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
     //  ***********Route
-    const route = useRoutes()
-    const searchParam = useSearchParams()
-    const classIdParam = searchParam.get('classId')
+    // const route = useRoutes()
+    // const searchParam = useSearchParams()
+    // const classIdParam = searchParam.get('classId')
 
     // Schedule insert data: Khác ngày, content,notes
     // *********** Main variable
@@ -61,13 +62,6 @@ const CourseProgress = () => {
     const [loading, setLoading] = useState(false)
 
     // *********** FETCH AREA
-
-    /**
-     * *Fetch CourseProgress AND
-     * *Run loop to insert totalCountClass In Schedule to list CourseProgress
-     * @param classId the param for get all progress by classId
-     * @param progressCourseRequest the param for get all progress by startDate and endDate
-     */
     const fetchCourseProgress = async () => {
         try {
             setLoading(true)
@@ -111,12 +105,6 @@ const CourseProgress = () => {
         }
     }
 
-    /**
-     * *CallBack function that return value
-     * TODO: function return a totalCountCourseProgress by classId
-     * @param classId the param for get all progress by classId
-     * @param progressCourseRequest the param for get all progress by startDate and endDate
-     */
     const fetchCourseProgressByClassId = async (
         classId,
         progressCourseRequest
@@ -172,14 +160,14 @@ const CourseProgress = () => {
         setTotalCountCourseProgress(totalCountCourseProgress)
     }, [totalCountCourseProgress])
 
-    useEffect(() => {
-        route.push(`?classId=${selectedCourse.classId}`, {
-            scroll: false
-        })
-    }, [route, selectedCourse])
+    // useEffect(() => {
+    //     route.push(`?classId=${selectedCourse.classId}`, {
+    //         scroll: false
+    //     })
+    // }, [route, selectedCourse])
 
     return (
-        <>
+        <Container size="xl" px="xs">
             {/* Title */}
             <Box>
                 <Title order={1} fw={700} mt={rem('2rem')} color="dark">
@@ -888,7 +876,7 @@ const CourseProgress = () => {
                     </Stack>
                 </Box>
             </Box>
-        </>
+        </Container>
     )
 }
 

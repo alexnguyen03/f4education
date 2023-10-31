@@ -27,6 +27,7 @@ import {
     IconChevronDown,
     IconLayoutDashboard,
     IconLogout2,
+    IconProgressAlert,
     IconSchoolBell,
     IconSearch,
     IconUserBolt
@@ -549,6 +550,16 @@ const ClientNavbar = () => {
                                         >
                                             Hệ thống học tập
                                         </Menu.Item>
+                                        <Menu.Item
+                                                icon={
+                                                    <IconProgressAlert size={14} />
+                                                }
+                                                component="a"
+                                                href="/course-progress"
+                                                target="_blank"
+                                            >
+                                                tiến độ
+                                            </Menu.Item>
                                         <Menu.Item
                                             icon={<IconUserBolt size={14} />}
                                             component="a"
