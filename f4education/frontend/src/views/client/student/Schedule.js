@@ -1,23 +1,21 @@
 import {
     Alert,
     Badge,
-    Center,
-    Flex,
     Group,
     HoverCard,
     Loader,
     LoadingOverlay,
+    Progress,
     Select,
-    Stack,
     Text
 } from '@mantine/core'
+import { IconAlertCircle } from '@tabler/icons-react'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
 import classApi from '../../../api/classApi'
 import scheduleApi from '../../../api/scheduleApi'
 import { convertArrayToLabel } from '../../../utils/Convertor'
-import { IconAlertCircle } from '@tabler/icons-react'
 const listOptionView = [
     {
         value: '30',
@@ -32,8 +30,8 @@ const listOptionView = [
         label: '2 tháng trước'
     }
 ]
-const today = new Date('2024-01-04').toDateString().substring(4, 16)
 const Schedule = (props) => {
+    const today = new Date('2024-01-04').toDateString().substring(4, 16)
     const [classSelected, setClassSelected] = useState()
     const [classes, setClasses] = useState([])
     const [viewValue, setViewValue] = useState(null)
@@ -118,42 +116,42 @@ const Schedule = (props) => {
                 new Date(item.studyDate.substring(0, 10)) < new Date(today) // test
             )
         })
-        let newScheduleInTable = []
+
+        const presentSchedule = allSchedules.filter((item) => {
+            return (
+                new Date(item.studyDate.substring(0, 10)) >= new Date(today) // test
+            )
+        })
+        let newScheduleInThePast = [...schedulesInThePast]
 
         // val is number of date
         switch (val) {
             case '15':
-                if (schedulesInThePast.length >= 5) {
-                    console.log(
-                        '🚀 ~ file: Schedule.js:132 ~ handleOnChangeViewValue ~ schedulesInThePast:',
-                        schedulesInThePast
-                    )
-                    newScheduleInTable = [...schedulesInThePast.slice(-5)]
+                if (viewValue === '15') return
+                if (schedulesInThePast.length >= 15) {
+                    newScheduleInThePast = [...schedulesInThePast.slice(-15)]
                 }
                 break
             case '30':
+                if (viewValue === '30') return
                 if (schedulesInThePast.length >= 30) {
-                    newScheduleInTable = [...schedulesInThePast.slice(-30)]
+                    newScheduleInThePast = [...schedulesInThePast.slice(-30)]
                 }
                 break
             case '60':
+                if (viewValue === '60') return
                 if (schedulesInThePast.length >= 60) {
-                    newScheduleInTable = [...schedulesInThePast.slice(-60)]
+                    newScheduleInThePast = [...schedulesInThePast.slice(-60)]
                 }
                 break
 
             default:
-                newScheduleInTable = schedulesInThePast
+                newScheduleInThePast = schedulesInThePast
                 break
         }
+        setViewValue(val)
 
-        setListScheduleInTable([...newScheduleInTable, ...listScheduleInTable])
-
-        console.log(
-            '🚀 ~ file: Schedule.js:117 ~ handleOnChangeViewValue ~ schedulesInThePast:',
-            newScheduleInTable,
-            listScheduleInTable
-        )
+        setListScheduleInTable([...newScheduleInThePast, ...presentSchedule])
     }
     // ! API
     const getAllClassByStudentId = async () => {
@@ -179,6 +177,7 @@ const Schedule = (props) => {
         try {
             setClassSelected(classId)
             setLoadingSchedule(true)
+
             const resp = await scheduleApi.getScheduleByClassId(classId)
 
             if (resp.status === 200) {
@@ -201,10 +200,6 @@ const Schedule = (props) => {
                 )
                 var schedule = listSchedules
                     .map((item) => {
-                        console.log(
-                            '🚀 ~ file: Schedule.js:162 ~ .map ~ item.studyDate:',
-                            item.studyDate
-                        )
                         return {
                             scheduleId: item.scheduleId,
                             studyDate: item.studyDate.substring(0, 10),
@@ -254,8 +249,8 @@ const Schedule = (props) => {
                         )}
                     />
                     <Select
-                        label="Chọn lớp học"
-                        placeholder="Chọn 1 lớp học"
+                        label="Xem thêm "
+                        placeholder="Chọn thời gian "
                         value={viewValue}
                         onChange={(viewVal) => {
                             handleOnChangeViewValue(viewVal)
@@ -284,14 +279,6 @@ const Schedule = (props) => {
                     <div pos={'relative'}>
                         <LoadingOverlay visible={loadingSchedule} />
                         <MaterialReactTable
-                            muiTableBodyProps={{
-                                sx: {
-                                    //stripe the rows, make odd rows a darker color
-                                    '& tr:nth-of-type(odd)': {
-                                        backgroundColor: '#f5f5f5'
-                                    }
-                                }
-                            }}
                             enableToolbarInternalActions={false}
                             enableStickyHeader
                             enableStickyFooter
@@ -313,30 +300,41 @@ const Schedule = (props) => {
                                 showLastButton: true
                             }}
                             muiTableBodyRowProps={({ row }) => {
-                                console.log(
-                                    '🚀 ~ file: Schedule.js:320 ~ Schedule ~  row.original.studyDate.substring(5,16) :',
-
-                                    new Date(row.original.studyDate)
-                                        .toDateString()
-                                        .substring(4, 16),
-                                    today
-                                )
-
                                 if (
                                     new Date(row.original.studyDate)
                                         .toDateString()
                                         .substring(4, 16) === today
                                 ) {
-                                    console.log('==========')
                                     return {
-                                        sx: { backgroundColor: '#87c7ff' }
+                                        sx: {
+                                            backgroundColor: '#87c7ff',
+                                            cursor: 'pointer'
+                                        }
+                                    }
+                                }
+                                return {
+                                    sx: {
+                                        cursor: 'pointer',
+                                        '& tr:nth-of-type(odd)': {
+                                            backgroundColor: '#f5f5f5'
+                                        }
                                     }
                                 }
                             }}
                         />
                     </div>
                 )}
-                {listScheduleInTable.length === 0 && (
+                {listScheduleInTable.length === 0 && loadingSchedule && (
+                    <>
+                        <div className="w-100 text-center mt-6">
+                            <Loader color="rgba(46, 46, 46, 1)" size={50} />
+                            <h3 className="text-muted mt-3">
+                                Vui lòng chờ trong giây lát!
+                            </h3>
+                        </div>
+                    </>
+                )}
+                {listScheduleInTable.length === 0 && !loadingSchedule && (
                     <div>
                         <Alert
                             icon={<IconAlertCircle size="1rem" />}

@@ -21,7 +21,7 @@ import CourseRegisterClient from '../../../f4education/frontend/src/views/client
 // import CourseRegisterDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from 'views/teacher/information'
 import StudentInformation from 'views/client/visitor/StudentInformation'
-import QuizzClient from 'views/client/visitor/QuizzClient';
+import QuizzClient from 'views/client/visitor/QuizzClient'
 
 import Accounts from 'views/admin/Accounts'
 import Schedules from 'views/admin/Schedules'
@@ -29,7 +29,8 @@ import Schedules from 'views/admin/Schedules'
 import Icons from 'views/examples/Icons'
 import ClassInformation from 'views/teacher/ClassInformation'
 import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
-import CourseProgress from 'views/client/student/CourseProgress'
+import CourseProgress from '../../../f4education/frontend/src/views/client/student/CourseProgress'
+import StudentHome from './views/client/student/StudentHome'
 
 export var routes = [
     {
@@ -177,7 +178,7 @@ export var routesClient = [
         layout: '/client'
     },
     {
-        path: '/course',
+        path: '/courses',
         name: 'Khóa học',
         icon: 'ni ni-planet text-blue',
         component: <CourseClient />,
@@ -216,20 +217,7 @@ export var routesClient = [
     //   component: <CourseRegisterDetailClient />,
     //   layout: "/client",
     // },
-    {
-        path: '/student-information',
-        name: 'Thông tin học viên',
-        icon: 'ni ni-planet text-blue',
-        component: <StudentInformation />,
-        layout: '/client'
-    },
-    {
-        path: '/quizz',
-        name: 'Thông tin bài kiểm tra',
-        icon: 'ni ni-planet text-blue',
-        component: <QuizzClient />,
-        layout: '/client'
-    },
+
     {
         path: '/course-progress',
         component: <CourseProgress />,
@@ -256,5 +244,29 @@ export const routesTeacher = [
         path: '/classes-infor/:classId',
         component: <ClassInformationDetail />,
         layout: '/teacher'
+    }
+]
+
+export const routesStudent = [
+    {
+        path: '/',
+        name: 'Trang chủ',
+        icon: 'ni ni-planet text-blue',
+        component: <StudentHome />,
+        layout: '/student'
+    },
+    {
+        path: '/student-information',
+        name: 'Thông tin học viên',
+        icon: 'ni ni-planet text-blue',
+        component: <StudentInformation />,
+        layout: '/student'
+    },
+    {
+        path: '/quizz',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <QuizzClient />,
+        layout: '/student'
     }
 ]

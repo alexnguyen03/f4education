@@ -265,13 +265,13 @@ const StudentInformation = () => {
                                     value="schedule"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
-                                    Lớp học của tôi
+                                    Thời khóa biểu
                                 </Tabs.Tab>
                                 <Tabs.Tab
                                     value="attendence"
                                     className="d-flex justify-content-center text-lg mt-3 font-weight-bold"
                                 >
-                                    Thời khóa biểu
+                                    Lớp học của tôi
                                 </Tabs.Tab>
                             </Tabs.List>
                         </div>

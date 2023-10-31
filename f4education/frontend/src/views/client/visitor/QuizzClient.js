@@ -183,7 +183,7 @@ function QuizzClient() {
 
     return (
         <>
-            <Container>
+            <Container fluid>
                 {/* BreadCums */}
                 <Breadcrumbs
                     className="my-5 p-3"

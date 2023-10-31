@@ -195,32 +195,32 @@ const CourseProgress = () => {
                                 <Group position="left">
                                     <Text c="dimmed" fz="xl">
                                         Lớp học:{' '}
-                                        <strong>
+                                        {/* <strong>
                                             {selectedCourse.classes.className}
-                                        </strong>
+                                        </strong> */}
                                     </Text>
                                     -
                                     <Text c="dimmed" fz="xl">
-                                        <strong>
+                                        {/* <strong>
                                             {selectedCourse.course
                                                 .courseDuration / 2}
-                                        </strong>{' '}
+                                        </strong>{' '} */}
                                         buổi học
                                     </Text>
                                 </Group>
                                 <Text fz="lg">
                                     Từ ngày:{' '}
-                                    <strong>
+                                    {/* <strong>
                                         {moment(
                                             selectedCourse.classes.startDate
                                         ).format('DD-MM-yyyy')}
-                                    </strong>{' '}
+                                    </strong>{' '} */}
                                     -{' '}
-                                    <strong>
+                                    {/* <strong>
                                         {moment(
                                             selectedCourse.classes.endDate
                                         ).format('DD-MM-yyyy')}
-                                    </strong>
+                                    </strong> */}
                                 </Text>
                                 <Group position="left">
                                     <Text fw={500} color="dimmed" fz="lg">
@@ -631,14 +631,14 @@ const CourseProgress = () => {
                                 >
                                     {progress.course.courseName}
                                 </Text>
-                                <Text size="sm" color="dimmed">
+                                {/* <Text size="sm" color="dimmed">
                                     <strong>{totalCountCourseProgress}</strong>{' '}
                                     trên{' '}
                                     <strong>
                                         {progress.course.courseDuration / 2}
                                     </strong>{' '}
                                     bài đã học.
-                                </Text>
+                                </Text> */}
                                 {/* {fetchCourseProgressByClassId(
                                     course.classes.classId
                                 )} */}
