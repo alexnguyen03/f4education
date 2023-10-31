@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Tabs, Stack, Title, Text, LoadingOverlay } from '@mantine/core'
+import {
+    Tabs,
+    Stack,
+    Title,
+    Text,
+    LoadingOverlay,
+    Container
+} from '@mantine/core'
 import { Button, Label, ButtonGroup } from 'reactstrap'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
@@ -228,6 +235,7 @@ const StudentInformation = () => {
 
     return (
         <>
+            {/* <Container fluid > */}
             <Tabs
                 color="violet"
                 variant="pills"
@@ -494,7 +502,7 @@ const StudentInformation = () => {
                                 </div>
                             </Tabs.Panel>
                             <Tabs.Panel value="messages">
-                                <Link to='/quizz'>
+                                <Link to="/quizz">
                                     <Button
                                         color="dark"
                                         role="button"
@@ -512,6 +520,7 @@ const StudentInformation = () => {
                 </div>
             </Tabs>
             <ToastContainer />
+            {/* </Container> */}
         </>
     )
 }

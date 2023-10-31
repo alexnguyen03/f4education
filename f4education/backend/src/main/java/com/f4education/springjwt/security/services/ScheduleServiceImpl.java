@@ -1,11 +1,14 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.ScheduleService;
@@ -36,6 +39,9 @@ public class ScheduleServiceImpl implements ScheduleService {
     ClassRepository classesRepository;
 
     @Autowired
+
+    private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
+    @Autowired
     SessionsRepository sessionsRepository;
 
     @Override
@@ -49,10 +55,10 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<Schedule> listSchedulesAdded = this.convertRequestToListEntity(scheduleRequest);
         try {
             listSchedules = scheduleRepository.saveAll(listSchedulesAdded);
-            Date endDate = listSchedules.get(listSchedules.size() - 1).getStudyDate();
-            Date startDate = listSchedules.get(0).getStudyDate();
-            classes.setStartDate(startDate);
-            classes.setEndDate(endDate);
+            OffsetDateTime endDate = listSchedules.get(listSchedules.size() - 1).getStudyDate();
+            OffsetDateTime startDate = listSchedules.get(0).getStudyDate();
+            classes.setStartDate(Date.from(startDate.toInstant()));
+            classes.setEndDate(Date.from(endDate.toInstant()));
 
             classesRepository.save(classes);
         } catch (Exception e) {
@@ -88,13 +94,25 @@ public class ScheduleServiceImpl implements ScheduleService {
 
     private ScheduleDTO convertEntityToDTO(Schedule schedule) {
 
+        ZoneOffset timeOffset = getTimeOffset();
+        // Xác định chênh lệch thời gian
+
+        OffsetDateTime synchronizedDateTime = schedule.getStudyDate().withOffsetSameInstant(timeOffset);
         ScheduleDTO scheduleDTO = new ScheduleDTO();
         scheduleDTO.setScheduleId(schedule.getScheduleId());
-        scheduleDTO.setStudyDate(schedule.getStudyDate());
+        scheduleDTO.setStudyDate(synchronizedDateTime);
         scheduleDTO.setContent(schedule.getContents());
         scheduleDTO.setIsPractice(schedule.getIsPractice());
 
         return scheduleDTO;
+    }
+
+    //
+    public ZoneOffset getSqlServerOffset() {
+        String sql = "SELECT SYSDATETIMEOFFSET() AS CurrentDateTime";
+        ZoneOffset offset = jdbcTemplate.queryForObject(sql,
+                (rs, rowNum) -> rs.getObject("CurrentDateTime", OffsetDateTime.class).getOffset());
+        return offset;
     }
 
     private ScheduleResponse convertListEntityToResponses(List<Schedule> schedules) {
@@ -126,5 +144,22 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<Schedule> schedules = scheduleRepository.findAllScheduleByClassId(classId);
         ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
         return scheduleResponse;
+    }
+
+    private ZoneOffset getTimeOffset() {
+        // Lấy múi giờ hiện tại của máy tính chạy Java
+
+        // Lấy múi giờ hiện tại của máy chủ SQL Server
+        // Thực hiện truy vấn hoặc lấy thông tin từ cơ sở dữ liệu để lấy múi giờ SQL
+        // Server
+        ZoneOffset javaOffset = OffsetDateTime.now().getOffset();
+        ZoneOffset sqlServerOffset = getSqlServerOffset(); // Hãy thay thế hàm này bằng cách lấy thông tin múi giờ từ
+
+        int offsetDifference = javaOffset.getTotalSeconds() - sqlServerOffset.getTotalSeconds();// SQL Server
+        int hoursDifference = offsetDifference / 3600;
+        // 3600: số giây trong 1h
+        ZoneOffset timeOffset = sqlServerOffset.ofHours(hoursDifference);
+
+        return timeOffset;
     }
 }

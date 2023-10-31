@@ -116,13 +116,13 @@ function Schedules() {
         const timetable = []
         let currentDate = moment(startDate)
         let lessonsRemaining = numberOfLessons - 1
-        while (lessonsRemaining > 0) {
+        while (lessonsRemaining >= 0) {
             const dayOfWeek = daysOfWeek[currentDate.day() - 1]
 
             if (dayOfWeek !== undefined) {
                 let isPractice = true
 
-                if (lessonsRemaining % 2 === 0) {
+                if (lessonsRemaining % 2 !== 0) {
                     isPractice = false
                 }
 
@@ -247,9 +247,13 @@ function Schedules() {
         )
 
         const schedule = ls.map((item, index) => {
+            console.log(
+                '🚀 ~ file: Schedules.js:251 ~ schedule ~ item.date._d:',
+                item.date._d
+            )
             return {
                 scheduleId: index,
-                studyDate: item.date,
+                studyDate: item.date._d,
                 session: item.session,
                 classroom: item.classroom,
                 isPractice: item.isPractice,
@@ -461,7 +465,7 @@ function Schedules() {
                 const schedule = listSchedules.map((item) => {
                     return {
                         scheduleId: item.scheduleId,
-                        studyDate: moment(item.studyDate),
+                        studyDate: moment(item.studyDate)._d,
                         session: sessionName,
                         classroom: classroomName,
                         isPractice: item.isPractice,

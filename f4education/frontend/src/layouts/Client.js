@@ -57,7 +57,8 @@ const Client = (props) => {
                 {/* </Container> */}
 
                 {/* Page content */}
-                <Container fluid size="xl">
+                <Container fluid size="xl" mt={'xl'} pt={'xl'}>
+                    <div className="py-4 my-2"></div>
                     <Routes>
                         {getRoutes(routesClient)}
                         <Route path="*" element={<Navigate to="/" replace />} />

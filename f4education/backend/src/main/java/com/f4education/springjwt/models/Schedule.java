@@ -1,6 +1,7 @@
 package com.f4education.springjwt.models;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -25,10 +26,10 @@ import lombok.ToString;
 public class Schedule implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "schedule_id") 
+	@Column(name = "schedule_id")
 	private Integer scheduleId;
 	@Column(name = "study_date")
-	private Date studyDate;
+	private OffsetDateTime studyDate;
 	private String contents;
 	@Column(name = "is_practice")
 	private Boolean isPractice;
