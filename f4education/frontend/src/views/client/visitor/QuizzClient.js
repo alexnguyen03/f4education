@@ -1,4 +1,12 @@
-import { Loader, Breadcrumbs, Anchor, Text, Radio, Button, Checkbox } from '@mantine/core'
+import {
+    Loader,
+    Breadcrumbs,
+    Anchor,
+    Text,
+    Radio,
+    Button,
+    Checkbox
+} from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
@@ -68,43 +76,78 @@ function QuizzClient() {
             const resp = await questionDetailApi.getQuestionDetailsByStudentId(
                 'loinvpc04549'
             )
-            if (resp.status === 200) {
+            if (resp.status === 200 && resp.data.length > 0) {
                 setQuestionDetail(resp.data)
                 console.log(resp.data)
+            } else {
+                console.log('aaa')
             }
         } catch (error) {
             console.log(error)
         }
     }
 
-    const [score, setScore] = useState(0)
     const [selectedAnswers, setSelectedAnswers] = useState([])
-    const handleAnswerSelect = (questionId, answerId, isCorrect) => {
-        const isSelected = selectedAnswers.find(
-            (selectedAnswer) => selectedAnswer.questionId === questionId
-        )
 
-        if (isSelected === undefined) {
-            const newAnswerSelected = {
-                questionId: questionId,
-                answerId: answerId
-            }
-            setSelectedAnswers((prev) => [...prev, newAnswerSelected])
-        } else {
-            const updatedQuestions = selectedAnswers.map((question) => {
-                if (question.questionId === questionId) {
-                    // Cập nhật giá trị selectedAnswerId cho câu hỏi
-                    return {
-                        ...question,
-                        answerId: answerId
-                    }
+    const handleAnswerSelect = (questionId, answerId, type) => {
+        if (type === 'checkbox') {
+            const isSelected = selectedAnswers.find(
+                (selectedAnswer) => selectedAnswer.questionId === questionId
+            )
+
+            if (isSelected === undefined) {
+                const newAnswerSelected = {
+                    questionId: questionId,
+                    answerId: [answerId]
                 }
-                return question
-            })
+                setSelectedAnswers((prev) => [...prev, newAnswerSelected])
+            } else {
+                const updatedQuestions = selectedAnswers.map((question) => {
+                    if (question.questionId === questionId) {
+                        const updatedAnswerId = question.answerId.includes(
+                            answerId
+                        )
+                            ? question.answerId.filter((id) => id !== answerId)
+                            : [...question.answerId, answerId]
 
-            // Cập nhật danh sách câu hỏi với câu hỏi có đáp án đã chọn
-            setSelectedAnswers([...updatedQuestions])
-            console.log(updatedQuestions)
+                        return {
+                            ...question,
+                            answerId: updatedAnswerId
+                        }
+                    }
+                    return question
+                })
+
+                setSelectedAnswers(updatedQuestions)
+                console.log(updatedQuestions)
+            }
+        } else {
+            const isSelected = selectedAnswers.find(
+                (selectedAnswer) => selectedAnswer.questionId === questionId
+            )
+
+            if (isSelected === undefined) {
+                const newAnswerSelected = {
+                    questionId: questionId,
+                    answerId: answerId
+                }
+                setSelectedAnswers((prev) => [...prev, newAnswerSelected])
+            } else {
+                const updatedQuestions = selectedAnswers.map((question) => {
+                    if (question.questionId === questionId) {
+                        // Cập nhật giá trị selectedAnswerId cho câu hỏi
+                        return {
+                            ...question,
+                            answerId: answerId
+                        }
+                    }
+                    return question
+                })
+
+                // Cập nhật danh sách câu hỏi với câu hỏi có đáp án đã chọn
+                setSelectedAnswers([...updatedQuestions])
+                console.log(updatedQuestions)
+            }
         }
     }
 
@@ -141,7 +184,69 @@ function QuizzClient() {
 
         console.log(selectedAnswers)
 
-        addQuizzResult(formattedTime, score)
+        let totalScoreRadio = 0
+        let totalScoreCheckbox = 0
+        selectedAnswers.map((selectedAnswers) => {
+            if (Array.isArray(selectedAnswers.answerId)) {
+                const selectedCorrectAnswers = selectedAnswers.answerId.filter(
+                    (answerId) => {
+                        const foundQuestionDetail = findAnswer(
+                            selectedAnswers.questionId,
+                            answerId
+                        )
+                        console.log(foundQuestionDetail)
+                        return (
+                            foundQuestionDetail && foundQuestionDetail.isCorrect
+                        )
+                    }
+                )
+
+                const filteredQuestionDetail = questionDetail.filter(
+                    (detail) =>
+                        detail.questionDetailId === selectedAnswers.questionId
+                )
+
+                const correctAnswers = filteredQuestionDetail[0].answer.filter(
+                    (answer) => answer.isCorrect
+                )
+
+                if (
+                    selectedCorrectAnswers.length === correctAnswers.length &&
+                    selectedCorrectAnswers.length ===
+                        selectedAnswers.answerId.length
+                ) {
+                    totalScoreCheckbox += 1
+                }
+            } else {
+                const foundQuestionDetail = findAnswer(
+                    selectedAnswers.questionId,
+                    selectedAnswers.answerId
+                )
+                console.log(foundQuestionDetail)
+
+                if (foundQuestionDetail.isCorrect === true) {
+                    totalScoreRadio += 1
+                }
+            }
+        })
+
+        console.log(`Tổng điểm số radio: ${totalScoreRadio}`)
+        console.log(`Tổng điểm số checkbox: ${totalScoreCheckbox}`)
+        addQuizzResult(formattedTime, totalScoreCheckbox + totalScoreRadio)
+    }
+
+    const findAnswer = (questionDetailId, answerId) => {
+        const question = questionDetail.find(
+            (detail) => detail.questionDetailId === questionDetailId
+        )
+
+        if (question) {
+            return question.answer.find(
+                (answer) => answer.answerId === answerId
+            )
+        }
+
+        return null
     }
 
     const addQuizzResult = async (formattedTime, score) => {
@@ -157,12 +262,12 @@ function QuizzClient() {
         }
         console.log(quizzResultRequest)
         try {
-            const resp = await quizzResultApi.createQuizzResult(
-                quizzResultRequest
-            )
-            if (resp.status === 200) {
-                alert('Thêm thành công')
-            }
+            // const resp = await quizzResultApi.createQuizzResult(
+            //     quizzResultRequest
+            // )
+            // if (resp.status === 200) {
+            //     alert('Thêm thành công')
+            // }
         } catch (error) {
             console.log('failed to fetch data', error)
         }
@@ -236,7 +341,7 @@ function QuizzClient() {
                                         width: 250,
                                         margin: 'auto',
                                         backgroundColor: 'white',
-                                        marginLeft: 200,
+                                        marginLeft: 230,
                                         borderRadius: '10px'
                                     }}
                                 >
@@ -279,23 +384,41 @@ function QuizzClient() {
                                         marginRight: 2
                                     }}
                                 >
+                                    <h1 className="display-2 text-dark mx-auto mt-3">
+                                        Quiz 1
+                                    </h1>
                                     {questionDetail.map(
                                         (question, indexQuestion) => (
                                             <div
                                                 className="col-lg-12"
                                                 key={question.questionDetailId}
                                             >
-                                                <div class="d-flex bd-highlight">
+                                                <div class="d-flex bd-highlight p-3">
                                                     <div class="p-2 w-100">
                                                         <h2 className="text-dark mt-3">
-                                                            Câu hỏi{' '}
-                                                            {indexQuestion + 1}
-                                                        </h2>
-                                                        <p className="h2 text-muted">
+                                                            {indexQuestion + 1}.{' '}
                                                             {
                                                                 question.questionTitle
                                                             }
-                                                        </p>
+                                                            ?
+                                                        </h2>
+                                                        <h4 className="text-muted mt-3">
+                                                            {question.answer.filter(
+                                                                (answer) =>
+                                                                    answer.isCorrect ===
+                                                                    true
+                                                            ).length >= 2
+                                                                ? 'Chọn tối đa ' +
+                                                                  question.answer.filter(
+                                                                      (
+                                                                          answer
+                                                                      ) =>
+                                                                          answer.isCorrect ===
+                                                                          true
+                                                                  ).length +
+                                                                  ' đáp án'
+                                                                : ''}
+                                                        </h4>
                                                     </div>
                                                 </div>
                                                 <div className="container mt-2 mb-3">
@@ -317,9 +440,10 @@ function QuizzClient() {
                                                                         ) =>
                                                                             answer.isCorrect ===
                                                                             true
-                                                                    ).length ===
+                                                                    ).length >=
                                                                     2 ? (
                                                                         <Checkbox
+                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
                                                                             id={
                                                                                 answer.answerId
                                                                             }
@@ -336,12 +460,13 @@ function QuizzClient() {
                                                                                 handleAnswerSelect(
                                                                                     question.questionDetailId,
                                                                                     answer.answerId,
-                                                                                    answer.isCorrect
+                                                                                    'checkbox'
                                                                                 )
                                                                             }
                                                                         />
                                                                     ) : (
                                                                         <Radio
+                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
                                                                             id={
                                                                                 answer.answerId
                                                                             }
@@ -358,7 +483,7 @@ function QuizzClient() {
                                                                                 handleAnswerSelect(
                                                                                     question.questionDetailId,
                                                                                     answer.answerId,
-                                                                                    answer.isCorrect
+                                                                                    'radio'
                                                                                 )
                                                                             }
                                                                         />

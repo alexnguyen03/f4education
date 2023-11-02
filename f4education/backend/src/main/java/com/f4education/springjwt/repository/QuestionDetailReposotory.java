@@ -11,8 +11,14 @@ import com.f4education.springjwt.models.QuestionDetail;
 
 @Repository
 public interface QuestionDetailReposotory extends JpaRepository<QuestionDetail, Integer> {
-	@Query("SELECT qd FROM QuestionDetail qd " + "JOIN Question q ON qd.question.questionId = q.questionId "
-			+ "JOIN Course c ON q.course.courseId = c.courseId " + "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
-			+ "WHERE rc.student.studentId = :studentId AND rc.course.courseId = q.course.courseId AND rc.classes.classId IS NOT NULL")
+	@Query("SELECT qd FROM QuestionDetail qd " +
+	        "JOIN qd.question q " +
+	        "JOIN q.course c " +
+	        "JOIN c.registerCourses rc " +
+	        "JOIN q.examinations e " +
+	        "WHERE rc.student.studentId = :studentId " +
+	        "AND rc.course.courseId = q.course.courseId " +
+	        "AND rc.classes.classId IS NOT NULL " +
+	        "AND e.finishDate = CURRENT_DATE")
 	List<QuestionDetail> findQuestionDetailByStudentId(@Param("studentId") String studentId);
 }
