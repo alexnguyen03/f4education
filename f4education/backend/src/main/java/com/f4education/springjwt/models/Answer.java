@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Entity
 @AllArgsConstructor
@@ -30,8 +28,13 @@ public class Answer {
     @JsonIgnore
     QuestionDetail questionDetail;
 
-	@Override
-	public String toString() {
-		return "Answer [answerId=" + answerId + ", answerContent=" + answerContent + ", isCorrect=" + isCorrect + "]";
-	}
+    @Override
+    public String toString() {
+        return "Answer{" +
+                "answerId=" + answerId +
+                ", answerContent='" + answerContent + '\'' +
+                ", isCorrect=" + isCorrect +
+                ", questionDetail=" + questionDetail +
+                '}';
+    }
 }

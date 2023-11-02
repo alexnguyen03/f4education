@@ -2,6 +2,10 @@ import axiosClient from './axiosClient'
 
 // api/classApi.js
 const classApi = {
+    getAllClassActive: () => {
+        const url = '/classes/actived'
+        return axiosClient.get(url)
+    },
     getAllClass: () => {
         const url = '/classes'
         return axiosClient.get(url)
@@ -20,6 +24,10 @@ const classApi = {
     },
     getAllClassByTeacherId: (teacherId) => {
         const url = `/classes/teacher/${teacherId}`
+        return axiosClient.get(url)
+    },
+    getAllClassByStudentId: (studentId) => {
+        const url = `/classes/student/${studentId}`
         return axiosClient.get(url)
     }
 }

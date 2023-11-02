@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,18 +40,23 @@ public class Question implements Serializable {
 	List<Examination> examinations;
 
 	@ManyToOne
+	@JoinColumn(name = "subject_id")
 	@JsonIgnore
-	@JoinColumn(name = "course_id")
-	Course course;
+	Subject subject;
 
 	@ManyToOne
+	@JoinColumn(name = "course_id")
 	@JsonIgnore
-	@JoinColumn(name = "subject_id")
-	Subject subject;
+	Course course;
 	
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
+	@JsonIgnore
 	Admin admin;
+
+	@OneToMany(mappedBy = "question")
+	@JsonIgnore
+	List<QuestionDetail> questionDetail;
 
 	@Override
 	public String toString() {

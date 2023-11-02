@@ -10,9 +10,9 @@ import lombok.NoArgsConstructor;
 public class AnswerDTO {
     private Integer answerId;
 
-    private String text;
+    private String answerContent;
  
     private Boolean isCorrect;
 
-    private Integer questionId;
+    private Integer questionDetailId;
 }

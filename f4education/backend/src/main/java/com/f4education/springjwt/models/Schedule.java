@@ -1,6 +1,7 @@
 package com.f4education.springjwt.models;
 
 import java.io.Serializable;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -28,9 +29,11 @@ public class Schedule implements Serializable {
 	@Column(name = "schedule_id")
 	private Integer scheduleId;
 	@Column(name = "study_date")
-	private Date studyDate;
+	private OffsetDateTime studyDate;
 	private String contents;
-	private String note;
+	@Column(name = "is_practice")
+	private Boolean isPractice;
+	@JsonIgnore
 	@OneToMany(mappedBy = "schedule")
 	List<Attendance> attendances;
 	@JsonIgnore
@@ -41,9 +44,12 @@ public class Schedule implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "class_id")
 	Classes classes;
+
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "classroom_id")
 	ClassRoom classRoom;
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "session_id")
 	private Sessions sessions;
@@ -51,6 +57,6 @@ public class Schedule implements Serializable {
 	@Override
 	public String toString() {
 		return "Schedule [scheduleId=" + scheduleId + ", studyDate=" + studyDate + ", contents=" + contents + ", note="
-				+ note + "]";
+				+ "]";
 	}
 }

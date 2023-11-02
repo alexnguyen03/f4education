@@ -8,6 +8,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,22 +23,28 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.request.CourseProgressRequestDTO;
+import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
+import com.f4education.springjwt.repository.ScheduleRepository;
 import com.f4education.springjwt.repository.StudentRepository;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
-    @Autowired
-    private RegisterCourseRepository registerCourseRepository;
-    @Autowired
-    private CourseRepository courseRepository;
-    @Autowired
-    private StudentRepository studentRepository;
+	@Autowired
+	private RegisterCourseRepository registerCourseRepository;
+	@Autowired
+	private CourseRepository courseRepository;
+	@Autowired
+	private StudentRepository studentRepository;
 
     @Autowired
     private ClassRepository classRepository;
+
+	@Autowired
+	private ScheduleRepository scheduleRepository;
 
     @Override
     public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
@@ -57,46 +66,42 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
         return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse by Student ID", responseDTOS);
     }
 
-    // public List<ClassesByTeacher> getRegisterCourseWithTeacherAndClasses() {
-    // List<ClassesByTeacherGetData> dtos = new ArrayList<>();
-    // List<ClassesByTeacher> results =
-    // registerCourseRepository.getRegisterCourseWithTeacherAndClasses();
-    //
-    // System.out.println("DATA HERE");
-    // System.out.println(results);
-    //
-    // for (Object[] result : results) {
-    // TeacherClassResponse dto = new TeacherClassResponse((RegisterCourse)
-    // result[0], (Classes) result[1],
-    // (Teacher) result[2]);
-    // dtos.add(dto);
-    // }
-    //
-    // for (Object[] result : results) {
-    // ClassesByTeacherGetData dto = new ClassesByTeacherGetData((Integer)
-    // result[0], (Integer) result[1],
-    // (String) result[2]);
-    // dtos.add(dto);
-    // }
-    //
-    // System.out.println(dtos);
-    //
-    // List<TeacherClassResponse> list = new ArrayList<>();
-    // for (ClassesByTeacherGetData dto : dtos) {
-    // RegisterCourse rc =
-    // registerCourseRepository.findById(dto.getRegisterCourseId()).get();
-    // Classes c = classRepository.findById(dto.getClassId()).get();
-    // Teacher tc = teacherRepository.findById(dto.getTeacherId()).get();
-    //
-    // TeacherClassResponse tcr = new TeacherClassResponse(rc, c, null);
-    //
-    // list.add(tcr);
-    // }
-    //
-    // System.out.println(list);
-    //
-    // return results;
-    // }
+	@Override
+	public List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId) {
+		List<RegisterCourse> registerCourses = registerCourseRepository.findCourseProgressByStudentId(studentId);
+		return registerCourses.stream().map(this::convertToCourseProgressResponseDTO).toList();
+	}
+
+	@Override
+	public Integer getTotalClassIdProgressByclassID(Integer classId, CourseProgressRequestDTO courseProgressRequest) {
+		Date startDate = null;
+		Date endDate = null;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+		try {
+			startDate = courseProgressRequest.getStartDate();
+			endDate = courseProgressRequest.getEndDate();
+			
+//			startDate = dateFormat.parse("20-08-2023");
+//			endDate = dateFormat.parse("26-10-2023");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		Integer totalScheduleCount = scheduleRepository.findTotalClassInSchedule(classId, startDate, endDate);
+
+		System.out.println(totalScheduleCount);
+
+		return totalScheduleCount;
+	}
+
+	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
+		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
+		courseResponse.setCourse(registerCourse.getCourse());
+		courseResponse.setClasses(registerCourse.getClasses());
+		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
+		return courseResponse;
+	}
 
     @Override
     public HandleResponseDTO<RegisterCourseResponseDTO> getRegisterCourseById(Integer registerCourseId) {
@@ -176,24 +181,29 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
         return registerCourseDTO;
     }
 
-    private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
-        RegisterCourse registerCourse = new RegisterCourse();
-        Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
-        Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
-        BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
-        if (course != null) {
-            registerCourse.setCourse(course);
-            registerCourse.setCourseDuration(course.getCourseDuration());
-            registerCourse.setCoursePrice(course.getCoursePrice());
-            registerCourse.setImage(course.getImage());
-            registerCourse.setCourseDescription(course.getCourseDescription());
-            registerCourse.setNumberSession(course.getNumberSession());
-        }
-        if (student != null) {
-            registerCourse.setStudent(student);
-        }
-        return registerCourse;
-    }
+	private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
+		RegisterCourse registerCourse = new RegisterCourse();
+
+		Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
+		Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
+
+		BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
+
+		if (course != null) {
+			registerCourse.setCourse(course);
+			registerCourse.setCourseDuration(course.getCourseDuration());
+			registerCourse.setCoursePrice(course.getCoursePrice());
+			registerCourse.setImage(course.getImage());
+			registerCourse.setCourseDescription(course.getCourseDescription());
+			registerCourse.setNumberSession(course.getNumberSession());
+		}
+
+		if (student != null) {
+			registerCourse.setStudent(student);
+		}
+
+		return registerCourse;
+	}
 
     private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO,
             RegisterCourse registerCourse) {

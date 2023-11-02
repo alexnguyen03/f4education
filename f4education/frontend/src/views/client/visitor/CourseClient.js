@@ -4,7 +4,8 @@ import {
     Breadcrumbs,
     Anchor,
     Text,
-    Pagination
+    Pagination,
+    Container
 } from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import FilterListIcon from '@mui/icons-material/FilterList'
@@ -234,6 +235,7 @@ function CourseClient() {
 
     return (
         <>
+            {/* <Container> */}
             {/* BreadCums */}
             <Breadcrumbs
                 className="my-5 p-3"
@@ -619,7 +621,10 @@ function CourseClient() {
                                                 IMG_URL +
                                                 course.image
                                             }
-                                            style={{ width: 260, height: 145 }}
+                                            style={{
+                                                width: 260,
+                                                height: 145
+                                            }}
                                             className="img-fluid"
                                             alt="Course"
                                         />
@@ -630,7 +635,9 @@ function CourseClient() {
                                         <Text lineClamp={1}>
                                             <h3
                                                 className="font-weight-700 text-dark"
-                                                style={{ lineHeight: '0.6' }}
+                                                style={{
+                                                    lineHeight: '0.6'
+                                                }}
                                             >
                                                 {course.courseName}
                                             </h3>
@@ -749,6 +756,7 @@ function CourseClient() {
                     />
                 </div>
             </div>
+            {/* </Container>{' '} */}
         </>
     )
 }

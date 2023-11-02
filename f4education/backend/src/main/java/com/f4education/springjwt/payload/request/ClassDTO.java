@@ -28,5 +28,6 @@ public class ClassDTO {
 	private List<Student> students;
 	private Teacher teacher;
 	private Integer courseId;
+	private Boolean hasSchedule;
 
 }

@@ -72,7 +72,7 @@ public class Course implements Serializable {
 
     @JsonIgnore
     @OneToMany(mappedBy = "course")
-    List<BillDetail> billDetails;
+    List<BillDetail> billDetail;
 
     public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
             Integer numberSession, String image) {

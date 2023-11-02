@@ -18,7 +18,8 @@ import {
     Grid,
     Title,
     rem,
-    getStylesRef
+    getStylesRef,
+    Container
 } from '@mantine/core'
 import { Carousel } from '@mantine/carousel'
 
@@ -76,16 +77,16 @@ function Cart() {
         }
     }
 
-  const fetchNewsetCourse = async () => {
-    try {
-      setLoading(true);
-      const resp = await courseApi.getNewestCourse();
+    const fetchNewsetCourse = async () => {
+        try {
+            setLoading(true)
+            const resp = await courseApi.getNewestCourse()
 
-      if (resp.status === 200 && resp.data.length > 0) {
-        setNewestCourse(resp.data);
-      } else {
-        console.log("loi fetch newestcourse ba con oi");
-      }
+            if (resp.status === 200 && resp.data.length > 0) {
+                setNewestCourse(resp.data)
+            } else {
+                console.log('loi fetch newestcourse ba con oi')
+            }
 
             setLoading(false)
         } catch (error) {
@@ -274,311 +275,316 @@ function Cart() {
 
     return (
         <>
-            {/* BreadCums */}
-            <Breadcrumbs
-                className="my-5 p-3"
-                style={{ backgroundColor: '#ebebeb' }}
-            >
-                {itemsBreadcum}
-            </Breadcrumbs>
+            <Container>
+                {/* BreadCums */}
+                <Breadcrumbs
+                    className="my-5 p-3"
+                    style={{ backgroundColor: '#ebebeb' }}
+                >
+                    {itemsBreadcum}
+                </Breadcrumbs>
 
-            {/* Title */}
-            <Title order={1} color="dark" fw={700}>
-                Giỏ hàng
-            </Title>
+                {/* Title */}
+                <Title order={1} color="dark" fw={700}>
+                    Giỏ hàng
+                </Title>
 
-            {/* Loading */}
-            {loading ? (
-                <h1 className="display-1 text-center mt-5">
-                    <Loader color="rgba(46, 46, 46, 1)" size={50} />
-                </h1>
-            ) : (
-                <>
-                    {carts.length === 0 ? (
-                        <>
-                            <Card className="w-100 shadow-lg">
-                                <Card.Section className="text-center">
-                                    <img
-                                        src={cartEmptyimage}
-                                        width="40%"
-                                        height="40%"
-                                        alt=""
-                                        className="img-fluid"
-                                    />
-                                    <h3 className="font-weight-800">
-                                        Giỏ hàng của bạn trống. <br />
-                                        Tiếp tục mua sắm để tìm một khóa học ưng
-                                        ý!
-                                    </h3>
-                                    <Link to={'/course'}>
+                {/* Loading */}
+                {loading ? (
+                    <h1 className="display-1 text-center mt-5">
+                        <Loader color="rgba(46, 46, 46, 1)" size={50} />
+                    </h1>
+                ) : (
+                    <>
+                        {carts.length === 0 ? (
+                            <>
+                                <Card className="w-100 shadow-lg">
+                                    <Card.Section className="text-center">
+                                        <img
+                                            src={cartEmptyimage}
+                                            width="40%"
+                                            height="40%"
+                                            alt=""
+                                            className="img-fluid"
+                                        />
+                                        <h3 className="font-weight-800">
+                                            Giỏ hàng của bạn trống. <br />
+                                            Tiếp tục mua sắm để tìm một khóa học
+                                            ưng ý!
+                                        </h3>
+                                        <Link to={'/course'}>
+                                            <Button
+                                                color="violet"
+                                                size={'lg'}
+                                                className="font-weight-800 mb-5 mt-2"
+                                                style={{
+                                                    borderRadius: '2px',
+                                                    fontSize: '20px'
+                                                }}
+                                            >
+                                                Tìm Khóa học
+                                            </Button>
+                                        </Link>
+                                    </Card.Section>
+                                </Card>
+                            </>
+                        ) : (
+                            <>
+                                <Grid mt={rem('1rem')}>
+                                    <Grid.Col xl="9" lg="9" md="12" sm="12">
+                                        <h5 className="font-weight-600 text-dark">
+                                            {carts.length} khóa học trong giỏ
+                                            hàng
+                                        </h5>
+                                        <hr className="text-muted mt-0 pt-0" />
+
+                                        {/* item */}
+                                        {carts.length > 0 &&
+                                            carts.map((cart, index) => (
+                                                <>
+                                                    <Grid key={index}>
+                                                        <Grid.Col span={2}>
+                                                            <Link
+                                                                to={`/course/${cart.course.courseId}`}
+                                                            >
+                                                                <img
+                                                                    src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                                                    // src={cart.course.courseImage}
+                                                                    alt={`${cart.course.courseName}`}
+                                                                    className="img-fluid"
+                                                                    style={{
+                                                                        maxHeight:
+                                                                            '100px',
+                                                                        width: '100%',
+                                                                        objectFit:
+                                                                            'cover'
+                                                                    }}
+                                                                />
+                                                            </Link>
+                                                        </Grid.Col>
+                                                        <Grid.Col span={10}>
+                                                            <Grid>
+                                                                <Grid.Col
+                                                                    xl="6"
+                                                                    lg="6"
+                                                                    md="12"
+                                                                    sm="12"
+                                                                >
+                                                                    <Link
+                                                                        to={`/course/${cart.course.courseId}`}
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        <p className="font-weight-700 text-dark m-0 p-0">
+                                                                            {
+                                                                                cart
+                                                                                    .course
+                                                                                    .courseName
+                                                                            }
+                                                                        </p>
+                                                                        <span className="text-muted">
+                                                                            {/* Môn học: <strong>{cart.subjectName}</strong> */}
+                                                                        </span>
+                                                                        <div className="d-flex text-dark">
+                                                                            <span className="font-weight-600">
+                                                                                {/* {cart.ratings} */}
+                                                                                4.6
+                                                                            </span>
+                                                                            <div className="mx-2">
+                                                                                <i className="bx bxs-star text-warning"></i>
+                                                                                <i className="bx bxs-star text-warning"></i>
+                                                                                <i className="bx bxs-star text-warning"></i>
+                                                                                <i className="bx bxs-star text-warning"></i>
+                                                                                <i className="bx bx-star"></i>
+                                                                            </div>
+                                                                            <span className="text-muted">
+                                                                                {/* ({cart.reviews}) */}{' '}
+                                                                                (39.930)
+                                                                            </span>
+                                                                        </div>
+                                                                        <div className="d-flex justify-content-start">
+                                                                            <span className="text-muted">
+                                                                                {
+                                                                                    cart
+                                                                                        .course
+                                                                                        .courseDuration
+                                                                                }
+                                                                            </span>
+                                                                            <span className="mx-2">
+                                                                                -
+                                                                            </span>
+                                                                            <span className="text-muted">
+                                                                                {
+                                                                                    cart
+                                                                                        .course
+                                                                                        .numberSession
+                                                                                }{' '}
+                                                                                bài
+                                                                                giảng
+                                                                            </span>
+                                                                            <span className="mx-2">
+                                                                                -
+                                                                            </span>
+                                                                            <span className="text-muted">
+                                                                                All
+                                                                                Levels
+                                                                            </span>
+                                                                        </div>
+                                                                    </Link>
+                                                                </Grid.Col>
+                                                                <Grid.Col
+                                                                    xl="2"
+                                                                    lg="2"
+                                                                    md="4"
+                                                                    sm="6"
+                                                                >
+                                                                    <div>
+                                                                        <Link
+                                                                            to={`/cart/${cart.cartId}`}
+                                                                            className="text-danger font-weight-700"
+                                                                            onClick={(
+                                                                                e
+                                                                            ) => {
+                                                                                handleRemoveCart(
+                                                                                    cart.cartId,
+                                                                                    e
+                                                                                )
+                                                                            }}
+                                                                        >
+                                                                            Xóa
+                                                                            khóa
+                                                                            học
+                                                                        </Link>
+                                                                    </div>
+                                                                </Grid.Col>
+                                                                <Grid.Col
+                                                                    xl="2"
+                                                                    lg="2"
+                                                                    md="4"
+                                                                    sm="6"
+                                                                >
+                                                                    <div>
+                                                                        <span className="text-primary font-weight-700">
+                                                                            {cart.course.coursePrice.toLocaleString(
+                                                                                'it-IT',
+                                                                                {
+                                                                                    style: 'currency',
+                                                                                    currency:
+                                                                                        'VND'
+                                                                                }
+                                                                            )}
+                                                                        </span>
+                                                                    </div>
+                                                                </Grid.Col>
+                                                                <Grid.Col
+                                                                    xl="2"
+                                                                    lg="2"
+                                                                    md="4"
+                                                                    sm="12"
+                                                                >
+                                                                    <div className="d-flex justify-content-sm-end justify-content-md-end">
+                                                                        <Checkbox
+                                                                            // label="I agree to sell my privacy"
+                                                                            color="violet"
+                                                                            checked={
+                                                                                selectedItem ===
+                                                                                cart.cartId
+                                                                            }
+                                                                            onChange={() =>
+                                                                                handleCheckboxChange(
+                                                                                    cart.cartId
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    </div>
+                                                                </Grid.Col>
+                                                            </Grid>
+                                                            <hr className="text-muted" />
+                                                        </Grid.Col>
+                                                    </Grid>
+                                                </>
+                                            ))}
+                                    </Grid.Col>
+                                    <Grid.Col
+                                        xl="3"
+                                        lg="3"
+                                        md="12"
+                                        sm="12"
+                                        className="mt-2 cart-summery-floating-bottom w-100"
+                                    >
+                                        <span className="font-weight-600 text-muted">
+                                            Tổng tiền:
+                                            <br />
+                                            <h3 className="font-weight-700">
+                                                {totalPrice.toLocaleString(
+                                                    'it-IT',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'VND'
+                                                    }
+                                                )}
+                                            </h3>
+                                        </span>
+                                        {/* <Link to={"/payment/checkout"} className="mt-2 mb-4"> */}
                                         <Button
                                             color="violet"
-                                            size={'lg'}
-                                            className="font-weight-800 mb-5 mt-2"
-                                            style={{
-                                                borderRadius: '2px',
-                                                fontSize: '20px'
-                                            }}
+                                            uppercase
+                                            size="md"
+                                            className="w-100"
+                                            style={{ borderRadius: '2px' }}
+                                            disabled={carts.length === 0}
+                                            onClick={() => handleCheckOut()}
                                         >
-                                            Tìm Khóa học
+                                            Thanh toán
                                         </Button>
-                                    </Link>
-                                </Card.Section>
-                            </Card>
-                        </>
-                    ) : (
-                        <>
-                            <Grid mt={rem('1rem')}>
-                                <Grid.Col xl="9" lg="9" md="12" sm="12">
-                                    <h5 className="font-weight-600 text-dark">
-                                        {carts.length} khóa học trong giỏ hàng
-                                    </h5>
-                                    <hr className="text-muted mt-0 pt-0" />
+                                    </Grid.Col>
+                                </Grid>
+                            </>
+                        )}
+                    </>
+                )}
 
-                                    {/* item */}
-                                    {carts.length > 0 &&
-                                        carts.map((cart, index) => (
-                                            <>
-                                                <Grid key={index}>
-                                                    <Grid.Col span={2}>
-                                                        <Link
-                                                            Link
-                                                            to={`/course/${cart.course.courseId}`}
-                                                        >
-                                                            <img
-                                                                src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                                                // src={cart.course.courseImage}
-                                                                alt={`${cart.course.courseName}`}
-                                                                className="img-fluid"
-                                                                style={{
-                                                                    maxHeight:
-                                                                        '100px',
-                                                                    width: '100%',
-                                                                    objectFit:
-                                                                        'cover'
-                                                                }}
-                                                            />
-                                                        </Link>
-                                                    </Grid.Col>
-                                                    <Grid.Col span={10}>
-                                                        <Grid>
-                                                            <Grid.Col
-                                                                xl="6"
-                                                                lg="6"
-                                                                md="12"
-                                                                sm="12"
-                                                            >
-                                                                <Link
-                                                                    Link
-                                                                    to={`/course/${cart.course.courseId}`}
-                                                                    key={index}
-                                                                >
-                                                                    <p className="font-weight-700 text-dark m-0 p-0">
-                                                                        {
-                                                                            cart
-                                                                                .course
-                                                                                .courseName
-                                                                        }
-                                                                    </p>
-                                                                    <span className="text-muted">
-                                                                        {/* Môn học: <strong>{cart.subjectName}</strong> */}
-                                                                    </span>
-                                                                    <div className="d-flex text-dark">
-                                                                        <span className="font-weight-600">
-                                                                            {/* {cart.ratings} */}
-                                                                            4.6
-                                                                        </span>
-                                                                        <div className="mx-2">
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bx-star"></i>
-                                                                        </div>
-                                                                        <span className="text-muted">
-                                                                            {/* ({cart.reviews}) */}{' '}
-                                                                            (39.930)
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="d-flex justify-content-start">
-                                                                        <span className="text-muted">
-                                                                            {
-                                                                                cart
-                                                                                    .course
-                                                                                    .courseDuration
-                                                                            }
-                                                                        </span>
-                                                                        <span className="mx-2">
-                                                                            -
-                                                                        </span>
-                                                                        <span className="text-muted">
-                                                                            {
-                                                                                cart
-                                                                                    .course
-                                                                                    .numberSession
-                                                                            }{' '}
-                                                                            bài
-                                                                            giảng
-                                                                        </span>
-                                                                        <span className="mx-2">
-                                                                            -
-                                                                        </span>
-                                                                        <span className="text-muted">
-                                                                            All
-                                                                            Levels
-                                                                        </span>
-                                                                    </div>
-                                                                </Link>
-                                                            </Grid.Col>
-                                                            <Grid.Col
-                                                                xl="2"
-                                                                lg="2"
-                                                                md="4"
-                                                                sm="6"
-                                                            >
-                                                                <div>
-                                                                    <Link
-                                                                        to={`/cart/${cart.cartId}`}
-                                                                        className="text-danger font-weight-700"
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            handleRemoveCart(
-                                                                                cart.cartId,
-                                                                                e
-                                                                            )
-                                                                        }}
-                                                                    >
-                                                                        Remove
-                                                                    </Link>
-                                                                </div>
-                                                            </Grid.Col>
-                                                            <Grid.Col
-                                                                xl="2"
-                                                                lg="2"
-                                                                md="4"
-                                                                sm="6"
-                                                            >
-                                                                <div>
-                                                                    <span className="text-primary font-weight-700">
-                                                                        {cart.course.coursePrice.toLocaleString(
-                                                                            'it-IT',
-                                                                            {
-                                                                                style: 'currency',
-                                                                                currency:
-                                                                                    'VND'
-                                                                            }
-                                                                        )}
-                                                                    </span>
-                                                                </div>
-                                                            </Grid.Col>
-                                                            <Grid.Col
-                                                                xl="2"
-                                                                lg="2"
-                                                                md="4"
-                                                                sm="12"
-                                                            >
-                                                                <div className="d-flex justify-content-sm-end justify-content-md-end">
-                                                                    <Checkbox
-                                                                        // label="I agree to sell my privacy"
-                                                                        color="violet"
-                                                                        checked={
-                                                                            selectedItem ===
-                                                                            cart.cartId
-                                                                        }
-                                                                        onChange={() =>
-                                                                            handleCheckboxChange(
-                                                                                cart.cartId
-                                                                            )
-                                                                        }
-                                                                    />
-                                                                </div>
-                                                            </Grid.Col>
-                                                        </Grid>
-                                                        <hr className="text-muted" />
-                                                    </Grid.Col>
-                                                </Grid>
-                                            </>
-                                        ))}
-                                </Grid.Col>
-                                <Grid.Col
-                                    xl="3"
-                                    lg="3"
-                                    md="12"
-                                    sm="12"
-                                    className="mt-2 cart-summery-floating-bottom w-100"
-                                >
-                                    <span className="font-weight-600 text-muted">
-                                        Tổng tiền:
-                                        <br />
-                                        <h3 className="font-weight-700">
-                                            {totalPrice.toLocaleString(
-                                                'it-IT',
-                                                {
-                                                    style: 'currency',
-                                                    currency: 'VND'
-                                                }
-                                            )}
-                                        </h3>
-                                    </span>
-                                    {/* <Link to={"/payment/checkout"} className="mt-2 mb-4"> */}
-                                    <Button
-                                        color="violet"
-                                        uppercase
-                                        size="md"
-                                        className="w-100"
-                                        style={{ borderRadius: '2px' }}
-                                        disabled={carts.length === 0}
-                                        onClick={() => handleCheckOut()}
-                                    >
-                                        Thanh toán
-                                    </Button>
-                                </Grid.Col>
-                            </Grid>
-                        </>
-                    )}
-                </>
-            )}
+                {/* Newest Course */}
+                <Title order={2} color="dark" fw={700} mt={rem('3rem')}>
+                    Những khóa học mới nhất
+                </Title>
 
-            {/* Newest Course */}
-            <Title order={2} color="dark" fw={700} mt={rem('3rem')}>
-                Những khóa học mới nhất
-            </Title>
-
-            {/* Mantine Carousel */}
-            <Carousel
-                slideSize="20%"
-                height="350px"
-                slideGap="lg"
-                controlsOffset="xs"
-                align="start"
-                loop
-                dragFree
-                slidesToScroll={2}
-                styles={{
-                    control: {
-                        background: '#212121',
-                        color: '#fff',
-                        fontSize: rem(25),
-                        '&[data-inactive]': {
-                            opacity: 0,
-                            cursor: 'default'
+                {/* Mantine Carousel */}
+                <Carousel
+                    slideSize="20%"
+                    height="350px"
+                    slideGap="lg"
+                    controlsOffset="xs"
+                    align="start"
+                    loop
+                    dragFree
+                    slidesToScroll={2}
+                    styles={{
+                        control: {
+                            background: '#212121',
+                            color: '#fff',
+                            fontSize: rem(25),
+                            '&[data-inactive]': {
+                                opacity: 0,
+                                cursor: 'default'
+                            },
+                            ref: getStylesRef('controls'),
+                            transition: 'opacity 150ms ease',
+                            opacity: 0
                         },
-                        ref: getStylesRef('controls'),
-                        transition: 'opacity 150ms ease',
-                        opacity: 0
-                    },
-                    root: {
-                        '&:hover': {
-                            [`& .${getStylesRef('controls')}`]: {
-                                opacity: 1
+                        root: {
+                            '&:hover': {
+                                [`& .${getStylesRef('controls')}`]: {
+                                    opacity: 1
+                                }
                             }
                         }
-                    }
-                }}
-            >
-                {slides}
-            </Carousel>
+                    }}
+                >
+                    {slides}
+                </Carousel>
+            </Container>{' '}
         </>
     )
 }

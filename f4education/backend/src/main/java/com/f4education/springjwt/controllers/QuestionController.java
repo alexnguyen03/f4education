@@ -1,49 +1,46 @@
 package com.f4education.springjwt.controllers;
 
-import java.util.List;
-
+import com.f4education.springjwt.interfaces.QuestionService;
+import com.f4education.springjwt.payload.request.QuestionDTO;
 import com.f4education.springjwt.payload.request.QuestionDTORequest;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
-import com.f4education.springjwt.payload.request.QuestionDTO;
-import com.f4education.springjwt.security.services.QuestionServiceImpl;
+import java.util.List;
 
 @CrossOrigin("*")
 @RestController
 @RequestMapping("/api/questions")
 public class QuestionController {
     @Autowired
-    QuestionServiceImpl questionService;
+    QuestionService questionService;
 
-//    @GetMapping
-////	@PreAuthorize("hasRole('ADMIN')")
-//    public List<QuestionDTO> findAll() {
-//        return questionService.getAllQuestion();
-//    }
-//
-//    @GetMapping("/{courseName}")
-////	@PreAuthorize("hasRole('ADMIN')")
-//    public List<QuestionDTO> findByCourseName(@PathVariable("courseName") String courseName) {
-//        return questionService.getQuestionByCourseName(courseName);
-//    }
-//
-//    @PostMapping
-//    public QuestionDTORequest createQuestion(@RequestBody QuestionDTORequest questionDTO) {
-//        return questionService.createQuestion(questionDTO);
-//    }
-//
-//    @PutMapping("/{questionId}")
-////	@PreAuthorize("hasRole('ADMIN')")
-//    public QuestionDTORequest updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDTORequest questionDTO) {
-//        return questionService.updateQuestion(questionId, questionDTO);
-//    }
+    @GetMapping
+//	@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> findAll() {
+        List<QuestionDTO> question = questionService.getAllQuestion();
+        return ResponseEntity.ok(question);
+    }
+
+    @GetMapping("/{questionId}")
+//	@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> findById(@PathVariable Integer questionId) {
+        QuestionDTO question = questionService.findQuestionById(questionId);
+        return ResponseEntity.ok(question);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> createQuestion(@RequestBody QuestionDTORequest questionDTO) {
+        QuestionDTO question = questionService.createQuestion(questionDTO);
+        return ResponseEntity.ok(question);
+    }
+
+    @PutMapping("/{id}")
+//	@PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDTORequest questionDTO) {
+        QuestionDTO question = questionService.updateQuestion(questionId, questionDTO);
+        return ResponseEntity.ok(question);
+    }
 
 }

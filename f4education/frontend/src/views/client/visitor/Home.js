@@ -4,6 +4,7 @@ import {
     Box,
     Button,
     Card,
+    Container,
     Flex,
     getStylesRef,
     Grid,
@@ -12,28 +13,25 @@ import {
     Image,
     Rating,
     rem,
-    Text,
-    Title,
-    Transition,
     SimpleGrid,
+    Skeleton,
+    Text,
     ThemeIcon,
-    Skeleton
+    Title,
+    Transition
 } from '@mantine/core'
-import React, { useEffect, useState } from 'react'
-
-import {
-    IconArrowAutofitRight,
-    IconArrowUp,
-    IconShoppingCartPlus
-} from '@tabler/icons-react'
 import { useWindowScroll } from '@mantine/hooks'
 import { breakpoints } from '@mui/system'
 import {
+    IconArrowAutofitRight,
+    IconArrowUp,
     IconCalendarTime,
     IconCertificate,
-    IconCoin
+    IconCoin,
+    IconShoppingCartPlus
 } from '@tabler/icons-react'
 import PropTypes from 'prop-types'
+import { useEffect, useState } from 'react'
 import Dots from '../../../utils/Dots'
 
 // scss import
@@ -122,8 +120,8 @@ const Home = () => {
     }
 
     // learnext course Carousel
-    const LearnNextSlides = newestCourse.map((learn) => (
-        <Carousel.Slide key={learn.courseId}>
+    const LearnNextSlides = newestCourse.map((learn, index) => (
+        <Carousel.Slide key={index}>
             <HoverCard width={'95%'} shadow="md" position="bottom">
                 {/* Target Hover */}
                 {loading ? (
@@ -214,8 +212,8 @@ const Home = () => {
     ))
 
     // recommentTopic
-    const recommentTopicSlides = recommentTopic.map((learn) => (
-        <Carousel.Slide key={learn.id}>
+    const recommentTopicSlides = recommentTopic.map((learn, index) => (
+        <Carousel.Slide key={index}>
             <Card className="card-hover-overlay">
                 <Card.Section>
                     <Flex direction="column" wrap="wrap">
@@ -247,7 +245,7 @@ const Home = () => {
     // Feature
     function Feature({ icon: Icon, title, description }) {
         return (
-            <div>
+            <div className="shadow p-4 rounded">
                 <ThemeIcon variant="light" size={40} radius={40}>
                     <Icon
                         style={{ width: rem(18), height: rem(18) }}
@@ -283,306 +281,315 @@ const Home = () => {
     return (
         <>
             {/* Mantine Hero section */}
-            <Group
-                className={classHeroText.wrapper}
-                size={1400}
-                mb={rem('5rem')}
-            >
-                <Dots
-                    className={classHeroText.dots}
-                    style={{ left: 0, top: 0 }}
-                />
-                <Dots
-                    className={classHeroText.dots}
-                    style={{ left: 60, top: 0 }}
-                />
-                <Dots
-                    className={classHeroText.dots}
-                    style={{ left: 0, top: 140 }}
-                />
-                <Dots
-                    className={classHeroText.dots}
-                    style={{ right: 0, top: 60 }}
-                />
-                <Dots
-                    className={classHeroText.dots}
-                    style={{ right: 0, top: 200 }}
-                />
+            <Container size="xl">
+                <Group
+                    className={classHeroText.wrapper}
+                    size={1400}
+                    mb={rem('5rem')}
+                >
+                    <Dots
+                        className={classHeroText.dots}
+                        style={{ left: 0, top: 0 }}
+                    />
+                    <Dots
+                        className={classHeroText.dots}
+                        style={{ left: 60, top: 0 }}
+                    />
+                    <Dots
+                        className={classHeroText.dots}
+                        style={{ left: 0, top: 140 }}
+                    />
+                    <Dots
+                        className={classHeroText.dots}
+                        style={{ right: 0, top: 60 }}
+                    />
+                    <Dots
+                        className={classHeroText.dots}
+                        style={{ right: 0, top: 200 }}
+                    />
 
-                <Box mx={'auto'}>
-                    <Title
-                        className={classHeroText.title}
-                        maw={700}
-                        color="dark"
-                        align="center"
-                    >
-                        Tham gia cùng với
-                        <Text
-                            component="span"
-                            className={classHeroText.highlight}
-                            mx={rem('0.5rem')}
-                            inherit
+                    <Box mx={'auto'}>
+                        <Title
+                            className={classHeroText.title}
+                            maw={700}
+                            color="dark"
+                            align="center"
+                            order={1}
                         >
-                            hàng triệu
-                        </Text>
-                        sinh viên tại F4 Education.
-                    </Title>
-                    <br />
-                    <Title
-                        order={5}
-                        maw={600}
-                        size="lg"
-                        c="dimmed"
-                        className={classHeroText.description}
-                    >
-                        Học những khóa học lập trình mà bạn thích Java, Python,
-                        Reactjs , Ruby,... cùng hàng trăm những khóa học về kỹ
-                        năng giao tiếp, kỹ năng thực chiến khác đang chờ đợi các
-                        bạn tham gia.
-                    </Title>
-                    <br />
-                    <div className={classHeroText.controls}>
-                        <Link to="/course">
+                            Tham gia cùng với
+                            <Text
+                                component="span"
+                                className={classHeroText.highlight}
+                                mx={rem('0.5rem')}
+                                inherit
+                            >
+                                hàng triệu
+                            </Text>
+                            sinh viên tại F4 Education.
+                        </Title>
+                        <br />
+                        <Title
+                            order={5}
+                            maw={600}
+                            size="lg"
+                            c="dimmed"
+                            className={classHeroText.description}
+                        >
+                            Học những khóa học lập trình mà bạn thích Java,
+                            Python, Reactjs , Ruby,... cùng hàng trăm những khóa
+                            học về kỹ năng giao tiếp, kỹ năng thực chiến khác
+                            đang chờ đợi các bạn tham gia.
+                        </Title>
+                        <br />
+                        <div className={classHeroText.controls}>
+                            <Link to="/course">
+                                <Button
+                                    className={classHeroText.control}
+                                    size="lg"
+                                    variant="default"
+                                    color="gray"
+                                >
+                                    Xem khóa học
+                                </Button>
+                            </Link>
                             <Button
                                 className={classHeroText.control}
                                 size="lg"
-                                variant="default"
-                                color="gray"
+                                ml={rem(3)}
                             >
-                                Xem khóa học
+                                Đăng ký tài khoản
                             </Button>
-                        </Link>
-                        <Button
-                            className={classHeroText.control}
-                            size="lg"
-                            ml={rem(3)}
+                        </div>
+                    </Box>
+                </Group>
+
+                {/* Feature section */}
+                <Group
+                    position="apart"
+                    my={rem('8rem')}
+                    className={classes.wrapper}
+                >
+                    <Title
+                        className={classes.title}
+                        align="center"
+                        color="dark"
+                    >
+                        Nâng cấp khả năng và kiến thức của bạn
+                    </Title>
+
+                    <br />
+
+                    <Title
+                        order={5}
+                        size="sm"
+                        className={classes.description}
+                        align="center"
+                        maw={600}
+                        color="dimmed"
+                    >
+                        Cung cấp cho bạn và nhóm của bạn kiến ​​thức, kinh
+                        nghiệm và sự tự tin mà bạn và họ cần để giải quyết mọi
+                        vấn đề.
+                    </Title>
+
+                    <SimpleGrid
+                        mt={60}
+                        cols={3}
+                        spacing="lg"
+                        breakpoints={[
+                            { maxWidth: 'md', cols: 3, spacing: 'md' },
+                            { maxWidth: 'sm', cols: 2, spacing: 'sm' },
+                            { maxWidth: 'xs', cols: 1, spacing: 'sm' }
+                        ]}
+                    >
+                        {features}
+                    </SimpleGrid>
+                </Group>
+
+                {/* wwhat learn nexxt */}
+                <Box mt={rem('5rem')}>
+                    <Title order={1} mt="lg" fw={700} color="dark">
+                        Tiếp theo học gì
+                    </Title>
+                    <Text size={'xl'} c="dimmed" maw={600} mb="md">
+                        Chúng tôi có những khóa học mới nhất và chất lượng nhất
+                    </Text>
+                    <Box>
+                        <Carousel
+                            slideSize="20%"
+                            height="400px"
+                            slideGap="lg"
+                            controlsOffset="xs"
+                            align="start"
+                            dragFree
+                            controlSize={35}
+                            slidesToScroll={breakpoints ? 3 : 1}
+                            styles={{
+                                control: {
+                                    background: '#212121',
+                                    color: '#fff',
+                                    fontSize: rem(35),
+                                    '&[data-inactive]': {
+                                        opacity: 0,
+                                        cursor: 'default'
+                                    },
+                                    ref: getStylesRef('controls'),
+                                    transition: 'opacity 150ms ease',
+                                    opacity: 0
+                                },
+                                root: {
+                                    '&:hover': {
+                                        [`& .${getStylesRef('controls')}`]: {
+                                            opacity: 1
+                                        }
+                                    }
+                                }
+                            }}
                         >
-                            Đăng ký tài khoản
-                        </Button>
-                    </div>
+                            {LearnNextSlides}
+                        </Carousel>
+                    </Box>
                 </Box>
-            </Group>
 
-            {/* Feature section */}
-            <Group
-                position="apart"
-                my={rem('8rem')}
-                className={classes.wrapper}
-            >
-                <Title className={classes.title} align="center" color="dark">
-                    Nâng cấp khả năng và kiến thức của bạn
-                </Title>
-
-                <br />
-
-                <Title
-                    order={5}
-                    size="sm"
-                    className={classes.description}
-                    align="center"
-                    maw={600}
-                    color="dimmed"
-                >
-                    Cung cấp cho bạn và nhóm của bạn kiến ​​thức, kinh nghiệm và
-                    sự tự tin mà bạn và họ cần để giải quyết mọi vấn đề.
-                </Title>
-
-                <SimpleGrid
-                    mt={60}
-                    cols={3}
-                    spacing="lg"
-                    breakpoints={[
-                        { maxWidth: 'md', cols: 3, spacing: 'md' },
-                        { maxWidth: 'sm', cols: 2, spacing: 'sm' },
-                        { maxWidth: 'xs', cols: 1, spacing: 'sm' }
-                    ]}
-                >
-                    {features}
-                </SimpleGrid>
-            </Group>
-
-            {/* wwhat learn nexxt */}
-            <Box mt={rem('5rem')}>
-                <Title order={1} mt="lg" fw={700} color="dark">
-                    Tiếp theo học gì
-                </Title>
-                <Text size={'xl'} c="dimmed" maw={600} mb="md">
-                    Chúng tôi có những khóa học mới nhất và chất lượng nhất
-                </Text>
+                {/* Top sell course*/}
                 <Box>
-                    <Carousel
-                        slideSize="20%"
-                        height="400px"
-                        slideGap="lg"
-                        controlsOffset="xs"
-                        align="start"
-                        loop
-                        dragFree
-                        slidesToScroll={breakpoints ? 3 : 1}
-                        styles={{
-                            control: {
-                                background: '#212121',
-                                color: '#fff',
-                                fontSize: rem(25),
-                                '&[data-inactive]': {
-                                    opacity: 0,
-                                    cursor: 'default'
+                    <Title order={1} mt="lg" fw={700} color="dark">
+                        Những khóa học bán chạy nhất
+                    </Title>
+                    <Box>
+                        <Carousel
+                            slideSize="20%"
+                            height="400px"
+                            slideGap="lg"
+                            controlsOffset="xs"
+                            align="start"
+                            dragFree
+                            controlSize={35}
+                            slidesToScroll={breakpoints ? 3 : 1}
+                            styles={{
+                                control: {
+                                    background: '#212121',
+                                    color: '#fff',
+                                    fontSize: rem(35),
+                                    '&[data-inactive]': {
+                                        opacity: 0,
+                                        cursor: 'default'
+                                    },
+                                    ref: getStylesRef('controls'),
+                                    transition: 'opacity 150ms ease',
+                                    opacity: 0
                                 },
-                                ref: getStylesRef('controls'),
-                                transition: 'opacity 150ms ease',
-                                opacity: 0
-                            },
-                            root: {
-                                '&:hover': {
-                                    [`& .${getStylesRef('controls')}`]: {
-                                        opacity: 1
+                                root: {
+                                    '&:hover': {
+                                        [`& .${getStylesRef('controls')}`]: {
+                                            opacity: 1
+                                        }
                                     }
                                 }
-                            }
-                        }}
-                    >
-                        {LearnNextSlides}
-                    </Carousel>
+                            }}
+                        >
+                            {LearnNextSlides}
+                        </Carousel>
+                    </Box>
                 </Box>
-            </Box>
 
-            {/* Top sell course*/}
-            <Box>
-                <Title order={1} mt="lg" fw={700} color="dark">
-                    Những khóa học bán chạy nhất
-                </Title>
-                <Box>
-                    <Carousel
-                        slideSize="20%"
-                        height="400px"
-                        slideGap="lg"
-                        controlsOffset="xs"
-                        align="start"
-                        loop
-                        dragFree
-                        slidesToScroll={breakpoints ? 3 : 1}
-                        styles={{
-                            control: {
-                                background: '#212121',
-                                color: '#fff',
-                                fontSize: rem(25),
-                                '&[data-inactive]': {
-                                    opacity: 0,
-                                    cursor: 'default'
-                                },
-                                ref: getStylesRef('controls'),
-                                transition: 'opacity 150ms ease',
-                                opacity: 0
-                            },
-                            root: {
-                                '&:hover': {
-                                    [`& .${getStylesRef('controls')}`]: {
-                                        opacity: 1
+                {/* Topic recomment*/}
+                <Box my={rem('5rem')}>
+                    <Title order={1} mt="lg" fw={700} color="dark" mb="lg">
+                        Những chủ đề gợi ý cho bạn
+                    </Title>
+                    <Box>
+                        <Carousel
+                            slideSize="20%"
+                            height={'auto'}
+                            slideGap="lg"
+                            controlsOffset="xs"
+                            align="start"
+                            dragFree
+                            slidesToScroll={breakpoints ? 3 : 1}
+                            styles={{
+                                control: {
+                                    background: '#212121',
+                                    color: '#fff',
+                                    fontSize: rem(25),
+                                    '&[data-inactive]': {
+                                        opacity: 0,
+                                        cursor: 'default'
                                     }
                                 }
-                            }
-                        }}
-                    >
-                        {LearnNextSlides}
-                    </Carousel>
+                            }}
+                        >
+                            {recommentTopicSlides}
+                        </Carousel>
+                    </Box>
                 </Box>
-            </Box>
-
-            {/* Topic recomment*/}
-            <Box my={rem('5rem')}>
-                <Title order={1} mt="lg" fw={700} color="dark" mb="lg">
-                    Những chủ đề gợi ý cho bạn
-                </Title>
-                <Box>
-                    <Carousel
-                        slideSize="20%"
-                        height={'auto'}
-                        slideGap="lg"
-                        controlsOffset="xs"
-                        align="start"
-                        dragFree
-                        slidesToScroll={breakpoints ? 3 : 1}
-                        styles={{
-                            control: {
-                                background: '#212121',
-                                color: '#fff',
-                                fontSize: rem(25),
-                                '&[data-inactive]': {
-                                    opacity: 0,
-                                    cursor: 'default'
-                                }
-                            }
-                        }}
-                    >
-                        {recommentTopicSlides}
-                    </Carousel>
-                </Box>
-            </Box>
-
+            </Container>
             {/* Other section */}
             <Box my={rem('5rem')} bg="#10162f" p={rem('2rem')}>
-                <Grid grow>
-                    <Grid.Col xl={6} lg={6} md={12} sm={12}>
-                        <Box>
-                            <Title
-                                order={1}
-                                color="#fff"
-                                fw={700}
-                                mx={'auto'}
-                                align={'center'}
-                                maw={300}
-                            >
-                                Gia nhập với chúng tôi ngay.
-                            </Title>
-                        </Box>
-                    </Grid.Col>
-                    <Grid.Col xl={6} lg={6} md={12} sm={12}>
-                        <Group position="apart">
-                            <Flex
-                                gap="md"
-                                justify="center"
-                                align="center"
-                                direction="column"
-                                wrap="wrap"
-                            >
-                                <Title order={1} color="#fff" fw={700}>
-                                    1M
+                <Container>
+                    <Grid grow>
+                        <Grid.Col xl={6} lg={6} md={12} sm={12}>
+                            <Box>
+                                <Title
+                                    order={1}
+                                    color="#fff"
+                                    fw={700}
+                                    mx={'auto'}
+                                    align={'center'}
+                                    maw={300}
+                                >
+                                    Gia nhập với chúng tôi ngay.
                                 </Title>
-                                <Text color="#fff" fw={700}>
-                                    Học viên
-                                </Text>
-                            </Flex>
-                            <Flex
-                                gap="md"
-                                justify="center"
-                                align="center"
-                                direction="column"
-                                wrap="wrap"
-                            >
-                                <Title order={1} color="#fff" fw={700}>
-                                    10+
-                                </Title>
-                                <Text color="#fff" fw={700}>
-                                    Quốc gia
-                                </Text>
-                            </Flex>
-                            <Flex
-                                gap="md"
-                                justify="center"
-                                align="center"
-                                direction="column"
-                                wrap="wrap"
-                            >
-                                <Title order={1} color="#fff" fw={700}>
-                                    100+
-                                </Title>
-                                <Text color="#fff" fw={700}>
-                                    Khóa học
-                                </Text>
-                            </Flex>
-                        </Group>
-                    </Grid.Col>
-                </Grid>
+                            </Box>
+                        </Grid.Col>
+                        <Grid.Col xl={6} lg={6} md={12} sm={12}>
+                            <Group position="apart">
+                                <Flex
+                                    gap="md"
+                                    justify="center"
+                                    align="center"
+                                    direction="column"
+                                    wrap="wrap"
+                                >
+                                    <Title order={1} color="#fff" fw={700}>
+                                        1M
+                                    </Title>
+                                    <Text color="#fff" fw={700}>
+                                        Học viên
+                                    </Text>
+                                </Flex>
+                                <Flex
+                                    gap="md"
+                                    justify="center"
+                                    align="center"
+                                    direction="column"
+                                    wrap="wrap"
+                                >
+                                    <Title order={1} color="#fff" fw={700}>
+                                        10+
+                                    </Title>
+                                    <Text color="#fff" fw={700}>
+                                        Quốc gia
+                                    </Text>
+                                </Flex>
+                                <Flex
+                                    gap="md"
+                                    justify="center"
+                                    align="center"
+                                    direction="column"
+                                    wrap="wrap"
+                                >
+                                    <Title order={1} color="#fff" fw={700}>
+                                        100+
+                                    </Title>
+                                    <Text color="#fff" fw={700}>
+                                        Khóa học
+                                    </Text>
+                                </Flex>
+                            </Group>
+                        </Grid.Col>
+                    </Grid>
+                </Container>
             </Box>
 
             <Box my={rem('5rem')} p={rem('2rem')}>
@@ -639,8 +646,9 @@ const Home = () => {
                     {(transitionStyles) => (
                         <Button
                             color="dark"
-                            // px={1}
-                            radius={'50%'}
+                            size="xs"
+                            // radius={'xl'}
+                            className="rounded-circle p-2"
                             style={transitionStyles}
                             onClick={() => scrollTo({ y: 0 })}
                         >

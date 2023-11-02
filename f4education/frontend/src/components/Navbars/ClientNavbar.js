@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Badge, Col, Row } from 'reactstrap'
 import logo from '../../assets/img/brand/f4.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
@@ -27,6 +27,7 @@ import {
     IconChevronDown,
     IconLayoutDashboard,
     IconLogout2,
+    IconProgressAlert,
     IconSchoolBell,
     IconSearch,
     IconUserBolt
@@ -38,99 +39,19 @@ import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
-// Styled component
-// const NavbarCustom = styled.nav`
-//   clear: both;
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   background: #fff;
-//   box-shadow: #63636333 2px 2px 8px 0px;
-//   z-index: 1000;
-//   transition: all 0.3s linear;
-// `;
-
-// const CustomNavLink = styled.div`
-//   position: relative;
-//   color: #555555 !important;
-//   font-size: 18px;
-//   font-weight: 600 !important;
-//   transition: all 0.3s linear;
-
-//   &:hover {
-//     color:#212121,
-//     font-weight:600,
-//   }
-
-//   &:hover {
-//     &::after {
-//       display: block;
-//       transition: all 0.3s linear;
-//     }
-//   }
-
-//   .active {
-//     &::after {
-//     display: block;
-//     }
-//   }
-
-//   &::after {
-//     position: absolute;
-//     content: "";
-//     left: 0;
-//     bottom: -58%;
-//     background: #333;
-//     height: 4px;
-//     width: 100%;
-//     display: none;
-//     transition: all 0.3s linear;
-//   }
-
-//   @media (max-width: 991px) {
-//     &::after {
-//       position: absolute;
-//       content: "";
-//       left: 50%;
-//       transform: translateX(-50%);
-//       right: 0;
-//       bottom: 0;
-//       background: #333;
-//       height: 5px;
-//       width: 100px;
-//       text-align: center;
-//       transition: all 0.3s linear;
-//     }
-//   }
-
-//   @media (max-width: 991px) {
-//     & {
-//       position: relative;
-//       color: #555555 !important;
-//       font-size: 18px;
-//       margin-bottom: 10px;
-//       font-weight: 600 !important;
-//       transition: all 0.3s linear;
-//     }
-//   }
-// `;
-
 const ClientNavbar = () => {
     const ref = useElementSize()
+    const navigate = useNavigate()
+
     const [login, setLogin] = useState(false)
     const [cartEmpty, setCartEmpty] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const [activeItems, setActiveItems] = useState([false, false, false])
-    const [opened, { toggle }] = useDisclosure(false)
+    const [opened, { toggle }] = useDisclosure(true)
 
     // *************** CART VARIABLE - AREA START
     const [carts, setCarts] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
-
-    // useEffect(() => {
-
-    // }, [searchParams]);
 
     const fetchCart = async () => {
         try {
@@ -168,6 +89,7 @@ const ClientNavbar = () => {
 
     const handleLogin = (prev) => {
         setLogin(!prev)
+        navigate('auth/login')
     }
 
     const handleCartEmpty = (prev) => {
@@ -177,38 +99,43 @@ const ClientNavbar = () => {
     window.addEventListener('scroll', function () {
         const navbar = this.document.querySelector('#navbar-animate')
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop
+        if (scrollTop && navbar) {
+            // window.addEventListener("scroll", function () {
+            //   if (window.pageYOffset === 0) {
+            //     navbar.style.boxShadow = "none";
+            //     navbar.style.top = 0;
+            //   } else {
+            //     navbar.style.boxShadow = "#63636333 2px 2px 8px 0px";
+            //   }
+            // });
 
-        window.addEventListener('scroll', function () {
-            if (window.pageYOffset === 0) {
-                navbar.style.boxShadow = 'none'
-                navbar.style.top = 0
+            // if (scrollTop === 0) {
+            //   navbar.style.top = 0;
+            // }
+            if (scrollTop > lastScrollTop) {
+                navbar.style.top = '-80px'
             } else {
-                navbar.style.boxShadow = '#63636333 2px 2px 8px 0px'
+                navbar.style.top = 0
             }
-        })
-
-        if (scrollTop === 0) {
-            navbar.style.top = 0
+            setLastScrollTop(scrollTop)
         }
-        if (scrollTop > lastScrollTop) {
-            navbar.style.top = '-80px'
-        } else {
-            navbar.style.top = 0
-        }
-        setLastScrollTop(scrollTop)
     })
 
     return (
         // <Container size="30rem" px={0}>
+        // <Container size="xl" px="xs">
         <nav
             className={`navbar navbar-expand-lg ${styles['navbar-animate']}`}
             id="navbar-animate"
         >
-            <div className="container-xl">
+            <div
+                className="container-xl"
+                style={{ width: '100%', maxWidth: '1360px' }}
+            >
                 <Link to={'/'} className="navbar-brand">
                     <img src={logo} className="img-fluid" alt="" />
                 </Link>
-                <button
+                <div
                     className="navbar-toggler"
                     type="button"
                     data-toggle="collapse"
@@ -218,8 +145,8 @@ const ClientNavbar = () => {
                     aria-label="Toggle navigation"
                     style={{ zIndex: '99999' }}
                 >
-                    <Burger opened={opened} onClick={toggle} />
-                </button>
+                    <Burger opened={!opened} onClick={toggle} />
+                </div>
 
                 {/* Content */}
                 <div
@@ -227,10 +154,10 @@ const ClientNavbar = () => {
                     id="navbarSupportedContent"
                 >
                     <ul
-                        className="navbar-nav mr-auto text-center d-md-flex d-sm-flex
-                        justify-content-md-center justify-content-sm-center"
+                        className="navbar-nav mr-sm-auto ml-sm-auto text-center d-md-flex d-sm-flex
+                        justify-content-md-center  justify-content-sm-center"
                     >
-                        <li className="nav-item">
+                        {/* <li className="nav-item">
                             <Link
                                 to={'/'}
                                 className={`
@@ -245,7 +172,7 @@ const ClientNavbar = () => {
                             >
                                 Trang chủ
                             </Link>
-                        </li>
+                        </li> */}
                         <li className="nav-item">
                             <Link
                                 to={'/course'}
@@ -262,23 +189,8 @@ const ClientNavbar = () => {
                                 Khóa học
                             </Link>
                         </li>
-                        <li className="nav-item">
-                            <Link
-                                to={'/cart'}
-                                className={`
-                ${
-                    activeItems[2]
-                        ? 'nav-link custom-nav-link active'
-                        : 'nav-link custom-nav-link'
-                }
-                ${styles['custom-nav-link']}
-                `}
-                                onClick={() => handleItemClick(2)}
-                            >
-                                Giỏ hàng
-                            </Link>
-                        </li>
-                        <li className="nav-item">
+
+                        <li className="nav-item d-flex justify-content-center">
                             <HoverCard
                                 width={'75vw'}
                                 position="bottom"
@@ -638,6 +550,16 @@ const ClientNavbar = () => {
                                         >
                                             Hệ thống học tập
                                         </Menu.Item>
+                                        <Menu.Item
+                                                icon={
+                                                    <IconProgressAlert size={14} />
+                                                }
+                                                component="a"
+                                                href="/course-progress"
+                                                target="_blank"
+                                            >
+                                                tiến độ
+                                            </Menu.Item>
                                         <Menu.Item
                                             icon={<IconUserBolt size={14} />}
                                             component="a"

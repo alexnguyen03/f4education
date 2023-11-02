@@ -17,7 +17,8 @@ const defaultOptions = {
 }
 const Notify = {
     msg: {
-        loading: 'Đang xử lý...'
+        loading: 'Đang xử lý...',
+        updateSuccess: 'Cập nhật thành công !'
     },
     options: {
         loading: () => {

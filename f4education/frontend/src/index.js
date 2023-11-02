@@ -10,6 +10,7 @@ import AdminLayout from 'layouts/Admin.js'
 import AuthLayout from 'layouts/Auth.js'
 import ClientLayout from 'layouts/Client.js'
 import Teacher from 'layouts/Teacher'
+import Student from './layouts/Student'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
@@ -19,14 +20,15 @@ root.render(
             {/* Admin Route */}
             <Route path="/admin/*" element={<AdminLayout />} />
             <Route path="/auth/*" element={<AuthLayout />} />
-            <Route
-                path="/admin"
-                element={<Navigate to="/admin/index" replace />}
-            />
-            <Route path="/admin/*/:courseName" element={<AdminLayout />} />
+            <Route path="/admin/*/:questionId" element={<AdminLayout />} />
             <Route
                 path="/admin/*/:courseName/:folderId"
                 element={<AdminLayout />}
+            />
+            <Route path="/admin/*/:courseName" element={<AdminLayout />} />
+            <Route
+                path="/admin"
+                element={<Navigate to="/admin/index" replace />}
             />
 
             {/* Client Route */}
@@ -42,6 +44,8 @@ root.render(
                 element={<AdminLayout />}
             />
 
+            {/* Student Route */}
+            <Route path="/student/*" element={<Student />} />
             {/* Teacher Route */}
             <Route path="/teacher/*" element={<Teacher />} />
             <Route path="/*/classes-infor/:classId" element={<Teacher />} />

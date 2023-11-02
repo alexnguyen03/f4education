@@ -1,6 +1,5 @@
 package com.f4education.springjwt.repository;
 
-import com.f4education.springjwt.models.ClassesByTeacher;
 import com.f4education.springjwt.models.RegisterCourse;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -17,8 +16,12 @@ public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, 
 	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.course.courseId = :courseId")
 	List<RegisterCourse> findByCourseId(@Param("courseId") Integer courseId);
 
+	@Query("SELECT rc FROM RegisterCourse rc JOIN rc.classes WHERE rc.student.studentId = :studentId")
+	List<RegisterCourse> findCourseProgressByStudentId(@Param("studentId") String studentId);
+
 	//
 	// @Query("SELECT new com.f4education.springjwt.models.ClassesByTeacher(rc,c,t)
 	// FROM RegisterCourse rc JOIN rc.classes c JOIN c.teacher t")
 	// List<ClassesByTeacher> getRegisterCourseWithTeacherAndClasses();
+	List<RegisterCourse> findRegisterCoursesByStudent_StudentId(String studentId);
 }
