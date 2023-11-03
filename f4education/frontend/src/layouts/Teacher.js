@@ -9,11 +9,25 @@ import TeacherAndStudentSidebar from '../components/Sidebar/TeacherAndStudentSid
 
 import { routesTeacher } from '../routes'
 import TeacherNavbar from 'components/Navbars/TeacherNavbar'
+import { Button, Container, Group, Menu } from '@mantine/core'
+import UserButton from 'components/UserButton/UserButton'
+import {
+    IconArrowsExchange,
+    IconArrowsLeftRight,
+    IconChevronDown,
+    IconChevronRight,
+    IconEdit,
+    IconLogout,
+    IconPasswordUser,
+    IconTrash
+} from '@tabler/icons-react'
 
 const Teacher = (props) => {
     const mainContent = useRef(null)
     const location = useLocation()
     const [teacherName, setTeacherName] = useState('')
+    const [showSideBar, setShowSideBar] = useState(false)
+    const [userIcon, setUserIcon] = useState(<IconChevronRight size="1rem" />)
     useEffect(() => {
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
@@ -54,24 +68,78 @@ const Teacher = (props) => {
 
     return (
         <>
-            <TeacherAndStudentSidebar
-                {...props}
-                routes={routesTeacher}
-                logo={{
-                    innerLink: '/student',
-                    imgSrc: require('../assets/img/brand/argon-react.png'),
-                    imgAlt: '...'
-                }}
-            />
-            <div
-                className="main-content"
-                style={{ minHeight: '100vh' }}
+            {showSideBar && (
+                <TeacherAndStudentSidebar {...props} routes={routesTeacher} />
+            )}
+            <Container
+                className="main-content "
+                style={{ backgroundColor: '#fff', minHeight: '100vh' }}
                 ref={mainContent}
+                fluid
+                pt={'md'}
             >
-                {/* <TeacherNavbar /> */}
+                <Container fluid px={0} className="border-bottom">
+                    <Group position="right" pos={'relative'}>
+                        <Button
+                            left={`${showSideBar ? -45 : 0}`}
+                            top={'25%'}
+                            pos={'absolute'}
+                            onClick={() => {
+                                setShowSideBar((prev) => !prev)
+                            }}
+                            // className={`${showSideBar ? 'ml--6' : ''} mt-3 `}
+                        >
+                            {!showSideBar ? (
+                                <i className="fa-solid fa-bars"></i>
+                            ) : (
+                                <i className="fa-solid fa-chevron-left"></i>
+                            )}
+                        </Button>
 
-                <div className="m-2 p-3" style={{ minHeight: '100vh' }}>
-                    <div className="mt-xl-7 mt-lg-6">
+                        <Group w={280}>
+                            <Menu
+                                shadow="md"
+                                onOpen={() => {
+                                    setUserIcon(<IconChevronDown size="1rem" />)
+                                }}
+                                onClose={() => {
+                                    setUserIcon(
+                                        <IconChevronRight size="1rem" />
+                                    )
+                                }}
+                            >
+                                <Menu.Target>
+                                    <UserButton
+                                        image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
+                                        name="Harriette Spoonlicker"
+                                        email="hspoonlicker@outlook.com"
+                                        icon={userIcon}
+                                    />
+                                </Menu.Target>
+                                <Menu.Dropdown>
+                                    {/* <Menu.Label>Danger zone</Menu.Label> */}
+                                    <Menu.Item icon={<IconEdit size={14} />}>
+                                        Thông tin tài khoản
+                                    </Menu.Item>
+                                    <Menu.Divider />
+                                    <Menu.Item
+                                        icon={<IconPasswordUser size={14} />}
+                                    >
+                                        Đổi mật khẩu
+                                    </Menu.Item>
+                                    <Menu.Item
+                                        color="red"
+                                        icon={<IconLogout size={14} />}
+                                    >
+                                        Đăng xuất
+                                    </Menu.Item>
+                                </Menu.Dropdown>
+                            </Menu>
+                        </Group>
+                    </Group>
+                </Container>
+                <div className="" style={{ minHeight: '100vh' }}>
+                    <div className="">
                         <Routes>
                             {getRoutes(routesTeacher)}
                             <Route
@@ -86,7 +154,7 @@ const Teacher = (props) => {
                         </Routes>
                     </div>
                 </div>
-            </div>
+            </Container>
         </>
     )
 }

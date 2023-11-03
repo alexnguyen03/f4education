@@ -249,7 +249,7 @@ export const routesTeacher = [
 
 export const routesStudent = [
     {
-        path: '/',
+        path: '/classes',
         name: 'Trang chủ',
         icon: 'ni ni-planet text-blue',
         component: <StudentHome />,

@@ -19,6 +19,7 @@ import { convertArrayToLabel } from '../../../utils/Convertor'
 import CourseProgress from './CourseProgress'
 
 const StudentHome = (props) => {
+    useEffect(() => {}, [])
     return (
         <>
             <div className="">

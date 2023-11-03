@@ -422,6 +422,7 @@ const Home = () => {
                             controlsOffset="xs"
                             align="start"
                             dragFree
+                            loop
                             controlSize={35}
                             slidesToScroll={breakpoints ? 3 : 1}
                             styles={{
@@ -464,6 +465,7 @@ const Home = () => {
                             controlsOffset="xs"
                             align="start"
                             dragFree
+                            loop
                             controlSize={35}
                             slidesToScroll={breakpoints ? 3 : 1}
                             styles={{
@@ -506,6 +508,7 @@ const Home = () => {
                             controlsOffset="xs"
                             align="start"
                             dragFree
+                            loop
                             slidesToScroll={breakpoints ? 3 : 1}
                             styles={{
                                 control: {
@@ -607,9 +610,18 @@ const Home = () => {
                         Cung cấp những khóa học lập trình, kiến thức bạn cần để
                         có thể học tập và đi làm chỉ trong 9 tháng.
                     </Text>
-                    <Button variant="outline" color="dark" size="lg" uppercase>
-                        Đăng ký ngay
-                    </Button>
+                    <Link to="/auth/login">
+                        <Button
+                            variant="outline"
+                            color="dark"
+                            size="lg"
+                            uppercase
+                            // component={'a'}
+                            // href="/auth/login"
+                        >
+                            Đăng ký ngay
+                        </Button>
+                    </Link>
                 </Flex>
             </Box>
 

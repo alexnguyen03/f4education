@@ -8,8 +8,10 @@ import {
     Grid,
     Group,
     Image,
+    Modal,
     rem,
     Skeleton,
+    Stack,
     Text,
     Title
 } from '@mantine/core'
@@ -23,6 +25,7 @@ import classApi from '../../api/classApi'
 
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
+import { useDisclosure } from '@mantine/hooks'
 
 const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -46,6 +49,12 @@ const ClassInformationDetail = () => {
 
     // ************* Action variable
     const [loading, setLoading] = useState(false)
+
+    const [examOpened, handlers] = useDisclosure(false, {
+        onOpen: () => console.log('Opened'),
+        onClose: () => console.log('Closed')
+    })
+
     const [isPresent, setIsPresent] = useState(false)
     const [seletedStudent, setSletedStudent] = useState({
         studentId: '',
@@ -195,8 +204,16 @@ const ClassInformationDetail = () => {
     return (
         <>
             {/* Header */}
-            <Box mb={'md'} className={styles['box-header']}>
-                <Group position="apart">
+            <Box my={'md'} className={styles['box-header']}>
+                <Group position="apart" px={'lg'} py={'md'}>
+                    {/* <Button color="cyan" size="md"> */}
+                    <div
+                        onClick={() => redirectTo()}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <i className="fa-solid fa-arrow-left"></i>
+                    </div>
+                    {/* </Button> */}
                     <Title order={3} color="dark">
                         Chi tiết lớp học: {classInfor.className}
                     </Title>
@@ -206,9 +223,9 @@ const ClassInformationDetail = () => {
             <Grid>
                 {/* Left side */}
                 <Grid.Col xl={3} lg={3}>
-                    <Box className={styles['box-header']}>
-                        {loading ? (
-                            <>
+                    {loading ? (
+                        <Card shadow="sm" padding="lg" radius="md" withBorder>
+                            <Card.Section>
                                 <Flex
                                     direction="column"
                                     justify="center"
@@ -242,83 +259,77 @@ const ClassInformationDetail = () => {
                                         mt={25}
                                     />
                                 </Flex>
-                            </>
-                        ) : (
-                            <>
-                                <Card
-                                    padding="xl"
-                                    radius="md"
-                                    className={styles.card}
+                            </Card.Section>
+                        </Card>
+                    ) : (
+                        <Card
+                            // padding="xl"
+                            shadow="sm"
+                            padding="lg"
+                            radius="md"
+                            className={styles.card}
+                        >
+                            <Card.Section
+                                h={200}
+                                style={{
+                                    backgroundImage:
+                                        'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80)'
+                                }}
+                            />
+                            {/* <Image
+                                    src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                                    height={160}
+                                    alt="Norway"
+                                    className={styles.avatar}
+                                /> */}
+                            <Avatar
+                                src="https://th.bing.com/th/id/OIP.0MP14fOr1ykZDCnNZ5grFwHaGZ?pid=ImgDet&rs=1"
+                                size={80}
+                                radius={80}
+                                mx="auto"
+                                mt={-30}
+                            />
+                            <Title order={2} fw={500} mt="sm" align="center">
+                                {classInfor.className}
+                            </Title>
+                            <Text ta="center" fz="md" c="dimmed" align="center">
+                                {courseName}
+                            </Text>
+                            <Text
+                                c="dimmed"
+                                mt="md"
+                                fz="md"
+                                align="center"
+                                gap={30}
+                            >
+                                Từ ngày{' '}
+                                {moment(classInfor.startDate).format(
+                                    'DD/mm/yyyy'
+                                )}{' '}
+                                -{' '}
+                                {moment(classInfor.endDate).format(
+                                    'DD/mm/yyyy'
+                                )}
+                            </Text>
+                            <Flex
+                                align={'center'}
+                                justify="space-between"
+                                mt="lg"
+                            >
+                                <Text
+                                    ta="center"
+                                    fz="md"
+                                    c="dimmed"
+                                    align="left"
                                 >
-                                    <Card.Section
-                                        h={140}
-                                        style={{
-                                            backgroundImage:
-                                                'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80)'
-                                        }}
-                                    />
-                                    <Avatar
-                                        src="https://th.bing.com/th/id/OIP.0MP14fOr1ykZDCnNZ5grFwHaGZ?pid=ImgDet&rs=1"
-                                        size={80}
-                                        radius={80}
-                                        mx="auto"
-                                        mt={-30}
-                                        className={styles.avatar}
-                                    />
-                                    <Title
-                                        order={2}
-                                        fw={500}
-                                        mt="sm"
-                                        align="center"
-                                    >
-                                        {classInfor.className}
-                                    </Title>
-                                    <Text
-                                        ta="center"
-                                        fz="md"
-                                        c="dimmed"
-                                        align="center"
-                                    >
-                                        {courseName}
-                                    </Text>
-                                    <Text
-                                        c="dimmed"
-                                        mt="md"
-                                        fz="md"
-                                        align="center"
-                                        gap={30}
-                                    >
-                                        Từ ngày{' '}
-                                        {moment(classInfor.startDate).format(
-                                            'DD/mm/yyyy'
-                                        )}{' '}
-                                        -{' '}
-                                        {moment(classInfor.endDate).format(
-                                            'DD/mm/yyyy'
-                                        )}
-                                    </Text>
-                                    <Flex
-                                        align={'center'}
-                                        justify="space-between"
-                                        mt="lg"
-                                    >
-                                        <Text
-                                            ta="center"
-                                            fz="md"
-                                            c="dimmed"
-                                            align="left"
-                                        >
-                                            Trạng thái:
-                                        </Text>
-                                        <Badge
-                                            color="indigo"
-                                            radius="sm"
-                                            mt={rem(3)}
-                                        >
-                                            {classInfor.status}
-                                        </Badge>
-                                    </Flex>
-                                    <Button
+                                    Trạng thái:
+                                </Text>
+                                <Badge color="indigo" radius="sm" mt={rem(3)}>
+                                    {classInfor.status}
+                                </Badge>
+                            </Flex>
+                            <Stack my={'xl'}>
+                                {/* <Button
                                         fullWidth
                                         radius="md"
                                         mt="xl"
@@ -327,11 +338,21 @@ const ClassInformationDetail = () => {
                                         onClick={() => redirectTo()}
                                     >
                                         Trở về
-                                    </Button>
-                                </Card>
-                            </>
-                        )}
-                    </Box>
+                                    </Button> */}
+                                <Button
+                                    onClick={handlers.open}
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                >
+                                    Tạo quiz
+                                </Button>
+                                <Button color="cyan" size="md" mb="md">
+                                    Giao bài tập
+                                </Button>
+                            </Stack>
+                        </Card>
+                    )}
                 </Grid.Col>
 
                 {/* Right side */}
@@ -352,6 +373,7 @@ const ClassInformationDetail = () => {
                                     <Button color="violet" size="md" mb="lg">
                                         Lưu điểm danh
                                     </Button>
+
                                     <Text color="dark" fz="lg" fw={500}>
                                         Tổng sinh viên:{' '}
                                         {students.length > 0
@@ -390,6 +412,27 @@ const ClassInformationDetail = () => {
                     </Box>
                 </Grid.Col>
             </Grid>
+
+            {/*Modals  */}
+            <Modal.Root opened={examOpened} onClose={handlers.close} centered>
+                <Modal.Overlay />
+                <Modal.Content>
+                    <Modal.Header>
+                        <Modal.Title>Xác nhận tạo bài kiểm tra </Modal.Title>
+                        <Modal.CloseButton />
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Title order={3} weight={100} align="center">
+                            Bạn có chắc chắn muốn tạo bài kiểm tra cho lớp{' '}
+                            {classInfor.className} không ?{' '}
+                        </Title>
+                        <Group grow mt={'lg'}>
+                            <Button color="red">Không, để sau</Button>
+                            <Button color="teal">Có, tạo ngay</Button>
+                        </Group>
+                    </Modal.Body>
+                </Modal.Content>
+            </Modal.Root>
         </>
     )
 }

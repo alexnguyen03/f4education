@@ -44,14 +44,14 @@ public class QuestionDetailController {
 	AnswerService answerService;
 
 	@GetMapping
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> findAll() {
 		List<QuestionDetailDTO> questionDetail = questionDetailService.findAll();
 		return ResponseEntity.ok(questionDetail);
 	}
 
 	@GetMapping("/{questionId}")
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> findAllByQuestionID(@PathVariable Integer questionId) {
 		List<QuestionDetailDTO> questionDetail = questionDetailService.getAllQuestionDetailByQuestionId(questionId);
 		return ResponseEntity.ok(questionDetail);
@@ -126,10 +126,10 @@ public class QuestionDetailController {
 					System.out.print(cellData + "\t");
 				}
 			}
-			
-//			LẤY DATA RA RỒI => filter -> lấy distinct theo tiêu đề câu hỏi
-//			1 Q => 4 A
-			
+
+			// LẤY DATA RA RỒI => filter -> lấy distinct theo tiêu đề câu hỏi
+			// 1 Q => 4 A
+
 			return ResponseEntity.ok("Upload Successfully");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -139,14 +139,14 @@ public class QuestionDetailController {
 
 	private Object getCellValue(Cell cell) {
 		switch (cell.getCellType()) {
-		case NUMERIC:
-			return cell.getNumericCellValue();
-		case STRING:
-			return cell.getStringCellValue();
-		case BOOLEAN:
-			return cell.getBooleanCellValue();
-		default:
-			return null;
+			case NUMERIC:
+				return cell.getNumericCellValue();
+			case STRING:
+				return cell.getStringCellValue();
+			case BOOLEAN:
+				return cell.getBooleanCellValue();
+			default:
+				return null;
 		}
 	}
 
@@ -158,8 +158,8 @@ public class QuestionDetailController {
 		return file;
 	}
 
-	public static void main(String[] args) {
-		QuestionDetailController qs = new QuestionDetailController();
-		qs.uploadExcelFile(null);
-	}
+	// public static void main(String[] args) {
+	// QuestionDetailController qs = new QuestionDetailController();
+	// qs.uploadExcelFile(null);
+	// }
 }

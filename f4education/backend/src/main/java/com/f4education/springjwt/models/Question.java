@@ -45,7 +45,7 @@ public class Question implements Serializable {
 	@JoinColumn(name = "course_id")
 	@JsonIgnore
 	Course course;
-	
+
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	@JsonIgnore
@@ -54,6 +54,10 @@ public class Question implements Serializable {
 	@OneToMany(mappedBy = "question")
 	@JsonIgnore
 	List<QuestionDetail> questionDetail;
+
+	@OneToMany(mappedBy = "question")
+	@JsonIgnore
+	List<Examination> examinations;
 
 	@Override
 	public String toString() {

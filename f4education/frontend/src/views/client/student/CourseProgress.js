@@ -21,7 +21,8 @@ import {
 import { useEffect, useState } from 'react'
 
 import { IconArrowBack, IconArrowRight } from '@tabler/icons-react'
-import { Link, useRoutes, useSearchParams } from 'react-router-dom'
+import { createSearchParams, Link, useNavigate } from 'react-router-dom'
+import scheduleApi from '../../../api/scheduleApi'
 
 // Scss
 import styles from '../../../assets/scss/custom-module-scss/client-custom/course-progress/CourseProgress.module.scss'
@@ -30,32 +31,26 @@ import styles from '../../../assets/scss/custom-module-scss/client-custom/course
 import moment from 'moment'
 import courseApi from '../../../api/courseApi'
 import registerCoursecAPI from '../../../api/registerCourseApi'
-
-const studentId = 'loinvpc04549'
-const user = JSON.parse(localStorage.getItem('user'))
+import Schedule from './Schedule'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
-// NOTES: GET DATA FROM DB
-//  ClassID is unique
-//  GET from Schedule select from current day to the back By ClassId = ?
-// EXP: currentDay-20-08-2023 => startDate 27-07-2023
-// Count by classId
-//  WE got totalClassId => ngay da hoc.
-
 const CourseProgress = () => {
-    //  ***********Route
-    // const route = useRoutes()
-    // const searchParam = useSearchParams()
-    // const classIdParam = searchParam.get('classId')
+    const today = new Date('2024-01-04').toDateString().substring(4, 16)
 
-    // Schedule insert data: Khác ngày, content,notes
+    const user = JSON.parse(localStorage.getItem('user'))
+
+    //  ***********Route
+    let navigate = useNavigate()
+
     // *********** Main variable
     const [courseProgresses, setCourseProgresses] = useState([])
+    const [totalCountCourseProgress, setDetailCourseProgress] = useState([])
     const [selectedCourse, setSelectedCourse] = useState({})
     const [showingDetail, setShowingDetail] = useState(false)
-    const [totalCountCourseProgress, setTotalCountCourseProgress] = useState(0)
+    const [showSchedule, setShowSchedule] = useState(false)
+
     const [newestCourse, setNewestCourse] = useState([])
 
     // *********** Action variable
@@ -67,7 +62,7 @@ const CourseProgress = () => {
             setLoading(true)
 
             const resp = await registerCoursecAPI.getAllCourseProgress(
-                studentId
+                user.username
             )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
@@ -75,20 +70,11 @@ const CourseProgress = () => {
             const newCourseProgresses = []
             for (let i = 0; i < reversedData.length; i++) {
                 const element = reversedData[i]
-                const startDate = element.classes.startDate
-                const endDate = element.classes.endDate
-
-                const progressCourseRequest = {
-                    startDate,
-                    endDate
-                }
-
-                console.log(progressCourseRequest)
 
                 const totalProgress = await fetchCourseProgressByClassId(
-                    element.classes.classId,
-                    progressCourseRequest
+                    element.classes.classId
                 )
+
                 const newCourse = {
                     ...element,
                     totalProgress: totalProgress
@@ -96,7 +82,7 @@ const CourseProgress = () => {
                 newCourseProgresses.push(newCourse)
             }
 
-            console.log(newCourseProgresses)
+            // console.log(newCourseProgresses)
             setCourseProgresses(newCourseProgresses)
 
             setLoading(false)
@@ -105,18 +91,23 @@ const CourseProgress = () => {
         }
     }
 
-    const fetchCourseProgressByClassId = async (
-        classId,
-        progressCourseRequest
-    ) => {
+    const fetchCourseProgressByClassId = async (classId) => {
         try {
             const resp = await registerCoursecAPI.getCourseProgressByClassId(
-                classId,
-                progressCourseRequest
+                classId
             )
-            // setSelectedCourse(resp.data)
-            setTotalCountCourseProgress(resp.data)
-            return resp.data
+            const responseData = resp.data
+
+            // Get current Date
+            const currentDate = moment()
+
+            // Count number studied date
+            const countItems = responseData.filter((item) => {
+                const studyDate = moment(item.studyDate)
+                return studyDate.isSameOrBefore(currentDate, 'day')
+            }).length
+
+            return countItems
         } catch (error) {
             console.log(error)
         }
@@ -141,10 +132,22 @@ const CourseProgress = () => {
 
     const handleShowCourseProgress = (course) => {
         setSelectedCourse(course)
+        console.log(
+            '🚀 ~ file: CourseProgress.js:129 ~ handleShowCourseProgress ~ course:',
+            course
+        )
         setShowingDetail(true)
+        navigate({
+            pathname: '/student/classes',
+            search: `?${createSearchParams({
+                classId: course.classes.classId
+            })}`
+        })
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
     }
+
+    const handleDirectToSchedule = () => {}
 
     // ************ USE EFECT AREA
     useEffect(() => {
@@ -157,17 +160,11 @@ const CourseProgress = () => {
     }, [])
 
     useEffect(() => {
-        setTotalCountCourseProgress(totalCountCourseProgress)
+        setDetailCourseProgress(totalCountCourseProgress)
     }, [totalCountCourseProgress])
 
-    // useEffect(() => {
-    //     route.push(`?classId=${selectedCourse.classId}`, {
-    //         scroll: false
-    //     })
-    // }, [route, selectedCourse])
-
     return (
-        <Container size="xl" px="xs">
+        <Container size="xl" px="xs" mt={rem('2rem')}>
             {/* Title */}
             <Box>
                 <Title order={1} fw={700} mt={rem('2rem')} color="dark">
@@ -176,9 +173,6 @@ const CourseProgress = () => {
             </Box>
 
             {/* Hero banner */}
-            {/* <Transition transition="slide-up" mounted={scroll.y > 0}>
-                {(transitionStyles) => <div></div>}
-            </Transition> */}
             <Box
                 pos={'relative'}
                 p={rem('3.5rem')}
@@ -187,125 +181,102 @@ const CourseProgress = () => {
             >
                 <Stack maw={500}>
                     {showingDetail ? (
-                        <>
-                            <Stack align="left">
-                                <Title order={2} fw={500} color="dark">
-                                    {selectedCourse.course.courseName}
-                                </Title>
-                                <Group position="left">
-                                    <Text c="dimmed" fz="xl">
-                                        Lớp học:{' '}
-                                        {/* <strong>
+                        <Stack align="left">
+                            <Title order={2} fw={500} color="dark">
+                                {selectedCourse.course.courseName}
+                            </Title>
+                            <Group position="left">
+                                <Text c="dimmed" fz="xl">
+                                    Lớp học:{' '}
+                                    {/* <strong>
                                             {selectedCourse.classes.className}
                                         </strong> */}
-                                    </Text>
-                                    -
-                                    <Text c="dimmed" fz="xl">
-                                        {/* <strong>
+                                </Text>
+                                -
+                                <Text c="dimmed" fz="xl">
+                                    {/* <strong>
                                             {selectedCourse.course
                                                 .courseDuration / 2}
                                         </strong>{' '} */}
-                                        buổi học
-                                    </Text>
-                                </Group>
-                                <Text fz="lg">
-                                    Từ ngày:{' '}
-                                    {/* <strong>
+                                    buổi học
+                                </Text>
+                            </Group>
+                            <Text fz="lg">
+                                Từ ngày:{' '}
+                                {/* <strong>
                                         {moment(
                                             selectedCourse.classes.startDate
                                         ).format('DD-MM-yyyy')}
                                     </strong>{' '} */}
-                                    -{' '}
-                                    {/* <strong>
+                                -{' '}
+                                {/* <strong>
                                         {moment(
                                             selectedCourse.classes.endDate
                                         ).format('DD-MM-yyyy')}
                                     </strong> */}
-                                </Text>
-                                <Group position="left">
-                                    <Text fw={500} color="dimmed" fz="lg">
-                                        Trạng thái lớp học:
-                                    </Text>{' '}
-                                    <Badge
-                                        color="indigo"
-                                        size="lg"
-                                        p={3}
-                                        ml={5}
-                                        mt={5}
-                                    >
-                                        {selectedCourse.classes.status}
-                                    </Badge>
-                                </Group>
-                                <Text
-                                    color="dimmed"
-                                    fw={500}
-                                    fz="lg"
-                                    lineClamp={3}
-                                >
-                                    Giáo viên hướng dẫn:
-                                    <strong className="ml-2">
-                                        {selectedCourse.teacherName}
-                                    </strong>
-                                </Text>
-                                <Text
-                                    color="dimmed"
-                                    fw={500}
-                                    fz="lg"
-                                    lineClamp={3}
-                                >
-                                    Mô tả khóa học:
-                                    <strong className="ml-2">
-                                        {
-                                            selectedCourse.course
-                                                .courseDescription
-                                        }
-                                        , Lorem ipsum dolor sit amet
-                                        consectetur, adipisicing elit.
-                                        Reprehenderit quo pariatur rerum
-                                        blanditiis provident dolores itaque,
-                                        illo porro. Totam, libero!
-                                    </strong>
-                                </Text>
-                                <Button
-                                    variant="outline"
+                            </Text>
+                            <Group position="left">
+                                <Text fw={500} color="dimmed" fz="lg">
+                                    Trạng thái lớp học:
+                                </Text>{' '}
+                                <Badge
                                     color="indigo"
                                     size="lg"
-                                    leftIcon={<IconArrowBack />}
-                                    mt={10}
-                                    onClick={() => {
-                                        fetchCourseProgress()
-                                        // fetchNewestCourse();
-                                    }}
+                                    p={3}
+                                    ml={5}
+                                    mt={5}
                                 >
-                                    Trở về trang tổng quan
-                                </Button>
-                            </Stack>
-                        </>
+                                    {selectedCourse.classes.status}
+                                </Badge>
+                            </Group>
+                            <Text color="dimmed" fw={500} fz="lg" lineClamp={3}>
+                                Giáo viên hướng dẫn:{' '}
+                                <strong className="ml-2">
+                                    {selectedCourse.teacherName}
+                                </strong>
+                            </Text>
+                            <Text color="dimmed" fw={500} fz="lg" lineClamp={3}>
+                                Mô tả khóa học:{' '}
+                                <strong className="ml-2">
+                                    {selectedCourse.course.courseDescription},
+                                    Lorem ipsum dolor sit amet consectetur,
+                                    adipisicing elit. Reprehenderit quo pariatur
+                                    rerum blanditiis provident dolores itaque,
+                                    illo porro. Totam, libero!
+                                </strong>
+                            </Text>
+                            <Button
+                                variant="outline"
+                                color="indigo"
+                                size="lg"
+                                leftIcon={<IconArrowBack />}
+                                mt={10}
+                                onClick={() => {
+                                    setShowingDetail(false)
+                                }}
+                            >
+                                Trở về trang tổng quan
+                            </Button>
+                        </Stack>
                     ) : (
                         <>
                             {loading ? (
-                                <>
-                                    <Stack>
-                                        <Skeleton width={'75%'} height={25} />
+                                <Stack>
+                                    <Skeleton width={'75%'} height={25} />
+                                    <Skeleton width="100%" height={50} mt={8} />
+                                    <Group position="left">
                                         <Skeleton
-                                            width="100%"
-                                            height={50}
+                                            width="49%"
+                                            height={25}
                                             mt={8}
                                         />
-                                        <Group position="left">
-                                            <Skeleton
-                                                width="49%"
-                                                height={25}
-                                                mt={8}
-                                            />
-                                            <Skeleton
-                                                width="49%"
-                                                height={25}
-                                                mt={8}
-                                            />
-                                        </Group>
-                                    </Stack>
-                                </>
+                                        <Skeleton
+                                            width="49%"
+                                            height={25}
+                                            mt={8}
+                                        />
+                                    </Group>
+                                </Stack>
                             ) : (
                                 <>
                                     <Title order={2} fw={500} color="dark">
@@ -377,213 +348,190 @@ const CourseProgress = () => {
                 </Stack>
 
                 {showingDetail ? (
-                    <>
-                        <Card
-                            className={styles['floating-result']}
-                            mt={40}
-                            style={{ minHeight: '570px' }}
-                        >
-                            <Card.Section>
-                                <Image
-                                    // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                    src={`${PUBLIC_IMAGE}/course/${selectedCourse.course.image}`}
-                                    height={250}
-                                    alt="Norway"
-                                    withPlaceholder
-                                />
-                            </Card.Section>
-                            <Card.Section mt={25} p={10}>
-                                <Box w={'100%'}>
-                                    <Text
-                                        fw={500}
-                                        fz="lg"
-                                        color="dimmed"
-                                        align="center"
-                                        mb={15}
-                                    >
-                                        Tiến độ khóa học
-                                    </Text>
-                                    <Text
-                                        fw={'bolder'}
-                                        color="dark"
-                                        fz="xl"
-                                        align="center"
-                                        m={0}
-                                        p={0}
-                                    >
-                                        {(
-                                            (totalCountCourseProgress /
-                                                (selectedCourse.course
-                                                    .courseDuration /
-                                                    2)) *
-                                            2 *
-                                            100
-                                        ).toFixed(1)}
-                                        %
-                                    </Text>
-                                    <Progress
-                                        value={(
-                                            (totalCountCourseProgress /
-                                                (selectedCourse.course
-                                                    .courseDuration /
-                                                    2)) *
-                                            2 *
-                                            100
-                                        ).toFixed(1)}
-                                        size="xl"
-                                        radius="xl"
-                                        striped
-                                        w={'100%'}
-                                    />
-                                </Box>
-                                <Stack align="left" mt={25}>
-                                    <Text
-                                        color="dimmed"
-                                        fw={500}
-                                        fz="xl"
-                                        m={0}
-                                        p={0}
-                                    >
-                                        Số buổi đã học:{' '}
-                                        <strong className="ml-2">
-                                            {selectedCourse.totalProgress} /{' '}
-                                            {selectedCourse.course
-                                                .courseDuration / 2}
-                                        </strong>
-                                    </Text>
-                                    <Text
-                                        color="dimmed"
-                                        fw={500}
-                                        fz="xl"
-                                        m={0}
-                                        p={0}
-                                    >
-                                        Số buổi vắng:{' '}
-                                        <strong className="ml-2">
-                                            {selectedCourse.totalProgress} /{' '}
-                                            {selectedCourse.course
-                                                .courseDuration / 2}
-                                        </strong>
-                                    </Text>
-                                </Stack>
-                            </Card.Section>
-                        </Card>
-                    </>
-                ) : (
-                    <>
-                        <Box className={styles['floating-result']}>
-                            <Stack align={'center'} p={rem('1rem')}>
-                                <Title order={5} color="dark" fw={700}>
-                                    Làm tốt lắm!
-                                </Title>
-                                <Text fz="md" c="dimmed">
-                                    Tổng quan
+                    <Card
+                        className={styles['floating-result']}
+                        mt={40}
+                        style={{ minHeight: '570px' }}
+                    >
+                        <Card.Section>
+                            <Image
+                                // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                                src={`${PUBLIC_IMAGE}/courses/${selectedCourse.course.image}`}
+                                height={250}
+                                alt="Norway"
+                                withPlaceholder
+                            />
+                        </Card.Section>
+                        <Card.Section mt={25} p={10}>
+                            <Box w={'100%'}>
+                                <Text
+                                    fw={500}
+                                    fz="lg"
+                                    color="dimmed"
+                                    align="center"
+                                    mb={15}
+                                >
+                                    Tiến độ khóa học
                                 </Text>
-                                <Box>
-                                    <RingProgress
-                                        label={
-                                            <Text
-                                                size="md"
-                                                align="center"
-                                                color="dark"
-                                                fw={700}
-                                            >
-                                                {/* Cai gi do o day. VD: phan tram khoa da hoc */}
-                                            </Text>
-                                        }
-                                        size={150}
-                                        sections={[
-                                            {
-                                                value:
-                                                    courseProgresses.length *
-                                                    50,
-                                                color: 'cyan',
-                                                tooltip: `Tổng ${courseProgresses.length} khóa học đăng ký`
-                                            },
-                                            {
-                                                value: 0,
-                                                color: 'lime',
-                                                tooltip: 'Đã hoàn thành 0 khóa'
-                                            },
-                                            {
-                                                value:
-                                                    courseProgresses.length *
-                                                    50,
-                                                color: 'violet',
-                                                tooltip: `Đang học ${courseProgresses.length} khóa`
-                                            }
-                                        ]}
-                                    />
-                                </Box>
-                                <Text c="dimmed" size="md" align="left"></Text>
-                                <Grid grow>
-                                    <Grid.Col span={6}>
-                                        <Box className={styles['box-score']}>
-                                            <Stack>
-                                                <Text
-                                                    color="dark"
-                                                    fz="lg"
-                                                    fw={700}
-                                                >
-                                                    {courseProgresses.length}
-                                                </Text>
-                                                <Text
-                                                    color="dimmed"
-                                                    fz="lg"
-                                                    mt={rem('-0.7rem')}
-                                                >
-                                                    Khóa đã đăng ký
-                                                </Text>
-                                            </Stack>
-                                        </Box>
-                                    </Grid.Col>
-                                    <Grid.Col span={6}>
-                                        <Box className={styles['box-score']}>
-                                            <Stack>
-                                                <Text
-                                                    color="dark"
-                                                    fz="lg"
-                                                    fw={700}
-                                                >
-                                                    0
-                                                </Text>
-                                                <Text
-                                                    color="dimmed"
-                                                    fz="lg"
-                                                    mt={rem('-0.7rem')}
-                                                >
-                                                    Bài đã hoàn thành
-                                                </Text>
-                                            </Stack>
-                                        </Box>
-                                    </Grid.Col>
-                                    <Grid.Col span={6}>
-                                        <Box className={styles['box-score']}>
-                                            <Stack>
-                                                <Text
-                                                    color="dark"
-                                                    fz="lg"
-                                                    fw={700}
-                                                >
-                                                    {courseProgresses.length}
-                                                </Text>
-                                                <Text
-                                                    color="dimmed"
-                                                    fz="lg"
-                                                    mt={rem('-0.7rem')}
-                                                >
-                                                    Bài đang học
-                                                </Text>
-                                            </Stack>
-                                        </Box>
-                                    </Grid.Col>
-                                </Grid>
+                                <Text
+                                    fw={'bolder'}
+                                    color="dark"
+                                    fz="xl"
+                                    align="center"
+                                    m={0}
+                                    p={0}
+                                >
+                                    {(
+                                        (selectedCourse.course.courseDuration /
+                                            2 /
+                                            100) *
+                                        Number(selectedCourse.totalProgress)
+                                    ).toFixed(1)}
+                                    %
+                                </Text>
+                                <Progress
+                                    value={(
+                                        (selectedCourse.course.courseDuration /
+                                            2 /
+                                            100) *
+                                        Number(selectedCourse.totalProgress)
+                                    ).toFixed(1)}
+                                    size="xl"
+                                    radius="xl"
+                                    striped
+                                    w={'100%'}
+                                />
+                            </Box>
+                            <Stack align="left" mt={25}>
+                                <Text
+                                    color="dimmed"
+                                    fw={500}
+                                    fz="xl"
+                                    m={0}
+                                    p={0}
+                                >
+                                    Số buổi đã học:{' '}
+                                    <strong className="ml-2">
+                                        {selectedCourse.totalProgress} /{' '}
+                                        {selectedCourse.course.courseDuration /
+                                            2}
+                                    </strong>
+                                </Text>
+                                <Text
+                                    color="dimmed"
+                                    fw={500}
+                                    fz="xl"
+                                    m={0}
+                                    p={0}
+                                >
+                                    Số buổi vắng:{' '}
+                                    <strong className="ml-2">
+                                        0 /{' '}
+                                        {selectedCourse.course.courseDuration /
+                                            2}
+                                    </strong>
+                                </Text>
                             </Stack>
-                        </Box>
-                    </>
+                        </Card.Section>
+                    </Card>
+                ) : (
+                    <Box className={styles['floating-result']}>
+                        <Stack align={'center'} p={rem('1rem')}>
+                            <Title order={5} color="dark" fw={700}>
+                                Làm tốt lắm!
+                            </Title>
+                            <Text fz="md" c="dimmed">
+                                Tổng quan
+                            </Text>
+                            <Box>
+                                <RingProgress
+                                    label={
+                                        <Text
+                                            size="md"
+                                            align="center"
+                                            color="dark"
+                                            fw={700}
+                                        >
+                                            {/* Cai gi do o day. VD: phan tram khoa da hoc */}
+                                        </Text>
+                                    }
+                                    size={150}
+                                    sections={[
+                                        {
+                                            value: courseProgresses.length * 50,
+                                            color: 'cyan',
+                                            tooltip: `Tổng ${courseProgresses.length} khóa học đăng ký`
+                                        },
+                                        {
+                                            value: 0,
+                                            color: 'lime',
+                                            tooltip: 'Đã hoàn thành 0 khóa'
+                                        },
+                                        {
+                                            value: courseProgresses.length * 50,
+                                            color: 'violet',
+                                            tooltip: `Đang học ${courseProgresses.length} khóa`
+                                        }
+                                    ]}
+                                />
+                            </Box>
+                            <Text c="dimmed" size="md" align="left"></Text>
+                            <Grid grow>
+                                <Grid.Col span={6}>
+                                    <Box className={styles['box-score']}>
+                                        <Stack>
+                                            <Text color="dark" fz="lg" fw={700}>
+                                                {courseProgresses.length}
+                                            </Text>
+                                            <Text
+                                                color="dimmed"
+                                                fz="lg"
+                                                mt={rem('-0.7rem')}
+                                            >
+                                                Khóa đã đăng ký
+                                            </Text>
+                                        </Stack>
+                                    </Box>
+                                </Grid.Col>
+                                <Grid.Col span={6}>
+                                    <Box className={styles['box-score']}>
+                                        <Stack>
+                                            <Text color="dark" fz="lg" fw={700}>
+                                                0
+                                            </Text>
+                                            <Text
+                                                color="dimmed"
+                                                fz="lg"
+                                                mt={rem('-0.7rem')}
+                                            >
+                                                Khóa hoàn thành
+                                            </Text>
+                                        </Stack>
+                                    </Box>
+                                </Grid.Col>
+                                <Grid.Col span={6}>
+                                    <Box className={styles['box-score']}>
+                                        <Stack>
+                                            <Text color="dark" fz="lg" fw={700}>
+                                                {courseProgresses.length}
+                                            </Text>
+                                            <Text
+                                                color="dimmed"
+                                                fz="lg"
+                                                mt={rem('-0.7rem')}
+                                            >
+                                                Khóa đang học
+                                            </Text>
+                                        </Stack>
+                                    </Box>
+                                </Grid.Col>
+                            </Grid>
+                        </Stack>
+                    </Box>
                 )}
             </Box>
 
+            {showingDetail && <Schedule />}
             {/* In Progress Course */}
             <Box mt={rem('8rem')}>
                 <Group position="left" mb={'lg'}>
@@ -592,92 +540,168 @@ const CourseProgress = () => {
                     </Title>
                 </Group>
                 <Grid>
-                    {courseProgresses.map((progress, index) => (
-                        <Grid.Col
-                            xl={3}
-                            lg={3}
-                            md={4}
-                            sm={6}
-                            // component='a'
-                            // href={`?classId=${progress.classId}`}
-                            onClick={() => handleShowCourseProgress(progress)}
-                            key={index}
+                    {courseProgresses.length === 0 && loading ? (
+                        <Box
+                            w="100%"
+                            p={rem('3rem')}
+                            style={{ boxShadow: '3px 3px 5px 5px #f1f1f1' }}
                         >
-                            <Card
-                                shadow="sm"
-                                padding="lg"
-                                radius="md"
-                                withBorder
-                                className={styles.card}
-                            >
-                                <Card.Section>
-                                    <Image
-                                        // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                        src={`${PUBLIC_IMAGE}/course/${progress.course.image}`}
-                                        height={160}
-                                        alt="Norway"
-                                        withPlaceholder
+                            <Center>
+                                <Stack align="center">
+                                    <i
+                                        className="bx bxl-dropbox"
+                                        style={{ fontSize: '5rem' }}
                                     />
-                                </Card.Section>
-
-                                <Text c="dimmed" fz="md" mt="md">
-                                    HƯỚNG DẪN
-                                </Text>
-                                <Text
-                                    fz="lg"
-                                    color="dark"
-                                    fw={500}
-                                    lineClamp={2}
+                                    <br />
+                                    <Title
+                                        order={2}
+                                        color="dark"
+                                        maw={600}
+                                        align="center"
+                                    >
+                                        Chúc mừng, bạn không có khóa học nào
+                                        đang trong tiến trình học.
+                                    </Title>
+                                </Stack>
+                            </Center>
+                        </Box>
+                    ) : (
+                        <>
+                            {courseProgresses.map((progress, index) => (
+                                <Grid.Col
+                                    xl={3}
+                                    lg={3}
+                                    md={4}
+                                    sm={6}
+                                    // component='a'
+                                    // href={`?classId=${progress.classId}`}
+                                    onClick={() =>
+                                        handleShowCourseProgress(progress)
+                                    }
+                                    key={index}
                                 >
-                                    {progress.course.courseName}
-                                </Text>
-                                {/* <Text size="sm" color="dimmed">
-                                    <strong>{totalCountCourseProgress}</strong>{' '}
-                                    trên{' '}
-                                    <strong>
-                                        {progress.course.courseDuration / 2}
-                                    </strong>{' '}
-                                    bài đã học.
-                                </Text> */}
-                                {/* {fetchCourseProgressByClassId(
+                                    {loading ? (
+                                        <>
+                                            <Skeleton
+                                                width="100%"
+                                                height={rem('20rem')}
+                                            />
+                                            <Skeleton
+                                                width="30%"
+                                                height={15}
+                                                mt={8}
+                                            />
+                                            <Skeleton
+                                                width="100%"
+                                                height={20}
+                                                mt={8}
+                                            />
+                                            <Skeleton
+                                                width="60%"
+                                                height={15}
+                                                mt={8}
+                                            />
+                                        </>
+                                    ) : (
+                                        <Card
+                                            shadow="sm"
+                                            padding="lg"
+                                            radius="md"
+                                            withBorder
+                                            className={styles.card}
+                                        >
+                                            <Card.Section>
+                                                <Image
+                                                    // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                                                    src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
+                                                    height={160}
+                                                    alt="Norway"
+                                                    withPlaceholder
+                                                />
+                                            </Card.Section>
+
+                                            <Group position="apart">
+                                                <Text
+                                                    c="dimmed"
+                                                    fz="md"
+                                                    mt="md"
+                                                >
+                                                    HƯỚNG DẪN
+                                                </Text>
+                                                <Badge
+                                                    color="violet"
+                                                    size="lg"
+                                                    radius={5}
+                                                    mt="sm"
+                                                >
+                                                    Lớp:{' '}
+                                                    {progress.classes.className}
+                                                </Badge>
+                                            </Group>
+                                            <Text
+                                                fz="lg"
+                                                color="dark"
+                                                fw={500}
+                                                lineClamp={2}
+                                                mt="md"
+                                            >
+                                                {progress.course.courseName}
+                                            </Text>
+                                            <Text size="sm" color="dimmed">
+                                                <strong>
+                                                    {totalCountCourseProgress}
+                                                </strong>{' '}
+                                                trên{' '}
+                                                <strong>
+                                                    {progress.course
+                                                        .courseDuration / 2}
+                                                </strong>{' '}
+                                                bài đã học.
+                                            </Text>
+                                            {/* {fetchCourseProgressByClassId(
                                     course.classes.classId
                                 )} */}
-                                <Stack mt={8}>
-                                    <Text
-                                        fw={'bolder'}
-                                        color="dark"
-                                        fz="xl"
-                                        align="right"
-                                        m={0}
-                                        p={0}
-                                    >
-                                        {(
-                                            (totalCountCourseProgress /
-                                                (progress.course
-                                                    .courseDuration /
-                                                    2)) *
-                                            2 *
-                                            100
-                                        ).toFixed(1)}
-                                        %
-                                    </Text>
-                                    <Progress
-                                        value={(
-                                            (totalCountCourseProgress /
-                                                (progress.course
-                                                    .courseDuration /
-                                                    2)) *
-                                            2 *
-                                            100
-                                        ).toFixed(1)}
-                                        size="xl"
-                                        radius="xl"
-                                        striped
-                                    />
-                                </Stack>
-                            </Card>
-                        </Grid.Col>
-                    ))}
+                                            <Stack mt={8}>
+                                                <Text
+                                                    fw={'bolder'}
+                                                    color="dark"
+                                                    fz="xl"
+                                                    align="right"
+                                                    m={0}
+                                                    p={0}
+                                                >
+                                                    {(
+                                                        (progress.course
+                                                            .courseDuration /
+                                                            2 /
+                                                            100) *
+                                                        Number(
+                                                            progress.totalProgress
+                                                        )
+                                                    ).toFixed(1)}
+                                                    %
+                                                </Text>
+                                                <Progress
+                                                    value={(
+                                                        (progress.course
+                                                            .courseDuration /
+                                                            2 /
+                                                            100) *
+                                                        Number(
+                                                            progress.totalProgress
+                                                        )
+                                                    ).toFixed(1)}
+                                                    size="xl"
+                                                    radius="xl"
+                                                    striped
+                                                />
+                                            </Stack>
+                                        </Card>
+                                    )}
+                                </Grid.Col>
+                            ))}
+                        </>
+                    )}
                 </Grid>
             </Box>
 
@@ -728,14 +752,14 @@ const CourseProgress = () => {
                                 <Card.Section>
                                     <Image
                                         // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                        src={`${PUBLIC_IMAGE}/course/${course.image}`}
+                                        src={`${PUBLIC_IMAGE}/courses/${course.image}`}
                                         height={200}
                                         withPlaceholder
                                         alt={course.courseName}
                                     />
                                 </Card.Section>
 
-                                <Text c="dimmed" fz="md" mt="md" lineClamp={2}>
+                                <Text c="dimmed" fz="md" mt="md" lineClamp={1}>
                                     {course.courseName}
                                 </Text>
                                 <Text fz="lg" color="dark" fw={500}>
@@ -748,7 +772,7 @@ const CourseProgress = () => {
                                         }
                                     )}
                                 </Text>
-                                <Group position="apart">
+                                <Group position="apart" mt="md">
                                     <Text color="dimmed">4.6</Text>
                                     <Rating
                                         value={3.5}
@@ -765,7 +789,7 @@ const CourseProgress = () => {
             </Box>
 
             {/* complete course */}
-            <Box mt={rem('8rem')}>
+            <Box my={rem('8rem')}>
                 <Group position="apart" mb={'lg'}>
                     <Title order={2} color="dark" fw={700}>
                         Các khóa học đã hoàn thành
