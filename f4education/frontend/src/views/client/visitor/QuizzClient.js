@@ -5,7 +5,11 @@ import {
     Text,
     Radio,
     Button,
-    Checkbox
+    Checkbox,
+    Grid,
+    Card,
+    Image,
+    Stack
 } from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
@@ -14,6 +18,13 @@ import moment from 'moment/moment'
 
 import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
+
+// SCSS
+import styles from '../../../assets/scss/custom-module-scss/client-custom/course-progress/CourseProgress.module.scss'
+
+// IMAGE PATH
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
+
 const user = JSON.parse(localStorage.getItem('user'))
 
 function QuizzClient() {
@@ -71,6 +82,13 @@ function QuizzClient() {
         }
     ])
 
+    const [
+        questionDetailsByCourseAndClass,
+        setQuestionDetailsByCourseAndClass
+    ] = useState({})
+
+    const [courseId, setCourseId] = useState()
+
     const getQuestionDetailsByStudentId = async () => {
         try {
             const resp = await questionDetailApi.getQuestionDetailsByStudentId(
@@ -78,7 +96,51 @@ function QuizzClient() {
             )
             if (resp.status === 200 && resp.data.length > 0) {
                 setQuestionDetail(resp.data)
-                console.log(resp.data)
+
+                const questionDetails = resp.data
+
+                // Tạo một đối tượng trống để chứa câu hỏi theo lớp và khóa học
+                const questionDetailsByCourseAndClass = {}
+
+                // Lặp qua từng câu hỏi
+                questionDetails.forEach((question) => {
+                    const courseId = question.courseId
+                    const courseName = question.courseName
+                    const classId = question.classId
+                    const className = question.className
+
+                    // Kiểm tra xem khóa học đã tồn tại trong đối tượng chưa
+                    if (!questionDetailsByCourseAndClass[courseId]) {
+                        questionDetailsByCourseAndClass[courseId] = {
+                            courseName,
+                            classes: {}
+                        }
+                    }
+
+                    // Kiểm tra xem lớp đã tồn tại trong khóa học chưa
+                    if (
+                        !questionDetailsByCourseAndClass[courseId].classes[
+                            classId
+                        ]
+                    ) {
+                        questionDetailsByCourseAndClass[courseId].classes[
+                            classId
+                        ] = {
+                            className,
+                            questions: []
+                        }
+                    }
+
+                    // Thêm câu hỏi vào lớp
+                    questionDetailsByCourseAndClass[courseId].classes[
+                        classId
+                    ].questions.push(question)
+                })
+
+                console.log(questionDetailsByCourseAndClass)
+                setQuestionDetailsByCourseAndClass(
+                    questionDetailsByCourseAndClass
+                )
             } else {
                 console.log('aaa')
             }
@@ -152,6 +214,7 @@ function QuizzClient() {
     }
 
     const [showQuestion, setShowQuestion] = useState(false)
+    const [showQuestionButton, setShowQuestionButton] = useState(false)
 
     const [quizzResultRequest, setQuizResultRequest] = useState({
         quizzId: 0,
@@ -163,8 +226,14 @@ function QuizzClient() {
         studentId: ''
     })
 
+    const showButton = () => {
+        setShowQuestionButton(true)
+        setShowQuestion(true)
+    }
+
     const startTimer = () => {
         setShowQuestion(true)
+        setShowQuestionButton(false)
         setIsFinished(false)
         setElapsedTime(0)
     }
@@ -286,43 +355,7 @@ function QuizzClient() {
             >
                 {itemsBreadcum}
             </Breadcrumbs>
-            {showQuestion ? (
-                ''
-            ) : (
-                <div
-                    className="rounded shadow p-3"
-                    style={{
-                        width: 450
-                    }}
-                >
-                    <h2 className="text-primary text-center pt-2">
-                        {questionDetail[0].courseId} -{' '}
-                        {questionDetail[0].courseName}
-                    </h2>
-                    <hr className="m-0" />
-                    <br />
-                    <span className="h3 ml-1">Mã số: {user.username}</span>
-                    <span className="float-right h3">
-                        Ngày thi: {moment(new Date()).format('DD/MM/yyyy')}
-                    </span>
-                    <br />
-                    <br />
-                    <span className="h3 ml-1">Họ tên: {user.fullName}</span>
-                    <span className="float-right h3">
-                        Lớp học: {questionDetail[0].className}
-                    </span>
-                    <Button
-                        className="my-4"
-                        fullWidth
-                        onClick={() => {
-                            startTimer()
-                        }}
-                    >
-                        BẮT ĐẦU LÀM BÀI
-                    </Button>
-                </div>
-            )}
-            {showQuestion && (
+            {showQuestion && showQuestionButton === false ? (
                 <div className="container">
                     <div className="row">
                         <div className="col-lg-12 mx-auto rounded">
@@ -341,7 +374,7 @@ function QuizzClient() {
                                         width: 250,
                                         margin: 'auto',
                                         backgroundColor: 'white',
-                                        marginLeft: 230,
+                                        marginLeft: 200,
                                         borderRadius: '10px'
                                     }}
                                 >
@@ -387,118 +420,134 @@ function QuizzClient() {
                                     <h1 className="display-2 text-dark mx-auto mt-3">
                                         Quiz 1
                                     </h1>
-                                    {questionDetail.map(
-                                        (question, indexQuestion) => (
-                                            <div
-                                                className="col-lg-12"
-                                                key={question.questionDetailId}
-                                            >
-                                                <div class="d-flex bd-highlight p-3">
-                                                    <div class="p-2 w-100">
-                                                        <h2 className="text-dark mt-3">
-                                                            {indexQuestion + 1}.{' '}
-                                                            {
-                                                                question.questionTitle
-                                                            }
-                                                            ?
-                                                        </h2>
-                                                        <h4 className="text-muted mt-3">
-                                                            {question.answer.filter(
-                                                                (answer) =>
-                                                                    answer.isCorrect ===
-                                                                    true
-                                                            ).length >= 2
-                                                                ? 'Chọn tối đa ' +
-                                                                  question.answer.filter(
-                                                                      (
-                                                                          answer
-                                                                      ) =>
-                                                                          answer.isCorrect ===
-                                                                          true
-                                                                  ).length +
-                                                                  ' đáp án'
-                                                                : ''}
-                                                        </h4>
+                                    {Object.keys(
+                                        questionDetailsByCourseAndClass[
+                                            courseId
+                                        ]?.classes || {}
+                                    ).map((classId) => {
+                                        const classInfo =
+                                            questionDetailsByCourseAndClass[
+                                                courseId
+                                            ]?.classes[classId]
+                                        console.log(classInfo)
+                                        return classInfo.questions.map(
+                                            (question, indexQuestion) => (
+                                                <div
+                                                    className="col-lg-12"
+                                                    key={
+                                                        question.questionDetailId
+                                                    }
+                                                >
+                                                    <div className="d-flex bd-highlight p-3">
+                                                        <div className="p-2 w-100">
+                                                            <h2 className="text-dark mt-3">
+                                                                {indexQuestion +
+                                                                    1}
+                                                                .{' '}
+                                                                {
+                                                                    question.questionTitle
+                                                                }
+                                                                ?
+                                                            </h2>
+                                                            <h4 className="text-muted mt-3">
+                                                                {question.answer.filter(
+                                                                    (answer) =>
+                                                                        answer.isCorrect ===
+                                                                        true
+                                                                ).length >= 2
+                                                                    ? `Chọn tối đa ${
+                                                                          question.answer.filter(
+                                                                              (
+                                                                                  answer
+                                                                              ) =>
+                                                                                  answer.isCorrect ===
+                                                                                  true
+                                                                          )
+                                                                              .length
+                                                                      } đáp án`
+                                                                    : ''}
+                                                            </h4>
+                                                        </div>
+                                                    </div>
+                                                    <div className="container mt-2 mb-3">
+                                                        <div className="row">
+                                                            {question.answer.map(
+                                                                (
+                                                                    answer,
+                                                                    indexAnswer
+                                                                ) => (
+                                                                    <div
+                                                                        className="col-md-6"
+                                                                        key={
+                                                                            indexAnswer
+                                                                        }
+                                                                    >
+                                                                        {question.answer.filter(
+                                                                            (
+                                                                                answer
+                                                                            ) =>
+                                                                                answer.isCorrect ===
+                                                                                true
+                                                                        )
+                                                                            .length >=
+                                                                        2 ? (
+                                                                            <Checkbox
+                                                                                className="bg-white mb-3 p-2 pt-3 pl-3"
+                                                                                id={
+                                                                                    answer.answerId
+                                                                                }
+                                                                                name={
+                                                                                    question.questionDetailId
+                                                                                }
+                                                                                value={
+                                                                                    answer.answerContent
+                                                                                }
+                                                                                label={
+                                                                                    answer.answerContent
+                                                                                }
+                                                                                onChange={() =>
+                                                                                    handleAnswerSelect(
+                                                                                        question.questionDetailId,
+                                                                                        answer.answerId,
+                                                                                        'checkbox'
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        ) : (
+                                                                            <Radio
+                                                                                className="bg-white mb-3 p-2 pt-3 pl-3"
+                                                                                id={
+                                                                                    answer.answerId
+                                                                                }
+                                                                                name={
+                                                                                    question.questionDetailId
+                                                                                }
+                                                                                value={
+                                                                                    answer.answerContent
+                                                                                }
+                                                                                label={
+                                                                                    answer.answerContent
+                                                                                }
+                                                                                onChange={() =>
+                                                                                    handleAnswerSelect(
+                                                                                        question.questionDetailId,
+                                                                                        answer.answerId,
+                                                                                        'radio'
+                                                                                    )
+                                                                                }
+                                                                            />
+                                                                        )}
+                                                                    </div>
+                                                                )
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
-                                                <div className="container mt-2 mb-3">
-                                                    <div className="row">
-                                                        {question.answer.map(
-                                                            (
-                                                                answer,
-                                                                indexAnswer
-                                                            ) => (
-                                                                <div
-                                                                    className="col-md-6"
-                                                                    key={
-                                                                        indexAnswer
-                                                                    }
-                                                                >
-                                                                    {question.answer.filter(
-                                                                        (
-                                                                            answer
-                                                                        ) =>
-                                                                            answer.isCorrect ===
-                                                                            true
-                                                                    ).length >=
-                                                                    2 ? (
-                                                                        <Checkbox
-                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
-                                                                            id={
-                                                                                answer.answerId
-                                                                            }
-                                                                            name={
-                                                                                question.questionDetailId
-                                                                            }
-                                                                            value={
-                                                                                answer.answerContent
-                                                                            }
-                                                                            label={
-                                                                                answer.answerContent
-                                                                            }
-                                                                            onChange={() =>
-                                                                                handleAnswerSelect(
-                                                                                    question.questionDetailId,
-                                                                                    answer.answerId,
-                                                                                    'checkbox'
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    ) : (
-                                                                        <Radio
-                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
-                                                                            id={
-                                                                                answer.answerId
-                                                                            }
-                                                                            name={
-                                                                                question.questionDetailId
-                                                                            }
-                                                                            value={
-                                                                                answer.answerContent
-                                                                            }
-                                                                            label={
-                                                                                answer.answerContent
-                                                                            }
-                                                                            onChange={() =>
-                                                                                handleAnswerSelect(
-                                                                                    question.questionDetailId,
-                                                                                    answer.answerId,
-                                                                                    'radio'
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    )}
-                                                                </div>
-                                                            )
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
+                                            )
                                         )
-                                    )}
+                                    })}
                                 </div>
                                 <Button
-                                    className="float-right"
                                     variant="gradient"
                                     gradient={{
                                         from: 'blue',
@@ -508,6 +557,7 @@ function QuizzClient() {
                                     w={200}
                                     size="md"
                                     fw={'bold'}
+                                    mb={50}
                                     fz={'lg'}
                                     onClick={handleFinish}
                                 >
@@ -517,6 +567,98 @@ function QuizzClient() {
                         </div>
                     </div>
                 </div>
+            ) : (
+                ''
+            )}
+
+            {showQuestion === false && showQuestionButton === false && (
+                <Grid>
+                    {Object.keys(questionDetailsByCourseAndClass).map(
+                        (courseId) => {
+                            const course =
+                                questionDetailsByCourseAndClass[courseId]
+                            return Object.keys(course.classes).map(
+                                (classId) => {
+                                    const classInfo = course.classes[classId]
+                                    return (
+                                        <Grid.Col
+                                            xl={3}
+                                            lg={3}
+                                            md={4}
+                                            sm={6}
+                                            key={classId}
+                                        >
+                                            <Card
+                                                shadow="sm"
+                                                padding="lg"
+                                                radius="md"
+                                                withBorder
+                                                className={styles.card}
+                                            >
+                                                <Card.Section>
+                                                    <Image
+                                                        src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                                                        height={160}
+                                                        alt="Norway"
+                                                        withPlaceholder
+                                                    />
+                                                </Card.Section>
+                                                <Text
+                                                    fz="lg"
+                                                    color="dark"
+                                                    fw={500}
+                                                    lineClamp={2}
+                                                    mt="md"
+                                                >
+                                                    {courseId +
+                                                        ' - ' +
+                                                        course.courseName}
+                                                </Text>
+                                                <Stack mt={8}>
+                                                    <Text
+                                                        fw={'bolder'}
+                                                        color="dark"
+                                                        fz="xl"
+                                                        align="left"
+                                                        m={0}
+                                                        p={0}
+                                                    >
+                                                        Lớp học:{' '}
+                                                        {classInfo.className}
+                                                    </Text>
+                                                </Stack>
+                                                <Button
+                                                    mt={20}
+                                                    fullWidth
+                                                    variant="filled"
+                                                    radius="xl"
+                                                    onClick={() => {
+                                                        showButton()
+                                                        setCourseId(courseId)
+                                                    }}
+                                                >
+                                                    Xem chi tiết
+                                                </Button>
+                                            </Card>
+                                        </Grid.Col>
+                                    )
+                                }
+                            )
+                        }
+                    )}
+                </Grid>
+            )}
+
+            {showQuestionButton && showQuestionButton === true && (
+                <Button
+                    className="my-4"
+                    fullWidth
+                    onClick={() => {
+                        startTimer()
+                    }}
+                >
+                    BẮT ĐẦU LÀM BÀI
+                </Button>
             )}
         </>
     )

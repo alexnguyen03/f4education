@@ -13,6 +13,7 @@ import com.f4education.springjwt.interfaces.QuestionDetailService;
 import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.Question;
 import com.f4education.springjwt.models.QuestionDetail;
+import com.f4education.springjwt.payload.request.QuestionDetailClientDTO;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 import com.f4education.springjwt.repository.AnswerReposotory;
 import com.f4education.springjwt.repository.QuestionDetailReposotory;
@@ -30,6 +31,26 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 	AnswerReposotory answerReposotory;
 
 	@Override
+	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(String studentId) {
+		List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(studentId);
+		System.out.println(questionDetail);
+		return questionDetail.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+
+	private QuestionDetailClientDTO convertToDto(QuestionDetail questionDetail) {
+		QuestionDetailClientDTO questionDetailClientDTO = new QuestionDetailClientDTO();
+		BeanUtils.copyProperties(questionDetail, questionDetailClientDTO);
+		questionDetailClientDTO.setAnswer(questionDetail.getAnswers());
+		questionDetailClientDTO.setCourseId(questionDetail.getQuestion().getCourse().getCourseId());
+		questionDetailClientDTO.setCourseName(questionDetail.getQuestion().getCourse().getCourseName());
+		questionDetailClientDTO.setClassId(
+				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassId());
+		questionDetailClientDTO.setClassName(
+				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassName());
+		return questionDetailClientDTO;
+	}
+
+	@Override
 	public List<QuestionDetailDTO> findAll() {
 		List<QuestionDetail> questionDetail = questionDetailReposotory.findAll();
 		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
@@ -37,8 +58,9 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
 	@Override
 	public List<QuestionDetailDTO> getAllQuestionDetailByQuestionId(Integer questionId) {
-		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
-		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
+//		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
+//		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
+		return null;
 	}
 
 	@Override

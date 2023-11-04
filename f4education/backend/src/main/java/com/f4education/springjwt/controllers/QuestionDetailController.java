@@ -31,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.AnswerService;
 import com.f4education.springjwt.interfaces.QuestionDetailService;
+import com.f4education.springjwt.payload.request.QuestionDetailClientDTO;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
 @CrossOrigin("*")
@@ -42,6 +43,13 @@ public class QuestionDetailController {
 
 	@Autowired
 	AnswerService answerService;
+
+	@GetMapping("/quizz/{studentId}")
+//	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getQuestionDetailsByStudentId(@PathVariable("studentId") String studentId) {
+		List<QuestionDetailClientDTO> questionDetailDTO = questionDetailService.getQuestionDetailsByStudentId(studentId);
+		return ResponseEntity.ok(questionDetailDTO);
+	}
 
 	@GetMapping
 //	@PreAuthorize("hasRole('ADMIN')")
@@ -126,10 +134,10 @@ public class QuestionDetailController {
 					System.out.print(cellData + "\t");
 				}
 			}
-			
+
 //			LẤY DATA RA RỒI => filter -> lấy distinct theo tiêu đề câu hỏi
 //			1 Q => 4 A
-			
+
 			return ResponseEntity.ok("Upload Successfully");
 		} catch (Exception e) {
 			e.printStackTrace();
