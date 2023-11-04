@@ -71,11 +71,10 @@ public class Classes implements Serializable {
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<RegisterCourse> registerCourses;
-    
+
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<QuizResult> quizResults;
-    
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<Examination> examinations;

@@ -1,6 +1,8 @@
 import {
     Alert,
     Badge,
+    Box,
+    Button,
     Group,
     HoverCard,
     Loader,
@@ -12,10 +14,11 @@ import {
 import { IconAlertCircle } from '@tabler/icons-react'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment'
-import { useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useState } from 'react'
 import classApi from '../../../api/classApi'
 import scheduleApi from '../../../api/scheduleApi'
 import { convertArrayToLabel } from '../../../utils/Convertor'
+import { useSearchParams } from 'react-router-dom'
 const listOptionView = [
     {
         value: '30',
@@ -30,8 +33,11 @@ const listOptionView = [
         label: '2 tháng trước'
     }
 ]
-const Schedule = (props) => {
+const Schedule = () => {
     const today = new Date('2024-01-04').toDateString().substring(4, 16)
+    const [showSchedule, setShowSchedule] = useState(false)
+
+    const [searchParams, setSearchParams] = useSearchParams()
     const [classSelected, setClassSelected] = useState()
     const [classes, setClasses] = useState([])
     const [viewValue, setViewValue] = useState(null)
@@ -173,8 +179,13 @@ const Schedule = (props) => {
             )
         }
     }
-    const getScheduleByClassId = async (classId) => {
+    const getScheduleByClassId = async () => {
         try {
+            const classId = searchParams.get('classId')
+            console.log(
+                '🚀 ~ file: Schedule.js:181 ~ getScheduleByClassId ~ classId:',
+                classId
+            )
             setClassSelected(classId)
             setLoadingSchedule(true)
 
@@ -229,25 +240,22 @@ const Schedule = (props) => {
         }
     }
     useEffect(() => {
-        getAllClassByStudentId()
+        // getAllClassByStudentId()
+        getScheduleByClassId()
     }, [])
     return (
         <>
-            <div className="my-3 px-2">
-                <Group grow>
-                    <Select
-                        label="Chọn lớp học"
-                        placeholder="Chọn 1 lớp học"
-                        value={classSelected}
-                        onChange={(classId) => {
-                            getScheduleByClassId(classId)
-                        }}
-                        data={convertArrayToLabel(
-                            classes,
-                            'classId',
-                            'className'
-                        )}
-                    />
+            <Box mt="xl" className="d-inline-block">
+                <Button
+                    color="violet"
+                    size="lg"
+                    onClick={() => setShowSchedule((prev) => !prev)}
+                >
+                    {showSchedule ? 'Ẩn ' : 'Xem '} thời khóa biểu
+                </Button>
+            </Box>
+            {showSchedule && (
+                <>
                     <Select
                         label="Xem thêm "
                         placeholder="Chọn thời gian "
@@ -261,94 +269,89 @@ const Schedule = (props) => {
                             'label'
                         )}
                     />
-                </Group>
-            </div>
-            {/* <Group my={'lg'}>
-                <Center mx="auto" className="shadow" p="md">
-                    <div>Đã học: 30 buổi</div>
-                </Center>
-                <Center mx="auto" className="shadow" p="md">
-                    <div>Còn lại: 20 buổi</div>
-                </Center>
-                <Center mx="auto" className="shadow" p="md">
-                    <div>All elements inside Center are centered</div>
-                </Center>
-            </Group> */}
-            <div className="mt-2  pb-3">
-                {listScheduleInTable.length > 0 && (
-                    <div pos={'relative'}>
-                        <LoadingOverlay visible={loadingSchedule} />
-                        <MaterialReactTable
-                            enableToolbarInternalActions={false}
-                            enableStickyHeader
-                            enableStickyFooter
-                            enableSorting={false}
-                            enableRowNumbers
-                            enableTopToolbar={false}
-                            enableColumnActions={false}
-                            state={{ isLoading: loadingSchedule }}
-                            displayColumnDefOptions={{
-                                'mrt-row-numbers': {
-                                    size: 5
-                                }
-                            }}
-                            columns={columnsSchedule}
-                            data={listScheduleInTable}
-                            muiTablePaginationProps={{
-                                rowsPerPageOptions: [10, 20, 50, 100],
-                                showFirstButton: true,
-                                showLastButton: true
-                            }}
-                            muiTableBodyRowProps={({ row }) => {
-                                if (
-                                    new Date(row.original.studyDate)
-                                        .toDateString()
-                                        .substring(4, 16) === today
-                                ) {
-                                    return {
-                                        sx: {
-                                            backgroundColor: '#87c7ff',
-                                            cursor: 'pointer'
+                    <div className="mt-2  pb-3">
+                        {listScheduleInTable.length > 0 && (
+                            <div pos={'relative'}>
+                                {/* <LoadingOverlay visible={loadingSchedule} /> */}
+                                <MaterialReactTable
+                                    enableToolbarInternalActions={false}
+                                    enableStickyHeader
+                                    enableStickyFooter
+                                    enableSorting={false}
+                                    enableRowNumbers
+                                    enableTopToolbar={false}
+                                    enableColumnActions={false}
+                                    state={{ isLoading: loadingSchedule }}
+                                    displayColumnDefOptions={{
+                                        'mrt-row-numbers': {
+                                            size: 5
                                         }
-                                    }
-                                }
-                                return {
-                                    sx: {
-                                        cursor: 'pointer',
-                                        '& tr:nth-of-type(odd)': {
-                                            backgroundColor: '#f5f5f5'
+                                    }}
+                                    columns={columnsSchedule}
+                                    data={listScheduleInTable}
+                                    muiTablePaginationProps={{
+                                        rowsPerPageOptions: [10, 20, 50, 100],
+                                        showFirstButton: true,
+                                        showLastButton: true
+                                    }}
+                                    muiTableBodyRowProps={({ row }) => {
+                                        if (
+                                            new Date(row.original.studyDate)
+                                                .toDateString()
+                                                .substring(4, 16) === today
+                                        ) {
+                                            return {
+                                                sx: {
+                                                    backgroundColor: '#87c7ff',
+                                                    cursor: 'pointer'
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                            }}
-                        />
+                                        return {
+                                            sx: {
+                                                cursor: 'pointer',
+                                                '& tr:nth-of-type(odd)': {
+                                                    backgroundColor: '#f5f5f5'
+                                                }
+                                            }
+                                        }
+                                    }}
+                                />
+                            </div>
+                        )}
+                        {listScheduleInTable.length === 0 &&
+                            loadingSchedule && (
+                                <>
+                                    <div className="w-100 text-center mt-6">
+                                        <Loader
+                                            color="rgba(46, 46, 46, 1)"
+                                            size={50}
+                                        />
+                                        <h3 className="text-muted mt-3">
+                                            Vui lòng chờ trong giây lát!
+                                        </h3>
+                                    </div>
+                                </>
+                            )}
+                        {listScheduleInTable.length === 0 &&
+                            !loadingSchedule && (
+                                <div>
+                                    <Alert
+                                        icon={<IconAlertCircle size="1rem" />}
+                                        title="Chú ý !"
+                                        color=""
+                                        gray
+                                    >
+                                        <Text weight={500}>
+                                            Vui lòng chọn lớp học để xem thời
+                                            khóa biểu !!
+                                        </Text>
+                                    </Alert>
+                                </div>
+                            )}
                     </div>
-                )}
-                {listScheduleInTable.length === 0 && loadingSchedule && (
-                    <>
-                        <div className="w-100 text-center mt-6">
-                            <Loader color="rgba(46, 46, 46, 1)" size={50} />
-                            <h3 className="text-muted mt-3">
-                                Vui lòng chờ trong giây lát!
-                            </h3>
-                        </div>
-                    </>
-                )}
-                {listScheduleInTable.length === 0 && !loadingSchedule && (
-                    <div>
-                        <Alert
-                            icon={<IconAlertCircle size="1rem" />}
-                            title="Chú ý !"
-                            color=""
-                            gray
-                        >
-                            <Text weight={500}>
-                                Vui lòng chọn lớp học để xem thời khóa biểu !!
-                            </Text>
-                        </Alert>
-                    </div>
-                )}
-            </div>
+                </>
+            )}
         </>
     )
 }

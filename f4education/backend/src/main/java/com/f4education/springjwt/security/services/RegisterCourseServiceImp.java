@@ -1,34 +1,40 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
 import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.models.ClassRoom;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.RegisterCourse;
+import com.f4education.springjwt.models.Schedule;
+import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
-import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
-import com.f4education.springjwt.payload.request.CourseProgressRequestDTO;
+import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.request.ScheduleDTO;
+import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
+import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.repository.ClassRepository;
+import com.f4education.springjwt.repository.ClassRoomRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.ScheduleRepository;
+import com.f4education.springjwt.repository.SessionsRepository;
 import com.f4education.springjwt.repository.StudentRepository;
 
 @Service
@@ -45,6 +51,15 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Autowired
 	private ScheduleRepository scheduleRepository;
+	
+	@Autowired
+    private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
+	
+    @Autowired
+    SessionsRepository sessionsRepository;
+    
+    @Autowired
+    ClassRoomRepository classRoomRepository;
 
     @Override
     public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
@@ -73,28 +88,19 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	}
 
 	@Override
-	public Integer getTotalClassIdProgressByclassID(Integer classId, CourseProgressRequestDTO courseProgressRequest) {
-		Date startDate = null;
-		Date endDate = null;
-		SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+    public List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId) {
+		List<Schedule> registerCourses = scheduleRepository.findAllScheduleByClassId(classId);
+		return registerCourses.stream().map(this::convertToScheduleCourseProgressDTO).toList();
+    }
 
-		try {
-			startDate = courseProgressRequest.getStartDate();
-			endDate = courseProgressRequest.getEndDate();
-			
-//			startDate = dateFormat.parse("20-08-2023");
-//			endDate = dateFormat.parse("26-10-2023");
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		Integer totalScheduleCount = scheduleRepository.findTotalClassInSchedule(classId, startDate, endDate);
-
-		System.out.println(totalScheduleCount);
-
-		return totalScheduleCount;
+	public ScheduleCourseProgressDTO convertToScheduleCourseProgressDTO(Schedule schedule) {
+		ScheduleCourseProgressDTO courseResponse = new ScheduleCourseProgressDTO();
+		courseResponse.setClassId(schedule.getClasses().getClassId());
+		courseResponse.setStudyDate(schedule.getStudyDate());
+		courseResponse.setScheduleId(schedule.getScheduleId());
+		return courseResponse;
 	}
-
+	
 	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
 		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
 		courseResponse.setCourse(registerCourse.getCourse());

@@ -20,9 +20,11 @@ import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.request.CourseProgressRequestDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.client.googleapis.auth.clientlogin.ClientLogin.Response;
@@ -65,12 +67,10 @@ public class RegisterCourseController {
 		return ResponseEntity.ok(lst);
 	}
 
-	@PostMapping("/student/progress/{classId}")
-	public ResponseEntity<?> findCourseProgressByclassId(@PathVariable Integer classId,
-	        @RequestBody CourseProgressRequestDTO courseProgressRequest) {
-	    Integer totalCountRegister = registerCourseService.getTotalClassIdProgressByclassID(classId,
-	            courseProgressRequest);
-	    return ResponseEntity.ok(totalCountRegister);
+    @GetMapping("/student/progress/{classId}")
+    public ResponseEntity<?> getAllScheduleByClassId(@PathVariable("classId") Integer classId) {
+    	List<ScheduleCourseProgressDTO> scheduleResponse = registerCourseService.findAllScheduleByClassId(classId);
+        return ResponseEntity.ok(scheduleResponse);
     }
 
     @GetMapping("/{studentId}")

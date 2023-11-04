@@ -4,11 +4,11 @@
     background: #fff;
     box-shadow: #959da533 0px 8px 24px;
 
-    @media (min-width:1400px) {
+    @media (min-width: 1400px) {
         min-height: 86vh;
     }
 
-    @media (min-width:1600px) {
+    @media (min-width: 1600px) {
         min-height: 90vh;
     }
 
@@ -33,7 +33,11 @@
             bottom: 0;
             left: 0;
             width: 6px;
-            background-image: radial-gradient(rgb(233, 18, 161) 5%, rgb(187, 31, 226) 15%, rgb(9, 9, 36) 60%);
+            background-image: radial-gradient(
+                rgb(233, 18, 161) 5%,
+                rgb(187, 31, 226) 15%,
+                rgb(9, 9, 36) 60%
+            );
         }
     }
 
@@ -44,7 +48,7 @@
 
 .box-header {
     width: 100%;
-    padding: 10px;
+    // padding: 10px;
     background: #fff;
     box-shadow: #959da533 0px 8px 24px;
 }
@@ -56,11 +60,11 @@
     background: #fff;
     box-shadow: #959da533 0px 8px 24px;
 
-    @media (min-width:1400px) {
+    @media (min-width: 1400px) {
         min-height: 75vh;
     }
 
-    @media (min-width:1600px) {
+    @media (min-width: 1600px) {
         min-height: 83vh;
     }
 }

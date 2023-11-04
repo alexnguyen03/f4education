@@ -4,11 +4,14 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.CourseProgressRequestDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 
 @Service
 public interface RegisterCourseService {
@@ -32,5 +35,5 @@ public interface RegisterCourseService {
 
         List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId);
     
-        Integer getTotalClassIdProgressByclassID(Integer classId, CourseProgressRequestDTO courseProgressRequest);
+        List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId);
 }
