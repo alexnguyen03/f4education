@@ -15,6 +15,7 @@ import React, { useState, useEffect } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import moment from 'moment/moment'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
@@ -28,6 +29,7 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 const user = JSON.parse(localStorage.getItem('user'))
 
 function QuizzClient() {
+    const [searchParams, setSearchParams] = useSearchParams()
     const [time, setTime] = useState(10 * 60)
     const [elapsedTime, setElapsedTime] = useState(0)
     const [isFinished, setIsFinished] = useState(true)
@@ -87,7 +89,7 @@ function QuizzClient() {
         setQuestionDetailsByCourseAndClass
     ] = useState({})
 
-    const [courseId, setCourseId] = useState()
+    const [statusQuizz, setStatusQuizz] = useState(true)
 
     const getQuestionDetailsByStudentId = async () => {
         try {
@@ -141,8 +143,9 @@ function QuizzClient() {
                 setQuestionDetailsByCourseAndClass(
                     questionDetailsByCourseAndClass
                 )
+                startTimer()
             } else {
-                console.log('aaa')
+                setStatusQuizz(false)
             }
         } catch (error) {
             console.log(error)
@@ -214,7 +217,6 @@ function QuizzClient() {
     }
 
     const [showQuestion, setShowQuestion] = useState(false)
-    const [showQuestionButton, setShowQuestionButton] = useState(false)
 
     const [quizzResultRequest, setQuizResultRequest] = useState({
         quizzId: 0,
@@ -226,14 +228,8 @@ function QuizzClient() {
         studentId: ''
     })
 
-    const showButton = () => {
-        setShowQuestionButton(true)
-        setShowQuestion(true)
-    }
-
     const startTimer = () => {
         setShowQuestion(true)
-        setShowQuestionButton(false)
         setIsFinished(false)
         setElapsedTime(0)
     }
@@ -338,7 +334,7 @@ function QuizzClient() {
             //     alert('Thêm thành công')
             // }
         } catch (error) {
-            console.log('failed to fetch data', error)
+            console.log('Thêm lỗi', error)
         }
     }
 
@@ -355,82 +351,101 @@ function QuizzClient() {
             >
                 {itemsBreadcum}
             </Breadcrumbs>
-            {showQuestion && showQuestionButton === false ? (
-                <div className="container">
-                    <div className="row">
-                        <div className="col-lg-12 mx-auto rounded">
-                            <div class="d-flex justify-content-between">
-                                <QuizIcon
-                                    className="rounded-circle p-3"
-                                    style={{
-                                        backgroundColor: 'white',
-                                        fontSize: 100,
-                                        color: '#34A633',
-                                        marginLeft: 100
-                                    }}
-                                />
-                                <div
-                                    style={{
-                                        width: 250,
-                                        margin: 'auto',
-                                        backgroundColor: 'white',
-                                        marginLeft: 200,
-                                        borderRadius: '10px'
-                                    }}
-                                >
-                                    <p className="text-center text-success p-2">
-                                        <span className="display-4">
-                                            Thời gian còn lại
-                                        </span>
-                                        <br />
-                                        <span className="display-2">
-                                            {seconds > 10
-                                                ? `0${minutes}`
-                                                : minutes}
-                                        </span>
-                                        <span className="display-2">
-                                            :
-                                            {seconds < 10
-                                                ? `0${seconds}`
-                                                : seconds}
-                                        </span>
-                                    </p>
+            {statusQuizz === false && (
+                <div className="text-center">
+                    <h1>Quizz hiện tại chưa được mở</h1>
+                    <Link to="/student/classes">
+                        <Button color="violet" size="lg">
+                            Quay lại
+                        </Button>
+                    </Link>
+                </div>
+            )}
+            {questionDetailsByCourseAndClass[searchParams.get('courseId')] ===
+                undefined &&
+                showQuestion === true && (
+                    <div className="text-center">
+                        <h1>Quizz hiện tại chưa được mở</h1>
+                        <Link to="/student/classes">
+                            <Button color="violet" size="lg">
+                                Quay lại
+                            </Button>
+                        </Link>
+                    </div>
+                )}
+            {showQuestion === true &&
+                questionDetailsByCourseAndClass[
+                    searchParams.get('courseId')
+                ] !== undefined && (
+                    <div className="container">
+                        <div className="row">
+                            <div className="col-lg-12 mx-auto rounded">
+                                <div class="d-flex justify-content-between">
+                                    <QuizIcon
+                                        className="rounded-circle p-3"
+                                        style={{
+                                            backgroundColor: 'white',
+                                            fontSize: 100,
+                                            color: '#34A633',
+                                            marginLeft: 100
+                                        }}
+                                    />
+                                    <div
+                                        style={{
+                                            width: 250,
+                                            margin: 'auto',
+                                            backgroundColor: 'white',
+                                            marginLeft: 220,
+                                            borderRadius: '10px'
+                                        }}
+                                    >
+                                        <p className="text-center text-success p-2">
+                                            <span className="display-4">
+                                                Thời gian còn lại
+                                            </span>
+                                            <br />
+                                            <span className="display-2">
+                                                {seconds > 10
+                                                    ? `0${minutes}`
+                                                    : minutes}
+                                            </span>
+                                            <span className="display-2">
+                                                :
+                                                {seconds < 10
+                                                    ? `0${seconds}`
+                                                    : seconds}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <QuestionMarkIcon
+                                        className="rounded-circle p-3"
+                                        style={{
+                                            backgroundColor: 'white',
+                                            fontSize: 100,
+                                            color: '#34A633',
+                                            marginRight: 100
+                                        }}
+                                    />
                                 </div>
-                                <QuestionMarkIcon
-                                    className="rounded-circle p-3"
-                                    style={{
-                                        backgroundColor: 'white',
-                                        fontSize: 100,
-                                        color: '#34A633',
-                                        marginRight: 100
-                                    }}
-                                />
-                            </div>
-                            <div className="container">
-                                <div
-                                    className="row my-4"
-                                    style={{
-                                        minHeight: 300,
-                                        backgroundColor: '#ebebeb',
-                                        borderRadius: '10px',
-                                        marginLeft: 2,
-                                        marginRight: 2
-                                    }}
-                                >
-                                    <h1 className="display-2 text-dark mx-auto mt-3">
-                                        Quiz 1
-                                    </h1>
-                                    {Object.keys(
-                                        questionDetailsByCourseAndClass[
-                                            courseId
-                                        ]?.classes || {}
-                                    ).map((classId) => {
-                                        const classInfo =
-                                            questionDetailsByCourseAndClass[
-                                                courseId
-                                            ]?.classes[classId]
-                                        console.log(classInfo)
-                                        return classInfo.questions.map(
+                                <div className="container">
+                                    <div
+                                        className="row my-4"
+                                        style={{
+                                            minHeight: 300,
+                                            backgroundColor: '#ebebeb',
+                                            borderRadius: '10px',
+                                            marginLeft: 2,
+                                            marginRight: 2
+                                        }}
+                                    >
+                                        <h1 className="display-2 text-dark mx-auto mt-3">
+                                            Quiz 1
+                                        </h1>
+                                        {questionDetailsByCourseAndClass[
+                                            searchParams.get('courseId')
+                                        ]?.classes[
+                                            searchParams.get('classId')
+                                        ].questions.map(
                                             (question, indexQuestion) => (
                                                 <div
                                                     className="col-lg-12"
@@ -544,122 +559,29 @@ function QuizzClient() {
                                                     </div>
                                                 </div>
                                             )
-                                        )
-                                    })}
+                                        )}
+                                    </div>
+                                    <Button
+                                        variant="gradient"
+                                        gradient={{
+                                            from: 'blue',
+                                            to: 'violet',
+                                            deg: 90
+                                        }}
+                                        w={200}
+                                        size="md"
+                                        fw={'bold'}
+                                        mb={50}
+                                        fz={'lg'}
+                                        onClick={handleFinish}
+                                    >
+                                        Nộp bài
+                                    </Button>
                                 </div>
-                                <Button
-                                    variant="gradient"
-                                    gradient={{
-                                        from: 'blue',
-                                        to: 'violet',
-                                        deg: 90
-                                    }}
-                                    w={200}
-                                    size="md"
-                                    fw={'bold'}
-                                    mb={50}
-                                    fz={'lg'}
-                                    onClick={handleFinish}
-                                >
-                                    Nộp bài
-                                </Button>
                             </div>
                         </div>
                     </div>
-                </div>
-            ) : (
-                ''
-            )}
-
-            {showQuestion === false && showQuestionButton === false && (
-                <Grid>
-                    {Object.keys(questionDetailsByCourseAndClass).map(
-                        (courseId) => {
-                            const course =
-                                questionDetailsByCourseAndClass[courseId]
-                            return Object.keys(course.classes).map(
-                                (classId) => {
-                                    const classInfo = course.classes[classId]
-                                    return (
-                                        <Grid.Col
-                                            xl={3}
-                                            lg={3}
-                                            md={4}
-                                            sm={6}
-                                            key={classId}
-                                        >
-                                            <Card
-                                                shadow="sm"
-                                                padding="lg"
-                                                radius="md"
-                                                withBorder
-                                                className={styles.card}
-                                            >
-                                                <Card.Section>
-                                                    <Image
-                                                        src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                                        height={160}
-                                                        alt="Norway"
-                                                        withPlaceholder
-                                                    />
-                                                </Card.Section>
-                                                <Text
-                                                    fz="lg"
-                                                    color="dark"
-                                                    fw={500}
-                                                    lineClamp={2}
-                                                    mt="md"
-                                                >
-                                                    {courseId +
-                                                        ' - ' +
-                                                        course.courseName}
-                                                </Text>
-                                                <Stack mt={8}>
-                                                    <Text
-                                                        fw={'bolder'}
-                                                        color="dark"
-                                                        fz="xl"
-                                                        align="left"
-                                                        m={0}
-                                                        p={0}
-                                                    >
-                                                        Lớp học:{' '}
-                                                        {classInfo.className}
-                                                    </Text>
-                                                </Stack>
-                                                <Button
-                                                    mt={20}
-                                                    fullWidth
-                                                    variant="filled"
-                                                    radius="xl"
-                                                    onClick={() => {
-                                                        showButton()
-                                                        setCourseId(courseId)
-                                                    }}
-                                                >
-                                                    Xem chi tiết
-                                                </Button>
-                                            </Card>
-                                        </Grid.Col>
-                                    )
-                                }
-                            )
-                        }
-                    )}
-                </Grid>
-            )}
-
-            {showQuestionButton && showQuestionButton === true && (
-                <Button
-                    className="my-4"
-                    fullWidth
-                    onClick={() => {
-                        startTimer()
-                    }}
-                >
-                    BẮT ĐẦU LÀM BÀI
-                </Button>
-            )}
+                )}
         </>
     )
 }

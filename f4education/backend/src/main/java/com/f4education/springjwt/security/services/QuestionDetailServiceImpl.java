@@ -1,5 +1,8 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +50,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassId());
 		questionDetailClientDTO.setClassName(
 				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassName());
+
 		return questionDetailClientDTO;
 	}
 

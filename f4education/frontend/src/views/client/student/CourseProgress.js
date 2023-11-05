@@ -20,7 +20,11 @@ import {
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { IconArrowBack, IconArrowRight } from '@tabler/icons-react'
+import {
+    IconArrowBack,
+    IconArrowRight,
+    IconZoomQuestion
+} from '@tabler/icons-react'
 import { createSearchParams, Link, useNavigate } from 'react-router-dom'
 import scheduleApi from '../../../api/scheduleApi'
 
@@ -147,6 +151,16 @@ const CourseProgress = () => {
         document.scrollingElement.scrollTop = 0
     }
 
+    const handleShowQuestion = (courseId, classId) => {
+        navigate({
+            pathname: '/student/quizz',
+            search: `?${createSearchParams({
+                courseId: courseId,
+                classId: classId
+            })}`
+        })
+    }
+
     const handleDirectToSchedule = () => {}
 
     // ************ USE EFECT AREA
@@ -188,32 +202,32 @@ const CourseProgress = () => {
                             <Group position="left">
                                 <Text c="dimmed" fz="xl">
                                     Lớp học:{' '}
-                                    {/* <strong>
-                                            {selectedCourse.classes.className}
-                                        </strong> */}
+                                    <strong>
+                                        {selectedCourse.classes.className}
+                                    </strong>
                                 </Text>
                                 -
                                 <Text c="dimmed" fz="xl">
-                                    {/* <strong>
-                                            {selectedCourse.course
-                                                .courseDuration / 2}
-                                        </strong>{' '} */}
+                                    <strong>
+                                        {selectedCourse.course.courseDuration /
+                                            2}
+                                    </strong>{' '}
                                     buổi học
                                 </Text>
                             </Group>
                             <Text fz="lg">
                                 Từ ngày:{' '}
-                                {/* <strong>
-                                        {moment(
-                                            selectedCourse.classes.startDate
-                                        ).format('DD-MM-yyyy')}
-                                    </strong>{' '} */}
+                                <strong>
+                                    {moment(
+                                        selectedCourse.classes.startDate
+                                    ).format('DD-MM-yyyy')}
+                                </strong>{' '}
                                 -{' '}
-                                {/* <strong>
-                                        {moment(
-                                            selectedCourse.classes.endDate
-                                        ).format('DD-MM-yyyy')}
-                                    </strong> */}
+                                <strong>
+                                    {moment(
+                                        selectedCourse.classes.endDate
+                                    ).format('DD-MM-yyyy')}
+                                </strong>
                             </Text>
                             <Group position="left">
                                 <Text fw={500} color="dimmed" fz="lg">
@@ -245,6 +259,21 @@ const CourseProgress = () => {
                                     illo porro. Totam, libero!
                                 </strong>
                             </Text>
+                            <Button
+                                variant="outline"
+                                color="indigo"
+                                size="lg"
+                                leftIcon={<IconZoomQuestion />}
+                                mt={10}
+                                onClick={() => {
+                                    handleShowQuestion(
+                                        selectedCourse.course.courseId,
+                                        selectedCourse.classes.classId
+                                    )
+                                }}
+                            >
+                                Làm bài trắc nghiệm
+                            </Button>
                             <Button
                                 variant="outline"
                                 color="indigo"

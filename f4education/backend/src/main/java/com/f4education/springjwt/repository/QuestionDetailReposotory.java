@@ -6,6 +6,10 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Repository
@@ -18,6 +22,7 @@ public interface QuestionDetailReposotory extends JpaRepository<QuestionDetail, 
 	        "WHERE rc.student.studentId = :studentId " +
 	        "AND rc.course.courseId = q.course.courseId " +
 	        "AND rc.classes.classId IS NOT NULL " +
-	        "AND e.finishDate = CURRENT_DATE")
+//	        "AND e.finishDate = CURRENT_DATE "+
+	         "AND e.finishDate >= CURRENT_TIMESTAMP")
 	List<QuestionDetail> findQuestionDetailByStudentId(@Param("studentId") String studentId);
 }

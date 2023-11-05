@@ -35,9 +35,6 @@ public class Question implements Serializable {
 
 	@OneToMany(mappedBy = "question")
 	List<QuestionDetail> questionDetails;
-	
-	@OneToMany(mappedBy = "question")
-	List<Examination> examinations;
 
 	@ManyToOne
 	@JoinColumn(name = "subject_id")

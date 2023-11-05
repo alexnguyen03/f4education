@@ -51,13 +51,6 @@ public class QuestionDetailController {
 		return ResponseEntity.ok(questionDetailDTO);
 	}
 
-	@GetMapping("/quizz/{studentId}")
-//	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getQuestionDetailsByStudentId(@PathVariable("studentId") String studentId) {
-		List<QuestionDetailClientDTO> questionDetailDTO = questionDetailService.getQuestionDetailsByStudentId(studentId);
-		return ResponseEntity.ok(questionDetailDTO);
-	}
-
 	@GetMapping
 	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> findAll() {
