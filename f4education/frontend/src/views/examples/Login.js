@@ -65,8 +65,8 @@ const Login = () => {
                 if (role === 'ROLE_ADMIN') {
                     navigate('/admin')
                 } else if (role === 'ROLE_TEACHER') {
-                    navigate('/teacher')
-                } else navigate('/')
+                    navigate('/teacher/classes')
+                } else navigate('/student/classes')
             }
             setLoading(false)
         } catch (error) {

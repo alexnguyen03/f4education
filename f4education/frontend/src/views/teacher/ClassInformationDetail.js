@@ -26,6 +26,11 @@ import classApi from '../../api/classApi'
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
 import { useDisclosure } from '@mantine/hooks'
+import questionApi from '../../api/questionApi'
+import { selectClasses } from '@mui/material'
+import { toast, ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import Notify from '../../utils/Notify'
 
 const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -56,6 +61,7 @@ const ClassInformationDetail = () => {
     })
 
     const [isPresent, setIsPresent] = useState(false)
+    const [activedExam, setActivedExam] = useState(false)
     const [seletedStudent, setSletedStudent] = useState({
         studentId: '',
         fullname: '',
@@ -94,6 +100,53 @@ const ClassInformationDetail = () => {
         }
     }
 
+    const settingQuizz = async () => {
+        const classId = classInfor.classId
+        console.log(
+            '🚀 ~ file: ClassInformationDetail.js:101 ~ settingQuizz ~ classId:',
+            classId
+        )
+        try {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
+            const resp = await questionApi.createExamination(classId)
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:103 ~ settingQuizz ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.createSuccess())
+            } else {
+                toast.update(id, Notify.options.createError())
+            }
+        } catch (error) {
+            toast(Notify.options.createError())
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:105 ~ settingQuizz ~ error:',
+                error
+            )
+        }
+        checkActivedExam()
+        handlers.close()
+    }
+    const checkActivedExam = async () => {
+        const classId = data.classId
+
+        try {
+            const resp = await questionApi.checkActivedExam(classId)
+
+            if (resp.status === 200 && resp.data) {
+                setActivedExam(true)
+            } else {
+                setActivedExam(false)
+            }
+        } catch (error) {
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:134 ~ checkActivedExam ~ error:',
+                error
+            )
+        }
+    }
     const redirectTo = () => {
         return navigate('/teacher/classes-infor')
     }
@@ -199,10 +252,13 @@ const ClassInformationDetail = () => {
     useEffect(() => {
         fetchClass()
         fetchClassByTeacher()
+        checkActivedExam()
     }, [])
 
     return (
         <>
+            <ToastContainer />
+
             {/* Header */}
             <Box my={'md'} className={styles['box-header']}>
                 <Group position="apart" px={'lg'} py={'md'}>
@@ -292,7 +348,13 @@ const ClassInformationDetail = () => {
                             <Title order={2} fw={500} mt="sm" align="center">
                                 {classInfor.className}
                             </Title>
-                            <Text ta="center" fz="md" c="dimmed" align="center">
+                            <Text
+                                ta="center"
+                                fz="lg"
+                                mt={'md'}
+                                c="dimmed"
+                                align="center"
+                            >
                                 {courseName}
                             </Text>
                             <Text
@@ -304,11 +366,11 @@ const ClassInformationDetail = () => {
                             >
                                 Từ ngày{' '}
                                 {moment(classInfor.startDate).format(
-                                    'DD/mm/yyyy'
+                                    'DD/MM/yyyy'
                                 )}{' '}
                                 -{' '}
                                 {moment(classInfor.endDate).format(
-                                    'DD/mm/yyyy'
+                                    'DD/MM/yyyy'
                                 )}
                             </Text>
                             <Flex
@@ -344,6 +406,7 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
+                                    disabled={activedExam}
                                 >
                                     Tạo quiz
                                 </Button>
@@ -428,7 +491,9 @@ const ClassInformationDetail = () => {
                         </Title>
                         <Group grow mt={'lg'}>
                             <Button color="red">Không, để sau</Button>
-                            <Button color="teal">Có, tạo ngay</Button>
+                            <Button onClick={settingQuizz} color="teal">
+                                Có, tạo ngay
+                            </Button>
                         </Group>
                     </Modal.Body>
                 </Modal.Content>

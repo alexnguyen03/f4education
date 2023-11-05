@@ -13,7 +13,7 @@ import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.QuestionDetail;
 import com.f4education.springjwt.payload.request.AnswerDTO;
 import com.f4education.springjwt.repository.AnswerReposotory;
-import com.f4education.springjwt.repository.QuestionDetailReposotory;
+import com.f4education.springjwt.repository.QuestionDetailRepository;
 
 @Service
 public class AnswerServiceImpl implements AnswerService {
@@ -21,7 +21,7 @@ public class AnswerServiceImpl implements AnswerService {
     private AnswerReposotory answerReposotory;
 
     @Autowired
-    private QuestionDetailReposotory questionDetailReposotory;
+    private QuestionDetailRepository questionDetailReposotory;
 
     @Override
     public List<AnswerDTO> getAllAnswer() {

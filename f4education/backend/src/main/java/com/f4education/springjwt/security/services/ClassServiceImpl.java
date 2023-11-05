@@ -161,13 +161,18 @@ public class ClassServiceImpl implements ClassService {
 
 	@Override
 	public List<Classes> getClassByStudentId(String studentId) {
-		List<RegisterCourse> registerCourses =
-				registerCourseRepository.findRegisterCoursesByStudent_StudentId(studentId);
+		List<RegisterCourse> registerCourses = registerCourseRepository
+				.findRegisterCoursesByStudent_StudentId(studentId);
 
 		List<Classes> classesList = registerCourses.stream()
 				.map(RegisterCourse::getClasses)
 				.collect(Collectors.toList());
 
 		return classesList;
+	}
+
+	@Override
+	public Classes findById(Integer classId) {
+		return classRepository.findById(classId).get();
 	}
 }

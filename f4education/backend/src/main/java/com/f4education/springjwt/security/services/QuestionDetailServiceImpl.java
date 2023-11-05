@@ -15,16 +15,16 @@ import com.f4education.springjwt.models.Question;
 import com.f4education.springjwt.models.QuestionDetail;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 import com.f4education.springjwt.repository.AnswerReposotory;
-import com.f4education.springjwt.repository.QuestionDetailReposotory;
-import com.f4education.springjwt.repository.QuestionReposotory;
+import com.f4education.springjwt.repository.QuestionDetailRepository;
+import com.f4education.springjwt.repository.QuestionRepository;
 
 @Service
 public class QuestionDetailServiceImpl implements QuestionDetailService {
 	@Autowired
-	QuestionDetailReposotory questionDetailReposotory;
+	QuestionDetailRepository questionDetailReposotory;
 
 	@Autowired
-	QuestionReposotory questionReposotory;
+	QuestionRepository questionReposotory;
 
 	@Autowired
 	AnswerReposotory answerReposotory;
@@ -74,17 +74,17 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
 			this.convertDTOtoEntity(questionDetailDTO, exitQuestionDetail);
 
-//			List<Answer> answers = questionDetailDTO.getAnswers();
-//			for (Answer as : answers) {
-//				Optional<Answer> exitAnswer = answerReposotory.findById(as.getAnswerId());
-//
-//				if (exitAnswer.isPresent()) {
-//		            Answer existingAnswer = exitAnswer.get();
-//		            System.out.println(existingAnswer);
-//		            
-//		            answerReposotory.save(existingAnswer);
-//		        }
-//			}
+			// List<Answer> answers = questionDetailDTO.getAnswers();
+			// for (Answer as : answers) {
+			// Optional<Answer> exitAnswer = answerReposotory.findById(as.getAnswerId());
+			//
+			// if (exitAnswer.isPresent()) {
+			// Answer existingAnswer = exitAnswer.get();
+			// System.out.println(existingAnswer);
+			//
+			// answerReposotory.save(existingAnswer);
+			// }
+			// }
 
 			QuestionDetail updateQuestionDetail = questionDetailReposotory.save(exitQuestionDetail);
 

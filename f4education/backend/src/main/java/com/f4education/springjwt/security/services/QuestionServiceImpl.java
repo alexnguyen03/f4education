@@ -9,7 +9,7 @@ import com.f4education.springjwt.payload.request.QuestionDTO;
 import com.f4education.springjwt.payload.request.QuestionDTORequest;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseRepository;
-import com.f4education.springjwt.repository.QuestionReposotory;
+import com.f4education.springjwt.repository.QuestionRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 @Service
 public class QuestionServiceImpl implements QuestionService {
 	@Autowired
-	QuestionReposotory questionReposotory;
+	QuestionRepository questionReposotory;
 
 	@Autowired
 	AdminRepository adminRepository;
@@ -50,7 +50,6 @@ public class QuestionServiceImpl implements QuestionService {
 	public QuestionDTO createQuestion(QuestionDTORequest questionDTO) {
 		Question question = this.convertRequestToEntity(questionDTO);
 		question.setCreateDate(new Date());
-		question.setStatus(true);
 
 		Question saveQuestion = questionReposotory.save(question);
 
@@ -64,8 +63,6 @@ public class QuestionServiceImpl implements QuestionService {
 		if (exitQuestion.isEmpty()) {
 			return null;
 		}
-
-		exitQuestion.get().setStatus(false);
 
 		Question updateQuestion = questionReposotory.save(exitQuestion.get());
 
@@ -99,6 +96,11 @@ public class QuestionServiceImpl implements QuestionService {
 		question.setAdmin(admin);
 
 		return question;
+	}
+
+	@Override
+	public List<Question> get60QuestionRamdomsByCourseId(Integer courseId) {
+		return questionReposotory.findAllByCourseId(courseId);
 	}
 
 }

@@ -34,6 +34,20 @@ const questionApi = {
         return axiosClient.post(url, file, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
+    },
+    createExamination: (classId) => {
+        const url = `exam/${classId}`
+        return axiosClient.post(url)
+    },
+
+    checkActivedExam: (classId) => {
+        const url = `exam/${classId}`
+        return axiosClient.get(url)
+    },
+
+    checkActivedExamByTodayAndClassId: (classId) => {
+        const url = `exam/student/${classId}`
+        return axiosClient.get(url)
     }
 }
 

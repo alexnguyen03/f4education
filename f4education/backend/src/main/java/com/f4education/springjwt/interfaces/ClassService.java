@@ -21,4 +21,5 @@ public interface ClassService {
 
 	ClassDTO updateClass(Integer classId, ClassDTO classDTO);
 
+	Classes findById(Integer classId);
 }

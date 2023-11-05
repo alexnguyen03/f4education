@@ -33,9 +33,6 @@ public class Question implements Serializable {
 	@Column(name = "create_date")
 	private Date createDate;
 
-	@Column(name = "status")
-	private Boolean status;
-
 	@ManyToOne
 	@JoinColumn(name = "subject_id")
 	@JsonIgnore
@@ -61,6 +58,6 @@ public class Question implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Question{" + "questionId=" + questionId + ", createDate=" + createDate + ", status=" + status + '}';
+		return "Question{" + "questionId=" + questionId + ", createDate=" + createDate + '}';
 	}
 }

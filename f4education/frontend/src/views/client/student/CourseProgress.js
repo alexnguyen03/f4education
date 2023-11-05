@@ -7,6 +7,7 @@ import {
     Container,
     Grid,
     Group,
+    HoverCard,
     Image,
     Progress,
     Rating,
@@ -20,8 +21,13 @@ import {
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { IconArrowBack, IconArrowRight } from '@tabler/icons-react'
-import { createSearchParams, Link, useNavigate } from 'react-router-dom'
+import { IconArrowBack, IconArrowRight, IconRefresh } from '@tabler/icons-react'
+import {
+    createSearchParams,
+    Link,
+    useNavigate,
+    useSearchParams
+} from 'react-router-dom'
 import scheduleApi from '../../../api/scheduleApi'
 
 // Scss
@@ -32,6 +38,7 @@ import moment from 'moment'
 import courseApi from '../../../api/courseApi'
 import registerCoursecAPI from '../../../api/registerCourseApi'
 import Schedule from './Schedule'
+import questionApi from 'api/questionApi'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -43,12 +50,15 @@ const CourseProgress = () => {
 
     //  ***********Route
     let navigate = useNavigate()
+    const [searchParams, setSearchParams] = useSearchParams()
 
     // *********** Main variable
     const [courseProgresses, setCourseProgresses] = useState([])
     const [totalCountCourseProgress, setDetailCourseProgress] = useState([])
     const [selectedCourse, setSelectedCourse] = useState({})
     const [showingDetail, setShowingDetail] = useState(false)
+    const [loadingCheckExam, setLoadingCheckExam] = useState(false)
+    const [enableExam, setEnableExam] = useState(false)
     const [showSchedule, setShowSchedule] = useState(false)
 
     const [newestCourse, setNewestCourse] = useState([])
@@ -147,6 +157,30 @@ const CourseProgress = () => {
         document.scrollingElement.scrollTop = 0
     }
 
+    const checkActivedExamByTodayAndClassId = async () => {
+        const classId = searchParams.get('classId')
+        try {
+            setLoadingCheckExam(true)
+            const resp = await questionApi.checkActivedExamByTodayAndClassId(
+                classId
+            )
+            console.log(
+                '🚀 ~ file: CourseProgress.js:160 ~ checkActivedExamByTodayAndClassId ~ resp:',
+                resp
+            )
+            if (resp.status === 200 && resp.data) {
+                setEnableExam(true)
+            } else {
+                setEnableExam(false)
+            }
+        } catch (error) {
+            console.log(
+                '🚀 ~ file: CourseProgress.js:154 ~ checkActivedExamByTodayAndClassId ~ error:',
+                error
+            )
+        }
+        setLoadingCheckExam(false)
+    }
     const handleDirectToSchedule = () => {}
 
     // ************ USE EFECT AREA
@@ -157,6 +191,7 @@ const CourseProgress = () => {
     useEffect(() => {
         fetchCourseProgress()
         fetchNewestCourse()
+        checkActivedExamByTodayAndClassId()
     }, [])
 
     useEffect(() => {
@@ -402,7 +437,7 @@ const CourseProgress = () => {
                                     w={'100%'}
                                 />
                             </Box>
-                            <Stack align="left" mt={25}>
+                            <Stack align="center" py={25}>
                                 <Text
                                     color="dimmed"
                                     fw={500}
@@ -417,13 +452,7 @@ const CourseProgress = () => {
                                             2}
                                     </strong>
                                 </Text>
-                                <Text
-                                    color="dimmed"
-                                    fw={500}
-                                    fz="xl"
-                                    m={0}
-                                    p={0}
-                                >
+                                <Text color="red" fw={500} fz="xl" m={0} p={0}>
                                     Số buổi vắng:{' '}
                                     <strong className="ml-2">
                                         0 /{' '}
@@ -431,6 +460,24 @@ const CourseProgress = () => {
                                             2}
                                     </strong>
                                 </Text>
+                                <Group>
+                                    <Button
+                                        color="teal"
+                                        loading={loadingCheckExam}
+                                        disabled={!enableExam}
+                                    >
+                                        Làm kiểm tra
+                                    </Button>
+                                    <Tooltip label="Làm mới" withArrow>
+                                        <IconRefresh
+                                            onClick={
+                                                checkActivedExamByTodayAndClassId
+                                            }
+                                            color="gray"
+                                            style={{ cursor: 'pointer' }}
+                                        />
+                                    </Tooltip>
+                                </Group>
                             </Stack>
                         </Card.Section>
                     </Card>

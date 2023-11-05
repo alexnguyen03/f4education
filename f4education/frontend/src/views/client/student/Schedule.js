@@ -248,7 +248,7 @@ const Schedule = () => {
             <Box mt="xl" className="d-inline-block">
                 <Button
                     color="violet"
-                    size="lg"
+                    // size="lg"
                     onClick={() => setShowSchedule((prev) => !prev)}
                 >
                     {showSchedule ? 'Ẩn ' : 'Xem '} thời khóa biểu
