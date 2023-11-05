@@ -31,6 +31,7 @@ import ClassInformation from 'views/teacher/ClassInformation'
 import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
 import CourseProgress from '../../../f4education/frontend/src/views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
+import CoursesDetail from 'views/admin/CoursesDetail'
 
 export var routes = [
     {
@@ -83,6 +84,11 @@ export var routes = [
         layout: '/admin'
     },
     {
+        path: '/courses-detail/:courseId',
+        component: <CoursesDetail />,
+        layout: '/admin'
+    },
+    {
         path: '/class-room',
         name: 'Phòng học',
         icon: 'ni ni-single-02 text-yellow',
@@ -126,7 +132,7 @@ export var routes = [
     },
 
     {
-        path: '/question-detail/:courseName',
+        path: '/question-detail/:questionId',
         component: <QuestionDetail />,
         layout: '/admin'
     },

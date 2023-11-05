@@ -53,6 +53,10 @@ const courseApi = {
     getCourseBySubjectName: (subjectName) => {
         const url = `/courses/${subjectName}`
         return axiosClient.get(url)
+    },
+    getCourseByCourseId: (courseId) => {
+        const url = `/courses/detail/${courseId}`
+        return axiosClient.get(url)
     }
 }
 

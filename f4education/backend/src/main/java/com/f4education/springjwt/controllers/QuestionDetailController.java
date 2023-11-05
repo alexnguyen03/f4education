@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.AnswerService;
 import com.f4education.springjwt.interfaces.QuestionDetailService;
+import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
 @CrossOrigin("*")
@@ -82,11 +84,12 @@ public class QuestionDetailController {
 		return ResponseEntity.noContent().build();
 	}
 
-	@PostMapping(value = "/upload-excel", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") Optional<MultipartFile> file) {
+	@PostMapping(value = "/upload-excel/{questionId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<?> uploadExcelFile(@RequestParam("excelFile") Optional<MultipartFile> file,
+			@PathVariable Integer questionId) {
 		try {
 			if (file.isEmpty()) {
-				return ResponseEntity.badRequest().body("File not found.");
+				return ResponseEntity.noContent().build();
 			}
 
 			// Get the file from the MultipartFile object
@@ -117,20 +120,61 @@ public class QuestionDetailController {
 				dataList.add(rowData);
 			}
 
-			// Closing file input stream
-			fis.close();
+			// Create a list to hold QuestionDetailDTO objects
+			List<QuestionDetailDTO> questionDetails = new ArrayList<>();
 
-			// Print the data from the Excel file
-			for (List<Object> rowData : dataList) {
-				for (Object cellData : rowData) {
-					System.out.print(cellData + "\t");
+			if (dataList.size() > 0) {
+				for (int i = 1; i < dataList.size(); i++) {
+					List<Object> row = dataList.get(i);
+
+					if (row.size() >= 3) {
+						String questionTitle = (String) row.get(0);
+						String answerContent = (String) row.get(1);
+						Boolean isCorrect = (Boolean) row.get(2);
+
+						// Check if the question already exists in the list
+						QuestionDetailDTO existingQuestion = questionDetails.stream()
+								.filter(q -> q.getQuestionTitle().equals(questionTitle)).findFirst().orElse(null);
+
+						if (existingQuestion == null) {
+							// If the question doesn't exist, create a new QuestionDetailDTO
+							QuestionDetailDTO newQuestion = new QuestionDetailDTO();
+							newQuestion.setQuestionTitle(questionTitle);
+							newQuestion.setAnswers(new ArrayList<>()); // Initialize the answers list
+							Answer newAnswer = new Answer();
+							newAnswer.setAnswerContent(answerContent);
+							newAnswer.setIsCorrect(isCorrect);
+							newQuestion.getAnswers().add(newAnswer);
+							newQuestion.setCreateDate(new Date());
+							newQuestion.setQuestionId(questionId);
+							// Add the new question to the list
+							questionDetails.add(newQuestion);
+						} else {
+							// If the question exists, add the answer to its list of answers
+							Answer newAnswer = new Answer();
+							newAnswer.setAnswerContent(answerContent);
+							newAnswer.setIsCorrect(isCorrect);
+							existingQuestion.getAnswers().add(newAnswer);
+						}
+					} else {
+						System.out.println("Row does not have enough columns for processing");
+						continue;
+					}
 				}
 			}
 
-			// LẤY DATA RA RỒI => filter -> lấy distinct theo tiêu đề câu hỏi
-			// 1 Q => 4 A
+			// Closing file input stream
+			fis.close();
 
-			return ResponseEntity.ok("Upload Successfully");
+			List<QuestionDetailDTO> resultList = new ArrayList<>();
+			// Print the data from the Excel file
+			for (QuestionDetailDTO questionDetail : questionDetails) {
+				resultList.add(questionDetailService.createQuestionDetail(questionDetail));
+			}
+
+			excelFile.delete();
+
+			return ResponseEntity.ok(resultList);
 		} catch (Exception e) {
 			e.printStackTrace();
 			return ResponseEntity.badRequest().body("Error");
@@ -158,8 +202,4 @@ public class QuestionDetailController {
 		return file;
 	}
 
-	// public static void main(String[] args) {
-	// QuestionDetailController qs = new QuestionDetailController();
-	// qs.uploadExcelFile(null);
-	// }
 }

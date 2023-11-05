@@ -3,21 +3,24 @@ package com.f4education.springjwt.security.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.CourseHistory;
+import com.f4education.springjwt.models.Evaluate;
+import com.f4education.springjwt.models.RegisterCourse;
+import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.request.ThoiLuongRange;
+import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
@@ -40,8 +43,19 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<CourseDTO> findNewestCourse() {
-		return courseRepository.findTop10LatestCourses().stream().map(this::convertEntityToDTO)
+	public CourseResponse findCourseByCourseId(Integer courseId) {
+		Optional<Course> course = courseRepository.findById(courseId);
+
+		if (course.isPresent()) {
+			return this.convertToResponseDTO(course.get());
+		}
+
+		return null;
+	}
+
+	@Override
+	public List<CourseResponse> findNewestCourse() {
+		return courseRepository.findTop10LatestCourses().stream().map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
 	}
 
@@ -85,14 +99,39 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	private CourseDTO convertEntityToDTO(Course course) {
-		return new CourseDTO(course.getCourseId(),
-				course.getCourseName(),
-				course.getCoursePrice(),
-				course.getCourseDuration(),
-				course.getCourseDescription(),
-				course.getNumberSession(),
-				course.getSubject(),
-				course.getImage());
+		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
+				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
+				course.getSubject(), course.getImage());
+	}
+
+	private CourseResponse convertToResponseDTO(Course course) {
+		CourseResponse courseResponse = new CourseResponse();
+
+		BeanUtils.copyProperties(course, courseResponse);
+
+		List<RegisterCourse> registerCourse = course.getRegisterCourses();
+
+		Float totalRating = (float) 0;
+		List<Evaluate> evaluateList = new ArrayList<>();
+		List<Student> studentList = new ArrayList<>();
+		for (RegisterCourse rg : registerCourse) {
+			for (Evaluate evaluate : rg.getEvaluates()) {
+				totalRating += evaluate.getRating();
+				evaluateList.add(evaluate);
+			}
+			studentList.add(rg.getStudent());
+		}
+		
+		// Calculate value		
+		Integer totalReview = evaluateList.size();
+		Integer totalStudent = studentList.size();
+		totalRating = totalRating / evaluateList.size();
+		
+		courseResponse.setRating(totalRating);
+		courseResponse.setReviewNumber(totalReview);
+		courseResponse.setTotalStudent(totalStudent);
+
+		return courseResponse;
 	}
 
 	private Course convertRequestToEntity(CourseRequest courseRequest) {
@@ -165,4 +204,5 @@ public class CourseServiceImpl implements CoursesService {
 		System.out.println(list);
 		return list;
 	}
+
 }

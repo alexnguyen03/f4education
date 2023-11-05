@@ -26,11 +26,19 @@ root.render(
                 path="/admin/*/:courseName/:folderId"
                 element={<AdminLayout />}
             />
-            <Route path="/admin/*/:courseName" element={<AdminLayout />} />
-            <Route
-                path="/admin"
-                element={<Navigate to="/admin/index" replace />}
-            />
+			<Route
+				path='/admin'
+				element={
+					<Navigate
+						to='/admin/index'
+						replace
+					/>
+				}
+			/>
+			<Route
+				path='/admin/*/:courseId'
+				element={<AdminLayout />}
+			/>
 
             {/* Client Route */}
             <Route path="/*" element={<ClientLayout />} />

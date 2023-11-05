@@ -2,7 +2,6 @@ package com.f4education.springjwt.models;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -13,51 +12,42 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "Question")
-public class Question implements Serializable {
+@Table(name = "CourseDetail")
+public class CourseDetail implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "question_id")
-	private Integer questionId;
+	@Column(name = "course_detail_id")
+	private Integer courseDetailId;
+
+	@Column(name = "lesson_title")
+	private String lessionTitle;
+
+	@Column(name = "lesson_content")
+	private String lessionContent;
 
 	@Column(name = "create_date")
 	private Date createDate;
-
-	@ManyToOne
-	@JoinColumn(name = "subject_id")
-	@JsonIgnore
-	Subject subject;
 
 	@ManyToOne
 	@JoinColumn(name = "course_id")
 	@JsonIgnore
 	Course course;
 
-	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	@JsonIgnore
-	Admin admin;
-
-	@OneToMany(mappedBy = "question")
-	@JsonIgnore
-	List<QuestionDetail> questionDetail;
-
-	@OneToMany(mappedBy = "question")
-	@JsonIgnore
-	List<Examination> examinations;
-
 	@Override
 	public String toString() {
-		return "Question{" + "questionId=" + questionId + ", createDate=" + createDate + "";
+		return "CourseDetail [courseDetailId=" + courseDetailId + ", lessionTitle=" + lessionTitle + ", lessionContent="
+				+ lessionContent + "]";
 	}
+
 }

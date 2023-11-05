@@ -92,7 +92,7 @@ const CourseProgress = () => {
                 newCourseProgresses.push(newCourse)
             }
 
-            // console.log(newCourseProgresses)
+            console.log(newCourseProgresses)
             setCourseProgresses(newCourseProgresses)
 
             setLoading(false)
@@ -226,32 +226,40 @@ const CourseProgress = () => {
                             <Group position="left">
                                 <Text c="dimmed" fz="xl">
                                     Lớp học:{' '}
-                                    {/* <strong>
-                                            {selectedCourse.classes.className}
-                                        </strong> */}
+                                    <strong>
+                                        {selectedCourse.classes.className}
+                                    </strong>
                                 </Text>
                                 -
                                 <Text c="dimmed" fz="xl">
-                                    {/* <strong>
-                                            {selectedCourse.course
-                                                .courseDuration / 2}
-                                        </strong>{' '} */}
+                                    <strong>
+                                        {selectedCourse.course.courseDuration /
+                                            2}
+                                    </strong>{' '}
                                     buổi học
                                 </Text>
                             </Group>
                             <Text fz="lg">
                                 Từ ngày:{' '}
-                                {/* <strong>
-                                        {moment(
-                                            selectedCourse.classes.startDate
-                                        ).format('DD-MM-yyyy')}
-                                    </strong>{' '} */}
+                                <strong>
+                                    {moment(
+                                        selectedCourse.classes.startDate
+                                    ).format('DD-MM-yyyy') === 'Invalid date'
+                                        ? 'Chưa có ngày bắt đầu'
+                                        : moment(
+                                              selectedCourse.classes.startDate
+                                          ).format('DD-MM-yyyy')}
+                                </strong>{' '}
                                 -{' '}
-                                {/* <strong>
-                                        {moment(
-                                            selectedCourse.classes.endDate
-                                        ).format('DD-MM-yyyy')}
-                                    </strong> */}
+                                <strong>
+                                    {moment(
+                                        selectedCourse.classes.endDate
+                                    ).format('DD-MM-yyyy') === 'Invalid date'
+                                        ? 'Chưa có ngày kết thúc'
+                                        : moment(
+                                              selectedCourse.classes.endDate
+                                          ).format('DD-MM-yyyy')}
+                                </strong>
                             </Text>
                             <Group position="left">
                                 <Text fw={500} color="dimmed" fz="lg">
@@ -582,6 +590,7 @@ const CourseProgress = () => {
             </Box>
 
             {showingDetail && <Schedule />}
+            
             {/* In Progress Course */}
             <Box mt={rem('8rem')}>
                 <Group position="left" mb={'lg'}>
@@ -590,7 +599,7 @@ const CourseProgress = () => {
                     </Title>
                 </Group>
                 <Grid>
-                    {courseProgresses.length === 0 && loading ? (
+                    {courseProgresses.length === 0 && !loading ? (
                         <Box
                             w="100%"
                             p={rem('3rem')}
@@ -618,137 +627,163 @@ const CourseProgress = () => {
                     ) : (
                         <>
                             {courseProgresses.map((progress, index) => (
-                                <Grid.Col
-                                    xl={3}
-                                    lg={3}
-                                    md={4}
-                                    sm={6}
-                                    // component='a'
-                                    // href={`?classId=${progress.classId}`}
-                                    onClick={() =>
-                                        handleShowCourseProgress(progress)
-                                    }
-                                    key={index}
-                                >
-                                    {loading ? (
+                                <>
+                                    {selectedCourse !== progress ? (
                                         <>
-                                            <Skeleton
-                                                width="100%"
-                                                height={rem('20rem')}
-                                            />
-                                            <Skeleton
-                                                width="30%"
-                                                height={15}
-                                                mt={8}
-                                            />
-                                            <Skeleton
-                                                width="100%"
-                                                height={20}
-                                                mt={8}
-                                            />
-                                            <Skeleton
-                                                width="60%"
-                                                height={15}
-                                                mt={8}
-                                            />
-                                        </>
-                                    ) : (
-                                        <Card
-                                            shadow="sm"
-                                            padding="lg"
-                                            radius="md"
-                                            withBorder
-                                            className={styles.card}
-                                        >
-                                            <Card.Section>
-                                                <Image
-                                                    // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                                    src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
-                                                    height={160}
-                                                    alt="Norway"
-                                                    withPlaceholder
-                                                />
-                                            </Card.Section>
-
-                                            <Group position="apart">
-                                                <Text
-                                                    c="dimmed"
-                                                    fz="md"
-                                                    mt="md"
-                                                >
-                                                    HƯỚNG DẪN
-                                                </Text>
-                                                <Badge
-                                                    color="violet"
-                                                    size="lg"
-                                                    radius={5}
-                                                    mt="sm"
-                                                >
-                                                    Lớp:{' '}
-                                                    {progress.classes.className}
-                                                </Badge>
-                                            </Group>
-                                            <Text
-                                                fz="lg"
-                                                color="dark"
-                                                fw={500}
-                                                lineClamp={2}
-                                                mt="md"
+                                            <Grid.Col
+                                                xl={3}
+                                                lg={3}
+                                                md={4}
+                                                sm={6}
+                                                // component='a'
+                                                // href={`?classId=${progress.classId}`}
+                                                onClick={() =>
+                                                    handleShowCourseProgress(
+                                                        progress,
+                                                        index
+                                                    )
+                                                }
+                                                key={index}
                                             >
-                                                {progress.course.courseName}
-                                            </Text>
-                                            <Text size="sm" color="dimmed">
-                                                <strong>
-                                                    {totalCountCourseProgress}
-                                                </strong>{' '}
-                                                trên{' '}
-                                                <strong>
-                                                    {progress.course
-                                                        .courseDuration / 2}
-                                                </strong>{' '}
-                                                bài đã học.
-                                            </Text>
-                                            {/* {fetchCourseProgressByClassId(
-                                    course.classes.classId
-                                )} */}
-                                            <Stack mt={8}>
-                                                <Text
-                                                    fw={'bolder'}
-                                                    color="dark"
-                                                    fz="xl"
-                                                    align="right"
-                                                    m={0}
-                                                    p={0}
-                                                >
-                                                    {(
-                                                        (progress.course
-                                                            .courseDuration /
-                                                            2 /
-                                                            100) *
-                                                        Number(
-                                                            progress.totalProgress
-                                                        )
-                                                    ).toFixed(1)}
-                                                    %
-                                                </Text>
-                                                <Progress
-                                                    value={(
-                                                        (progress.course
-                                                            .courseDuration /
-                                                            2 /
-                                                            100) *
-                                                        Number(
-                                                            progress.totalProgress
-                                                        )
-                                                    ).toFixed(1)}
-                                                    size="xl"
-                                                    radius="xl"
-                                                    striped
-                                                />
-                                            </Stack>
-                                        </Card>
-                                    )}
-                                </Grid.Col>
+                                                {loading ? (
+                                                    <>
+                                                        <Skeleton
+                                                            width="100%"
+                                                            height={rem(
+                                                                '20rem'
+                                                            )}
+                                                        />
+                                                        <Skeleton
+                                                            width="30%"
+                                                            height={15}
+                                                            mt={8}
+                                                        />
+                                                        <Skeleton
+                                                            width="100%"
+                                                            height={20}
+                                                            mt={8}
+                                                        />
+                                                        <Skeleton
+                                                            width="60%"
+                                                            height={15}
+                                                            mt={8}
+                                                        />
+                                                    </>
+                                                ) : (
+                                                    <Card
+                                                        shadow="sm"
+                                                        padding="lg"
+                                                        radius="md"
+                                                        withBorder
+                                                        className={styles.card}
+                                                    >
+                                                        <Card.Section>
+                                                            <Image
+                                                                // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                                                                src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
+                                                                height={160}
+                                                                alt="Norway"
+                                                                withPlaceholder
+                                                            />
+                                                        </Card.Section>
+
+                                                        <Group position="apart">
+                                                            <Text
+                                                                c="dimmed"
+                                                                fz="md"
+                                                                mt="md"
+                                                            >
+                                                                HƯỚNG DẪN
+                                                            </Text>
+                                                            <Badge
+                                                                color="violet"
+                                                                size="lg"
+                                                                radius={5}
+                                                                mt="sm"
+                                                            >
+                                                                Lớp:{' '}
+                                                                {
+                                                                    progress
+                                                                        .classes
+                                                                        .className
+                                                                }
+                                                            </Badge>
+                                                        </Group>
+                                                        <Text
+                                                            fz="lg"
+                                                            color="dark"
+                                                            fw={500}
+                                                            lineClamp={2}
+                                                            mt="md"
+                                                        >
+                                                            {
+                                                                progress.course
+                                                                    .courseName
+                                                            }
+                                                        </Text>
+                                                        <Text
+                                                            size="sm"
+                                                            color="dimmed"
+                                                        >
+                                                            <strong>
+                                                                {
+                                                                    totalCountCourseProgress
+                                                                }
+                                                            </strong>{' '}
+                                                            trên{' '}
+                                                            <strong>
+                                                                {progress.course
+                                                                    .courseDuration /
+                                                                    2}
+                                                            </strong>{' '}
+                                                            bài đã học.
+                                                        </Text>
+                                                        {/* {fetchCourseProgressByClassId(
+                    course.classes.classId
+                )} */}
+                                                        <Stack mt={8}>
+                                                            <Text
+                                                                fw={'bolder'}
+                                                                color="dark"
+                                                                fz="xl"
+                                                                align="right"
+                                                                m={0}
+                                                                p={0}
+                                                            >
+                                                                {(
+                                                                    (progress
+                                                                        .course
+                                                                        .courseDuration /
+                                                                        2 /
+                                                                        100) *
+                                                                    Number(
+                                                                        progress.totalProgress
+                                                                    )
+                                                                ).toFixed(1)}
+                                                                %
+                                                            </Text>
+                                                            <Progress
+                                                                value={(
+                                                                    (progress
+                                                                        .course
+                                                                        .courseDuration /
+                                                                        2 /
+                                                                        100) *
+                                                                    Number(
+                                                                        progress.totalProgress
+                                                                    )
+                                                                ).toFixed(1)}
+                                                                size="xl"
+                                                                radius="xl"
+                                                                striped
+                                                            />
+                                                        </Stack>
+                                                    </Card>
+                                                )}
+                                            </Grid.Col>
+                                        </>
+                                    ) : null}
+                                </>
                             ))}
                         </>
                     )}
@@ -801,7 +836,6 @@ const CourseProgress = () => {
                             >
                                 <Card.Section>
                                     <Image
-                                        // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
                                         src={`${PUBLIC_IMAGE}/courses/${course.image}`}
                                         height={200}
                                         withPlaceholder
@@ -822,15 +856,25 @@ const CourseProgress = () => {
                                         }
                                     )}
                                 </Text>
-                                <Group position="apart" mt="md">
-                                    <Text color="dimmed">4.6</Text>
+                                <Group position="left" mt="md">
+                                    <Text color="dimmed">
+                                        {course.rating === 'NaN'
+                                            ? 5
+                                            : course.rating}
+                                    </Text>
                                     <Rating
-                                        value={3.5}
+                                        value={
+                                            course.rating === 'NaN'
+                                                ? 5
+                                                : course.rating
+                                        }
                                         fractions={2}
                                         readOnly
                                         mx={2}
                                     />
-                                    <Text color="dimmed">(39.930)</Text>
+                                    <Text color="dimmed">
+                                        ({course.reviewNumber})
+                                    </Text>
                                 </Group>
                             </Card>
                         </Grid.Col>

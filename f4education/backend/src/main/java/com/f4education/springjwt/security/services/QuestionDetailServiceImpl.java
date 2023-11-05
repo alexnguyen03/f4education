@@ -53,7 +53,6 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 		questionDetail.setCreateDate(new Date());
 
 		QuestionDetail saveQuestionDetail = questionDetailReposotory.save(questionDetail);
-		System.out.println(saveQuestionDetail);
 
 		if (questionDetailDTO.getAnswers().size() > 0) {
 			for (Answer as : questionDetailDTO.getAnswers()) {

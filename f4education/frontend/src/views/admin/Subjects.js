@@ -4,9 +4,7 @@ import SubjectHeader from 'components/Headers/SubjectHeader'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { IconEyeSearch, IconCheck, IconListDetails } from '@tabler/icons-react'
-import { Notification } from '@mantine/core'
-
+import { IconEyeSearch, IconListDetails } from '@tabler/icons-react'
 // reactstrap components
 import {
     Badge,
@@ -22,6 +20,9 @@ import {
     UncontrolledTooltip
 } from 'reactstrap'
 
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
+
 // Axios
 import subjectApi from '../../api/subjectApi'
 import subjectHistoryApi from '../../api/subjectHistoryApi'
@@ -30,6 +31,8 @@ import courseApi from '../../api/courseApi'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const Subjects = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // Main variable
     const [subjects, setSubjects] = useState([])
     const [subjectHistories, setSubjectHistories] = useState([])
@@ -59,13 +62,10 @@ const Subjects = () => {
         message: ''
     })
 
-    // Initial
-    // const storedUser = JSON.parse(localStorage.getItem("user"));
-
     // *************** Subject AREA
     const [subject, setSubject] = useState({
         subjectId: '',
-        adminId: '',
+        adminId: user.username,
         subjectName: '',
         createDate: new Date()
     })
@@ -145,7 +145,8 @@ const Subjects = () => {
 
     // API_AREA > CRUD
     const handleCreateNewSubject = async () => {
-        subject.adminId = 'namnguyen'
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        subject.adminId = user.username
 
         const lastSubject = subjects.slice(-1)[0]
         const lastSubjectId = lastSubject.subjectId
@@ -164,14 +165,12 @@ const Subjects = () => {
             try {
                 const body = subject
                 const resp = await subjectApi.createSubject(body)
-                console.log(resp.data)
-                notifycationAction(
-                    'Thêm mới môn học',
-                    'thêm mới môn học thành công!',
-                    'teal'
-                )
-                // Create SubjectHistory
-                // handleCreateNewSubjectHistory(subject, action);
+
+                if (resp.status === 201 || resp.status === 200) {
+                    toast.update(id, Notify.options.createSuccess())
+                } else {
+                    toast.update(id, Notify.options.createError())
+                }
             } catch (error) {
                 console.log(error)
             }
@@ -183,6 +182,8 @@ const Subjects = () => {
     }
 
     const handleUpdateSubject = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
         const newSubjects = [...subjects]
 
         const index = newSubjects.findIndex(
@@ -198,18 +199,17 @@ const Subjects = () => {
 
         if (validateForm()) {
             try {
-                subject.adminId = 'namnguyen'
+                subject.adminId = user.username
                 const body = subject
                 const resp = await subjectApi.updateSubject(
                     body,
                     subject.subjectId
                 )
-                console.log(resp.data)
-                notifycationAction(
-                    'Cập nhật môn học',
-                    'Cập nhật môn học thành công!',
-                    'indigo'
-                )
+                if (resp.status === 200) {
+                    toast.update(id, Notify.options.updateSuccess())
+                } else {
+                    toast.update(id, Notify.options.updateError())
+                }
                 // Add subjectHistory
                 // handleCreateNewSubjectHistory(subject, action);
             } catch (error) {
@@ -229,7 +229,7 @@ const Subjects = () => {
         setShowModal(true)
         setSubject({
             ...row.original,
-            adminId: row.original.adminName,
+            adminId: user.username,
             createDate: row.original.createDate
         })
         setUpdate(true)
@@ -239,21 +239,11 @@ const Subjects = () => {
     const resetForm = () => {
         setSubject({
             subjectId: '',
-            adminId: 'namnguyen',
+            adminId: user.username,
             subjectName: '',
             createDate: new Date()
         })
     }
-
-    const notifycationAction = (title, message, color) => {
-        setShowNotification({
-            status: true,
-            title: title,
-            message: message,
-            color: color
-        })
-    }
-
     // Validation area
     const validateForm = () => {
         if (subject.subjectName.length === 0) {
@@ -335,9 +325,7 @@ const Subjects = () => {
             {
                 accessorFn: (row) =>
                     row.createDate
-                        ? moment(row.createDate).format(
-                              'DD/MM/yyyy, h:mm:ss A'
-                          )
+                        ? moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A')
                         : 'Không có ngày khả dụng',
                 header: 'Ngày Tạo',
                 size: 120
@@ -459,6 +447,8 @@ const Subjects = () => {
 
     return (
         <>
+            <ToastContainer />
+
             {/* HeaderSubject start */}
             <SubjectHeader />
             {/* HeaderSubject End */}
@@ -618,24 +608,6 @@ const Subjects = () => {
                         )}
                     </CardBody>
                 </Card>
-
-                {/* Notifycation */}
-                {showNotification.status && (
-                    <Notification
-                        icon={<IconCheck size="1.1rem" />}
-                        color={showNotification.color}
-                        title={showNotification.title}
-                        style={{
-                            position: 'fixed',
-                            top: '20px',
-                            right: '20px',
-                            zIndex: '2023',
-                            maxWidth: '400px'
-                        }}
-                    >
-                        {showNotification.message}
-                    </Notification>
-                )}
 
                 {/* Modal Add - Update Suject*/}
                 <Modal className="modal-dialog-centered" isOpen={showModal}>

@@ -38,7 +38,6 @@ public class CartServiceImp implements CartService {
 
 	@Override
 	public List<CartResponseDTO> findAllCartByStudentId(String studentId, boolean status) {
-		System.out.println(studentId);
 		status = false; 
 		return cartRepository.findByStudentIdAndStatus(studentId, status).stream().map(this::convertToReponseDTO)
 				.collect(Collectors.toList());

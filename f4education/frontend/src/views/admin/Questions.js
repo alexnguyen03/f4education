@@ -16,6 +16,9 @@ import {
     Row
 } from 'reactstrap'
 
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
+
 // Axios Custom API
 import courseApi from '../../api/courseApi'
 import questionApi from '../../api/questionApi'
@@ -27,9 +30,10 @@ import moment from 'moment/moment'
 import { Link } from 'react-router-dom'
 
 // ************* Get LocalStorage
-const user = JSON.parse(localStorage.getItem('user' | ''))
 
 const Questions = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // ************* Main variable
     const [questions, setQuestions] = useState([])
     const [courses, setCourses] = useState([])
@@ -44,13 +48,11 @@ const Questions = () => {
     const [selectedSubjectId, setSelectedSubjectId] = useState(null)
     const [selectedCourseId, setSelectedCourseId] = useState(null)
     const [msgForm, setMsgForm] = useState({})
-    console.log(user)
 
     const [question] = useState({
         subjectId: selectedSubjectId,
         courseId: selectedCourseId,
-        // adminId: user.username | 'namnguyen'
-        adminId: 'namnguyen'
+        adminId: user.username
     })
 
     // *************** Api Area
@@ -93,12 +95,16 @@ const Questions = () => {
 
     // + API_AREA > CRUD
     const handleStoreQuestions = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
         if (validateForm()) {
             try {
                 setQuestionLoading(true)
                 const resp = await questionApi.createQuestion(question)
                 if (resp.status === 200 && resp.data.length > 0) {
-                    setQuestions(resp.data)
+                    toast.update(id, Notify.options.createSuccess())
+                } else {
+                    toast.update(id, Notify.options.createError())
                 }
                 setQuestionLoading(false)
 
@@ -232,6 +238,8 @@ const Questions = () => {
 
     return (
         <>
+            <ToastContainer />
+
             {/* HeaderSubject start */}
             <QuestionHeader />
             {/* HeaderSubject End */}

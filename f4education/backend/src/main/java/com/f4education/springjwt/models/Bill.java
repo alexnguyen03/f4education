@@ -50,10 +50,12 @@ public class Bill {
 
     @ManyToOne
     @JoinColumn(name = "student_id")
+    @JsonIgnore
     Student student;
 
     @ManyToOne
     @JoinColumn(name = "payment_method_id")
+    @JsonIgnore
     PaymentMethod paymentMethod;
 
     @Override

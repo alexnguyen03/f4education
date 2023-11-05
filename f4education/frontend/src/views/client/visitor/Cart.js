@@ -26,6 +26,9 @@ import { Carousel } from '@mantine/carousel'
 // Icon
 import { IconShoppingCartPlus } from '@tabler/icons-react'
 
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../../utils/Notify'
+
 // API - declare variable
 import cartApi from '../../../api/cartApi'
 import courseApi from '../../../api/courseApi'
@@ -43,6 +46,8 @@ const itemsBreadcum = [
 ))
 
 function Cart() {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // *************** Main Variable
     const [carts, setCarts] = useState([])
     const [newestCourse, setNewestCourse] = useState([])
@@ -61,15 +66,14 @@ function Cart() {
 
     // *************** Fetch Area
     const fetchCart = async () => {
-        try {
-            setLoading(true)
-            const resp = await cartApi.getAllCart()
+        setLoading(true)
 
-            if (resp.status === 200 && resp.data.length > 0) {
+        try {
+            const resp = await cartApi.getAllCartByStudentId(user.username)
+            if (resp.status === 200) {
                 setCarts(resp.data)
-            } else {
-                console.log('Loi fetch cart ba con oi')
-            }
+            } 
+            console.log(resp)
 
             setLoading(false)
         } catch (error) {
@@ -96,11 +100,26 @@ function Cart() {
 
     // *************** Fetch Area > CRUD
     const handleRemoveCart = async (cartId, e) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         e.preventDefault()
         try {
+            const updateCarts = [...carts]
+            const indexToDelete = updateCarts.findIndex(
+                (cart) => cart.cartId === cartId
+            )
+            if (indexToDelete !== -1) {
+                updateCarts.splice(indexToDelete, 1)
+            }
+            setCarts(updateCarts)
+
             const resp = await cartApi.removeCart(cartId)
-            // setCarts(resp);
-            fetchCart()
+
+            if (resp.status === 204) {
+                toast.update(id, Notify.options.deleteSuccess())
+            } else {
+                toast.update(id, Notify.options.deleteError())
+            }
+
             console.log('remove successfully')
         } catch (error) {
             console.log(error)
@@ -109,8 +128,14 @@ function Cart() {
 
     // *************** Action && Logic UI
     const handleCheckOut = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         if (selectedItem === null) {
-            alert('Chon khoa hoc di ban ei, 1 khoa thoi')
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Chỉ thanh toán được một khóa học mỗi lần'
+                )
+            )
             return
         }
         // store cart to localstorage
@@ -126,7 +151,7 @@ function Cart() {
             studentId: 1
         }
         try {
-            const resp = await cartApi.createCart(cart)
+            await cartApi.createCart(cart)
             fetchCart()
         } catch (error) {
             console.log(error)
@@ -164,20 +189,19 @@ function Cart() {
                     ) : (
                         <>
                             <HoverCard.Target>
-                                <Card.Section
-                                    component="a"
-                                    href={`/course/${course.courseId}`}
-                                >
-                                    <Image
-                                        src={`${PUBLIC_IMAGE}/courses/${course.image}`}
-                                        fit="cover"
-                                        width={'100%'}
-                                        height={200}
-                                        radius="sm"
-                                        alt={`${course.courseName}`}
-                                        withPlaceholder
-                                    />
-                                </Card.Section>
+                                <Link to={`/course/${course.courseId}`}>
+                                    <Card.Section>
+                                        <Image
+                                            src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                            fit="cover"
+                                            width={'100%'}
+                                            height={200}
+                                            radius="sm"
+                                            alt={`${course.courseName}`}
+                                            withPlaceholder
+                                        />
+                                    </Card.Section>
+                                </Link>
                             </HoverCard.Target>
                         </>
                     )}
@@ -191,25 +215,30 @@ function Cart() {
                     ) : (
                         <>
                             <Box>
-                                <Text
-                                    fw={500}
-                                    lineClamp={2}
-                                    component="a"
-                                    href={`/course/${course.courseId}`}
-                                >
+                                <Text color='dark' fw={500} lineClamp={1}>
                                     {course.courseName}
                                 </Text>
                                 <Box>
                                     <Flex justify="flex-start" gap="md">
-                                        <Text>3.6</Text>
+                                        <Text>
+                                            {course.rating === 'NaN'
+                                                ? 5
+                                                : course.rating}
+                                        </Text>
                                         <Group position="center">
                                             <Rating
-                                                value={3.56}
+                                                value={
+                                                    course.rating === 'NaN'
+                                                        ? 5
+                                                        : course.rating
+                                                }
                                                 fractions={2}
                                                 readOnly
                                             />
                                         </Group>
-                                        <Text c="dimmed">(389.208)</Text>
+                                        <Text c="dimmed">
+                                            ({course.reviewNumber})
+                                        </Text>
                                     </Flex>
                                 </Box>
                                 <Box>
@@ -275,7 +304,9 @@ function Cart() {
 
     return (
         <>
-            <Container>
+            <ToastContainer />
+
+            <Container size="xl">
                 {/* BreadCums */}
                 <Breadcrumbs
                     className="my-5 p-3"
@@ -339,172 +370,168 @@ function Cart() {
                                         <hr className="text-muted mt-0 pt-0" />
 
                                         {/* item */}
-                                        {carts.length > 0 &&
-                                            carts.map((cart, index) => (
-                                                <>
-                                                    <Grid key={index}>
-                                                        <Grid.Col span={2}>
-                                                            <Link
-                                                                to={`/course/${cart.course.courseId}`}
+                                        {carts.map((cart, index) => (
+                                            <>
+                                                <Grid key={index}>
+                                                    <Grid.Col span={2}>
+                                                        <Link
+                                                            to={`/course/${cart.course.courseId}`}
+                                                        >
+                                                            <img
+                                                                src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                                                // src={cart.course.courseImage}
+                                                                alt={`${cart.course.courseName}`}
+                                                                className="img-fluid"
+                                                                style={{
+                                                                    maxHeight:
+                                                                        '100px',
+                                                                    width: '100%',
+                                                                    objectFit:
+                                                                        'cover'
+                                                                }}
+                                                            />
+                                                        </Link>
+                                                    </Grid.Col>
+                                                    <Grid.Col span={10}>
+                                                        <Grid>
+                                                            <Grid.Col
+                                                                xl="6"
+                                                                lg="6"
+                                                                md="12"
+                                                                sm="12"
                                                             >
-                                                                <img
-                                                                    src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                                                    // src={cart.course.courseImage}
-                                                                    alt={`${cart.course.courseName}`}
-                                                                    className="img-fluid"
-                                                                    style={{
-                                                                        maxHeight:
-                                                                            '100px',
-                                                                        width: '100%',
-                                                                        objectFit:
-                                                                            'cover'
-                                                                    }}
-                                                                />
-                                                            </Link>
-                                                        </Grid.Col>
-                                                        <Grid.Col span={10}>
-                                                            <Grid>
-                                                                <Grid.Col
-                                                                    xl="6"
-                                                                    lg="6"
-                                                                    md="12"
-                                                                    sm="12"
+                                                                <Link
+                                                                    to={`/course/${cart.course.courseId}`}
+                                                                    key={index}
                                                                 >
-                                                                    <Link
-                                                                        to={`/course/${cart.course.courseId}`}
-                                                                        key={
-                                                                            index
+                                                                    <p className="font-weight-700 text-dark m-0 p-0">
+                                                                        {
+                                                                            cart
+                                                                                .course
+                                                                                .courseName
                                                                         }
-                                                                    >
-                                                                        <p className="font-weight-700 text-dark m-0 p-0">
+                                                                    </p>
+                                                                    <span className="text-muted">
+                                                                        {/* Môn học: <strong>{cart.subjectName}</strong> */}
+                                                                    </span>
+                                                                    <div className="d-flex text-dark">
+                                                                        <span className="font-weight-600">
+                                                                            {/* {cart.ratings} */}
+                                                                            4.6
+                                                                        </span>
+                                                                        <div className="mx-2">
+                                                                            <i className="bx bxs-star text-warning"></i>
+                                                                            <i className="bx bxs-star text-warning"></i>
+                                                                            <i className="bx bxs-star text-warning"></i>
+                                                                            <i className="bx bxs-star text-warning"></i>
+                                                                            <i className="bx bx-star"></i>
+                                                                        </div>
+                                                                        <span className="text-muted">
+                                                                            {/* ({cart.reviews}) */}{' '}
+                                                                            (39.930)
+                                                                        </span>
+                                                                    </div>
+                                                                    <div className="d-flex justify-content-start">
+                                                                        <span className="text-muted">
                                                                             {
                                                                                 cart
                                                                                     .course
-                                                                                    .courseName
+                                                                                    .courseDuration
                                                                             }
-                                                                        </p>
+                                                                        </span>
+                                                                        <span className="mx-2">
+                                                                            -
+                                                                        </span>
                                                                         <span className="text-muted">
-                                                                            {/* Môn học: <strong>{cart.subjectName}</strong> */}
+                                                                            {
+                                                                                cart
+                                                                                    .course
+                                                                                    .numberSession
+                                                                            }{' '}
+                                                                            bài
+                                                                            giảng
                                                                         </span>
-                                                                        <div className="d-flex text-dark">
-                                                                            <span className="font-weight-600">
-                                                                                {/* {cart.ratings} */}
-                                                                                4.6
-                                                                            </span>
-                                                                            <div className="mx-2">
-                                                                                <i className="bx bxs-star text-warning"></i>
-                                                                                <i className="bx bxs-star text-warning"></i>
-                                                                                <i className="bx bxs-star text-warning"></i>
-                                                                                <i className="bx bxs-star text-warning"></i>
-                                                                                <i className="bx bx-star"></i>
-                                                                            </div>
-                                                                            <span className="text-muted">
-                                                                                {/* ({cart.reviews}) */}{' '}
-                                                                                (39.930)
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="d-flex justify-content-start">
-                                                                            <span className="text-muted">
-                                                                                {
-                                                                                    cart
-                                                                                        .course
-                                                                                        .courseDuration
-                                                                                }
-                                                                            </span>
-                                                                            <span className="mx-2">
-                                                                                -
-                                                                            </span>
-                                                                            <span className="text-muted">
-                                                                                {
-                                                                                    cart
-                                                                                        .course
-                                                                                        .numberSession
-                                                                                }{' '}
-                                                                                bài
-                                                                                giảng
-                                                                            </span>
-                                                                            <span className="mx-2">
-                                                                                -
-                                                                            </span>
-                                                                            <span className="text-muted">
-                                                                                All
-                                                                                Levels
-                                                                            </span>
-                                                                        </div>
-                                                                    </Link>
-                                                                </Grid.Col>
-                                                                <Grid.Col
-                                                                    xl="2"
-                                                                    lg="2"
-                                                                    md="4"
-                                                                    sm="6"
-                                                                >
-                                                                    <div>
-                                                                        <Link
-                                                                            to={`/cart/${cart.cartId}`}
-                                                                            className="text-danger font-weight-700"
-                                                                            onClick={(
+                                                                        <span className="mx-2">
+                                                                            -
+                                                                        </span>
+                                                                        <span className="text-muted">
+                                                                            All
+                                                                            Levels
+                                                                        </span>
+                                                                    </div>
+                                                                </Link>
+                                                            </Grid.Col>
+                                                            <Grid.Col
+                                                                xl="2"
+                                                                lg="2"
+                                                                md="4"
+                                                                sm="6"
+                                                            >
+                                                                <div>
+                                                                    <Link
+                                                                        to={`/cart/${cart.cartId}`}
+                                                                        className="text-danger font-weight-700"
+                                                                        onClick={(
+                                                                            e
+                                                                        ) => {
+                                                                            handleRemoveCart(
+                                                                                cart.cartId,
                                                                                 e
-                                                                            ) => {
-                                                                                handleRemoveCart(
-                                                                                    cart.cartId,
-                                                                                    e
-                                                                                )
-                                                                            }}
-                                                                        >
-                                                                            Xóa
-                                                                            khóa
-                                                                            học
-                                                                        </Link>
-                                                                    </div>
-                                                                </Grid.Col>
-                                                                <Grid.Col
-                                                                    xl="2"
-                                                                    lg="2"
-                                                                    md="4"
-                                                                    sm="6"
-                                                                >
-                                                                    <div>
-                                                                        <span className="text-primary font-weight-700">
-                                                                            {cart.course.coursePrice.toLocaleString(
-                                                                                'it-IT',
-                                                                                {
-                                                                                    style: 'currency',
-                                                                                    currency:
-                                                                                        'VND'
-                                                                                }
-                                                                            )}
-                                                                        </span>
-                                                                    </div>
-                                                                </Grid.Col>
-                                                                <Grid.Col
-                                                                    xl="2"
-                                                                    lg="2"
-                                                                    md="4"
-                                                                    sm="12"
-                                                                >
-                                                                    <div className="d-flex justify-content-sm-end justify-content-md-end">
-                                                                        <Checkbox
-                                                                            // label="I agree to sell my privacy"
-                                                                            color="violet"
-                                                                            checked={
-                                                                                selectedItem ===
+                                                                            )
+                                                                        }}
+                                                                    >
+                                                                        Xóa khóa
+                                                                        học
+                                                                    </Link>
+                                                                </div>
+                                                            </Grid.Col>
+                                                            <Grid.Col
+                                                                xl="2"
+                                                                lg="2"
+                                                                md="4"
+                                                                sm="6"
+                                                            >
+                                                                <div>
+                                                                    <span className="text-primary font-weight-700">
+                                                                        {cart.course.coursePrice.toLocaleString(
+                                                                            'it-IT',
+                                                                            {
+                                                                                style: 'currency',
+                                                                                currency:
+                                                                                    'VND'
+                                                                            }
+                                                                        )}
+                                                                    </span>
+                                                                </div>
+                                                            </Grid.Col>
+                                                            <Grid.Col
+                                                                xl="2"
+                                                                lg="2"
+                                                                md="4"
+                                                                sm="12"
+                                                            >
+                                                                <div className="d-flex justify-content-sm-end justify-content-md-end">
+                                                                    <Checkbox
+                                                                        // label="I agree to sell my privacy"
+                                                                        color="violet"
+                                                                        checked={
+                                                                            selectedItem ===
+                                                                            cart.cartId
+                                                                        }
+                                                                        onChange={() =>
+                                                                            handleCheckboxChange(
                                                                                 cart.cartId
-                                                                            }
-                                                                            onChange={() =>
-                                                                                handleCheckboxChange(
-                                                                                    cart.cartId
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                </Grid.Col>
-                                                            </Grid>
-                                                            <hr className="text-muted" />
-                                                        </Grid.Col>
-                                                    </Grid>
-                                                </>
-                                            ))}
+                                                                            )
+                                                                        }
+                                                                    />
+                                                                </div>
+                                                            </Grid.Col>
+                                                        </Grid>
+                                                        <hr className="text-muted" />
+                                                    </Grid.Col>
+                                                </Grid>
+                                            </>
+                                        ))}
                                     </Grid.Col>
                                     <Grid.Col
                                         xl="3"
@@ -546,45 +573,47 @@ function Cart() {
                 )}
 
                 {/* Newest Course */}
-                <Title order={2} color="dark" fw={700} mt={rem('3rem')}>
-                    Những khóa học mới nhất
-                </Title>
+                <Box>
+                    <Title order={2} color="dark" fw={700} mt={rem('3rem')}>
+                        Những khóa học mới nhất
+                    </Title>
 
-                {/* Mantine Carousel */}
-                <Carousel
-                    slideSize="20%"
-                    height="350px"
-                    slideGap="lg"
-                    controlsOffset="xs"
-                    align="start"
-                    loop
-                    dragFree
-                    slidesToScroll={2}
-                    styles={{
-                        control: {
-                            background: '#212121',
-                            color: '#fff',
-                            fontSize: rem(25),
-                            '&[data-inactive]': {
-                                opacity: 0,
-                                cursor: 'default'
+                    {/* Mantine Carousel */}
+                    <Carousel
+                        slideSize="20%"
+                        height="350px"
+                        slideGap="lg"
+                        controlsOffset="xs"
+                        align="start"
+                        loop
+                        dragFree
+                        slidesToScroll={2}
+                        styles={{
+                            control: {
+                                background: '#212121',
+                                color: '#fff',
+                                fontSize: rem(25),
+                                '&[data-inactive]': {
+                                    opacity: 0,
+                                    cursor: 'default'
+                                },
+                                ref: getStylesRef('controls'),
+                                transition: 'opacity 150ms ease',
+                                opacity: 0
                             },
-                            ref: getStylesRef('controls'),
-                            transition: 'opacity 150ms ease',
-                            opacity: 0
-                        },
-                        root: {
-                            '&:hover': {
-                                [`& .${getStylesRef('controls')}`]: {
-                                    opacity: 1
+                            root: {
+                                '&:hover': {
+                                    [`& .${getStylesRef('controls')}`]: {
+                                        opacity: 1
+                                    }
                                 }
                             }
-                        }
-                    }}
-                >
-                    {slides}
-                </Carousel>
-            </Container>{' '}
+                        }}
+                    >
+                        {slides}
+                    </Carousel>
+                </Box>
+            </Container>
         </>
     )
 }

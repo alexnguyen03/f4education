@@ -1,7 +1,6 @@
 import {
     Blockquote,
     Checkbox,
-    Container,
     Group,
     Loader,
     rem,
@@ -29,17 +28,15 @@ import {
     Modal,
     Row
 } from 'reactstrap'
+
+import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
 // API
-import questionApi from '../../api/questionApi'
-import answersApi from '../../api/answersApi'
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import { IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
-import { toast } from 'react-toastify'
-
-// ************* Get LocalStorage
-// const userDetail = JSON.parse(localStorage.getItem('user'))
+import answersApi from '../../api/answersApi'
+import questionApi from '../../api/questionApi'
 
 const QuestionDetail = () => {
     // ************* Route and Params
@@ -59,13 +56,14 @@ const QuestionDetail = () => {
     const [editQuestionId, setEditQuestionId] = useState(null)
     const [isUpdate, setIsUpdate] = useState(false)
     const [upLoadExcel, setUploadExcel] = useState(false)
+    const [loadingDropZone, setLoadingDropZone] = useState(false)
 
     // ************* Form variable
     const [questionTitle, setQuestionTitle] = useState('')
     const [msgError, setMsgError] = useState({})
     const [questionRequest, setQuestionRequest] = useState({
         questionTitle: '',
-        questionId: params.courseName,
+        questionId: params.questionId,
         answers: []
     })
     const [answerRequest, setAnswerRequest] = useState([
@@ -83,7 +81,7 @@ const QuestionDetail = () => {
         try {
             setLoading(true)
             const resp = await questionApi.getQuestionDetailByQuestionId(
-                params.courseName
+                params.questionId
             )
 
             if (resp.status === 200 || resp.data.length > 0) {
@@ -119,7 +117,7 @@ const QuestionDetail = () => {
     const fetchQuestionPrev = async () => {
         try {
             setLoading(true)
-            const resp = await questionApi.getQuestionById(params.courseName)
+            const resp = await questionApi.getQuestionById(params.questionId)
 
             if (resp.status === 200 || resp.data.length > 0) {
                 setQuestionPrev(resp.data)
@@ -137,6 +135,8 @@ const QuestionDetail = () => {
     // *************** FORM AREA ACTION - START
     // ====================== QUESTION ======================
     const handleStoreNewQuestions = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
         if (validateForm()) {
             try {
                 questionRequest.questionTitle = questionTitle
@@ -150,9 +150,9 @@ const QuestionDetail = () => {
                 if (resp.status === 200) {
                     fetchQuestionDetail()
                     setShowModal(false)
-                    return console.log('toast here')
+                    toast.update(id, Notify.options.createSuccess())
                 } else {
-                    return console.log('certainly error toast here')
+                    toast.update(id, Notify.options.createError())
                 }
             } catch (error) {
                 console.log(error)
@@ -161,6 +161,9 @@ const QuestionDetail = () => {
     }
 
     const handleExcelFileUpload = async () => {
+        setLoadingDropZone(true)
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
         const formData = new FormData()
         formData.append('excelFile', selectedFile)
 
@@ -176,20 +179,29 @@ const QuestionDetail = () => {
         }
 
         try {
-            const resp = await questionApi.uploadExcel(formData)
+            const resp = await questionApi.uploadExcel(
+                formData,
+                params.questionId
+            )
 
             if (resp.status === 200) {
                 console.log('File uploaded successfully.')
+                setLoadingDropZone(false)
                 setUploadExcel(false)
                 setShowModal(false)
+                toast.update(id, Notify.options.createSuccess())
+                fetchQuestionDetail()
             }
         } catch (error) {
+            toast.update(id, Notify.options.createError())
             console.error('Failed to upload file.', error)
         }
     }
 
     // + Function update when click update
     const handleUpdateQuestion = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
         // Set change action render UI
         setEditQuestionId(null)
         setEditQuestion(false)
@@ -266,9 +278,9 @@ const QuestionDetail = () => {
             }
 
             if (resp.status === 200) {
-                console.log('updated')
+                toast.update(id, Notify.options.updateSuccess())
             } else {
-                console.log('update fail')
+                toast.update(id, Notify.options.updateError())
             }
         } catch (error) {
             console.log(error)
@@ -279,6 +291,17 @@ const QuestionDetail = () => {
     }
 
     const handleDeleteQuestion = async (questionDetail) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        const updateQuestions = [...questions]
+        const indexToDelete = updateQuestions.findIndex(
+            (qs) => qs.questionDetailId === questionDetail.questionDetailId
+        )
+        if (indexToDelete !== -1) {
+            updateQuestions.splice(indexToDelete, 1)
+        }
+        setQuestions(updateQuestions)
+
         // Delete Question
         try {
             questionDetail.answers.forEach(async (as) => {
@@ -294,8 +317,9 @@ const QuestionDetail = () => {
             )
 
             if (resp.status === 204) {
-                console.log('Xóa question rồi')
-                fetchQuestionDetail()
+                toast.update(id, Notify.options.deleteSuccess())
+            } else {
+                toast.update(id, Notify.options.deleteError())
             }
         } catch (error) {
             console.log(error)
@@ -314,7 +338,7 @@ const QuestionDetail = () => {
     const handleClearForm = () => {
         setQuestionRequest({
             questionTitle: '',
-            questionId: params.courseName,
+            questionId: params.questionId,
             answers: []
         })
 
@@ -995,334 +1019,359 @@ const QuestionDetail = () => {
 
     return (
         <>
+            <ToastContainer />
+
             {/* HeaderSubject start */}
             <QuestionDetailHeader />
             {/* HeaderSubject End */}
 
-            {/* Top tollbar and title */}
-            <div className="container-fluid mt-3">
-                <div className="bg-white p-4">
-                    {/* BreadCum */}
-                    <Link
-                        to="/admin/questions"
-                        className="blockquote-footer mt-3 mb-5"
-                    >
-                        Câu hỏi / Câu hỏi chi tiết
-                    </Link>
-                    {/* Header Title */}
-                    <div className="d-flex align-items-center justify-content-between flex-wrap">
-                        <div className="d-flex align-items-center">
-                            {loading ? (
-                                <>
-                                    <Skeleton circle width={70} height={70} />
-                                    <div className="ml-3">
+            <div style={{ minHeight: '80vh' }}>
+                {/* Top tollbar and title */}
+                <div className="container-fluid mt-3">
+                    <div className="bg-white p-4">
+                        {/* BreadCum */}
+                        <Link
+                            to="/admin/questions"
+                            className="blockquote-footer mt-3 mb-5"
+                        >
+                            Câu hỏi / Câu hỏi chi tiết
+                        </Link>
+                        {/* Header Title */}
+                        <div className="d-flex align-items-center justify-content-between flex-wrap">
+                            <div className="d-flex align-items-center">
+                                {loading ? (
+                                    <>
                                         <Skeleton
-                                            width={450}
-                                            height={15}
-                                            mb={8}
+                                            circle
+                                            width={70}
+                                            height={70}
                                         />
-                                        <Skeleton
-                                            width={450}
-                                            height={20}
-                                            mb={8}
-                                        />
-                                        <Skeleton
-                                            width={450}
-                                            height={15}
-                                            mb={8}
-                                        />
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <div>
-                                        <img
-                                            src="https://i.pinimg.com/originals/ec/04/8f/ec048fa1e083df7aeb49c06d7b75bcfc.jpg"
-                                            alt=""
-                                            className="course-image rounded-circle overflow-hidden"
-                                            width="70px"
-                                            height="70px"
-                                        />
-                                    </div>
-                                    <div className="ml-3">
-                                        <h3 className="text-muted">
-                                            Môn học - {questionPrev.subjectName}
-                                        </h3>
-                                        <h2 className="text-dark">
-                                            {questionPrev.courseName}
-                                        </h2>
-                                        <div className="d-flex align-items-center flex-wrap">
-                                            <h5>{questionPrev.adminName}</h5>
-                                            <span className="mx-1 font-weight-400 mt--1">
-                                                <i className="bx bx-minus"></i>
-                                            </span>
-                                            <h5>
-                                                {moment(
-                                                    questionPrev.createDate
-                                                ).format(
-                                                    'DD-MM-yyyy, h:mm:ss A'
-                                                )}
-                                            </h5>
+                                        <div className="ml-3">
+                                            <Skeleton
+                                                width={450}
+                                                height={15}
+                                                mb={8}
+                                            />
+                                            <Skeleton
+                                                width={450}
+                                                height={20}
+                                                mb={8}
+                                            />
+                                            <Skeleton
+                                                width={450}
+                                                height={15}
+                                                mb={8}
+                                            />
                                         </div>
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                        <div>
-                            {loading ? (
-                                <>
-                                    <div>
-                                        <Skeleton width={170} height={50} />
-                                    </div>
-                                </>
-                            ) : (
-                                <>
-                                    <Button
-                                        color={isUpdate ? 'primary' : 'success'}
-                                        onClick={() => {
-                                            handleClearForm()
-                                            setShowModal(true)
-                                        }}
-                                        variant="contained"
-                                        id="addSubjects"
-                                    >
-                                        <i className="bx bx-layer-plus"></i>{' '}
-                                        Thêm câu hỏi
-                                    </Button>
-                                    <Button
-                                        color="primary"
-                                        outline
-                                        onClick={() => {
-                                            setUploadExcel(true)
-                                            setShowModal(true)
-                                        }}
-                                    >
-                                        Upload EXCEL
-                                    </Button>
-                                </>
-                            )}
+                                    </>
+                                ) : (
+                                    <>
+                                        <div>
+                                            <img
+                                                src="https://i.pinimg.com/originals/ec/04/8f/ec048fa1e083df7aeb49c06d7b75bcfc.jpg"
+                                                alt=""
+                                                className="course-image rounded-circle overflow-hidden"
+                                                width="70px"
+                                                height="70px"
+                                            />
+                                        </div>
+                                        <div className="ml-3">
+                                            <h3 className="text-muted">
+                                                Môn học -{' '}
+                                                {questionPrev.subjectName}
+                                            </h3>
+                                            <h2 className="text-dark">
+                                                {questionPrev.courseName}
+                                            </h2>
+                                            <div className="d-flex align-items-center flex-wrap">
+                                                <h5>
+                                                    {questionPrev.adminName}
+                                                </h5>
+                                                <span className="mx-1 font-weight-400 mt--1">
+                                                    <i className="bx bx-minus"></i>
+                                                </span>
+                                                <h5>
+                                                    {moment(
+                                                        questionPrev.createDate
+                                                    ).format(
+                                                        'DD-MM-yyyy, h:mm:ss A'
+                                                    )}
+                                                </h5>
+                                            </div>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                            <div>
+                                {loading ? (
+                                    <>
+                                        <div>
+                                            <Skeleton width={170} height={50} />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            color={
+                                                isUpdate ? 'primary' : 'success'
+                                            }
+                                            onClick={() => {
+                                                handleClearForm()
+                                                setShowModal(true)
+                                            }}
+                                            variant="contained"
+                                            id="addSubjects"
+                                        >
+                                            <i className="bx bx-layer-plus"></i>{' '}
+                                            Thêm câu hỏi
+                                        </Button>
+                                        <Button
+                                            color="primary"
+                                            outline
+                                            onClick={() => {
+                                                setUploadExcel(true)
+                                                setShowModal(true)
+                                            }}
+                                        >
+                                            Upload EXCEL
+                                        </Button>
+                                    </>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            {/* Main content start */}
-            <main className="container-fluid">
-                <Row className="mt-3">
-                    {/* Item */}
-                    {loading ? (
-                        <>
-                            <div className="w-100 text-center mt-6">
-                                <Loader color="rgba(46, 46, 46, 1)" size={50} />
-                                <h3 className="text-muted mt-3">
-                                    Vui lòng chờ trong giây lát!
-                                </h3>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            {renderGroupsQuestion()}
-                            {questions.length === 0 && (
-                                <h2 className="mx-auto">
-                                    Chưa có câu hỏi nào được tạo!
-                                </h2>
-                            )}
-                        </>
-                    )}
-                </Row>
-            </main>
-            {/* Main content End*/}
+                {/* Main content start */}
+                <main className="container-fluid">
+                    <Row className="mt-3">
+                        {/* Item */}
+                        {loading ? (
+                            <>
+                                <div className="w-100 text-center mt-6">
+                                    <Loader
+                                        color="rgba(46, 46, 46, 1)"
+                                        size={50}
+                                    />
+                                    <h3 className="text-muted mt-3">
+                                        Vui lòng chờ trong giây lát!
+                                    </h3>
+                                </div>
+                            </>
+                        ) : (
+                            <>
+                                {renderGroupsQuestion()}
+                                {questions.length === 0 && (
+                                    <h2 className="mx-auto">
+                                        Chưa có câu hỏi nào được tạo!
+                                    </h2>
+                                )}
+                            </>
+                        )}
+                    </Row>
+                </main>
+                {/* Main content End*/}
 
-            {/* Modal start*/}
-            <Modal
-                className="modal-dialog-centered modal-lg"
-                isOpen={showModal}
-                backdrop={'static'}
-            >
-                <div className="modal-header">
-                    <h3 className="modal-title" id="modal-title-default">
-                        Thêm câu hỏi mới
-                    </h3>
-                    <button
-                        aria-label="Close"
-                        className="close"
-                        data-dismiss="modal"
-                        type="button"
-                        onClick={() => setShowModal(false)}
-                    >
-                        <span
-                            aria-hidden={true}
-                            onClick={() => setIsUpdate(false)}
+                {/* Modal start*/}
+                <Modal
+                    className="modal-dialog-centered modal-lg"
+                    isOpen={showModal}
+                    backdrop={'static'}
+                >
+                    <div className="modal-header">
+                        <h3 className="modal-title" id="modal-title-default">
+                            Thêm câu hỏi mới
+                        </h3>
+                        <button
+                            aria-label="Close"
+                            className="close"
+                            data-dismiss="modal"
+                            type="button"
+                            onClick={() => setShowModal(false)}
                         >
-                            ×
-                        </span>
-                    </button>
-                </div>
-                <div className="modal-body">
-                    {upLoadExcel ? (
-                        <>
-                            <Dropzone
-                                onDrop={(files) => {
-                                    console.log('accepted files', files)
-                                    setSelectedFile(files[0])
-                                }}
-                                onReject={(files) =>
-                                    console.log('rejected files', files)
-                                }
-                                maxSize={3 * 1024 ** 2}
-                                accept={[MIME_TYPES.xls, MIME_TYPES.xlsx]}
-                                name="excelFile"
+                            <span
+                                aria-hidden={true}
+                                onClick={() => setIsUpdate(false)}
                             >
-                                <Group
-                                    position="center"
-                                    spacing="xl"
-                                    style={{
-                                        minHeight: rem(220),
-                                        pointerEvents: 'none'
+                                ×
+                            </span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        {upLoadExcel ? (
+                            <>
+                                <Dropzone
+                                    onDrop={(files) => {
+                                        console.log('accepted files', files)
+                                        setSelectedFile(files[0])
                                     }}
+                                    onReject={(files) =>
+                                        console.log('rejected files', files)
+                                    }
+                                    maxSize={3 * 1024 ** 2}
+                                    accept={[MIME_TYPES.xls, MIME_TYPES.xlsx]}
+                                    name="excelFile"
+                                    loading={loadingDropZone}
                                 >
-                                    <Dropzone.Accept>
-                                        <IconUpload
-                                            size="3.2rem"
-                                            stroke={1.5}
-                                            color={
-                                                theme.colors[
-                                                    theme.primaryColor
-                                                ][
-                                                    theme.colorScheme === 'dark'
-                                                        ? 4
-                                                        : 6
-                                                ]
-                                            }
-                                        />
-                                    </Dropzone.Accept>
-                                    <Dropzone.Reject>
-                                        <IconX
-                                            size="3.2rem"
-                                            stroke={1.5}
-                                            color={
-                                                theme.colors.red[
-                                                    theme.colorScheme === 'dark'
-                                                        ? 4
-                                                        : 6
-                                                ]
-                                            }
-                                        />
-                                    </Dropzone.Reject>
-                                    <Dropzone.Idle>
-                                        <IconPhoto size="3.2rem" stroke={1.5} />
-                                    </Dropzone.Idle>
+                                    <Group
+                                        position="center"
+                                        spacing="xl"
+                                        style={{
+                                            minHeight: rem(220),
+                                            pointerEvents: 'none'
+                                        }}
+                                    >
+                                        <Dropzone.Accept>
+                                            <IconUpload
+                                                size="3.2rem"
+                                                stroke={1.5}
+                                                color={
+                                                    theme.colors[
+                                                        theme.primaryColor
+                                                    ][
+                                                        theme.colorScheme ===
+                                                        'dark'
+                                                            ? 4
+                                                            : 6
+                                                    ]
+                                                }
+                                            />
+                                        </Dropzone.Accept>
+                                        <Dropzone.Reject>
+                                            <IconX
+                                                size="3.2rem"
+                                                stroke={1.5}
+                                                color={
+                                                    theme.colors.red[
+                                                        theme.colorScheme ===
+                                                        'dark'
+                                                            ? 4
+                                                            : 6
+                                                    ]
+                                                }
+                                            />
+                                        </Dropzone.Reject>
+                                        <Dropzone.Idle>
+                                            <IconPhoto
+                                                size="3.2rem"
+                                                stroke={1.5}
+                                            />
+                                        </Dropzone.Idle>
 
-                                    <div>
-                                        <Text size="xl" inline>
-                                            Thả files excel vào đây hoặc click
-                                            vào để chọn files
-                                        </Text>
-                                        <Text
-                                            size="sm"
-                                            color="dimmed"
-                                            inline
-                                            mt={7}
-                                        >
-                                            Thả mỗi lần một file, lưu ý dung
-                                            lượng file phải dưới 5MB
-                                        </Text>
-                                    </div>
-                                </Group>
-                            </Dropzone>
-                        </>
-                    ) : (
-                        <>
-                            <form method="post" className="mt--4">
-                                <Row>
-                                    <Col xl={12} lg={12} md={12} sm={12}>
-                                        <Textarea
-                                            placeholder="Câu hỏi?"
-                                            label="Tiêu đề câu hỏi"
-                                            className="w-100"
-                                            withAsterisk
-                                            autosize
-                                            minRows={3}
-                                            onChange={
-                                                handleOnChangeInputAnswerInCreateNewQuestion
-                                            }
-                                            name="questionTitle"
-                                            value={questionTitle}
-                                        />
-                                        {msgError.msg ? (
-                                            <span className="text-danger ml-1">
-                                                Không được để trống tiêu đề câu
-                                                hỏi
-                                            </span>
-                                        ) : (
-                                            ''
-                                        )}
-                                    </Col>
-                                    <Col xl={12} lg={12} md={12} sm={12}>
-                                        <hr />
-                                        <h4 className="font-weight-600">
-                                            Câu trả lời
-                                        </h4>
-                                        <Blockquote
-                                            cite="Chọn vào checkbox để đánh dấu câu trả lời đúng!"
-                                            icon={null}
-                                            className="mt--3 p-0"
-                                        ></Blockquote>
-                                        <Blockquote icon={null} className="p-0">
-                                            <span className="text-danger">
-                                                {msgError.msgAnswer
-                                                    ? msgError.msgAnswer
-                                                    : ''}
-                                            </span>
-                                        </Blockquote>
-                                        <div className="container">
-                                            <Row>{renderInputs()}</Row>
+                                        <div>
+                                            <Text size="xl" inline>
+                                                Thả files excel vào đây hoặc
+                                                click vào để chọn files
+                                            </Text>
+                                            <Text
+                                                size="sm"
+                                                color="dimmed"
+                                                inline
+                                                mt={7}
+                                            >
+                                                Thả mỗi lần một file, lưu ý dung
+                                                lượng file phải dưới 5MB
+                                            </Text>
                                         </div>
-                                    </Col>
-                                    <div className="container">
-                                        <Button
-                                            color="dark"
-                                            className="mt-3 float-left"
-                                            onClick={handleAddGroup}
-                                        >
-                                            <i className="bx bx-list-plus"></i>{' '}
-                                            Thêm câu trả lời
-                                        </Button>
-                                    </div>
-                                </Row>
-                            </form>
-                        </>
-                    )}
-                </div>
-                <div className="modal-footer">
-                    <Button
-                        color="default"
-                        outline
-                        data-dismiss="modal"
-                        type="button"
-                        onClick={() => {
-                            setShowModal(false)
-                            setIsUpdate(false)
-                            setUploadExcel(false)
-                        }}
-                    >
-                        Trở lại
-                    </Button>
-                    <Button
-                        // color="success"
-                        color={upLoadExcel ? 'primary' : 'success'}
-                        type="button"
-                        onClick={() => {
-                            upLoadExcel
-                                ? handleExcelFileUpload()
-                                : handleStoreNewQuestions()
-                        }}
-                    >
-                        Thêm câu hỏi
-                    </Button>
-                </div>
-            </Modal>
-            {/* Modal End*/}
+                                    </Group>
+                                </Dropzone>
+                            </>
+                        ) : (
+                            <>
+                                <form method="post" className="mt--4">
+                                    <Row>
+                                        <Col xl={12} lg={12} md={12} sm={12}>
+                                            <Textarea
+                                                placeholder="Câu hỏi?"
+                                                label="Tiêu đề câu hỏi"
+                                                className="w-100"
+                                                withAsterisk
+                                                autosize
+                                                minRows={3}
+                                                onChange={
+                                                    handleOnChangeInputAnswerInCreateNewQuestion
+                                                }
+                                                name="questionTitle"
+                                                value={questionTitle}
+                                            />
+                                            {msgError.msg ? (
+                                                <span className="text-danger ml-1">
+                                                    Không được để trống tiêu đề
+                                                    câu hỏi
+                                                </span>
+                                            ) : (
+                                                ''
+                                            )}
+                                        </Col>
+                                        <Col xl={12} lg={12} md={12} sm={12}>
+                                            <hr />
+                                            <h4 className="font-weight-600">
+                                                Câu trả lời
+                                            </h4>
+                                            <Blockquote
+                                                cite="Chọn vào checkbox để đánh dấu câu trả lời đúng!"
+                                                icon={null}
+                                                className="mt--3 p-0"
+                                            ></Blockquote>
+                                            <Blockquote
+                                                icon={null}
+                                                className="p-0"
+                                            >
+                                                <span className="text-danger">
+                                                    {msgError.msgAnswer
+                                                        ? msgError.msgAnswer
+                                                        : ''}
+                                                </span>
+                                            </Blockquote>
+                                            <div className="container">
+                                                <Row>{renderInputs()}</Row>
+                                            </div>
+                                        </Col>
+                                        <div className="container">
+                                            <Button
+                                                color="dark"
+                                                className="mt-3 float-left"
+                                                onClick={handleAddGroup}
+                                            >
+                                                <i className="bx bx-list-plus"></i>{' '}
+                                                Thêm câu trả lời
+                                            </Button>
+                                        </div>
+                                    </Row>
+                                </form>
+                            </>
+                        )}
+                    </div>
+                    <div className="modal-footer">
+                        <Button
+                            color="default"
+                            outline
+                            data-dismiss="modal"
+                            type="button"
+                            onClick={() => {
+                                setShowModal(false)
+                                setIsUpdate(false)
+                                setUploadExcel(false)
+                            }}
+                        >
+                            Trở lại
+                        </Button>
+                        <Button
+                            // color="success"
+                            color={upLoadExcel ? 'primary' : 'success'}
+                            type="button"
+                            onClick={() => {
+                                upLoadExcel
+                                    ? handleExcelFileUpload()
+                                    : handleStoreNewQuestions()
+                            }}
+                        >
+                            Thêm câu hỏi
+                        </Button>
+                    </div>
+                </Modal>
+                {/* Modal End*/}
+            </div>
         </>
     )
 }
