@@ -48,6 +48,7 @@ import ReactLoading from 'react-loading'
 import { Timeline, Event } from 'react-timeline-scribble'
 import { Warning } from '@material-ui/icons'
 import { formatDate } from '../../utils/formater'
+import { Link } from 'react-router-dom'
 const IMG_URL = '/courses/'
 const Courses = () => {
     const user = JSON.parse(localStorage.getItem('user') | '')
@@ -590,7 +591,7 @@ const Courses = () => {
                                 displayColumnDefOptions={{
                                     'mrt-row-actions': {
                                         header: 'Thao tác',
-                                        size: 20
+                                        size: 70
                                         // Something else here
                                     },
                                     'mrt-row-numbers': {
@@ -637,6 +638,11 @@ const Courses = () => {
                                         >
                                             <IconEyeSearch />
                                         </IconButton>
+                                        <Link to={`/admin/courses-detail/${row.original.courseId}`}>
+                                            <IconButton color="info">
+                                                <i className="bx bx-layer-plus"></i>
+                                            </IconButton>
+                                        </Link>
                                     </Box>
                                 )}
                                 muiTablePaginationProps={{

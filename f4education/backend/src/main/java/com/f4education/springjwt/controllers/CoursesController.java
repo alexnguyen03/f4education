@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,8 +53,19 @@ public class CoursesController {
 
 	@GetMapping("/newest-courses")
 	public ResponseEntity<?> getTop10NewsetCourse() {
-		List<CourseDTO> list = courseService.findNewestCourse();
+		List<CourseResponse> list = courseService.findNewestCourse();
 		return ResponseEntity.ok(list);
+	}
+
+	@GetMapping("/detail/{courseId}")
+	public ResponseEntity<?> getTopCourseDetailByCourseId(@PathVariable Integer courseId) {
+		CourseResponse course = courseService.findCourseByCourseId(courseId);
+
+		if (course == null) {
+			return ResponseEntity.noContent().build();		
+		}
+
+		return ResponseEntity.ok(course);
 	}
 
 //	@GetMapping("/top-selling")

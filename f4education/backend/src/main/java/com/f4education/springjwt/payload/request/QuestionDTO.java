@@ -18,8 +18,6 @@ public class QuestionDTO {
 
 	private Date createDate;
 
-	private Boolean status;
-
 	private String adminName;
 
 }

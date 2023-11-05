@@ -21,7 +21,7 @@ import CourseRegisterClient from '../../../f4education/frontend/src/views/client
 // import CourseRegisterDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from 'views/teacher/information'
 import StudentInformation from 'views/client/visitor/StudentInformation'
-import QuizzClient from 'views/client/visitor/QuizzClient';
+import QuizzClient from 'views/client/visitor/QuizzClient'
 
 import Accounts from 'views/admin/Accounts'
 import Schedules from 'views/admin/Schedules'
@@ -30,6 +30,7 @@ import Icons from 'views/examples/Icons'
 import ClassInformation from 'views/teacher/ClassInformation'
 import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
 import CourseProgress from 'views/client/student/CourseProgress'
+import CoursesDetail from 'views/admin/CoursesDetail'
 
 export var routes = [
     {
@@ -82,6 +83,11 @@ export var routes = [
         layout: '/admin'
     },
     {
+        path: '/courses-detail/:courseId',
+        component: <CoursesDetail />,
+        layout: '/admin'
+    },
+    {
         path: '/class-room',
         name: 'Phòng học',
         icon: 'ni ni-single-02 text-yellow',
@@ -125,7 +131,7 @@ export var routes = [
     },
 
     {
-        path: '/question-detail/:courseName',
+        path: '/question-detail/:questionId',
         component: <QuestionDetail />,
         layout: '/admin'
     },

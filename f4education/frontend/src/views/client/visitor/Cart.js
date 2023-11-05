@@ -26,6 +26,9 @@ import { Carousel } from '@mantine/carousel'
 // Icon
 import { IconShoppingCartPlus } from '@tabler/icons-react'
 
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../../utils/Notify'
+
 // API - declare variable
 import cartApi from '../../../api/cartApi'
 import courseApi from '../../../api/courseApi'
@@ -43,6 +46,8 @@ const itemsBreadcum = [
 ))
 
 function Cart() {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // *************** Main Variable
     const [carts, setCarts] = useState([])
     const [newestCourse, setNewestCourse] = useState([])
@@ -63,7 +68,7 @@ function Cart() {
     const fetchCart = async () => {
         try {
             setLoading(true)
-            const resp = await cartApi.getAllCart()
+            const resp = await cartApi.getAllCartByStudentId(user.username)
 
             if (resp.status === 200 && resp.data.length > 0) {
                 setCarts(resp.data)
@@ -96,12 +101,28 @@ function Cart() {
 
     // *************** Fetch Area > CRUD
     const handleRemoveCart = async (cartId, e) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         e.preventDefault()
         try {
+            const updateCarts = [...carts]
+            const indexToDelete = updateCarts.findIndex(
+                (cart) => cart.cartId === cartId
+            )
+            if (indexToDelete !== -1) {
+                updateCarts.splice(indexToDelete, 1)
+            }
+            setCarts(updateCarts)
+
             const resp = await cartApi.removeCart(cartId)
-            // setCarts(resp);
-            fetchCart()
+
+            if (resp.status === 204) {
+                toast.update(id, Notify.options.deleteSuccess())
+            } else {
+                toast.update(id, Notify.options.deleteError())
+            }
+
             console.log('remove successfully')
+            fetchCart()
         } catch (error) {
             console.log(error)
         }
@@ -109,8 +130,14 @@ function Cart() {
 
     // *************** Action && Logic UI
     const handleCheckOut = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         if (selectedItem === null) {
-            alert('Chon khoa hoc di ban ei, 1 khoa thoi')
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Chỉ thanh toán được một khóa học mỗi lần'
+                )
+            )
             return
         }
         // store cart to localstorage
@@ -275,7 +302,9 @@ function Cart() {
 
     return (
         <>
-            <Container>
+            <ToastContainer />
+            
+            <Container size="xl">
                 {/* BreadCums */}
                 <Breadcrumbs
                     className="my-5 p-3"
@@ -584,7 +613,7 @@ function Cart() {
                 >
                     {slides}
                 </Carousel>
-            </Container>{' '}
+            </Container>
         </>
     )
 }

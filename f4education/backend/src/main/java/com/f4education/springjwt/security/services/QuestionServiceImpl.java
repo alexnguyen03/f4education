@@ -50,7 +50,6 @@ public class QuestionServiceImpl implements QuestionService {
 	public QuestionDTO createQuestion(QuestionDTORequest questionDTO) {
 		Question question = this.convertRequestToEntity(questionDTO);
 		question.setCreateDate(new Date());
-		question.setStatus(true);
 
 		Question saveQuestion = questionReposotory.save(question);
 
@@ -64,8 +63,6 @@ public class QuestionServiceImpl implements QuestionService {
 		if (exitQuestion.isEmpty()) {
 			return null;
 		}
-
-		exitQuestion.get().setStatus(false);
 
 		Question updateQuestion = questionReposotory.save(exitQuestion.get());
 

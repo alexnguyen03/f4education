@@ -58,6 +58,27 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        createErrorParam: (message) => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: message,
+                ...defaultOptions
+            }
+        },
+        deleteSuccess: ()=>{
+            return{
+                type:toast.TYPE.SUCCESS,
+                render:'Xóa thành công !',
+                ...defaultOptions
+            }
+        },
+        deleteError: ()=>{
+            return{
+                type:toast.TYPE.ERROR,
+                render:'Xóa thất bại !',
+                ...defaultOptions
+            }
+        },
         error: () => {
             // loi chung thi dung ong nay
             return {

@@ -100,6 +100,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/payment-method/**",
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
+                                        "/api/evaluate/**",
                                         "/img/**")
                                 .permitAll()
                                 .requestMatchers(
@@ -109,6 +110,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/courses-history/**",
                                         "/api/subject-history/**",
                                         "/api/courses/**",
+                                        "/api/courses-detail/**",
                                         "/api/classroom/**",
                                         "/api/sessions/**",
                                         "/api/classhistory/**",
@@ -130,7 +132,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/api/accounts/**",
-                                        "/api/schedule/**")
+                                        "/api/schedule/**"
+                                		)
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

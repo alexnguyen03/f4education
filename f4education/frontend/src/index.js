@@ -45,6 +45,10 @@ root.render(
 					/>
 				}
 			/>
+			<Route
+				path='/admin/*/:courseId'
+				element={<AdminLayout />}
+			/>
 
             {/* Client Route */}
             <Route path="/*" element={<ClientLayout />} />

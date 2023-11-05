@@ -29,8 +29,8 @@ const questionApi = {
         const url = `/question-detail/${questionDetailId}`
         return axiosClient.delete(url)
     },
-    uploadExcel: (file) => {
-        const url = `/question-detail/upload-excel`
+    uploadExcel: (file, questionId) => {
+        const url = `/question-detail/upload-excel/${questionId}`
         return axiosClient.post(url, file, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })

@@ -38,6 +38,7 @@ import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 // API
 import cartApi from '../../api/cartApi'
 import courseApi from '../../api/courseApi'
+import { useCallback } from 'react'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -52,8 +53,6 @@ const ClientNavbar = () => {
     const navigate = useNavigate()
     const smallScreen = useMediaQuery('(max-width: 500px)')
 
-    const [login, setLogin] = useState(false)
-    const [cartEmpty, setCartEmpty] = useState(true)
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const [activeItems, setActiveItems] = useState([false, false, false])
     const [opened, { toggle }] = useDisclosure(true)
@@ -63,10 +62,10 @@ const ClientNavbar = () => {
     const [totalPrice, setTotalPrice] = useState(0)
     const [listCourse, setListCourse] = useState([])
 
-    const fetchCart = async () => {
+    const fetchCart = useCallback(async () => {
         if (user !== null) {
             try {
-                const resp = await cartApi.getAllCart()
+                const resp = await cartApi.getAllCartByStudentId(user.username)
                 if (resp.status === 200 && resp.data.length > 0) {
                     setCarts(resp.data)
                 }
@@ -76,7 +75,7 @@ const ClientNavbar = () => {
         } else {
             setCarts([])
         }
-    }
+    },[user])
 
     const fetchCourse = async () => {
         try {
@@ -106,7 +105,7 @@ const ClientNavbar = () => {
 
     useEffect(() => {
         fetchCart()
-    }, [user])
+    }, [fetchCart])
 
     // *************** CART VARIABLE - AREA END
     const handleItemClick = (index) => {
@@ -120,17 +119,12 @@ const ClientNavbar = () => {
         setActiveItems(newActiveItems)
     }
 
-    const handleLogin = (prev) => {
-        setLogin(!prev)
+    const handleLogin = () => {
         navigate('auth/login')
     }
 
     const handleLogout = () => {
         localStorage.removeItem('user')
-    }
-
-    const handleCartEmpty = (prev) => {
-        setCartEmpty(!prev)
     }
 
     window.addEventListener('scroll', function () {
@@ -239,13 +233,13 @@ const ClientNavbar = () => {
                                         to="#"
                                         className={`
                 ${
-                    activeItems[1]
+                    activeItems[2]
                         ? 'nav-link custom-nav-link active'
                         : 'nav-link custom-nav-link'
                 }
                 ${styles['custom-nav-link']}
                 `}
-                                        onClick={() => handleItemClick(1)}
+                                        onClick={() => handleItemClick(2)}
                                     >
                                         Danh mục
                                         <IconChevronDown
@@ -461,20 +455,8 @@ const ClientNavbar = () => {
                                                     src={cartEmptyimage}
                                                     alt="cart Empty"
                                                     className="img-fluid"
-                                                    onClick={() =>
-                                                        handleCartEmpty(
-                                                            cartEmpty
-                                                        )
-                                                    }
                                                 />
-                                                <p
-                                                    className="mx-auto mb-3 text-muted font-weight-600 mx-auto"
-                                                    onClick={() =>
-                                                        handleCartEmpty(
-                                                            cartEmpty
-                                                        )
-                                                    }
-                                                >
+                                                <p className="mx-auto mb-3 text-muted font-weight-600 mx-auto">
                                                     Giỏ hàng trống.
                                                 </p>
                                             </>
@@ -669,7 +651,7 @@ const ClientNavbar = () => {
                                     color="dark"
                                     uppercase
                                     className="mt-1 ml-2 font-weight-700"
-                                    onClick={() => handleLogin(login)}
+                                    onClick={() => handleLogin()}
                                     style={{ borderRadius: '2px' }}
                                 >
                                     Đăng nhập

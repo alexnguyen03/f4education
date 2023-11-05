@@ -129,38 +129,44 @@ const Home = () => {
                         <Card className="card-hover-overlay">
                             <HoverCard.Target>
                                 <Card.Section>
-                                    <Image
-                                        src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
-                                        fit="cover"
-                                        width={'100%'}
-                                        height={150}
-                                        radius="sm"
-                                        withPlaceholder
-                                        component="a"
-                                        href={`/course/${learn.courseId}`}
-                                    />
+                                    <Link to={`/course/${learn.courseId}`}>
+                                        <Image
+                                            src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                                            fit="cover"
+                                            width={'100%'}
+                                            height={150}
+                                            radius="sm"
+                                            withPlaceholder
+                                        />
+                                    </Link>
                                 </Card.Section>
                             </HoverCard.Target>
 
                             <Box>
-                                <Text fw={500} lineClamp={2} fs="lg">
+                                <Text fw={500} lineClamp={1} fs="lg">
                                     {learn.courseName}
-                                </Text>
-                                <Text fw={500} c="dimmed" lineClamp={2} fs="sm">
-                                    {/* {learn.master} */}
-                                    Jonh Macro
                                 </Text>
                                 <Box>
                                     <Flex justify="flex-start" gap="sm">
-                                        <Text>3.7</Text>
+                                        <Text>
+                                            {learn.rating === 'NaN'
+                                                ? 5
+                                                : learn.rating}
+                                        </Text>
                                         <Group position="center">
                                             <Rating
-                                                value={3.6}
+                                                value={
+                                                    learn.rating === 'NaN'
+                                                        ? 5
+                                                        : learn.rating
+                                                }
                                                 fractions={2}
                                                 readOnly
                                             />
                                         </Group>
-                                        <Text c="dimmed">({39})</Text>
+                                        <Text c="dimmed">
+                                            ({learn.reviewNumber})
+                                        </Text>
                                     </Flex>
                                 </Box>
                                 <Box>
