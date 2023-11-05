@@ -187,6 +187,9 @@ const CourseProgress = () => {
     useEffect(() => {
         setSelectedCourse(selectedCourse)
     }, [selectedCourse])
+    useEffect(() => {
+        checkActivedExamByTodayAndClassId()
+    }, [searchParams])
 
     useEffect(() => {
         fetchCourseProgress()
