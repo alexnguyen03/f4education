@@ -116,7 +116,7 @@ public class GoogleDriveRepository {
 
 				// Đặt quyền truy cập cho tệp
 				driveQuickstart.getInstance().permissions()
-						.create(uploadFile.getId(), setPermission("anyone", "reader")).execute();
+						.create(uploadFile.getId(), setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
 
 				return uploadFile.getId();
 			}
@@ -154,7 +154,7 @@ public class GoogleDriveRepository {
 		}
 		folderId = driveInstance.files().create(fileMetadata).setFields("id").execute().getId();
 		// Set folder permission to allow others to view
-		Permission permission = setPermission("anyone", "reader");
+		Permission permission = setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com");
 		driveInstance.permissions().create(folderId, permission).execute();
 		return folderId;
 	}
