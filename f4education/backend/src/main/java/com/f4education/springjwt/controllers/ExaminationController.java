@@ -38,19 +38,14 @@ public class ExaminationController {
     @PostMapping("/{classId}")
     public ResponseEntity<?> createExam(@PathVariable("classId") Integer classId) {
         Classes classes = classService.findById(classId);
-        List<Question> listQuestion = questionService
-                .get60QuestionRamdomsByCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
 
-        List<Examination> listExamination = new ArrayList<Examination>();
-        listQuestion.forEach(item -> {
-            Examination exam = new Examination();
-            exam.setExamId(1);
-            exam.setClasses(classes);
-            exam.setFinishDate(new Date());
-            exam.setQuestion(item);
-            listExamination.add(exam);
-        });
-        List<Examination> listExaminationSaved = examinationService.saveExamination(listExamination);
+        Examination newExamination = new Examination();
+        Integer courseId = classes.getRegisterCourses().get(0).getCourse().getCourseId();
+        Question question = questionService.getQuestionByCourseId(courseId);
+        newExamination.setQuestion(question);
+        newExamination.setClasses(classes);
+        newExamination.setFinishDate(new Date());
+        Examination listExaminationSaved = examinationService.saveExamination(newExamination);
         return ResponseEntity.ok(listExaminationSaved);
     }
 
@@ -60,7 +55,7 @@ public class ExaminationController {
     }
 
     @GetMapping("/student/{classId}")
-    public ResponseEntity<?> checkActivedExamByDateAndClassid(@PathVariable("classId") Integer classId) {
-        return ResponseEntity.ok(examinationService.isActivedExam(classId));
+    public ResponseEntity<?> checkActivedExamByDateAndClassId(@PathVariable("classId") Integer classId) {
+        return ResponseEntity.ok(examinationService.isActivedExamByTodayAndClassId(classId));
     }
 }

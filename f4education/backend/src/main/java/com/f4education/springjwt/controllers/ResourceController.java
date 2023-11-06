@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,6 +31,7 @@ import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,6 +45,9 @@ public class ResourceController {
 
 	@Autowired
 	CoursesService coursesService;
+
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
 
 	@GetMapping
 	public ResponseEntity<?> getAll() {
@@ -83,5 +89,39 @@ public class ResourceController {
 	@GetMapping("/delete/file/{id}")
 	public void deleteFile(@PathVariable String id) throws Exception {
 		resourceService.deleteFile(id);
+	}
+
+	@GetMapping("/files/{courseName}")
+	public ResponseEntity<?> getAllFilesByCourseName(@PathVariable("courseName") String courseName) {
+		String folderId = "";
+		List<GoogleDriveFileDTO> list = new ArrayList<>();
+
+		try {
+			folderId = googleDriveRepository.getFolderId(courseName);
+
+			list.addAll(resourceService.getAllFilesByFolderLesson(folderId));
+			list.addAll(resourceService.getAllFilesByFolderResource(folderId));
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		return ResponseEntity.ok(list);
+	}
+
+	@GetMapping("/download-multiple")
+	public ResponseEntity<?> downloadMultipleFiles(@RequestParam List<String> fileIds) {
+		try {
+			// Gọi phương thức từ driveService để tải nhiều file từ Google Drive
+			byte[] zipFile = googleDriveRepository.downloadMultipleFiles(fileIds);
+
+			// Trả về file zip cho client
+			HttpHeaders headers = new HttpHeaders();
+			headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+			headers.setContentDispositionFormData("attachment", "files.zip");
+
+			return new ResponseEntity<>(zipFile, headers, HttpStatus.OK);
+		} catch (Exception e) {
+			return new ResponseEntity<>("Failed to download files", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

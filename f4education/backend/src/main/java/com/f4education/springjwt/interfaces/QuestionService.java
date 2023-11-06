@@ -16,7 +16,7 @@ public interface QuestionService {
 
     QuestionDTO createQuestion(QuestionDTORequest questionDTO);
 
-    List<Question> get60QuestionRamdomsByCourseId(Integer courseId);
+    Question getQuestionByCourseId(Integer courseId);
 
     QuestionDTO updateQuestion(Integer questionId, QuestionDTORequest questionDTO);
 }

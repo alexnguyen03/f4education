@@ -1,36 +1,37 @@
 import Index from 'views/Index.js'
 import Register from 'views/examples/Register.js'
-import Subjects from 'views/admin/Subjects'
-import Sessions from 'views/admin/Sessions'
-import Courses from 'views/admin/Courses.js'
-import Teachers from 'views/admin/Teachers.js'
-import Classs from 'views/admin/Classs.js'
-import ClasssRoom from 'views/admin/ClasssRoom.js'
-import Resources from 'views/admin/Resources.js'
-import ResourceDetail from 'views/admin/ResourceDetail'
-import Questions from 'views/admin/Questions'
-import QuestionDetail from 'views/admin/QuestionDetail'
-import Home from '../../../f4education/frontend/src/views/client/visitor/Home'
-import CourseClient from '../../../f4education/frontend/src/views/client/visitor/CourseClient'
-import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
-import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
-import ClassDetail from 'views/admin/ClassDetail'
+import Subjects from './views/admin/Subjects'
+import Sessions from './views/admin/Sessions'
+import Courses from './views/admin/Courses.js'
+import Teachers from './views/admin/Teachers.js'
+import Classs from './views/admin/Classs.js'
+import ClasssRoom from './views/admin/ClasssRoom.js'
+import Resources from './views/admin/Resources.js'
+import ResourceDetail from './views/admin/ResourceDetail'
+import Questions from './views/admin/Questions'
+import QuestionDetail from './views/admin/QuestionDetail'
+import Home from './views/client/visitor/Home'
+import CourseClient from './views/client/visitor/CourseClient'
+import Cart from './views/client/visitor/Cart'
+import Checkout from './views/client/visitor/Checkout'
+import ClassDetail from './views/admin/ClassDetail'
 import Login from 'views/examples/Login'
-import CourseDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseDetailClient'
-import CourseRegisterClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterClient'
-// import CourseRegisterDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterDetailClient'/
-import InformationTeacher from 'views/teacher/information'
-import StudentInformation from 'views/client/visitor/StudentInformation'
-import QuizzClient from 'views/client/visitor/QuizzClient'
+import CourseDetailClient from './views/client/visitor/CourseDetailClient'
+import CourseRegisterClient from './views/client/visitor/CourseRegisterClient'
+// import CourseRegisterDetailClient from './views/client/visitor/CourseRegisterDetailClient'/
+import InformationTeacher from './views/teacher/information'
+import StudentInformation from './views/client/visitor/StudentInformation'
+import QuizzClient from './views/client/visitor/QuizzClient'
 
-import Accounts from 'views/admin/Accounts'
-import Schedules from 'views/admin/Schedules'
+import Accounts from './views/admin/Accounts'
+import Schedules from './views/admin/Schedules'
 
-import Icons from 'views/examples/Icons'
-import ClassInformation from 'views/teacher/ClassInformation'
-import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
-import CourseProgress from '../../../f4education/frontend/src/views/client/student/CourseProgress'
+import Icons from './views/examples/Icons'
+import ClassInformation from './views/teacher/ClassInformation'
+import ClassInformationDetail from './views/teacher/ClassInformationDetail'
+import CourseProgress from './views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
+import DownloadRecource from './views/client/student/DownloadRecource'
 
 export var routes = [
     {
@@ -267,6 +268,13 @@ export const routesStudent = [
         name: 'Thông tin bài kiểm tra',
         icon: 'ni ni-planet text-blue',
         component: <QuizzClient />,
+        layout: '/student'
+    },
+    {
+        path: '/classes/recources/:classId',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <DownloadRecource />,
         layout: '/student'
     }
 ]

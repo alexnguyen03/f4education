@@ -9,6 +9,7 @@ import {
     Group,
     HoverCard,
     Image,
+    Modal,
     Progress,
     Rating,
     rem,
@@ -39,13 +40,19 @@ import courseApi from '../../../api/courseApi'
 import registerCoursecAPI from '../../../api/registerCourseApi'
 import Schedule from './Schedule'
 import questionApi from 'api/questionApi'
+import { IconDatabasePlus } from '@tabler/icons-react'
+import { useDisclosure } from '@mantine/hooks'
+import DownloadRecource from './DownloadRecource'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
     const today = new Date('2024-01-04').toDateString().substring(4, 16)
-
+    const [downloadRecource, downloadRecourceHandlers] = useDisclosure(false, {
+        onOpen: () => console.log('Opened'),
+        onClose: () => console.log('Closed')
+    })
     const user = JSON.parse(localStorage.getItem('user'))
 
     //  ***********Route
@@ -54,12 +61,21 @@ const CourseProgress = () => {
 
     // *********** Main variable
     const [courseProgresses, setCourseProgresses] = useState([])
+    const [allCourseProgresses, setAllCourseProgresses] = useState([])
     const [totalCountCourseProgress, setDetailCourseProgress] = useState([])
-    const [selectedCourse, setSelectedCourse] = useState({})
+    const [selectedCourse, setSelectedCourse] = useState({
+        course: {
+            courseName: '',
+            courseDuration: 0
+        },
+        totalProgress: 0,
+        classes: {
+            className: ''
+        }
+    })
     const [showingDetail, setShowingDetail] = useState(false)
     const [loadingCheckExam, setLoadingCheckExam] = useState(false)
     const [enableExam, setEnableExam] = useState(false)
-    const [showSchedule, setShowSchedule] = useState(false)
 
     const [newestCourse, setNewestCourse] = useState([])
 
@@ -94,6 +110,7 @@ const CourseProgress = () => {
 
             // console.log(newCourseProgresses)
             setCourseProgresses(newCourseProgresses)
+            setAllCourseProgresses(newCourseProgresses)
 
             setLoading(false)
         } catch (error) {
@@ -142,10 +159,23 @@ const CourseProgress = () => {
 
     const handleShowCourseProgress = (course) => {
         setSelectedCourse(course)
-        console.log(
-            '🚀 ~ file: CourseProgress.js:129 ~ handleShowCourseProgress ~ course:',
-            course
-        )
+
+        if (
+            courseProgresses.find(
+                (item) => item.course.courseId === course.course.courseId
+            )
+        ) {
+            setCourseProgresses(
+                allCourseProgresses.filter((item) => {
+                    console.log(
+                        '🚀 ~ file: CourseProgress.js:171 ~ handleShowCourseProgress ~ item:',
+                        item
+                    )
+                    return item.course.courseId !== course.course.courseId
+                })
+            )
+        }
+
         setShowingDetail(true)
         navigate({
             pathname: '/student/classes',
@@ -186,6 +216,10 @@ const CourseProgress = () => {
     // ************ USE EFECT AREA
     useEffect(() => {
         setSelectedCourse(selectedCourse)
+        console.log(
+            '🚀 ~ file: CourseProgress.js:220 ~ useEffect ~ selectedCourse:',
+            selectedCourse
+        )
     }, [selectedCourse])
     useEffect(() => {
         checkActivedExamByTodayAndClassId()
@@ -209,7 +243,6 @@ const CourseProgress = () => {
                     Tiến độ học tập
                 </Title>
             </Box>
-
             {/* Hero banner */}
             <Box
                 pos={'relative'}
@@ -283,18 +316,30 @@ const CourseProgress = () => {
                                     illo porro. Totam, libero!
                                 </strong>
                             </Text>
-                            <Button
-                                variant="outline"
-                                color="indigo"
-                                size="lg"
-                                leftIcon={<IconArrowBack />}
-                                mt={10}
-                                onClick={() => {
-                                    setShowingDetail(false)
-                                }}
-                            >
-                                Trở về trang tổng quan
-                            </Button>
+                            <Group>
+                                <Button
+                                    variant="outline"
+                                    color="indigo"
+                                    size="lg"
+                                    leftIcon={<IconArrowBack />}
+                                    mt={10}
+                                    onClick={() => {
+                                        setShowingDetail(false)
+                                    }}
+                                >
+                                    Trở về trang tổng quan
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    color="indigo"
+                                    size="lg"
+                                    leftIcon={<IconDatabasePlus />}
+                                    mt={10}
+                                    onClick={downloadRecourceHandlers.open}
+                                >
+                                    Tải tài nguyên
+                                </Button>
+                            </Group>
                         </Stack>
                     ) : (
                         <>
@@ -580,7 +625,6 @@ const CourseProgress = () => {
                     </Box>
                 )}
             </Box>
-
             {showingDetail && <Schedule />}
             {/* In Progress Course */}
             <Box mt={rem('8rem')}>
@@ -754,7 +798,6 @@ const CourseProgress = () => {
                     )}
                 </Grid>
             </Box>
-
             {/* Relation course in progress */}
             <Box mt={rem('8rem')}>
                 <Group position="apart" mb={'lg'}>
@@ -837,7 +880,6 @@ const CourseProgress = () => {
                     ))}
                 </Grid>
             </Box>
-
             {/* complete course */}
             <Box my={rem('8rem')}>
                 <Group position="apart" mb={'lg'}>
@@ -950,6 +992,32 @@ const CourseProgress = () => {
                     </Stack>
                 </Box>
             </Box>
+            //! Modals
+            <Modal.Root
+                opened={downloadRecource}
+                onClose={downloadRecourceHandlers.close}
+                centered
+                closeOnClickOutside={false}
+                closeOnEscape={false}
+            >
+                <Modal.Overlay />
+                <Modal.Content>
+                    <Modal.Header>
+                        <Modal.Title>
+                            <Text fz="lg">
+                                {' '}
+                                Tải xuống tài nguyên của khóa học
+                            </Text>
+                        </Modal.Title>
+                        <Modal.CloseButton />
+                    </Modal.Header>
+                    <Modal.Body>
+                        <DownloadRecource
+                            courseName={selectedCourse.course.courseName}
+                        />
+                    </Modal.Body>
+                </Modal.Content>
+            </Modal.Root>
         </Container>
     )
 }

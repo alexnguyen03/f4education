@@ -406,7 +406,10 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
-                                    disabled={activedExam}
+                                    disabled={
+                                        activedExam ||
+                                        selectClasses.status === 'Đang diễn ra'
+                                    }
                                 >
                                     Tạo quiz
                                 </Button>

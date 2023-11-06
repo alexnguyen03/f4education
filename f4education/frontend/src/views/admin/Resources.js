@@ -201,6 +201,10 @@ const Resource = () => {
         try {
             setLoadingResource(true) // Bắt đầu quá trình tải dữ liệu
             const resp = await resourceApi.getAllResource()
+            console.log(
+                '🚀 ~ file: Resources.js:204 ~ getDataResource ~ resp:',
+                resp
+            )
             if (resp.status === 200 && resp.data.length > 0) {
                 setResources(resp.data)
                 setLoadingResource(false)

@@ -99,8 +99,8 @@ public class QuestionServiceImpl implements QuestionService {
 	}
 
 	@Override
-	public List<Question> get60QuestionRamdomsByCourseId(Integer courseId) {
-		return questionReposotory.findAllByCourseId(courseId);
+	public Question getQuestionByCourseId(Integer courseId) {
+		return questionReposotory.findByCourseId(courseId);
 	}
 
 }
