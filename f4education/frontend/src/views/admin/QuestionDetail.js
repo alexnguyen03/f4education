@@ -1,8 +1,10 @@
 import {
     Blockquote,
+    Center,
     Checkbox,
     Group,
     Loader,
+    Pagination,
     rem,
     Skeleton,
     Text,
@@ -34,7 +36,7 @@ import Notify from '../../utils/Notify'
 
 // API
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
-import { IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
+import { IconBookUpload, IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
 import answersApi from '../../api/answersApi'
 import questionApi from '../../api/questionApi'
 
@@ -57,6 +59,7 @@ const QuestionDetail = () => {
     const [isUpdate, setIsUpdate] = useState(false)
     const [upLoadExcel, setUploadExcel] = useState(false)
     const [loadingDropZone, setLoadingDropZone] = useState(false)
+    const [searchTerm, setSearchTerm] = useState('')
 
     // ************* Form variable
     const [questionTitle, setQuestionTitle] = useState('')
@@ -75,6 +78,36 @@ const QuestionDetail = () => {
         }
     ])
     const [deleteAnsers, setDeleteAnswer] = useState([])
+
+    // *************** PAGINATION AND SEARCH START
+    const [currentPage, setCurrentPage] = useState(1)
+    const itemsPerPage = 4
+
+    const filteredQuestion = questions.filter((item) => {
+        const questionTitle = item.questionTitle
+
+        const lowerSearchTerm = searchTerm.toLowerCase()
+
+        return questionTitle.toLowerCase().includes(lowerSearchTerm)
+    })
+
+    const handleChangeSearchQuestions = (e) => {
+        setSearchTerm(e.target.value)
+        setCurrentPage(1)
+    }
+
+    const handlePaginationChange = (page) => {
+        setCurrentPage(page)
+    }
+
+    const firstIndex = (currentPage - 1) * itemsPerPage
+    const lastIndex = Math.min(
+        firstIndex + itemsPerPage,
+        filteredQuestion.length
+    )
+    const currentItems = filteredQuestion.slice(firstIndex, lastIndex)
+
+    // *************** PAGINATION AND SEARCH END
 
     // ************* API - FETCH AREA
     const fetchQuestionDetail = async () => {
@@ -167,17 +200,6 @@ const QuestionDetail = () => {
         const formData = new FormData()
         formData.append('excelFile', selectedFile)
 
-        console.log(selectedFile)
-
-        // console log excel file with formData
-        for (let pair of formData.entries()) {
-            console.log(
-                pair[0] +
-                    ': ' +
-                    (pair[1] instanceof File ? pair[1].name : pair[1])
-            )
-        }
-
         try {
             const resp = await questionApi.uploadExcel(
                 formData,
@@ -191,6 +213,9 @@ const QuestionDetail = () => {
                 setShowModal(false)
                 toast.update(id, Notify.options.createSuccess())
                 fetchQuestionDetail()
+            } else {
+                setLoadingDropZone(false)
+                toast.update(id, Notify.options.createError())
             }
         } catch (error) {
             toast.update(id, Notify.options.createError())
@@ -682,7 +707,7 @@ const QuestionDetail = () => {
     // *************** RENDER QUESTION AND ANSWER - START
     // + render UI questions
     const renderGroupsQuestion = () => {
-        return questions.map((questionDetail, index) => (
+        return currentItems.map((questionDetail, index) => (
             <>
                 <Col
                     lg={12}
@@ -1013,10 +1038,6 @@ const QuestionDetail = () => {
         setEditQuestionId(editQuestionId)
     }, [editQuestionId])
 
-    useEffect(() => {
-        console.log(editQuestionId)
-    }, [editQuestionId])
-
     return (
         <>
             <ToastContainer />
@@ -1030,12 +1051,27 @@ const QuestionDetail = () => {
                 <div className="container-fluid mt-3">
                     <div className="bg-white p-4">
                         {/* BreadCum */}
-                        <Link
-                            to="/admin/questions"
-                            className="blockquote-footer mt-3 mb-5"
-                        >
-                            Câu hỏi / Câu hỏi chi tiết
-                        </Link>
+                        <div className="d-flex justify-content-between mt-3 mb-5">
+                            <Link
+                                to="/admin/questions"
+                                className="blockquote-footer"
+                            >
+                                Câu hỏi / Câu hỏi chi tiết
+                            </Link>
+                            <div className="d-flex">
+                                <Input
+                                    placeholder="Tìm câu hỏi...."
+                                    value={searchTerm}
+                                    onChange={(e) =>
+                                        handleChangeSearchQuestions(e)
+                                    }
+                                    style={{ minWidth: '300px' }}
+                                />
+                                <Button color="default" className="ml-2 w-75">
+                                    Tìm kiếm
+                                </Button>
+                            </div>
+                        </div>
                         {/* Header Title */}
                         <div className="d-flex align-items-center justify-content-between flex-wrap">
                             <div className="d-flex align-items-center">
@@ -1133,7 +1169,7 @@ const QuestionDetail = () => {
                                                 setShowModal(true)
                                             }}
                                         >
-                                            Upload EXCEL
+                                            <IconBookUpload /> Upload Excel
                                         </Button>
                                     </>
                                 )}
@@ -1165,6 +1201,20 @@ const QuestionDetail = () => {
                                     <h2 className="mx-auto">
                                         Chưa có câu hỏi nào được tạo!
                                     </h2>
+                                )}
+
+                                {questions.length > itemsPerPage && (
+                                    <Center w="100%" mt={20} mx="auto">
+                                        <Pagination
+                                            mx="auto"
+                                            total={filteredQuestion.length}
+                                            color="green"
+                                            withEdges
+                                            value={currentPage}
+                                            onChange={handlePaginationChange}
+                                            itemsPerPage={itemsPerPage}
+                                        />
+                                    </Center>
                                 )}
                             </>
                         )}

@@ -39,6 +39,8 @@ public class Course implements Serializable {
 	private Integer numberSession;
 
 	private String image;
+	
+	private Boolean status;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "course")

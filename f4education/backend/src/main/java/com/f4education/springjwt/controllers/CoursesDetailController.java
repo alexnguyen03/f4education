@@ -149,9 +149,9 @@ public class CoursesDetailController {
 			List<CourseDetailDTO> saveList = new ArrayList<>();
 
 			Course course = courseRepository.findById(courseId).get();
-			if (dataList.size() < (course.getCourseDuration() / 2)) {
+			if (dataList.size() < (course.getCourseDuration() / 4)) {
 				System.out.println(dataList.size());
-				return ResponseEntity.badRequest().body("CourseDuration_ " + course.getCourseDuration());
+				return ResponseEntity.badRequest().body("CourseDuration_ " + (course.getCourseDuration() / 4));
 			} else {
 				for (List<Object> rowData : dataList) {
 					CourseDetailDTO courseDetail = new CourseDetailDTO();

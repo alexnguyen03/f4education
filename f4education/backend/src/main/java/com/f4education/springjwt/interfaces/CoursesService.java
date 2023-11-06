@@ -11,9 +11,9 @@ public interface CoursesService {
 
 	List<CourseResponse> findNewestCourse();
 
-	CourseResponse findCourseByCourseId(Integer courseId);
+	CourseResponse findCourseByCourseId(Integer courseId,String studentId);
 
-//	List<CourseDTO> findTop10SoldCourse();
+	List<CourseResponse> findTop10SoldCourse();
 
 	CourseDTO findById(Integer id);
 

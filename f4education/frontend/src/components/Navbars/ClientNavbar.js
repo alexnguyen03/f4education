@@ -38,7 +38,6 @@ import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 // API
 import cartApi from '../../api/cartApi'
 import courseApi from '../../api/courseApi'
-import { useCallback } from 'react'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -62,7 +61,7 @@ const ClientNavbar = () => {
     const [totalPrice, setTotalPrice] = useState(0)
     const [listCourse, setListCourse] = useState([])
 
-    const fetchCart = useCallback(async () => {
+    const fetchCart =async () => {
         if (user !== null) {
             try {
                 const resp = await cartApi.getAllCartByStudentId(user.username)
@@ -75,7 +74,7 @@ const ClientNavbar = () => {
         } else {
             setCarts([])
         }
-    },[user])
+    }
 
     const fetchCourse = async () => {
         try {
@@ -105,7 +104,7 @@ const ClientNavbar = () => {
 
     useEffect(() => {
         fetchCart()
-    }, [fetchCart])
+    }, [])
 
     // *************** CART VARIABLE - AREA END
     const handleItemClick = (index) => {
@@ -205,7 +204,7 @@ const ClientNavbar = () => {
                         </li>
                         <li className="nav-item">
                             <Link
-                                to={'/course'}
+                                to={'/courses'}
                                 className={`
                 ${
                     activeItems[1]

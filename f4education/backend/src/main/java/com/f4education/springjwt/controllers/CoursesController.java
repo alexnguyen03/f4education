@@ -58,21 +58,22 @@ public class CoursesController {
 	}
 
 	@GetMapping("/detail/{courseId}")
-	public ResponseEntity<?> getTopCourseDetailByCourseId(@PathVariable Integer courseId) {
-		CourseResponse course = courseService.findCourseByCourseId(courseId);
+	public ResponseEntity<?> getTopCourseDetailByCourseId(@PathVariable Integer courseId,
+			@RequestParam(value = "studentId") String studentId) {
+		CourseResponse course = courseService.findCourseByCourseId(courseId, studentId);
 
 		if (course == null) {
-			return ResponseEntity.noContent().build();		
+			return ResponseEntity.noContent().build();
 		}
 
 		return ResponseEntity.ok(course);
 	}
 
-//	@GetMapping("/top-selling")
-//	public ResponseEntity<?> getTop10SoldCourse() {
-//		List<CourseDTO> list = courseService.findTop10SoldCourse();
-//		return ResponseEntity.ok(list);
-//	}
+	@GetMapping("/top-selling")
+	public ResponseEntity<?> getTop10SoldCourse() {
+		List<CourseResponse> list = courseService.findTop10SoldCourse();
+		return ResponseEntity.ok(list);
+	}
 
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody

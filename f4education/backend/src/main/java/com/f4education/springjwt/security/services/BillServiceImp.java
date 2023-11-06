@@ -96,7 +96,7 @@ public class BillServiceImp implements BillService {
 
 	private Bill convertRequestToEntity(BillRequestDTO billRequestDTO) {
 		Bill bill = new Bill();
-
+		System.out.println(billRequestDTO);
 		PaymentMethod paymentMethod = paymentMethodRepository
 				.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
 		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();

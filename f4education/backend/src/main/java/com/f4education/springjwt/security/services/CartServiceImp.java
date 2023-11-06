@@ -39,7 +39,7 @@ public class CartServiceImp implements CartService {
 	@Override
 	public List<CartResponseDTO> findAllCartByStudentId(String studentId, boolean status) {
 		status = false; 
-		return cartRepository.findByStudentIdAndStatus(studentId, status).stream().map(this::convertToReponseDTO)
+		return cartRepository.findByStudentIdAndStatus(studentId, true).stream().map(this::convertToReponseDTO)
 				.collect(Collectors.toList());
 	}
 
@@ -60,7 +60,7 @@ public class CartServiceImp implements CartService {
 		Cart cart = this.convertRequestToEntity(cartRequestDTO);
 
 		cart.setCreateDate(new Date());
-		cart.setStatus(false);
+		cart.setStatus(true);
 
 		Cart newCart = cartRepository.save(cart);
 

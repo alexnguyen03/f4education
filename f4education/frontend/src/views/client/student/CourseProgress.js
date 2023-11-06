@@ -299,6 +299,7 @@ const CourseProgress = () => {
                                 mt={10}
                                 onClick={() => {
                                     setShowingDetail(false)
+                                    setSelectedCourse({})
                                 }}
                             >
                                 Trở về trang tổng quan
@@ -727,7 +728,7 @@ const CourseProgress = () => {
                                                         >
                                                             <strong>
                                                                 {
-                                                                    totalCountCourseProgress
+                                                                    progress.totalProgress
                                                                 }
                                                             </strong>{' '}
                                                             trên{' '}
@@ -738,9 +739,7 @@ const CourseProgress = () => {
                                                             </strong>{' '}
                                                             bài đã học.
                                                         </Text>
-                                                        {/* {fetchCourseProgressByClassId(
-                    course.classes.classId
-                )} */}
+                                                       
                                                         <Stack mt={8}>
                                                             <Text
                                                                 fw={'bolder'}
@@ -883,7 +882,7 @@ const CourseProgress = () => {
             </Box>
 
             {/* complete course */}
-            <Box my={rem('8rem')}>
+            <Box mt={rem('8rem')} pb={rem('2rem')}>
                 <Group position="apart" mb={'lg'}>
                     <Title order={2} color="dark" fw={700}>
                         Các khóa học đã hoàn thành

@@ -27,6 +27,10 @@ public class CourseResponse {
 	private Subject subject;
 
 	private String image;
+	
+	private Integer registerCourseId;
+	
+	private Boolean isPurchase;
 
 	private Float rating;
 

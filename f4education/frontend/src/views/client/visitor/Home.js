@@ -99,6 +99,7 @@ const mockdata = [
 const Home = () => {
     // Main Variable
     const [newestCourse, setNewestCourse] = useState([])
+    const [bestSellingCourse, setBestSellingCourse] = useState([])
     const [loading, setLoading] = useState(false)
     const [scroll, scrollTo] = useWindowScroll()
 
@@ -119,8 +120,123 @@ const Home = () => {
         }
     }
 
+    const fetchTopBestSellingCourse = async () => {
+        try {
+            setLoading(false)
+            const resp = await courseApi.getTopSellingCourse()
+
+            if (resp.status === 200 && resp.data.length > 0) {
+                setBestSellingCourse(resp.data)
+                console.log(resp.data)
+            } else {
+                console.log('cannot get data best selling')
+            }
+            setLoading(true)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     // learnext course Carousel
     const LearnNextSlides = newestCourse.map((learn, index) => (
+        <Carousel.Slide key={index}>
+            <HoverCard width={'95%'} shadow="md" position="bottom">
+                {/* Target Hover */}
+                {loading ? (
+                    <>
+                        <Card className="card-hover-overlay">
+                            <HoverCard.Target>
+                                <Card.Section>
+                                    <Link to={`/course/${learn.courseId}`}>
+                                        <Image
+                                            src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                                            fit="cover"
+                                            width={'100%'}
+                                            height={150}
+                                            radius="sm"
+                                            withPlaceholder
+                                        />
+                                    </Link>
+                                </Card.Section>
+                            </HoverCard.Target>
+
+                            <Box>
+                                <Text fw={500} lineClamp={1} fs="lg">
+                                    {learn.courseName}
+                                </Text>
+                                <Box>
+                                    <Flex justify="flex-start" gap="sm">
+                                        <Text>
+                                            {learn.rating === 'NaN'
+                                                ? 5
+                                                : learn.rating}
+                                        </Text>
+                                        <Group position="center">
+                                            <Rating
+                                                value={
+                                                    learn.rating === 'NaN'
+                                                        ? 5
+                                                        : learn.rating
+                                                }
+                                                fractions={2}
+                                                readOnly
+                                            />
+                                        </Group>
+                                        <Text c="dimmed">
+                                            ({learn.reviewNumber})
+                                        </Text>
+                                    </Flex>
+                                </Box>
+                                <Box>
+                                    <Text fw={500}>
+                                        {learn.coursePrice.toLocaleString(
+                                            'it-IT',
+                                            {
+                                                style: 'currency',
+                                                currency: 'VND'
+                                            }
+                                        )}
+                                    </Text>
+                                </Box>
+                            </Box>
+                        </Card>
+                    </>
+                ) : (
+                    <>
+                        <Skeleton height={200} radius="sm" mb="sm" />
+                        <Skeleton height={8} radius="xl" />
+                        <Skeleton height={8} radius="xl" />
+                        <Skeleton height={8} radius="xl" />
+                    </>
+                )}
+
+                {/* Value hover */}
+                <HoverCard.Dropdown mt={'-10px'}>
+                    <Button
+                        color="grape"
+                        variant="light"
+                        className="w-100"
+                        // onClick={() => handleAddCart(course)}
+                        leftIcon={<IconShoppingCartPlus size="1rem" />}
+                    >
+                        Thêm vào giỏ hàng
+                    </Button>
+                    <Text c="dimmed">
+                        Giá khóa học:
+                        <Text fw="500">
+                            {learn.coursePrice.toLocaleString('it-IT', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}
+                        </Text>
+                    </Text>
+                </HoverCard.Dropdown>
+            </HoverCard>
+        </Carousel.Slide>
+    ))
+    
+    // learnext course Carousel
+    const bestSellingslides = bestSellingCourse.map((learn, index) => (
         <Carousel.Slide key={index}>
             <HoverCard width={'95%'} shadow="md" position="bottom">
                 {/* Target Hover */}
@@ -282,12 +398,14 @@ const Home = () => {
     // UseEffect AREA
     useEffect(() => {
         fetchNewestCourse()
+        fetchTopBestSellingCourse()
     }, [])
 
     return (
         <>
             {/* Mantine Hero section */}
             <Container size="xl">
+                
                 <Group
                     className={classHeroText.wrapper}
                     size={1400}
@@ -496,7 +614,7 @@ const Home = () => {
                                 }
                             }}
                         >
-                            {LearnNextSlides}
+                            {bestSellingslides}
                         </Carousel>
                     </Box>
                 </Box>
@@ -533,6 +651,7 @@ const Home = () => {
                     </Box>
                 </Box>
             </Container>
+
             {/* Other section */}
             <Box my={rem('5rem')} bg="#10162f" p={rem('2rem')}>
                 <Container>
@@ -601,6 +720,7 @@ const Home = () => {
                 </Container>
             </Box>
 
+            {/* Sub Footer section */}
             <Box my={rem('5rem')} p={rem('2rem')}>
                 <Flex direction={'column'} justify="center" align={'center'}>
                     <Title order={1} color="dark" mx={'auto'}>
@@ -631,6 +751,7 @@ const Home = () => {
                 </Flex>
             </Box>
 
+            {/* Contact section */}
             <Box my={rem('5rem')} p={rem('2rem')}>
                 <Flex direction={'column'} justify="center" align={'center'}>
                     <Text

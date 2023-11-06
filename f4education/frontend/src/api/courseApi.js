@@ -54,8 +54,8 @@ const courseApi = {
         const url = `/courses/${subjectName}`
         return axiosClient.get(url)
     },
-    getCourseByCourseId: (courseId) => {
-        const url = `/courses/detail/${courseId}`
+    getCourseByCourseId: (courseId, studentId) => {
+        const url = `/courses/detail/${courseId}?studentId=${studentId}`
         return axiosClient.get(url)
     }
 }

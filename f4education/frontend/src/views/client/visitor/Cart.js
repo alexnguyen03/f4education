@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import {
     Breadcrumbs,
     Anchor,
@@ -63,6 +63,7 @@ function Cart() {
     // *************** Logic UI Variable
     const [totalPrice, setTotalPrice] = useState(0)
     let navigate = useNavigate()
+    const [searchParams] = useSearchParams()
 
     // *************** Fetch Area
     const fetchCart = async () => {
@@ -72,7 +73,7 @@ function Cart() {
             const resp = await cartApi.getAllCartByStudentId(user.username)
             if (resp.status === 200) {
                 setCarts(resp.data)
-            } 
+            }
             console.log(resp)
 
             setLoading(false)
@@ -133,7 +134,7 @@ function Cart() {
             toast.update(
                 id,
                 Notify.options.createErrorParam(
-                    'Chỉ thanh toán được một khóa học mỗi lần'
+                    'Vui chọn một khóa học để thanh toán'
                 )
             )
             return
@@ -146,14 +147,17 @@ function Cart() {
     }
 
     const handleAddCart = async (course) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         const cart = {
             courseId: course.courseId,
-            studentId: 1
+            studentId: user.username
         }
         try {
             await cartApi.createCart(cart)
+            toast.update(id, Notify.options.createSuccess())
             fetchCart()
         } catch (error) {
+            toast.update(id, Notify.options.createError())
             console.log(error)
         }
     }
@@ -215,7 +219,7 @@ function Cart() {
                     ) : (
                         <>
                             <Box>
-                                <Text color='dark' fw={500} lineClamp={1}>
+                                <Text color="dark" fw={500} lineClamp={1}>
                                     {course.courseName}
                                 </Text>
                                 <Box>
@@ -301,6 +305,10 @@ function Cart() {
             }))
         setSelectedCart(cartCheckout)
     }, [selectedItem])
+
+    useEffect(() => {
+        fetchCart()
+    }, [searchParams.get('checkoutComplete')])
 
     return (
         <>
@@ -411,12 +419,10 @@ function Cart() {
                                                                                 .courseName
                                                                         }
                                                                     </p>
-                                                                    <span className="text-muted">
-                                                                        {/* Môn học: <strong>{cart.subjectName}</strong> */}
+                                                                    {/* <span className="text-muted">
                                                                     </span>
                                                                     <div className="d-flex text-dark">
                                                                         <span className="font-weight-600">
-                                                                            {/* {cart.ratings} */}
                                                                             4.6
                                                                         </span>
                                                                         <div className="mx-2">
@@ -427,10 +433,9 @@ function Cart() {
                                                                             <i className="bx bx-star"></i>
                                                                         </div>
                                                                         <span className="text-muted">
-                                                                            {/* ({cart.reviews}) */}{' '}
                                                                             (39.930)
                                                                         </span>
-                                                                    </div>
+                                                                    </div> */}
                                                                     <div className="d-flex justify-content-start">
                                                                         <span className="text-muted">
                                                                             {
@@ -439,7 +444,7 @@ function Cart() {
                                                                                     .courseDuration
                                                                             }
                                                                         </span>
-                                                                        <span className="mx-2">
+                                                                        {/* <span className="mx-2">
                                                                             -
                                                                         </span>
                                                                         <span className="text-muted">
@@ -450,7 +455,7 @@ function Cart() {
                                                                             }{' '}
                                                                             bài
                                                                             giảng
-                                                                        </span>
+                                                                        </span> */}
                                                                         <span className="mx-2">
                                                                             -
                                                                         </span>

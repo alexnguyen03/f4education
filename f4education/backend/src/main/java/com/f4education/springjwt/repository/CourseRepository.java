@@ -2,21 +2,18 @@ package com.f4education.springjwt.repository;
 
 import java.util.List;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Course;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findAllByAdmin_AdminId(String adminId);
 
 	List<Course> findAllByCourseName(String courseName);
+
+	List<Course> findAllByStatus(Boolean status);
 
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName IN (:subjectNames)")
 	List<Course> findBySubjectNames(@Param("subjectNames") List<String> subjectNames);
@@ -29,11 +26,14 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "WHERE s.studentId IN :studentId AND r.classes.classId IS NULL")
 	List<Course> findByStudentId(@Param("studentId") String studentId);
 
-	@Query("SELECT c FROM Course c ORDER BY c.courseId DESC LIMIT 10")
-	List<Course> findTop10LatestCourses();
+	@Query("SELECT c FROM Course c WHERE c.status = :status ORDER BY c.courseId DESC LIMIT 10")
+	List<Course> findTop10LatestCourses(Boolean status);
 
-	@Query("SELECT c FROM Course c JOIN c.billDetail bd GROUP BY c.courseId,c.admin.adminId,c.courseDescription")
-	List<Course> findTopSellingCourses();
+	@Query(value = "SELECT TOP 10 c.*, bd.* FROM Course c "
+			+ "JOIN (SELECT bd1.course_id, SUM(bd1.total_price) AS total_sales "
+			+ "FROM BillDetail bd1 GROUP BY bd1.course_id) bd ON c.course_id = bd.course_id "
+			+ "WHERE c.status = :status " + "ORDER BY bd.total_sales DESC", nativeQuery = true)
+	List<Object[]> findTop10CoursesWithBillDetails(Boolean status);
 
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName = :subjectName")
 	List<Course> getCourseBySubjectName(@Param("subjectName") String subjectName);

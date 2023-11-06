@@ -117,6 +117,7 @@ const CoursesDetail = () => {
                             ' buổi học'
                     )
                 )
+                setLoadingDropZone(false)
             }
 
             if (resp.status === 200) {

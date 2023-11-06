@@ -54,6 +54,7 @@ public class EvaluateServiceImpl implements EvaluateService {
 
 	@Override
 	public EvaluateResponse createEvaluate(EvaluateRequestDTO evaluateDTO) {
+		System.out.println(evaluateDTO);
 		Evaluate evaluate = this.convertRequestToEntity(evaluateDTO);
 
 		if (evaluate != null) {

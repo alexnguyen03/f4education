@@ -30,6 +30,16 @@ import courseApi from '../../api/courseApi'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
+const formatCurrency = (amount) => {
+    const formatter = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0
+    })
+
+    return formatter.format(amount)
+}
+
 const Subjects = () => {
     const user = JSON.parse(localStorage.getItem('user'))
 
@@ -47,12 +57,6 @@ const Subjects = () => {
     const [ModalHistory, setModalHistory] = useState(false)
     const [loadingPopupHistory, setLoadingPopupHistory] = useState(false)
     const [courseBySubject, setCourseBySubject] = useState(false)
-    const [showNotification, setShowNotification] = useState({
-        status: false,
-        title: '',
-        message: '',
-        color: ''
-    })
     const [subjectLoading, setSubjectLoading] = useState(false)
     const [subjectNameRecent, setSubjectNameRecent] = useState('')
 
@@ -145,7 +149,6 @@ const Subjects = () => {
 
     // API_AREA > CRUD
     const handleCreateNewSubject = async () => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
         subject.adminId = user.username
 
         const lastSubject = subjects.slice(-1)[0]
@@ -162,6 +165,8 @@ const Subjects = () => {
         subject.subjectId = ''
         // const action = "add";
         if (validateForm()) {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
                 const body = subject
                 const resp = await subjectApi.createSubject(body)
@@ -182,8 +187,6 @@ const Subjects = () => {
     }
 
     const handleUpdateSubject = async () => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
         const newSubjects = [...subjects]
 
         const index = newSubjects.findIndex(
@@ -198,6 +201,8 @@ const Subjects = () => {
         setSubject(newSubjects[index])
 
         if (validateForm()) {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
                 subject.adminId = user.username
                 const body = subject
@@ -383,15 +388,6 @@ const Subjects = () => {
     }
 
     // *************** Subject History AREA
-    // const [subjectHistory] = useState({
-    //   subjectHistoryId: "",
-    //   action: "",
-    //   modifyDate: new Date(),
-    //   adminId: "",
-    //   subjectName: "",
-    //   subjectId: "",
-    // });
-
     // API
     const fetchSubjectHistory = async () => {
         try {
@@ -410,40 +406,11 @@ const Subjects = () => {
         }
     }
 
-    // API_AREA > CRUD
-    // const handleCreateNewSubjectHistory = async (subject, action) => {
-    //   try {
-    //     subjectHistory.subjectName = subject.subjectName;
-    //     subjectHistory.subjectId = subject.subjectId;
-    //     subjectHistory.action = action === "add" ? "CREATE" : "UPDATE";
-    //     subjectHistory.adminId = subject.adminId;
-
-    //     const body = subjectHistory;
-    //     console.log(body);
-    //     const resp = await subjectHistoryApi.createSubjectHistory(body);
-    //     console.log(resp.data);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    //   fetchSubjectHistory();
-    // };
-
     // *************** Use effect area
     useEffect(() => {
         fetchSubjects()
         fetchSubjectHistory()
     }, [])
-
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setShowNotification({
-                status: false,
-                title: '',
-                message: ''
-            })
-        }, 4000)
-        return () => clearTimeout(timeout)
-    }, [showNotification])
 
     return (
         <>
@@ -768,7 +735,6 @@ const Subjects = () => {
                                 </h4>
                                 <Button
                                     color="default"
-                                    outline
                                     data-dismiss="modal"
                                     type="button"
                                     onClick={() => {
@@ -818,16 +784,16 @@ const Subjects = () => {
                                                                             alt=""
                                                                             style={{
                                                                                 width: '100%',
-                                                                                height: '400px',
+                                                                                height: '250px',
                                                                                 objectFit:
                                                                                     'cover'
                                                                             }}
                                                                         />
-                                                                        <h3 className="font-weight-600 mt-2">
+                                                                        <h2 className="font-weight-600 mt-2">
                                                                             {
                                                                                 course.courseName
                                                                             }
-                                                                        </h3>
+                                                                        </h2>
                                                                         <div className="d-flex justify-content-start">
                                                                             <h4 className="text-muted">
                                                                                 <span className="mr-2">
@@ -837,9 +803,8 @@ const Subjects = () => {
                                                                                 <strong className="font-weight-500">
                                                                                     {
                                                                                         course.courseDuration
-                                                                                    }
-
-                                                                                    H
+                                                                                    }{' '}
+                                                                                    Giờ
                                                                                 </strong>
                                                                             </h4>
                                                                             <span className="font-weight-600 mx-3 mt--1">
@@ -851,16 +816,14 @@ const Subjects = () => {
                                                                                     khóa
                                                                                     học:
                                                                                 </span>
-                                                                                <strong className="text-danger font-weight-500">
+                                                                                <strong className="text-primary font-weight-700">
                                                                                     {
-                                                                                        course.coursePrice
+                                                                                        formatCurrency(course.coursePrice)
                                                                                     }
-
-                                                                                    đ
                                                                                 </strong>
                                                                             </h4>
                                                                         </div>
-                                                                        <hr className="text-muted" />
+                                                                        {/* <hr className="text-muted" /> */}
                                                                     </CardBody>
                                                                 </Card>
                                                             </Col>

@@ -24,30 +24,49 @@ import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
 @Service
 public class CourseServiceImpl implements CoursesService {
 	@Autowired
 	CourseRepository courseRepository;
+
 	@Autowired
 	AdminRepository adminRepository;
+
 	@Autowired
 	SubjectRepository subjectRepository;
+
 	@Autowired
 	CourseHistoryRepository courseHistoryRepository;
 
+	@Autowired
+	RegisterCourseRepository registerCourseRepository;
+
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+		return courseRepository.findAll().stream().map(this::convertEntityToDTO)
+				.collect(Collectors.toList());
 	}
 
 	@Override
-	public CourseResponse findCourseByCourseId(Integer courseId) {
+	public CourseResponse findCourseByCourseId(Integer courseId, String studentId) {
 		Optional<Course> course = courseRepository.findById(courseId);
 
+		Boolean isPurchase = false;
+		Integer registerCourseId = 0;
+		for (RegisterCourse rg : course.get().getRegisterCourses()) {
+			if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
+				isPurchase = true;
+			}
+			if (course.get().getCourseId().equals(rg.getCourse().getCourseId())) {
+				registerCourseId = rg.getRegisterCourseId();
+			}
+		}
+
 		if (course.isPresent()) {
-			return this.convertToResponseDTO(course.get());
+			return this.convertToResponseDTO(course.get(), isPurchase, registerCourseId);
 		}
 
 		return null;
@@ -55,15 +74,83 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseResponse> findNewestCourse() {
-		return courseRepository.findTop10LatestCourses().stream().map(this::convertToResponseDTO)
-				.collect(Collectors.toList());
+		List<Course> courses = courseRepository.findTop10LatestCourses(true);
+
+		List<CourseResponse> courseResponses = new ArrayList<>();
+
+		for (Course course : courses) {
+			CourseResponse courseResponse = convertToResponseDTO(course, false, null);
+			courseResponses.add(courseResponse);
+		}
+
+		return courseResponses;
 	}
 
-//	@Override
-//	public List<CourseDTO> findTop10SoldCourse() {
-//		return courseRepository.findTopSellingCourses().stream().map(this::convertEntityToDTO)
-//				.collect(Collectors.toList());
-//	}
+	@Override
+	public List<CourseResponse> findTop10SoldCourse() {
+		List<Object[]> list = courseRepository.findTop10CoursesWithBillDetails(true);
+
+		List<Course> courses = new ArrayList<>();
+
+		for (Object[] objArray : list) {
+			if (objArray.length >= 1) {
+				Course courseData = new Course();
+				courseData.setAdmin(null);
+				courseData.setBillDetail(null);
+				courseData.setCourseHistories(null);
+				courseData.setQuestions(null);
+				courseData.setResources(null);
+				courseData.setQuizResults(null);
+
+				courseData.setCourseId((Integer) objArray[0]);
+				courseData.setCourseName((String) objArray[1]);
+				Object value = objArray[2];
+				Float floatValue = null;
+
+				if (value != null) {
+					String stringValue = value.toString();
+
+					try {
+						floatValue = Float.parseFloat(stringValue);
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+				courseData.setCoursePrice(floatValue);
+				courseData.setCourseDuration((Integer) objArray[3]);
+				courseData.setCourseDescription((String) objArray[4]);
+				courseData.setNumberSession((Integer) objArray[5]);
+				courseData.setImage((String) objArray[6]);
+				Object subjectId = objArray[7];
+
+				Subject subject = null;
+				if (subjectId != null) {
+					Integer subjectIdvalue = Integer.parseInt(subjectId.toString());
+					try {
+						subject = subjectRepository.findById(subjectIdvalue).get();
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+				courseData.setSubject(subject);
+
+				List<RegisterCourse> rg = registerCourseRepository.findByCourseId((Integer) objArray[0]);
+				System.out.println(rg);
+				courseData.setRegisterCourses(rg);
+				courseData.setStatus((Boolean) objArray[9].toString().equals("1") ? true : false);
+
+				courses.add(courseData);
+			}
+		}
+		List<CourseResponse> courseResponses = new ArrayList<>();
+
+		for (Course course : courses) {
+			CourseResponse courseResponse = convertToResponseDTO(course, false, null);
+			courseResponses.add(courseResponse);
+		}
+
+		return courseResponses;
+	}
 
 	@Override
 	public CourseDTO findById(Integer id) {
@@ -101,10 +188,10 @@ public class CourseServiceImpl implements CoursesService {
 	private CourseDTO convertEntityToDTO(Course course) {
 		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
 				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
-				course.getSubject(), course.getImage());
+				course.getSubject(), course.getImage(), course.getStatus());
 	}
 
-	private CourseResponse convertToResponseDTO(Course course) {
+	private CourseResponse convertToResponseDTO(Course course, Boolean isPurchase, Integer registerCourseId) {
 		CourseResponse courseResponse = new CourseResponse();
 
 		BeanUtils.copyProperties(course, courseResponse);
@@ -114,6 +201,7 @@ public class CourseServiceImpl implements CoursesService {
 		Float totalRating = (float) 0;
 		List<Evaluate> evaluateList = new ArrayList<>();
 		List<Student> studentList = new ArrayList<>();
+
 		for (RegisterCourse rg : registerCourse) {
 			for (Evaluate evaluate : rg.getEvaluates()) {
 				totalRating += evaluate.getRating();
@@ -121,15 +209,17 @@ public class CourseServiceImpl implements CoursesService {
 			}
 			studentList.add(rg.getStudent());
 		}
-		
-		// Calculate value		
+
+		// Calculate value
 		Integer totalReview = evaluateList.size();
 		Integer totalStudent = studentList.size();
 		totalRating = totalRating / evaluateList.size();
-		
+
 		courseResponse.setRating(totalRating);
 		courseResponse.setReviewNumber(totalReview);
 		courseResponse.setTotalStudent(totalStudent);
+		courseResponse.setIsPurchase(isPurchase);
+		courseResponse.setRegisterCourseId(registerCourseId);
 
 		return courseResponse;
 	}
