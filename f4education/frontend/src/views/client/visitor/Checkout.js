@@ -342,7 +342,7 @@ const Checkout = () => {
             </div>
 
             {/* content */}
-            <div className="my-5">
+            <div className="mt-5 pb-5">
                 <Row>
                     {listCart !== null ? (
                         <>

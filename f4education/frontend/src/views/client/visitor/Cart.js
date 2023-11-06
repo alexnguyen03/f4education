@@ -337,7 +337,7 @@ function Cart() {
                     <>
                         {carts.length === 0 ? (
                             <>
-                                <Card className="w-100 shadow-lg">
+                                <Card className="w-100 shadow-lg mt-4">
                                     <Card.Section className="text-center">
                                         <img
                                             src={cartEmptyimage}
@@ -346,11 +346,11 @@ function Cart() {
                                             alt=""
                                             className="img-fluid"
                                         />
-                                        <h3 className="font-weight-800">
+                                        <h2 className="font-weight-700">
                                             Giỏ hàng của bạn trống. <br />
                                             Tiếp tục mua sắm để tìm một khóa học
                                             ưng ý!
-                                        </h3>
+                                        </h2>
                                         <Link to={'/course'}>
                                             <Button
                                                 color="violet"
@@ -438,11 +438,14 @@ function Cart() {
                                                                     </div> */}
                                                                     <div className="d-flex justify-content-start">
                                                                         <span className="text-muted">
+                                                                            Tổng{' '}
                                                                             {
                                                                                 cart
                                                                                     .course
                                                                                     .courseDuration
-                                                                            }
+                                                                            }{' '}
+                                                                            giờ
+                                                                            học
                                                                         </span>
                                                                         {/* <span className="mx-2">
                                                                             -
@@ -460,8 +463,9 @@ function Cart() {
                                                                             -
                                                                         </span>
                                                                         <span className="text-muted">
-                                                                            All
-                                                                            Levels
+                                                                            Mọi
+                                                                            mức
+                                                                            độ
                                                                         </span>
                                                                     </div>
                                                                 </Link>

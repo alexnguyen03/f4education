@@ -61,7 +61,7 @@ const ClientNavbar = () => {
     const [totalPrice, setTotalPrice] = useState(0)
     const [listCourse, setListCourse] = useState([])
 
-    const fetchCart =async () => {
+    const fetchCart = async () => {
         if (user !== null) {
             try {
                 const resp = await cartApi.getAllCartByStudentId(user.username)
@@ -600,36 +600,35 @@ const ClientNavbar = () => {
 
                                     <Menu.Dropdown>
                                         <Menu.Label>DASHBOARD</Menu.Label>
-                                        <Menu.Item
-                                            icon={
-                                                <IconLayoutDashboard
-                                                    size={14}
-                                                />
-                                            }
-                                        >
-                                            Hệ thống học tập
-                                        </Menu.Item>
-                                        <Link to="/course-progress">
+                                        <Link to="/student/classes">
                                             <Menu.Item
                                                 icon={
-                                                    <IconProgressAlert
+                                                    <IconLayoutDashboard
                                                         size={14}
                                                     />
                                                 }
                                             >
-                                                Tiến độ học tập
+                                                Hệ thống học tập
                                             </Menu.Item>
                                         </Link>
-                                        <Menu.Item
-                                            icon={<IconUserBolt size={14} />}
-                                        >
-                                            Tài khoản
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            icon={<IconSchoolBell size={14} />}
-                                        >
-                                            Lịch học
-                                        </Menu.Item>
+                                        <Link to="/student/classes">
+                                            <Menu.Item
+                                                icon={
+                                                    <IconUserBolt size={14} />
+                                                }
+                                            >
+                                                Tài khoản
+                                            </Menu.Item>
+                                        </Link>
+                                        <Link to="/student/classes">
+                                            <Menu.Item
+                                                icon={
+                                                    <IconSchoolBell size={14} />
+                                                }
+                                            >
+                                                Lịch học
+                                            </Menu.Item>
+                                        </Link>
 
                                         <Menu.Divider />
 

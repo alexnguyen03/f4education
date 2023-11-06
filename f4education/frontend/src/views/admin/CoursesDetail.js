@@ -70,7 +70,7 @@ const CoursesDetail = () => {
             const resp = await courseDetailApi.getAllByCourseId(params.courseId)
 
             if (resp.status === 200) {
-                setCourseDetail(resp.data.reverse())
+                setCourseDetail(resp.data)
                 setShowModal(false)
                 setLoading(false)
                 console.log('Fetch successfully')
