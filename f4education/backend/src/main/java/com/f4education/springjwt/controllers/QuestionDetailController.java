@@ -44,10 +44,10 @@ public class QuestionDetailController {
 	@Autowired
 	AnswerService answerService;
 
-	@GetMapping("/quizz/{studentId}")
+	@GetMapping("/quizz/{classId}")
 //	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getQuestionDetailsByStudentId(@PathVariable("studentId") String studentId) {
-		List<QuestionDetailClientDTO> questionDetailDTO = questionDetailService.getQuestionDetailsByStudentId(studentId);
+	public ResponseEntity<?> getQuestionDetailsByStudentId(@PathVariable("classId") Integer classId) {
+		List<QuestionDetailClientDTO> questionDetailDTO = questionDetailService.getQuestionDetailsByStudentId(classId);
 		return ResponseEntity.ok(questionDetailDTO);
 	}
 

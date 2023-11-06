@@ -19,10 +19,7 @@ public interface QuestionDetailReposotory extends JpaRepository<QuestionDetail, 
 	        "JOIN q.course c " +
 	        "JOIN c.registerCourses rc " +
 	        "JOIN q.examinations e " +
-	        "WHERE rc.student.studentId = :studentId " +
-	        "AND rc.course.courseId = q.course.courseId " +
-	        "AND rc.classes.classId IS NOT NULL " +
-//	        "AND e.finishDate = CURRENT_DATE "+
-	         "AND e.finishDate >= CURRENT_TIMESTAMP")
-	List<QuestionDetail> findQuestionDetailByStudentId(@Param("studentId") String studentId);
+	        "WHERE rc.course.courseId = q.course.courseId " +
+	        "AND rc.classes.classId = :classId")
+	List<QuestionDetail> findQuestionDetailByStudentId(@Param("classId") Integer classId);
 }

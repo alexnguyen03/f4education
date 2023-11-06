@@ -6,25 +6,17 @@ import {
     Radio,
     Button,
     Checkbox,
-    Grid,
-    Card,
-    Image,
-    Stack
+    Stack,
+    Title,
+    Modal
 } from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
-import moment from 'moment/moment'
 import { Link, useSearchParams } from 'react-router-dom'
 
 import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
-
-// SCSS
-import styles from '../../../assets/scss/custom-module-scss/client-custom/course-progress/CourseProgress.module.scss'
-
-// IMAGE PATH
-const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -78,74 +70,19 @@ function QuizzClient() {
                 }
             ],
             courseId: 0,
-            courseName: '',
-            classId: 0,
-            className: ''
+            classId: 0
         }
     ])
 
-    const [
-        questionDetailsByCourseAndClass,
-        setQuestionDetailsByCourseAndClass
-    ] = useState({})
-
-    const [statusQuizz, setStatusQuizz] = useState(true)
-
-    const getQuestionDetailsByStudentId = async () => {
+    const getQuestionDetailsByClassId = async () => {
         try {
-            const resp = await questionDetailApi.getQuestionDetailsByStudentId(
-                'loinvpc04549'
+            const resp = await questionDetailApi.getQuestionDetailsByClassId(
+                searchParams.get('classId')
             )
             if (resp.status === 200 && resp.data.length > 0) {
                 setQuestionDetail(resp.data)
-
-                const questionDetails = resp.data
-
-                // Tạo một đối tượng trống để chứa câu hỏi theo lớp và khóa học
-                const questionDetailsByCourseAndClass = {}
-
-                // Lặp qua từng câu hỏi
-                questionDetails.forEach((question) => {
-                    const courseId = question.courseId
-                    const courseName = question.courseName
-                    const classId = question.classId
-                    const className = question.className
-
-                    // Kiểm tra xem khóa học đã tồn tại trong đối tượng chưa
-                    if (!questionDetailsByCourseAndClass[courseId]) {
-                        questionDetailsByCourseAndClass[courseId] = {
-                            courseName,
-                            classes: {}
-                        }
-                    }
-
-                    // Kiểm tra xem lớp đã tồn tại trong khóa học chưa
-                    if (
-                        !questionDetailsByCourseAndClass[courseId].classes[
-                            classId
-                        ]
-                    ) {
-                        questionDetailsByCourseAndClass[courseId].classes[
-                            classId
-                        ] = {
-                            className,
-                            questions: []
-                        }
-                    }
-
-                    // Thêm câu hỏi vào lớp
-                    questionDetailsByCourseAndClass[courseId].classes[
-                        classId
-                    ].questions.push(question)
-                })
-
-                console.log(questionDetailsByCourseAndClass)
-                setQuestionDetailsByCourseAndClass(
-                    questionDetailsByCourseAndClass
-                )
                 startTimer()
             } else {
-                setStatusQuizz(false)
             }
         } catch (error) {
             console.log(error)
@@ -221,7 +158,7 @@ function QuizzClient() {
     const [quizzResultRequest, setQuizResultRequest] = useState({
         quizzId: 0,
         score: 0,
-        duration: '',
+        duration: 0,
         quizzDate: '',
         courseId: 0,
         classId: 0,
@@ -236,16 +173,18 @@ function QuizzClient() {
 
     const handleFinish = () => {
         setIsFinished(true)
-        const minutes = Math.floor(elapsedTime / 60)
-        const seconds = elapsedTime % 60
-        let formattedTime = ''
-        if (minutes === 0) {
-            formattedTime = `${seconds} giây`
-        } else {
-            formattedTime = `${minutes} phút ${
-                seconds < 10 ? '0' : ''
-            }${seconds} giây`
-        }
+        // const minutes = Math.floor(elapsedTime / 60)
+        // const seconds = elapsedTime % 60
+        // let formattedTime = ''
+        // if (minutes === 0) {
+        //     formattedTime = `${seconds} giây`
+        // } else {
+        //     formattedTime = `${minutes} phút ${
+        //         seconds < 10 ? '0' : ''
+        //     }${seconds} giây`
+        // }
+
+        console.log(elapsedTime)
 
         console.log(selectedAnswers)
 
@@ -280,7 +219,7 @@ function QuizzClient() {
                     selectedCorrectAnswers.length ===
                         selectedAnswers.answerId.length
                 ) {
-                    totalScoreCheckbox += 1
+                    totalScoreCheckbox += 0.5
                 }
             } else {
                 const foundQuestionDetail = findAnswer(
@@ -290,14 +229,14 @@ function QuizzClient() {
                 console.log(foundQuestionDetail)
 
                 if (foundQuestionDetail.isCorrect === true) {
-                    totalScoreRadio += 1
+                    totalScoreRadio += 0.5
                 }
             }
         })
 
         console.log(`Tổng điểm số radio: ${totalScoreRadio}`)
         console.log(`Tổng điểm số checkbox: ${totalScoreCheckbox}`)
-        addQuizzResult(formattedTime, totalScoreCheckbox + totalScoreRadio)
+        addQuizzResult(elapsedTime, totalScoreCheckbox + totalScoreRadio)
     }
 
     const findAnswer = (questionDetailId, answerId) => {
@@ -314,12 +253,12 @@ function QuizzClient() {
         return null
     }
 
-    const addQuizzResult = async (formattedTime, score) => {
+    const addQuizzResult = async (elapsedTime, score) => {
         const courseId = questionDetail[0].courseId
         const classId = questionDetail[0].classId
         const quizzResultRequest = {
             score: score,
-            duration: formattedTime,
+            duration: elapsedTime,
             quizzDate: new Date(),
             courseId: courseId,
             classId: classId,
@@ -327,19 +266,26 @@ function QuizzClient() {
         }
         console.log(quizzResultRequest)
         try {
-            // const resp = await quizzResultApi.createQuizzResult(
-            //     quizzResultRequest
-            // )
-            // if (resp.status === 200) {
-            //     alert('Thêm thành công')
-            // }
+            const resp = await quizzResultApi.createQuizzResult(
+                quizzResultRequest
+            )
         } catch (error) {
             console.log('Thêm lỗi', error)
         }
     }
 
+    const [open, setOpen] = useState(false)
+
+    const openModal = () => {
+        setOpen(true)
+    }
+
+    const closeModal = () => {
+        setOpen(false)
+    }
+
     useEffect(() => {
-        getQuestionDetailsByStudentId()
+        getQuestionDetailsByClassId()
     }, [])
 
     return (
@@ -351,237 +297,242 @@ function QuizzClient() {
             >
                 {itemsBreadcum}
             </Breadcrumbs>
-            {statusQuizz === false && (
-                <div className="text-center">
-                    <h1>Quizz hiện tại chưa được mở</h1>
-                    <Link to="/student/classes">
-                        <Button color="violet" size="lg">
-                            Quay lại
-                        </Button>
-                    </Link>
-                </div>
-            )}
-            {questionDetailsByCourseAndClass[searchParams.get('courseId')] ===
-                undefined &&
-                showQuestion === true && (
-                    <div className="text-center">
-                        <h1>Quizz hiện tại chưa được mở</h1>
-                        <Link to="/student/classes">
-                            <Button color="violet" size="lg">
-                                Quay lại
-                            </Button>
-                        </Link>
-                    </div>
-                )}
-            {showQuestion === true &&
-                questionDetailsByCourseAndClass[
-                    searchParams.get('courseId')
-                ] !== undefined && (
-                    <div className="container">
-                        <div className="row">
-                            <div className="col-lg-12 mx-auto rounded">
-                                <div class="d-flex justify-content-between">
-                                    <QuizIcon
-                                        className="rounded-circle p-3"
-                                        style={{
-                                            backgroundColor: 'white',
-                                            fontSize: 100,
-                                            color: '#34A633',
-                                            marginLeft: 100
-                                        }}
-                                    />
-                                    <div
-                                        style={{
-                                            width: 250,
-                                            margin: 'auto',
-                                            backgroundColor: 'white',
-                                            marginLeft: 220,
-                                            borderRadius: '10px'
-                                        }}
-                                    >
-                                        <p className="text-center text-success p-2">
-                                            <span className="display-4">
-                                                Thời gian còn lại
-                                            </span>
-                                            <br />
-                                            <span className="display-2">
-                                                {seconds > 10
-                                                    ? `0${minutes}`
-                                                    : minutes}
-                                            </span>
-                                            <span className="display-2">
-                                                :
-                                                {seconds < 10
-                                                    ? `0${seconds}`
-                                                    : seconds}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <QuestionMarkIcon
-                                        className="rounded-circle p-3"
-                                        style={{
-                                            backgroundColor: 'white',
-                                            fontSize: 100,
-                                            color: '#34A633',
-                                            marginRight: 100
-                                        }}
-                                    />
+            {showQuestion === true ? (
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-12 mx-auto rounded">
+                            <div class="d-flex justify-content-between">
+                                <QuizIcon
+                                    className="rounded-circle p-3"
+                                    style={{
+                                        backgroundColor: 'white',
+                                        fontSize: 100,
+                                        color: '#34A633',
+                                        marginLeft: 100
+                                    }}
+                                />
+                                <div
+                                    style={{
+                                        width: 250,
+                                        margin: 'auto',
+                                        backgroundColor: 'white',
+                                        marginLeft: 220,
+                                        borderRadius: '10px'
+                                    }}
+                                >
+                                    <p className="text-center text-success p-2">
+                                        <span className="display-4">
+                                            Thời gian còn lại
+                                        </span>
+                                        <br />
+                                        <span className="display-2">
+                                            {seconds > 10
+                                                ? `0${minutes}`
+                                                : minutes}
+                                        </span>
+                                        <span className="display-2">
+                                            :
+                                            {seconds < 10
+                                                ? `0${seconds}`
+                                                : seconds}
+                                        </span>
+                                    </p>
                                 </div>
-                                <div className="container">
-                                    <div
-                                        className="row my-4"
-                                        style={{
-                                            minHeight: 300,
-                                            backgroundColor: '#ebebeb',
-                                            borderRadius: '10px',
-                                            marginLeft: 2,
-                                            marginRight: 2
-                                        }}
-                                    >
-                                        <h1 className="display-2 text-dark mx-auto mt-3">
-                                            Quiz 1
-                                        </h1>
-                                        {questionDetailsByCourseAndClass[
-                                            searchParams.get('courseId')
-                                        ]?.classes[
-                                            searchParams.get('classId')
-                                        ].questions.map(
-                                            (question, indexQuestion) => (
-                                                <div
-                                                    className="col-lg-12"
-                                                    key={
-                                                        question.questionDetailId
-                                                    }
-                                                >
-                                                    <div className="d-flex bd-highlight p-3">
-                                                        <div className="p-2 w-100">
-                                                            <h2 className="text-dark mt-3">
-                                                                {indexQuestion +
-                                                                    1}
-                                                                .{' '}
-                                                                {
-                                                                    question.questionTitle
-                                                                }
-                                                                ?
-                                                            </h2>
-                                                            <h4 className="text-muted mt-3">
-                                                                {question.answer.filter(
-                                                                    (answer) =>
-                                                                        answer.isCorrect ===
-                                                                        true
-                                                                ).length >= 2
-                                                                    ? `Chọn tối đa ${
-                                                                          question.answer.filter(
-                                                                              (
-                                                                                  answer
-                                                                              ) =>
-                                                                                  answer.isCorrect ===
-                                                                                  true
-                                                                          )
-                                                                              .length
-                                                                      } đáp án`
-                                                                    : ''}
-                                                            </h4>
-                                                        </div>
-                                                    </div>
-                                                    <div className="container mt-2 mb-3">
-                                                        <div className="row">
-                                                            {question.answer.map(
-                                                                (
-                                                                    answer,
-                                                                    indexAnswer
-                                                                ) => (
-                                                                    <div
-                                                                        className="col-md-6"
-                                                                        key={
-                                                                            indexAnswer
-                                                                        }
-                                                                    >
-                                                                        {question.answer.filter(
-                                                                            (
-                                                                                answer
-                                                                            ) =>
-                                                                                answer.isCorrect ===
-                                                                                true
-                                                                        )
-                                                                            .length >=
-                                                                        2 ? (
-                                                                            <Checkbox
-                                                                                className="bg-white mb-3 p-2 pt-3 pl-3"
-                                                                                id={
-                                                                                    answer.answerId
-                                                                                }
-                                                                                name={
-                                                                                    question.questionDetailId
-                                                                                }
-                                                                                value={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                label={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                onChange={() =>
-                                                                                    handleAnswerSelect(
-                                                                                        question.questionDetailId,
-                                                                                        answer.answerId,
-                                                                                        'checkbox'
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        ) : (
-                                                                            <Radio
-                                                                                className="bg-white mb-3 p-2 pt-3 pl-3"
-                                                                                id={
-                                                                                    answer.answerId
-                                                                                }
-                                                                                name={
-                                                                                    question.questionDetailId
-                                                                                }
-                                                                                value={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                label={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                onChange={() =>
-                                                                                    handleAnswerSelect(
-                                                                                        question.questionDetailId,
-                                                                                        answer.answerId,
-                                                                                        'radio'
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                )
-                                                            )}
-                                                        </div>
+                                <QuestionMarkIcon
+                                    className="rounded-circle p-3"
+                                    style={{
+                                        backgroundColor: 'white',
+                                        fontSize: 100,
+                                        color: '#34A633',
+                                        marginRight: 100
+                                    }}
+                                />
+                            </div>
+                            <div className="container">
+                                <div
+                                    className="row my-4"
+                                    style={{
+                                        minHeight: 300,
+                                        backgroundColor: '#ebebeb',
+                                        borderRadius: '10px',
+                                        marginLeft: 2,
+                                        marginRight: 2
+                                    }}
+                                >
+                                    <h1 className="display-2 text-dark mx-auto mt-3">
+                                        Quiz 1
+                                    </h1>
+                                    {questionDetail.map(
+                                        (question, indexQuestion) => (
+                                            <div
+                                                className="col-lg-12"
+                                                key={question.questionDetailId}
+                                            >
+                                                <div className="d-flex bd-highlight p-3">
+                                                    <div className="p-2 w-100">
+                                                        <h2 className="text-dark mt-3">
+                                                            {indexQuestion + 1}.{' '}
+                                                            {
+                                                                question.questionTitle
+                                                            }
+                                                            ?
+                                                        </h2>
+                                                        <h4 className="text-muted mt-3">
+                                                            {question.answer.filter(
+                                                                (answer) =>
+                                                                    answer.isCorrect ===
+                                                                    true
+                                                            ).length >= 2
+                                                                ? `Chọn tối đa ${
+                                                                      question.answer.filter(
+                                                                          (
+                                                                              answer
+                                                                          ) =>
+                                                                              answer.isCorrect ===
+                                                                              true
+                                                                      ).length
+                                                                  } đáp án`
+                                                                : ''}
+                                                        </h4>
                                                     </div>
                                                 </div>
-                                            )
-                                        )}
-                                    </div>
-                                    <Button
-                                        variant="gradient"
-                                        gradient={{
-                                            from: 'blue',
-                                            to: 'violet',
-                                            deg: 90
-                                        }}
-                                        w={200}
-                                        size="md"
-                                        fw={'bold'}
-                                        mb={50}
-                                        fz={'lg'}
-                                        onClick={handleFinish}
-                                    >
-                                        Nộp bài
-                                    </Button>
+                                                <div className="container mt-2 mb-3">
+                                                    <div className="row">
+                                                        {question.answer.map(
+                                                            (
+                                                                answer,
+                                                                indexAnswer
+                                                            ) => (
+                                                                <div
+                                                                    className="col-md-6"
+                                                                    key={
+                                                                        indexAnswer
+                                                                    }
+                                                                >
+                                                                    {question.answer.filter(
+                                                                        (
+                                                                            answer
+                                                                        ) =>
+                                                                            answer.isCorrect ===
+                                                                            true
+                                                                    ).length >=
+                                                                    2 ? (
+                                                                        <Checkbox
+                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
+                                                                            id={
+                                                                                answer.answerId
+                                                                            }
+                                                                            name={
+                                                                                question.questionDetailId
+                                                                            }
+                                                                            value={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            label={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            onChange={() =>
+                                                                                handleAnswerSelect(
+                                                                                    question.questionDetailId,
+                                                                                    answer.answerId,
+                                                                                    'checkbox'
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <Radio
+                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
+                                                                            id={
+                                                                                answer.answerId
+                                                                            }
+                                                                            name={
+                                                                                question.questionDetailId
+                                                                            }
+                                                                            value={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            label={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            onChange={() =>
+                                                                                handleAnswerSelect(
+                                                                                    question.questionDetailId,
+                                                                                    answer.answerId,
+                                                                                    'radio'
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    )}
                                 </div>
+                                <Button
+                                    variant="gradient"
+                                    gradient={{
+                                        from: 'blue',
+                                        to: 'violet',
+                                        deg: 90
+                                    }}
+                                    w={200}
+                                    size="md"
+                                    fw={'bold'}
+                                    mb={50}
+                                    fz={'lg'}
+                                    onClick={openModal}
+                                >
+                                    Nộp bài
+                                </Button>
+                                <Modal
+                                    opened={open}
+                                    onClose={closeModal}
+                                    title="Thông báo"
+                                >
+                                    <Text size="lg">
+                                        Bạn có chắc chắn muốn nộp bài ???
+                                    </Text>
+                                    <Link to="/student/classes">
+                                        <Button
+                                            onClick={() => {
+                                                closeModal()
+                                                handleFinish()
+                                            }}
+                                            className="float-right"
+                                            mt={30}
+                                        >
+                                            Nộp bài
+                                        </Button>
+                                    </Link>
+                                    <Button
+                                        onClick={closeModal}
+                                        color="red"
+                                        mr={10}
+                                        mb={20}
+                                        mt={30}
+                                        className="float-right"
+                                    >
+                                        Hủy
+                                    </Button>
+                                </Modal>
                             </div>
                         </div>
                     </div>
-                )}
+                </div>
+            ) : (
+                <Stack mt={250} mx="auto" align="center">
+                    <Title order={2} color="dark">
+                        <Loader color="rgba(46, 46, 46, 1)" />
+                    </Title>
+                    <Text c="dimmed" fz="lg">
+                        Vui lòng chờ trong giây lát...
+                    </Text>
+                </Stack>
+            )}
         </>
     )
 }

@@ -23,11 +23,7 @@ public class QuestionDetailClientDTO {
 
 	private Integer courseId;
 
-	private String courseName;
-
 	private Integer classId;
-
-	private String className;
 
 	private List<Answer> answer;
 

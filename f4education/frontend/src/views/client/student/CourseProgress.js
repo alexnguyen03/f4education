@@ -66,7 +66,7 @@ const CourseProgress = () => {
             setLoading(true)
 
             const resp = await registerCoursecAPI.getAllCourseProgress(
-                user.username
+               'loinvpc04549'
             )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
@@ -155,7 +155,6 @@ const CourseProgress = () => {
         navigate({
             pathname: '/student/quizz',
             search: `?${createSearchParams({
-                courseId: courseId,
                 classId: classId
             })}`
         })

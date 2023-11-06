@@ -3,6 +3,7 @@ package com.f4education.springjwt.security.services;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,10 +35,17 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 	AnswerReposotory answerReposotory;
 
 	@Override
-	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(String studentId) {
-		List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(studentId);
+	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId) {
+		List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(classId);
 		System.out.println(questionDetail);
-		return questionDetail.stream().map(this::convertToDto).collect(Collectors.toList());
+		// Xáo trộn các phần tử trong danh sách
+	    Collections.shuffle(questionDetail);
+	    
+	    // Lấy 20 phần tử đầu tiên
+	    List<QuestionDetail> randomQuestions = questionDetail.subList(0, Math.min(questionDetail.size(), 20));
+	    System.out.println(randomQuestions);
+	    
+		return randomQuestions.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
 	private QuestionDetailClientDTO convertToDto(QuestionDetail questionDetail) {
@@ -45,12 +53,8 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 		BeanUtils.copyProperties(questionDetail, questionDetailClientDTO);
 		questionDetailClientDTO.setAnswer(questionDetail.getAnswers());
 		questionDetailClientDTO.setCourseId(questionDetail.getQuestion().getCourse().getCourseId());
-		questionDetailClientDTO.setCourseName(questionDetail.getQuestion().getCourse().getCourseName());
 		questionDetailClientDTO.setClassId(
 				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassId());
-		questionDetailClientDTO.setClassName(
-				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassName());
-
 		return questionDetailClientDTO;
 	}
 
