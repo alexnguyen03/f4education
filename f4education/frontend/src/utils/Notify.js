@@ -51,6 +51,13 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        createSuccessParam: (msg) => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: msg,
+                ...defaultOptions
+            }
+        },
         createError: () => {
             return {
                 type: toast.TYPE.ERROR,

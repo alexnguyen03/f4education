@@ -17,6 +17,8 @@ public class EvaluateResponse {
 	private Float rating;
 
 	private String content;
+	
+	private String studentId;
 
 	private String studentName;
 

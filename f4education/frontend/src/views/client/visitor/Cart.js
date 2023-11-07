@@ -56,7 +56,6 @@ function Cart() {
     const [loading, setLoading] = useState(false)
     const [selectedItem, setSelectedItem] = useState(null)
     const [selectedCart, setSelectedCart] = useState({
-        cartId: '',
         course: ''
     })
 
@@ -70,11 +69,9 @@ function Cart() {
         setLoading(true)
 
         try {
-            const resp = await cartApi.getAllCartByStudentId(user.username)
-            if (resp.status === 200) {
-                setCarts(resp.data)
-            }
-            console.log(resp)
+            const userCart = JSON.parse(localStorage.getItem('userCart')) || []
+            console.log(userCart)
+            setCarts(userCart)
 
             setLoading(false)
         } catch (error) {
@@ -100,61 +97,95 @@ function Cart() {
     }
 
     // *************** Fetch Area > CRUD
-    const handleRemoveCart = async (cartId, e) => {
+    const handleRemoveCart = async (courseId, e) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
         e.preventDefault()
         try {
             const updateCarts = [...carts]
             const indexToDelete = updateCarts.findIndex(
-                (cart) => cart.cartId === cartId
+                (cart) => cart.course.courseId === courseId
             )
             if (indexToDelete !== -1) {
                 updateCarts.splice(indexToDelete, 1)
             }
+
             setCarts(updateCarts)
 
-            const resp = await cartApi.removeCart(cartId)
+            const userCart = JSON.parse(localStorage.getItem('userCart')) || []
 
-            if (resp.status === 204) {
-                toast.update(id, Notify.options.deleteSuccess())
-            } else {
-                toast.update(id, Notify.options.deleteError())
+            if (userCart !== null) {
+                const indexToDelete = userCart.findIndex(
+                    (cart) => cart.course.courseId === courseId
+                )
+
+                if (indexToDelete !== -1) {
+                    userCart.splice(indexToDelete, 1)
+                    localStorage.setItem('userCart', JSON.stringify(userCart))
+                }
             }
 
+            console.log(userCart)
+
+            toast.update(id, Notify.options.deleteSuccess())
             console.log('remove successfully')
         } catch (error) {
             console.log(error)
+            toast.update(id, Notify.options.deleteError())
         }
     }
 
     // *************** Action && Logic UI
     const handleCheckOut = async () => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
-        if (selectedItem === null) {
+
+        if (user === null) {
             toast.update(
                 id,
                 Notify.options.createErrorParam(
-                    'Vui chọn một khóa học để thanh toán'
+                    'Vui lòng đăng nhập trước khi thanh toán'
                 )
             )
             return
         }
-        // store cart to localstorage
-        else {
+
+        if (selectedItem === null) {
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Vui lòng chọn một khóa học để thanh toán'
+                )
+            )
+            return
+        } else {
+            // store cart to localstorage
             localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
             return navigate('/payment/checkout')
         }
     }
 
-    const handleAddCart = async (course) => {
+    const handleAddCart = (course) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
-        const cart = {
-            courseId: course.courseId,
-            studentId: user.username
-        }
+
         try {
-            await cartApi.createCart(cart)
-            toast.update(id, Notify.options.createSuccess())
+            const userCart = JSON.parse(localStorage.getItem('userCart')) || []
+
+            const cart = {
+                course: course
+            }
+
+            userCart.push(cart)
+
+            localStorage.setItem('userCart', JSON.stringify(userCart))
+
+            console.log(userCart)
+
+            toast.update(
+                id,
+                Notify.options.createSuccessParam(
+                    'Thêm vào giỏ hàng thành công'
+                )
+            )
+
             fetchCart()
         } catch (error) {
             toast.update(id, Notify.options.createError())
@@ -166,7 +197,7 @@ function Cart() {
         // get Total Price from list totalCartItem
         let newTotalPrice = 0
         carts.length > 0 &&
-            carts.map((item) => (newTotalPrice += item.course.coursePrice))
+            carts.forEach((item) => (newTotalPrice += item.course.coursePrice))
         setTotalPrice(newTotalPrice)
     }, [carts, loading])
 
@@ -176,9 +207,9 @@ function Cart() {
         fetchNewsetCourse()
     }, [])
 
-    const slides = newestCourse.map((course) => (
+    const slides = newestCourse.map((course, index) => (
         <Carousel.Slide
-            key={course.courseId}
+            key={index}
             style={{
                 overflow: 'visible'
             }}
@@ -285,24 +316,26 @@ function Cart() {
         </Carousel.Slide>
     ))
 
-    const handleCheckboxChange = (cartId) => {
-        if (selectedItem === cartId) {
+    const handleCheckboxChange = (courseId) => {
+        if (selectedItem === courseId) {
             setSelectedItem(null)
         } else if (selectedItem !== null) {
-            alert('error choose just 1 course at time')
-            return console.log('Chỉ được chọn duy nhất 1 khóa học')
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Chỉ thanh toán được một lần một khóa học'
+                )
+            )
         } else {
-            setSelectedItem(cartId)
+            setSelectedItem(courseId)
         }
     }
 
     useEffect(() => {
-        const cartCheckout = carts
-            .filter((cart) => cart.cartId === selectedItem)
-            .map((cart) => ({
-                cartId: cart.cartId,
-                course: cart.course
-            }))
+        const cartCheckout = carts.filter(
+            (cart) => cart.course.courseId === selectedItem
+        )
         setSelectedCart(cartCheckout)
     }, [selectedItem])
 
@@ -412,56 +445,97 @@ function Cart() {
                                                                     to={`/course/${cart.course.courseId}`}
                                                                     key={index}
                                                                 >
-                                                                    <p className="font-weight-700 text-dark m-0 p-0">
+                                                                    <p
+                                                                        className="font-weight-700 text-dark m-0 p-0"
+                                                                        style={{
+                                                                            maxWidth:
+                                                                                '400px'
+                                                                        }}
+                                                                    >
                                                                         {
                                                                             cart
                                                                                 .course
                                                                                 .courseName
                                                                         }
                                                                     </p>
-                                                                    {/* <span className="text-muted">
-                                                                    </span>
+                                                                    <span className="text-muted"></span>
                                                                     <div className="d-flex text-dark">
                                                                         <span className="font-weight-600">
-                                                                            4.6
+                                                                            {cart
+                                                                                .course
+                                                                                .rating ===
+                                                                            'NaN'
+                                                                                ? 5
+                                                                                : parseFloat(
+                                                                                      cart
+                                                                                          .course
+                                                                                          .rating
+                                                                                  ).toFixed(
+                                                                                      1
+                                                                                  )}
                                                                         </span>
                                                                         <div className="mx-2">
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bxs-star text-warning"></i>
-                                                                            <i className="bx bx-star"></i>
+                                                                            <Rating
+                                                                                fractions={
+                                                                                    2
+                                                                                }
+                                                                                defaultValue={
+                                                                                    5
+                                                                                }
+                                                                                value={
+                                                                                    cart
+                                                                                        .course
+                                                                                        .rating ===
+                                                                                    'NaN'
+                                                                                        ? 5
+                                                                                        : parseFloat(
+                                                                                              cart
+                                                                                                  .course
+                                                                                                  .rating
+                                                                                          ).toFixed(
+                                                                                              1
+                                                                                          )
+                                                                                }
+                                                                                readOnly
+                                                                            />
                                                                         </div>
                                                                         <span className="text-muted">
-                                                                            (39.930)
+                                                                            (
+                                                                            {
+                                                                                cart
+                                                                                    .course
+                                                                                    .reviewNumber
+                                                                            }{' '}
+                                                                            đánh
+                                                                            giá)
+                                                                            - từ{' '}
+                                                                            {
+                                                                                cart
+                                                                                    .course
+                                                                                    .totalStudent
+                                                                            }{' '}
+                                                                            học
+                                                                            viên
                                                                         </span>
-                                                                    </div> */}
+                                                                    </div>
                                                                     <div className="d-flex justify-content-start">
                                                                         <span className="text-muted">
+                                                                            Tổng{' '}
                                                                             {
                                                                                 cart
                                                                                     .course
                                                                                     .courseDuration
-                                                                            }
-                                                                        </span>
-                                                                        {/* <span className="mx-2">
-                                                                            -
-                                                                        </span>
-                                                                        <span className="text-muted">
-                                                                            {
-                                                                                cart
-                                                                                    .course
-                                                                                    .numberSession
                                                                             }{' '}
-                                                                            bài
-                                                                            giảng
-                                                                        </span> */}
+                                                                            Giờ
+                                                                            học
+                                                                        </span>
                                                                         <span className="mx-2">
                                                                             -
                                                                         </span>
                                                                         <span className="text-muted">
-                                                                            All
-                                                                            Levels
+                                                                            Mọi
+                                                                            trình
+                                                                            độ
                                                                         </span>
                                                                     </div>
                                                                 </Link>
@@ -480,7 +554,9 @@ function Cart() {
                                                                             e
                                                                         ) => {
                                                                             handleRemoveCart(
-                                                                                cart.cartId,
+                                                                                cart
+                                                                                    .course
+                                                                                    .courseId,
                                                                                 e
                                                                             )
                                                                         }}
@@ -521,20 +597,24 @@ function Cart() {
                                                                         color="violet"
                                                                         checked={
                                                                             selectedItem ===
-                                                                            cart.cartId
+                                                                            cart
+                                                                                .course
+                                                                                .courseId
                                                                         }
                                                                         onChange={() =>
                                                                             handleCheckboxChange(
-                                                                                cart.cartId
+                                                                                cart
+                                                                                    .course
+                                                                                    .courseId
                                                                             )
                                                                         }
                                                                     />
                                                                 </div>
                                                             </Grid.Col>
                                                         </Grid>
-                                                        <hr className="text-muted" />
                                                     </Grid.Col>
                                                 </Grid>
+                                                <hr className="text-muted" />
                                             </>
                                         ))}
                                     </Grid.Col>

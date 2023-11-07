@@ -59,8 +59,8 @@ public class CoursesController {
 
 	@GetMapping("/detail/{courseId}")
 	public ResponseEntity<?> getTopCourseDetailByCourseId(@PathVariable Integer courseId,
-			@RequestParam(value = "studentId") String studentId) {
-		CourseResponse course = courseService.findCourseByCourseId(courseId, studentId);
+			@RequestParam(value = "studentId") Optional<String> studentId) {
+		CourseResponse course = courseService.findCourseByCourseId(courseId, studentId.get());
 
 		if (course == null) {
 			return ResponseEntity.noContent().build();

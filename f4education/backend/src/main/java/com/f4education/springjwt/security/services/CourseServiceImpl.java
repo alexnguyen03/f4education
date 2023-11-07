@@ -46,8 +46,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll().stream().map(this::convertEntityToDTO)
-				.collect(Collectors.toList());
+		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
 	}
 
 	@Override
@@ -56,6 +55,7 @@ public class CourseServiceImpl implements CoursesService {
 
 		Boolean isPurchase = false;
 		Integer registerCourseId = 0;
+
 		for (RegisterCourse rg : course.get().getRegisterCourses()) {
 			if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
 				isPurchase = true;
