@@ -20,43 +20,48 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/register-course")
 public class RegisterCourseController {
-    @Autowired
-    RegisterCourseServiceImp registerCourseService;
+	@Autowired
+	RegisterCourseServiceImp registerCourseService;
 
-    @GetMapping
-    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAll() {
-        return registerCourseService.getAllRegisterCourse();
-    }
+	@GetMapping
+	public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAll() {
+		return registerCourseService.getAllRegisterCourse();
+	}
 
-    @GetMapping("/distinc")
-    public ResponseEntity<?> findAllDistincByCourse_CourseName() {
-        List<RegisterCourseResponseDTO> list = registerCourseService.getAllRegisterCoursesByCourse_CourseName();
-        return ResponseEntity.ok(list);
-    }
+	@GetMapping("/distinc")
+	public ResponseEntity<?> findAllDistincByCourse_CourseName() {
+		List<RegisterCourseResponseDTO> list = registerCourseService.getAllRegisterCoursesByCourse_CourseName();
+		return ResponseEntity.ok(list);
+	}
 
-    @GetMapping("/{studentId}")
-    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllByStudentId(@PathVariable Integer studentId) {
-        return registerCourseService.findAllRegisterCourseByStudentId(studentId);
-    }
+	@GetMapping("/{studentId}")
+	public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllByStudentId(@PathVariable Integer studentId) {
+		return registerCourseService.findAllRegisterCourseByStudentId(studentId);
+	}
 
-    @PostMapping
-    public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(
-            @RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
-        return registerCourseService.createRegisterCourse(registerCourseRequestDTO);
-    }
+	@PostMapping
+	public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(
+			@RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
+		return registerCourseService.createRegisterCourse(registerCourseRequestDTO);
+	}
 
-    @PutMapping("/{id}")
-    public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(@PathVariable("id") Integer id,
-            @RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
-        return registerCourseService.updateRegisterCourse(id, registerCourseRequestDTO);
-    }
+	@PutMapping("/{id}")
+	public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(@PathVariable("id") Integer id,
+			@RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
+		return registerCourseService.updateRegisterCourse(id, registerCourseRequestDTO);
+	}
 
-    @PutMapping
-    public ResponseEntity<?> updateRegisterCourseInClass(
-            @RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
+	@PutMapping
+	public ResponseEntity<?> updateRegisterCourseInClass(
+			@RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
 
-        List<RegisterCourseResponseDTO> ls = registerCourseService
-                .updateRegisterCourseInClass(registerCourseRequestDTO);
-        return ResponseEntity.ok(ls);
-    }
+		List<RegisterCourseResponseDTO> ls = registerCourseService
+				.updateRegisterCourseInClass(registerCourseRequestDTO);
+		return ResponseEntity.ok(ls);
+	}
+
+	@GetMapping("/grantAccess")
+	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
+		registerCourseService.grantPermissionsByEmails(folderName, emails);
+	}
 }

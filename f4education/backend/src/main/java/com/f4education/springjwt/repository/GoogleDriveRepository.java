@@ -115,8 +115,8 @@ public class GoogleDriveRepository {
 						.setFields("id").execute();
 
 				// Đặt quyền truy cập cho tệp
-				driveQuickstart.getInstance().permissions()
-						.create(uploadFile.getId(), setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
+				driveQuickstart.getInstance().permissions().create(uploadFile.getId(),
+						setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
 
 				return uploadFile.getId();
 			}
@@ -128,6 +128,7 @@ public class GoogleDriveRepository {
 
 	// get id folder google drive
 	public String getFolderId(String folderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		String parentId = null;
 		String[] folderNames = folderName.split("/");
 
@@ -192,5 +193,38 @@ public class GoogleDriveRepository {
 	public void deleteFile(String fileId) throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		driveQuickstart.getInstance().files().delete(fileId).execute();
+	}
+
+	public String renameFolder(String folderName, String newFolderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+
+		String folderId = getFolderId(folderName);
+		if (folderId != null) {
+
+			File file = new File();
+			file.setName(newFolderName);
+
+			try {
+				File updatedFile = driveQuickstart.getInstance().files().update(folderId, file).execute();
+				return updatedFile.getId();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
+	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		
+		String folderId = getFolderId(folderName);
+		for (String email : emails) {
+			Permission permission = setPermission("user", "reader").setEmailAddress(email);
+
+			// Gọi API Drive API để cấp quyền truy cập
+			driveQuickstart.getInstance().permissions().create(folderId, permission).execute();
+		}
 	}
 }

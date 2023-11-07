@@ -25,4 +25,6 @@ public interface CoursesService {
 	List<CourseDTO> findAllCourseDTOByStudentId(String studentId);
 
 	List<CourseDTO> getCourseBySubjectName(String subjectName);
+	
+	String renameFolder(String folderName, String newFolderName) throws Exception;
 }

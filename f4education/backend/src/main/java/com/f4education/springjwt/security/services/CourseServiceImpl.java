@@ -21,6 +21,7 @@ import com.f4education.springjwt.payload.request.ThoiLuongRange;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
 @Service
@@ -33,6 +34,8 @@ public class CourseServiceImpl implements CoursesService {
 	SubjectRepository subjectRepository;
 	@Autowired
 	CourseHistoryRepository courseHistoryRepository;
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
 
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
@@ -164,5 +167,10 @@ public class CourseServiceImpl implements CoursesService {
 				.collect(Collectors.toList());
 		System.out.println(list);
 		return list;
+	}
+
+	@Override
+	public String renameFolder(String folderName, String newFolderName) throws Exception {
+		return googleDriveRepository.renameFolder(folderName, newFolderName);
 	}
 }

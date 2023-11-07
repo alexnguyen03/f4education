@@ -28,4 +28,5 @@ public interface RegisterCourseService {
 
         List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName();
 
+        void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception;
 }

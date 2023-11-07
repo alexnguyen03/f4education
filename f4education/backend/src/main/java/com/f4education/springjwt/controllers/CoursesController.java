@@ -147,4 +147,9 @@ public class CoursesController {
 		CourseDTO course = courseService.findById(courseId);
 		return ResponseEntity.ok(course);
 	}
+	
+	@GetMapping("/renameFolder")
+	public String renameFolder(String courseName, String newCoursename) throws Exception {
+		return courseService.renameFolder(courseName, newCoursename);
+	}
 }

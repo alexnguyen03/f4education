@@ -22,6 +22,7 @@ import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.StudentRepository;
 
@@ -33,7 +34,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     private CourseRepository courseRepository;
     @Autowired
     private StudentRepository studentRepository;
-
+    @Autowired
+    GoogleDriveRepository googleDriveRepository;
     @Autowired
     private ClassRepository classRepository;
 
@@ -208,4 +210,9 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                 .collect(Collectors.toList());
 
     }
+
+	@Override
+	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
+		googleDriveRepository.grantPermissionsByEmails(folderName, emails);
+	}
 }
