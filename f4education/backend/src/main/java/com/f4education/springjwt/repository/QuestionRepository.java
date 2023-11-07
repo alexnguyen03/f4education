@@ -24,7 +24,6 @@ public interface QuestionRepository extends JpaRepository<Question, Integer> {
     @Query("SELECT MAX(q.questionId) FROM Question q")
     Integer getMaxQuestionId();
 
-    @Query(value = "SELECT TOP 60 *  FROM Question q where q.course_id =:courseId ORDER BY NEWID()", nativeQuery = true)
-
-    public List<Question> findAllByCourseId(@Param("courseId") Integer courseId);
+    @Query(value = "SELECT q  FROM Question q WHERE q.course.courseId = :courseId ")
+    public Question findByCourseId(@Param("courseId") Integer courseId);
 }

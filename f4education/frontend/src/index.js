@@ -55,6 +55,7 @@ root.render(
 
             {/* Student Route */}
             <Route path="/student/*" element={<Student />} />
+            <Route path="/*/:classId" element={<Student />} />
             {/* Teacher Route */}
             <Route path="/teacher/*" element={<Teacher />} />
             <Route path="/*/classes-infor/:classId" element={<Teacher />} />

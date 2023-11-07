@@ -8,8 +8,9 @@ import com.f4education.springjwt.models.Examination;
 
 @Service
 public interface ExaminationService {
-    public List<Examination> saveExamination(List<Examination> listExam);
+    public Examination saveExamination(Examination examination);
 
     public Boolean isActivedExam(Integer classId);
+
     public Boolean isActivedExamByTodayAndClassId(Integer classId);
 }
