@@ -156,7 +156,12 @@ const CourseProgress = () => {
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
     }
-
+    const formatDateWithDayOfWeek = (date) => {
+        const formattedDate = moment(date)
+            .locale('vi')
+            .format('dddd, DD/MM/yyyy')
+        return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
+    }
     const checkActivedExamByTodayAndClassId = async () => {
         const classId = searchParams.get('classId')
         try {
@@ -227,7 +232,7 @@ const CourseProgress = () => {
                                 <Text c="dimmed" fz="xl">
                                     Lớp học:{' '}
                                     <strong>
-                                        {selectedCourse.classes.className}
+                                        {selectedCourse.classes.className.toUpperCase()}
                                     </strong>
                                 </Text>
                                 -
@@ -240,25 +245,25 @@ const CourseProgress = () => {
                                 </Text>
                             </Group>
                             <Text fz="lg">
-                                Từ ngày:{' '}
+                                Từ:{' '}
                                 <strong>
-                                    {moment(
+                                    {formatDateWithDayOfWeek(
                                         selectedCourse.classes.startDate
-                                    ).format('DD-MM-yyyy') === 'Invalid date'
+                                    ) === 'Invalid date'
                                         ? 'Chưa có ngày bắt đầu'
-                                        : moment(
+                                        : formatDateWithDayOfWeek(
                                               selectedCourse.classes.startDate
-                                          ).format('DD-MM-yyyy')}
+                                          )}
                                 </strong>{' '}
                                 -{' '}
                                 <strong>
-                                    {moment(
+                                    {formatDateWithDayOfWeek(
                                         selectedCourse.classes.endDate
-                                    ).format('DD-MM-yyyy') === 'Invalid date'
+                                    ) === 'Invalid date'
                                         ? 'Chưa có ngày kết thúc'
-                                        : moment(
+                                        : formatDateWithDayOfWeek(
                                               selectedCourse.classes.endDate
-                                          ).format('DD-MM-yyyy')}
+                                          )}
                                 </strong>
                             </Text>
                             <Group position="left">
@@ -413,7 +418,7 @@ const CourseProgress = () => {
                             <Box w={'100%'}>
                                 <Text
                                     fw={500}
-                                    fz="lg"
+                                    fz="xl"
                                     color="dimmed"
                                     align="center"
                                     mb={15}
@@ -453,7 +458,7 @@ const CourseProgress = () => {
                                 <Text
                                     color="dimmed"
                                     fw={500}
-                                    fz="xl"
+                                    fz="md"
                                     m={0}
                                     p={0}
                                 >
@@ -464,7 +469,7 @@ const CourseProgress = () => {
                                             2}
                                     </strong>
                                 </Text>
-                                <Text color="red" fw={500} fz="xl" m={0} p={0}>
+                                <Text color="red" fw={500} fz="lg" m={0} p={0}>
                                     Số buổi vắng:{' '}
                                     <strong className="ml-2">
                                         0 /{' '}
@@ -591,7 +596,7 @@ const CourseProgress = () => {
             </Box>
 
             {showingDetail && <Schedule />}
-            
+
             {/* In Progress Course */}
             <Box mt={rem('8rem')}>
                 <Group position="left" mb={'lg'}>
@@ -739,7 +744,7 @@ const CourseProgress = () => {
                                                             </strong>{' '}
                                                             bài đã học.
                                                         </Text>
-                                                       
+
                                                         <Stack mt={8}>
                                                             <Text
                                                                 fw={'bolder'}
