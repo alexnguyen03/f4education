@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Badge, Col, Row } from 'reactstrap'
 import logo from '../../assets/img/brand/f4.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
@@ -36,7 +36,6 @@ import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks'
 import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 
 // API
-import cartApi from '../../api/cartApi'
 import courseApi from '../../api/courseApi'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -47,10 +46,12 @@ const category_3 = ['SQL Server', 'MySQL', 'Xampp']
 
 const ClientNavbar = () => {
     const user = JSON.parse(localStorage.getItem('user'))
+    const listCart = JSON.parse(localStorage.getItem('userCart')) || []
 
     const ref = useElementSize()
     const navigate = useNavigate()
     const smallScreen = useMediaQuery('(max-width: 500px)')
+    const [searchParams] = useSearchParams()
 
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const [activeItems, setActiveItems] = useState([false, false, false])
@@ -62,49 +63,43 @@ const ClientNavbar = () => {
     const [listCourse, setListCourse] = useState([])
 
     const fetchCart = async () => {
-        if (user !== null) {
-            try {
-                const resp = await cartApi.getAllCartByStudentId(user.username)
-                if (resp.status === 200 && resp.data.length > 0) {
-                    setCarts(resp.data)
-                }
-            } catch (error) {
-                console.log(error)
-            }
-        } else {
-            setCarts([])
-        }
-    }
-
-    const fetchCourse = async () => {
         try {
-            const resp = await courseApi.getAll()
-
-            if (resp.status === 200 && resp.data.length > 0) {
-                setListCourse(resp.data)
-            }
+            const userCart = JSON.parse(localStorage.getItem('userCart')) || []
+            console.log(userCart)
+            setCarts(userCart)
         } catch (error) {
             console.log(error)
         }
     }
 
+    // const fetchCourse = async () => {
+    //     try {
+    //         const resp = await courseApi.getAll()
+
+    //         if (resp.status === 200 && resp.data.length > 0) {
+    //             setListCourse(resp.data)
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
     useEffect(() => {
         // get Total Price from list totalCartItem
         let newTotalPrice = 0
         if (carts) {
-            carts.map((item) => (newTotalPrice += item.course.coursePrice))
+            carts.forEach((item) => (newTotalPrice += item.course.coursePrice))
             setTotalPrice(newTotalPrice)
         }
     }, [carts])
 
     useEffect(() => {
         fetchCart()
-        fetchCourse()
     }, [])
 
     useEffect(() => {
         fetchCart()
-    }, [])
+    }, [searchParams.get('checkoutComplete'), listCart.length])
 
     // *************** CART VARIABLE - AREA END
     const handleItemClick = (index) => {
@@ -124,6 +119,10 @@ const ClientNavbar = () => {
 
     const handleLogout = () => {
         localStorage.removeItem('user')
+        fetchCart()
+        window.location.reload()
+        // const currentPath = window.location.pathname
+        // console.log('Địa chỉ (path) hiện tại của trang web là:', currentPath)
     }
 
     window.addEventListener('scroll', function () {

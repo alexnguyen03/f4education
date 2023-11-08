@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 public class BillRequestDTO {
     private Double totalPrice;
 
-    private String checkoutMethod;
+    private Integer checkoutMethodId;
 
     private String studentId;
 }

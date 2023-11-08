@@ -9,11 +9,11 @@ import com.f4education.springjwt.payload.response.CourseResponse;
 public interface CoursesService {
 	List<CourseDTO> findAllCourseDTO();
 
-	List<CourseResponse> findNewestCourse();
+	List<CourseResponse> findNewestCourse(String studentId);
 
 	CourseResponse findCourseByCourseId(Integer courseId,String studentId);
 
-	List<CourseResponse> findTop10SoldCourse();
+	List<CourseResponse> findTop10SoldCourse(String studentId);
 
 	CourseDTO findById(Integer id);
 

@@ -9,7 +9,6 @@ import {
     getStylesRef,
     Grid,
     Group,
-    HoverCard,
     Image,
     Rating,
     rem,
@@ -27,8 +26,7 @@ import {
     IconArrowUp,
     IconCalendarTime,
     IconCertificate,
-    IconCoin,
-    IconShoppingCartPlus
+    IconCoin
 } from '@tabler/icons-react'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
@@ -40,7 +38,11 @@ import classHeroText from '../../../assets/scss/custom-module-scss/client-custom
 
 // API
 import courseApi from '../../../api/courseApi'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../../utils/Notify'
+import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -97,6 +99,9 @@ const mockdata = [
 ]
 
 const Home = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+    let navigate = useNavigate()
+
     // Main Variable
     const [newestCourse, setNewestCourse] = useState([])
     const [bestSellingCourse, setBestSellingCourse] = useState([])
@@ -104,9 +109,12 @@ const Home = () => {
     const [scroll, scrollTo] = useWindowScroll()
 
     const fetchNewestCourse = async () => {
+        setLoading(true)
+
         try {
-            setLoading(false)
-            const resp = await courseApi.getNewestCourse()
+            const resp = await courseApi.getNewestCourse(
+                user !== null ? user.username : ''
+            )
 
             if (resp.status === 200 && resp.data.length > 0) {
                 setNewestCourse(resp.data)
@@ -114,16 +122,20 @@ const Home = () => {
             } else {
                 console.log('cannot get data')
             }
-            setLoading(true)
+
+            setLoading(false)
         } catch (error) {
             console.log(error)
         }
     }
 
     const fetchTopBestSellingCourse = async () => {
+        setLoading(true)
+
         try {
-            setLoading(false)
-            const resp = await courseApi.getTopSellingCourse()
+            const resp = await courseApi.getTopSellingCourse(
+                user !== null ? user.username : ''
+            )
 
             if (resp.status === 200 && resp.data.length > 0) {
                 setBestSellingCourse(resp.data)
@@ -131,205 +143,334 @@ const Home = () => {
             } else {
                 console.log('cannot get data best selling')
             }
-            setLoading(true)
+
+            setLoading(false)
         } catch (error) {
             console.log(error)
         }
     }
 
+    // CART - CHECK OUT
+    const handleAddCart = (course, e) => {
+        e.preventDefault()
+        return new Promise((resolve, reject) => {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
+            try {
+                const userCart =
+                    JSON.parse(localStorage.getItem('userCart')) || []
+
+                const cart = {
+                    course: course
+                }
+
+                let currentCart = []
+
+                const cartExists = userCart.some(
+                    (userCartMap) =>
+                        userCartMap.course.courseId === course.courseId
+                )
+
+                if (!cartExists) {
+                    userCart.push(cart)
+                    localStorage.setItem('userCart', JSON.stringify(userCart))
+                    currentCart = [cart]
+                } else {
+                    const prevCart = userCart.filter(
+                        (userCartMap) =>
+                            userCartMap.course.courseId === course.courseId
+                    )
+                    currentCart = prevCart
+                }
+
+                toast.update(
+                    id,
+                    Notify.options.createSuccessParam(
+                        'Thêm vào giỏ hàng thành công'
+                    )
+                )
+                resolve(currentCart)
+            } catch (error) {
+                toast.update(id, Notify.options.createError())
+                console.log(error)
+                reject(error)
+            }
+        })
+    }
+
+    const handleCheckOutNow = async (course, e) => {
+        e.preventDefault()
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        if (user === null) {
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Vui lòng đăng nhập trước khi thanh toán'
+                )
+            )
+            return
+        }
+
+        try {
+            const selectedCart = await handleAddCart(course,e)
+
+            // store cart to localstorage
+            localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
+            return navigate('/payment/checkout')
+        } catch (error) {
+            toast.update(id, Notify.options.createError())
+            console.log(error)
+        }
+    }
+
+    const navigateToStudent = (e) => {
+        e.preventDefault()
+        navigate('/student/classes')
+    }
+
     // learnext course Carousel
     const LearnNextSlides = newestCourse.map((learn, index) => (
         <Carousel.Slide key={index}>
-            <HoverCard width={'95%'} shadow="md" position="bottom">
-                {/* Target Hover */}
-                {loading ? (
-                    <>
-                        <Card className="card-hover-overlay">
-                            <HoverCard.Target>
-                                <Card.Section>
-                                    <Link to={`/course/${learn.courseId}`}>
-                                        <Image
-                                            src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
-                                            fit="cover"
-                                            width={'100%'}
-                                            height={150}
-                                            radius="sm"
-                                            withPlaceholder
-                                        />
-                                    </Link>
-                                </Card.Section>
-                            </HoverCard.Target>
+            {!loading ? (
+                <>
+                    <Card className={`${cartStyle['card-hover-overlay']}`}>
+                        <Card.Section>
+                            <Image
+                                src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                                fit="cover"
+                                width={'100%'}
+                                height={200}
+                                radius="sm"
+                                withPlaceholder
+                            />
+                        </Card.Section>
 
+                        <Box>
+                            <Text fw={500} lineClamp={1} fs="lg">
+                                {learn.courseName}
+                            </Text>
                             <Box>
-                                <Text fw={500} lineClamp={1} fs="lg">
-                                    {learn.courseName}
-                                </Text>
-                                <Box>
-                                    <Flex justify="flex-start" gap="sm">
-                                        <Text>
-                                            {learn.rating === 'NaN'
-                                                ? 5
-                                                : learn.rating}
-                                        </Text>
-                                        <Group position="center">
-                                            <Rating
-                                                value={
-                                                    learn.rating === 'NaN'
-                                                        ? 5
-                                                        : learn.rating
-                                                }
-                                                fractions={2}
-                                                readOnly
-                                            />
-                                        </Group>
-                                        <Text c="dimmed">
-                                            ({learn.reviewNumber})
-                                        </Text>
-                                    </Flex>
-                                </Box>
-                                <Box>
-                                    <Text fw={500}>
-                                        {learn.coursePrice.toLocaleString(
-                                            'it-IT',
-                                            {
-                                                style: 'currency',
-                                                currency: 'VND'
-                                            }
-                                        )}
+                                <Flex justify="flex-start" gap="sm">
+                                    <Text>
+                                        {learn.rating === 'NaN'
+                                            ? 5
+                                            : learn.rating}
                                     </Text>
-                                </Box>
+                                    <Group position="center">
+                                        <Rating
+                                            value={
+                                                learn.rating === 'NaN'
+                                                    ? 5
+                                                    : learn.rating
+                                            }
+                                            fractions={2}
+                                            readOnly
+                                        />
+                                    </Group>
+                                    <Text c="dimmed">
+                                        ({learn.reviewNumber})
+                                    </Text>
+                                </Flex>
                             </Box>
-                        </Card>
-                    </>
-                ) : (
-                    <>
-                        <Skeleton height={200} radius="sm" mb="sm" />
-                        <Skeleton height={8} radius="xl" />
-                        <Skeleton height={8} radius="xl" />
-                        <Skeleton height={8} radius="xl" />
-                    </>
-                )}
+                            <Box>
+                                <Text fw={500}>
+                                    {learn.coursePrice.toLocaleString('it-IT', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    })}
+                                </Text>
+                            </Box>
+                        </Box>
 
-                {/* Value hover */}
-                <HoverCard.Dropdown mt={'-10px'}>
-                    <Button
-                        color="grape"
-                        variant="light"
-                        className="w-100"
-                        // onClick={() => handleAddCart(course)}
-                        leftIcon={<IconShoppingCartPlus size="1rem" />}
-                    >
-                        Thêm vào giỏ hàng
-                    </Button>
-                    <Text c="dimmed">
-                        Giá khóa học:
-                        <Text fw="500">
-                            {learn.coursePrice.toLocaleString('it-IT', {
-                                style: 'currency',
-                                currency: 'VND'
-                            })}
-                        </Text>
-                    </Text>
-                </HoverCard.Dropdown>
-            </HoverCard>
+                        {/* Overlay đây nha */}
+                        <Link to={`/course/${learn.courseId}`}>
+                            <Box className={cartStyle.overlay}>
+                                {learn.isPurchase ? (
+                                    <>
+                                        <Button
+                                            color="violet"
+                                            fullWidth
+                                            onClick={(e) =>
+                                                navigateToStudent(e)
+                                            }
+                                            style={{ zIndex: 1000 }}
+                                        >
+                                            <Text color="#fff" size="md">
+                                                Đã đăng ký khóa học
+                                            </Text>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            color="violet"
+                                            fullWidth
+                                            onClick={(e) =>
+                                                handleAddCart(learn, e)
+                                            }
+                                        >
+                                            <Text color="#fff" size="md">
+                                                Thêm vào giỏ hàng
+                                            </Text>
+                                        </Button>
+                                        <Button
+                                            bg={'transparent'}
+                                            fullWidth
+                                            styles={{
+                                                root: {
+                                                    outline: '1px solid #fff',
+                                                    '&:hover': {
+                                                        background:
+                                                            'transparent'
+                                                    }
+                                                }
+                                            }}
+                                            onClick={(e) =>
+                                                handleCheckOutNow(learn, e)
+                                            }
+                                        >
+                                            <Text color="#fff" size="md">
+                                                ĐĂNG KÝ NGAY
+                                            </Text>
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
+                        </Link>
+                    </Card>
+                </>
+            ) : (
+                <>
+                    <Skeleton height={200} radius="sm" mb="sm" />
+                    <Skeleton height={8} radius="xl" />
+                    <Skeleton height={8} radius="xl" />
+                    <Skeleton height={8} radius="xl" />
+                </>
+            )}
         </Carousel.Slide>
     ))
-    
+
     // learnext course Carousel
     const bestSellingslides = bestSellingCourse.map((learn, index) => (
         <Carousel.Slide key={index}>
-            <HoverCard width={'95%'} shadow="md" position="bottom">
-                {/* Target Hover */}
-                {loading ? (
-                    <>
-                        <Card className="card-hover-overlay">
-                            <HoverCard.Target>
-                                <Card.Section>
-                                    <Link to={`/course/${learn.courseId}`}>
-                                        <Image
-                                            src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
-                                            fit="cover"
-                                            width={'100%'}
-                                            height={150}
-                                            radius="sm"
-                                            withPlaceholder
-                                        />
-                                    </Link>
-                                </Card.Section>
-                            </HoverCard.Target>
+            {/* Target Hover */}
+            {!loading ? (
+                <>
+                    <Card className={`${cartStyle['card-hover-overlay']}`}>
+                        <Card.Section>
+                            <Image
+                                src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                                fit="cover"
+                                width={'100%'}
+                                height={200}
+                                radius="sm"
+                                withPlaceholder
+                            />
+                        </Card.Section>
 
+                        <Box>
+                            <Text fw={500} lineClamp={1} fs="lg">
+                                {learn.courseName}
+                            </Text>
                             <Box>
-                                <Text fw={500} lineClamp={1} fs="lg">
-                                    {learn.courseName}
-                                </Text>
-                                <Box>
-                                    <Flex justify="flex-start" gap="sm">
-                                        <Text>
-                                            {learn.rating === 'NaN'
-                                                ? 5
-                                                : learn.rating}
-                                        </Text>
-                                        <Group position="center">
-                                            <Rating
-                                                value={
-                                                    learn.rating === 'NaN'
-                                                        ? 5
-                                                        : learn.rating
-                                                }
-                                                fractions={2}
-                                                readOnly
-                                            />
-                                        </Group>
-                                        <Text c="dimmed">
-                                            ({learn.reviewNumber})
-                                        </Text>
-                                    </Flex>
-                                </Box>
-                                <Box>
-                                    <Text fw={500}>
-                                        {learn.coursePrice.toLocaleString(
-                                            'it-IT',
-                                            {
-                                                style: 'currency',
-                                                currency: 'VND'
-                                            }
-                                        )}
+                                <Flex justify="flex-start" gap="sm">
+                                    <Text>
+                                        {learn.rating === 'NaN'
+                                            ? 5
+                                            : learn.rating}
                                     </Text>
-                                </Box>
+                                    <Group position="center">
+                                        <Rating
+                                            value={
+                                                learn.rating === 'NaN'
+                                                    ? 5
+                                                    : learn.rating
+                                            }
+                                            fractions={2}
+                                            readOnly
+                                        />
+                                    </Group>
+                                    <Text c="dimmed">
+                                        ({learn.reviewNumber})
+                                    </Text>
+                                </Flex>
                             </Box>
-                        </Card>
-                    </>
-                ) : (
-                    <>
-                        <Skeleton height={200} radius="sm" mb="sm" />
-                        <Skeleton height={8} radius="xl" />
-                        <Skeleton height={8} radius="xl" />
-                        <Skeleton height={8} radius="xl" />
-                    </>
-                )}
+                            <Box>
+                                <Text fw={500}>
+                                    {learn.coursePrice.toLocaleString('it-IT', {
+                                        style: 'currency',
+                                        currency: 'VND'
+                                    })}
+                                </Text>
+                            </Box>
+                        </Box>
 
-                {/* Value hover */}
-                <HoverCard.Dropdown mt={'-10px'}>
-                    <Button
-                        color="grape"
-                        variant="light"
-                        className="w-100"
-                        // onClick={() => handleAddCart(course)}
-                        leftIcon={<IconShoppingCartPlus size="1rem" />}
-                    >
-                        Thêm vào giỏ hàng
-                    </Button>
-                    <Text c="dimmed">
-                        Giá khóa học:
-                        <Text fw="500">
-                            {learn.coursePrice.toLocaleString('it-IT', {
-                                style: 'currency',
-                                currency: 'VND'
-                            })}
-                        </Text>
-                    </Text>
-                </HoverCard.Dropdown>
-            </HoverCard>
+                        {/* Overlay đây nha */}
+                        <Link to={`/course/${learn.courseId}`}>
+                            <Box className={cartStyle.overlay}>
+                                {learn.isPurchase ? (
+                                    <>
+                                        <Button
+                                            color="violet"
+                                            fullWidth
+                                            onClick={(e) =>
+                                                navigateToStudent(e)
+                                            }
+                                            style={{ zIndex: 1000 }}
+                                        >
+                                            <Text color="#fff" size="md">
+                                                Đã đăng ký khóa học
+                                            </Text>
+                                        </Button>
+                                    </>
+                                ) : (
+                                    <>
+                                        <Button
+                                            color="violet"
+                                            fullWidth
+                                            onClick={(e) =>
+                                                handleAddCart(learn, e)
+                                            }
+                                        >
+                                            <Text color="#fff" size="md">
+                                                Thêm vào giỏ hàng
+                                            </Text>
+                                        </Button>
+                                        <Button
+                                            bg={'transparent'}
+                                            fullWidth
+                                            styles={{
+                                                root: {
+                                                    outline: '1px solid #fff',
+                                                    '&:hover': {
+                                                        background:
+                                                            'transparent'
+                                                    }
+                                                }
+                                            }}
+                                            onClick={(e) =>
+                                                handleCheckOutNow(learn, e)
+                                            }
+                                        >
+                                            <Text color="#fff" size="md">
+                                                ĐĂNG KÝ NGAY
+                                            </Text>
+                                        </Button>
+                                    </>
+                                )}
+                            </Box>
+                        </Link>
+                    </Card>
+                </>
+            ) : (
+                <>
+                    <Skeleton height={200} radius="sm" mb="sm" />
+                    <Skeleton height={8} radius="xl" />
+                    <Skeleton height={8} radius="xl" />
+                    <Skeleton height={8} radius="xl" />
+                </>
+            )}
         </Carousel.Slide>
     ))
 
@@ -403,9 +544,10 @@ const Home = () => {
 
     return (
         <>
-            {/* Mantine Hero section */}
+            <ToastContainer />
+
             <Container size="xl">
-                
+                {/* Hero section */}
                 <Group
                     className={classHeroText.wrapper}
                     size={1400}
@@ -530,7 +672,7 @@ const Home = () => {
                     </SimpleGrid>
                 </Group>
 
-                {/* wwhat learn nexxt */}
+                {/* what learn nexxt */}
                 <Box mt={rem('5rem')}>
                     <Title order={1} mt="lg" fw={700} color="dark">
                         Tiếp theo học gì

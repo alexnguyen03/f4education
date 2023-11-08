@@ -139,6 +139,7 @@ public class EvaluateServiceImpl implements EvaluateService {
 
 		evaluateResponse.setContent(evaluate.getContents());
 		evaluateResponse.setRating(evaluate.getRating());
+		evaluateResponse.setStudentId(evaluate.getStudent().getStudentId());
 		evaluateResponse.setStudentName(evaluate.getStudent().getFullname());
 		evaluateResponse.setStudentImage(evaluate.getStudent().getImage());
 		evaluateResponse.setRegisterCourse(evaluate.getRegisterCourse());

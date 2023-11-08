@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -52,15 +50,15 @@ public class CoursesController {
 	}
 
 	@GetMapping("/newest-courses")
-	public ResponseEntity<?> getTop10NewsetCourse() {
-		List<CourseResponse> list = courseService.findNewestCourse();
+	public ResponseEntity<?> getTop10NewsetCourse(@RequestParam(value = "studentId") Optional<String> studentId) {
+		List<CourseResponse> list = courseService.findNewestCourse(studentId.get());
 		return ResponseEntity.ok(list);
 	}
 
 	@GetMapping("/detail/{courseId}")
 	public ResponseEntity<?> getTopCourseDetailByCourseId(@PathVariable Integer courseId,
-			@RequestParam(value = "studentId") String studentId) {
-		CourseResponse course = courseService.findCourseByCourseId(courseId, studentId);
+			@RequestParam(value = "studentId") Optional<String> studentId) {
+		CourseResponse course = courseService.findCourseByCourseId(courseId, studentId.get());
 
 		if (course == null) {
 			return ResponseEntity.noContent().build();
@@ -70,8 +68,8 @@ public class CoursesController {
 	}
 
 	@GetMapping("/top-selling")
-	public ResponseEntity<?> getTop10SoldCourse() {
-		List<CourseResponse> list = courseService.findTop10SoldCourse();
+	public ResponseEntity<?> getTop10SoldCourse(@RequestParam(value = "studentId") Optional<String> studentId) {
+		List<CourseResponse> list = courseService.findTop10SoldCourse(studentId.get());
 		return ResponseEntity.ok(list);
 	}
 

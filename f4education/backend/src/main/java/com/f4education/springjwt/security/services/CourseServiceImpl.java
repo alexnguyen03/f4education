@@ -46,8 +46,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll().stream().map(this::convertEntityToDTO)
-				.collect(Collectors.toList());
+		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
 	}
 
 	@Override
@@ -56,6 +55,7 @@ public class CourseServiceImpl implements CoursesService {
 
 		Boolean isPurchase = false;
 		Integer registerCourseId = 0;
+
 		for (RegisterCourse rg : course.get().getRegisterCourses()) {
 			if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
 				isPurchase = true;
@@ -73,13 +73,21 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<CourseResponse> findNewestCourse() {
+	public List<CourseResponse> findNewestCourse(String studentId) {
 		List<Course> courses = courseRepository.findTop10LatestCourses(true);
-
 		List<CourseResponse> courseResponses = new ArrayList<>();
 
 		for (Course course : courses) {
-			CourseResponse courseResponse = convertToResponseDTO(course, false, null);
+			Boolean isPurchase = false;
+
+			for (RegisterCourse rg : course.getRegisterCourses()) {
+				if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
+					isPurchase = true;
+					break;
+				}
+			}
+
+			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
 			courseResponses.add(courseResponse);
 		}
 
@@ -87,7 +95,7 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<CourseResponse> findTop10SoldCourse() {
+	public List<CourseResponse> findTop10SoldCourse(String studentId) {
 		List<Object[]> list = courseRepository.findTop10CoursesWithBillDetails(true);
 
 		List<Course> courses = new ArrayList<>();
@@ -145,9 +153,23 @@ public class CourseServiceImpl implements CoursesService {
 		List<CourseResponse> courseResponses = new ArrayList<>();
 
 		for (Course course : courses) {
-			CourseResponse courseResponse = convertToResponseDTO(course, false, null);
+			Boolean isPurchase = false;
+
+			for (RegisterCourse rg : course.getRegisterCourses()) {
+				if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
+					isPurchase = true;
+					break;
+				}
+			}
+
+			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
 			courseResponses.add(courseResponse);
 		}
+		
+//		for (Course course : courses) {
+//			CourseResponse courseResponse = convertToResponseDTO(course, false, null);
+//			courseResponses.add(courseResponse);
+//		}
 
 		return courseResponses;
 	}

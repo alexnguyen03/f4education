@@ -16,8 +16,8 @@ export default function Paypal({ totalPrice, handlePaymentPayPalComplete }) {
                                 description: 'Cool looking table',
                                 amount: {
                                     currency_code: 'CAD',
-                                    value: converterPrice
-                                    // value: 5.0,
+                                    // value: converterPrice
+                                    value: 1.0
                                 }
                             }
                         ]
@@ -25,20 +25,21 @@ export default function Paypal({ totalPrice, handlePaymentPayPalComplete }) {
                 },
                 onApprove: async (data, actions) => {
                     const order = await actions.order.capture()
-                    handlePaymentPayPalComplete(order)
+                    handlePaymentPayPalComplete(order, null, null)
                 },
                 onError: (err) => {
                     const isError = true
-                    handlePaymentPayPalComplete(isError)
+                    handlePaymentPayPalComplete(null, null, isError)
+                    console.log(err)
                 },
                 oncancel: (data) => {
                     const isCancle = true
-                    handlePaymentPayPalComplete(isCancle)
-                    console.log('cancle:' + data)
+                    handlePaymentPayPalComplete(null, isCancle, null)
+                    console.log(data)
                 }
             })
             .render(paypal.current)
-    }, [])
+    }, [handlePaymentPayPalComplete])
 
     return (
         <div>

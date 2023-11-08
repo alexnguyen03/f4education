@@ -1,5 +1,6 @@
 import {
     Accordion,
+    ActionIcon,
     Anchor,
     Avatar,
     Badge,
@@ -32,6 +33,7 @@ import {
     IconInfinity,
     IconSourceCode,
     IconStarFilled,
+    IconTrash,
     IconTrophy
 } from '@tabler/icons-react'
 import { useEffect } from 'react'
@@ -49,7 +51,6 @@ import styles from '../../../assets/scss/custom-module-scss/client-custom/course
 import courseDetailApi from '../../../api/courseDetailApi'
 import courseApi from '../../../api/courseApi'
 import evaluateApi from '../../../api/evaluateApi'
-import cartApi from '../../../api/cartApi'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -107,8 +108,8 @@ function CourseDetailClient() {
     const [evaluateRequest, setEvaluateRequest] = useState({
         rating: '',
         content: '',
-        studentId: user.username,
-        registerCourseId: course.registerCourseId
+        studentId: '',
+        registerCourseId: ''
     })
 
     // PAGINATION
@@ -130,12 +131,12 @@ function CourseDetailClient() {
         try {
             const resp = await courseApi.getCourseByCourseId(
                 params.courseId,
-                user.username
+                user !== null ? user.username : 'nouser'
             )
 
+            console.log(resp.data)
             if (resp.status === 200) {
                 setCourse(resp.data)
-
                 setLoading(false)
             } else if (resp.status === 204) {
                 console.log('no content')
@@ -148,10 +149,13 @@ function CourseDetailClient() {
     const fetchNewestCourse = async () => {
         setLoading(true)
         try {
-            const resp = await courseApi.getNewestCourse()
+            const resp = await courseApi.getNewestCourse(
+                user !== null ? user.username : 'nouser'
+            )
 
             if (resp.status === 200) {
                 setNewstCourse(resp.data)
+                console.log(resp.data)
 
                 setLoading(false)
             } else if (resp.status === 204) {
@@ -191,6 +195,7 @@ function CourseDetailClient() {
 
     // FETCH + CRUD AREA
     const handleCreateEvaluate = async () => {
+        evaluateRequest.studentId = user.username
         evaluateRequest.registerCourseId = course.registerCourseId
 
         const id = toast(Notify.msg.loading, Notify.options.loading())
@@ -205,41 +210,28 @@ function CourseDetailClient() {
         }
     }
 
-    const handleAddCart = async (course, user) => {
+    const handleDeleteEvaluate = async (evaluateId) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
-
-        const cart = {
-            courseId: course.courseId,
-            studentId: user
-        }
-
         try {
-            const resp = await cartApi.createCart(cart)
-            toast.update(id, Notify.options.createSuccess())
-
-            const selectedCart = {
-                cartId: resp.data.cartId,
-                course: resp.data.course
+            const updateEvaluate = [...listEvaluate]
+            const indexToDelete = updateEvaluate.findIndex(
+                (evalu) => evalu.evaluateId === evaluateId
+            )
+            if (indexToDelete !== -1) {
+                updateEvaluate.splice(indexToDelete, 1)
             }
-            localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
 
-            return selectedCart
+            setListEvaluate(updateEvaluate)
+
+            const resp = await evaluateApi.deleteEvaluate(evaluateId)
+            if (resp.status === 204 || resp.status === 200) {
+                toast.update(id, Notify.options.deleteSuccess())
+                fetchListEvaluate()
+            }
         } catch (error) {
-            console.log(error)
+            toast.update(id, Notify.options.deleteError())
         }
     }
-
-    // const handleCheckout = async (course, user) => {
-    //     try {
-    //         const selectedCart = await handleAddCart(course, user)
-
-    //         console.log(selectedCart)
-    //         localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
-    //          return navigate('/payment/checkout')
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
 
     const handleOnChangeEvaluate = (e) => {
         setEvaluateRequest((prev) => ({
@@ -248,15 +240,89 @@ function CourseDetailClient() {
         }))
     }
 
-    const handleSwitchCourse = async () => {
-        setLoading(true)
-        await Promise.all([
-            fetchCurrentCourse(),
-            fetchListCourseContent(),
-            fetchListEvaluate(),
-            fetchNewestCourse()
-        ])
-        setLoading(false)
+    // CART - CHECK OUT
+    const handleAddCart = (course) => {
+        return new Promise((resolve, reject) => {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
+            // if (user === null) {
+            //     toast.update(
+            //         id,
+            //         Notify.options.createErrorParam(
+            //             'Vui lòng đăng nhập trước khi thanh toán'
+            //         )
+            //     )
+            //     return
+            // }
+
+            try {
+                const userCart =
+                    JSON.parse(localStorage.getItem('userCart')) || []
+
+                const cart = {
+                    course: course
+                }
+
+                let currentCart = []
+
+                const cartExists = userCart.some(
+                    (userCartMap) =>
+                        userCartMap.course.courseId === course.courseId
+                )
+
+                if (!cartExists) {
+                    userCart.push(cart)
+                    localStorage.setItem('userCart', JSON.stringify(userCart))
+                    currentCart = [cart]
+                } else {
+                    const prevCart = userCart.filter(
+                        (userCartMap) =>
+                            userCartMap.course.courseId === course.courseId
+                    )
+                    currentCart = prevCart
+                }
+
+                toast.update(
+                    id,
+                    Notify.options.createSuccessParam(
+                        'Thêm vào giỏ hàng thành công'
+                    )
+                )
+
+                console.log(currentCart)
+                console.log(userCart)
+                resolve(currentCart)
+            } catch (error) {
+                toast.update(id, Notify.options.createError())
+                console.log(error)
+                reject(error)
+            }
+        })
+    }
+
+    const handleCheckOut = async (course) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        if (user === null) {
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Vui lòng đăng nhập trước khi thanh toán'
+                )
+            )
+            return
+        }
+
+        try {
+            const selectedCart = await handleAddCart(course)
+
+            // store cart to localstorage
+            localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
+            return navigate('/payment/checkout')
+        } catch (error) {
+            toast.update(id, Notify.options.createError())
+            console.log(error)
+        }
     }
 
     // useEffect AREA
@@ -273,7 +339,7 @@ function CourseDetailClient() {
         }
 
         fetchData()
-    }, [])
+    }, [params])
 
     // UI ACTION
     window.addEventListener('scroll', handleScroll)
@@ -655,26 +721,24 @@ function CourseDetailClient() {
                                                             mt="md"
                                                             onClick={() => {
                                                                 handleAddCart(
-                                                                    course,
-                                                                    user.username
+                                                                    course
                                                                 )
                                                             }}
                                                         >
                                                             Thêm vào giỏ hàng
                                                         </Button>
-                                                        {/* <Button
+                                                        <Button
                                                             variant="default"
                                                             color="dark"
                                                             fullWidth
                                                             onClick={() => {
-                                                                handleCheckout(
-                                                                    course,
-                                                                    user.username
+                                                                handleCheckOut(
+                                                                    course
                                                                 )
                                                             }}
                                                         >
                                                             Đăng ký ngay
-                                                        </Button> */}
+                                                        </Button>
                                                     </>
                                                 )}
 
@@ -862,27 +926,21 @@ function CourseDetailClient() {
                                                     fullWidth
                                                     mt="md"
                                                     onClick={() => {
-                                                        handleAddCart(
-                                                            course,
-                                                            user.username
-                                                        )
+                                                        handleAddCart(course)
                                                     }}
                                                 >
                                                     Thêm vào giỏ hàng
                                                 </Button>
-                                                {/* <Button
+                                                <Button
                                                     variant="default"
                                                     color="dark"
                                                     fullWidth
                                                     onClick={() => {
-                                                        handleCheckout(
-                                                            course,
-                                                            user.username
-                                                        )
+                                                        handleCheckOut(course)
                                                     }}
                                                 >
                                                     Đăng ký ngay
-                                                </Button> */}
+                                                </Button>
                                             </>
                                         )}
 
@@ -1148,157 +1206,179 @@ function CourseDetailClient() {
                                 Những khóa học mới
                             </Text>
 
-                            <Spoiler
-                                maxHeight={400}
-                                color="dark"
-                                showLabel={
-                                    <Center>
-                                        <Button
-                                            color="dark"
-                                            variant="default"
-                                            size="lg"
-                                        >
-                                            Hiển thị tất cả khóa học
-                                        </Button>
-                                    </Center>
-                                }
-                                hideLabel={
-                                    <Center>
-                                        <Button
-                                            color="dark"
-                                            variant="default"
-                                            size="lg"
-                                        >
-                                            Ẩn bớt khóa học
-                                        </Button>
-                                    </Center>
-                                }
-                            >
-                                {loading ? (
-                                    <>
-                                        <Skeleton width={'100%'} height={85} />
-                                    </>
-                                ) : (
-                                    <>
-                                        {newstCourse.map((course, index) => (
-                                            <>
-                                                <Link
-                                                    to={`/course/${course.courseId}`}
-                                                    key={index}
-                                                    onClick={() => {
-                                                        handleSwitchCourse()
-                                                    }}
+                            {loading ? (
+                                <>
+                                    <Skeleton
+                                        height={20}
+                                        width="100%"
+                                        mb={10}
+                                    />
+                                    <Skeleton height={80} width="100%" />
+                                </>
+                            ) : (
+                                <>
+                                    <Spoiler
+                                        maxHeight={400}
+                                        color="dark"
+                                        showLabel={
+                                            <Center>
+                                                <Button
+                                                    color="dark"
+                                                    variant="default"
+                                                    size="lg"
                                                 >
-                                                    <Card>
-                                                        <Card.Section>
-                                                            <Grid>
-                                                                <Grid.Col
-                                                                    span={2}
-                                                                >
-                                                                    <Image
-                                                                        src={`${PUBLIC_IMAGE}/courses/${course.image}`}
-                                                                        alt={
-                                                                            course.courseName
-                                                                        }
-                                                                        height={
-                                                                            82
-                                                                        }
-                                                                        withPlaceholder
-                                                                    />
-                                                                </Grid.Col>
-                                                                <Grid.Col
-                                                                    span={10}
-                                                                >
-                                                                    <Grid>
-                                                                        <Grid.Col
-                                                                            span={
-                                                                                7
-                                                                            }
-                                                                        >
-                                                                            <Stack>
-                                                                                <Text
-                                                                                    color="dark"
-                                                                                    fw={
-                                                                                        700
-                                                                                    }
-                                                                                    fz="xl"
-                                                                                    lineClamp={
-                                                                                        1
-                                                                                    }
-                                                                                >
-                                                                                    {
+                                                    Hiển thị tất cả khóa học
+                                                </Button>
+                                            </Center>
+                                        }
+                                        hideLabel={
+                                            <Center>
+                                                <Button
+                                                    color="dark"
+                                                    variant="default"
+                                                    size="lg"
+                                                >
+                                                    Ẩn bớt khóa học
+                                                </Button>
+                                            </Center>
+                                        }
+                                    >
+                                        {loading ? (
+                                            <>
+                                                <Skeleton
+                                                    width={'100%'}
+                                                    height={85}
+                                                />
+                                            </>
+                                        ) : (
+                                            <>
+                                                {newstCourse.map(
+                                                    (course, index) => (
+                                                        <>
+                                                            <Link
+                                                                to={`/course/${course.courseId}`}
+                                                                key={index}
+                                                                onClick={() => {
+                                                                    // handleSwitchCourse()
+                                                                }}
+                                                            >
+                                                                <Card>
+                                                                    <Card.Section>
+                                                                        <Grid>
+                                                                            <Grid.Col
+                                                                                span={
+                                                                                    2
+                                                                                }
+                                                                            >
+                                                                                <Image
+                                                                                    src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                                                                    alt={
                                                                                         course.courseName
                                                                                     }
-                                                                                </Text>
-                                                                                <Text color="dimmed">
-                                                                                    {
-                                                                                        course.courseDuration
-                                                                                    }{' '}
-                                                                                    giờ{' '}
-                                                                                    -{' '}
-                                                                                    {course.courseDuration /
-                                                                                        2}{' '}
-                                                                                    buổi
-                                                                                    học
-                                                                                </Text>
-                                                                            </Stack>
-                                                                        </Grid.Col>
-                                                                        <Grid.Col
-                                                                            span={
-                                                                                5
-                                                                            }
-                                                                        >
-                                                                            <Group position="apart">
-                                                                                <Text
-                                                                                    color="dark"
-                                                                                    fz="xl"
-                                                                                    lineClamp={
-                                                                                        1
+                                                                                    height={
+                                                                                        82
                                                                                     }
-                                                                                >
-                                                                                    {course.rating ===
-                                                                                    'NaN'
-                                                                                        ? 5
-                                                                                        : parseFloat(
-                                                                                              course.rating
-                                                                                          ).toFixed(
-                                                                                              1
-                                                                                          )}
-                                                                                    <IconStarFilled
-                                                                                        style={{
-                                                                                            color: '#f6ad06',
-                                                                                            marginTop:
-                                                                                                '-5px',
-                                                                                            marginLeft:
-                                                                                                '5px'
-                                                                                        }}
-                                                                                    />
-                                                                                </Text>
-                                                                                <Text
-                                                                                    color="dark"
-                                                                                    fz="lg"
-                                                                                    fw={
-                                                                                        500
-                                                                                    }
-                                                                                >
-                                                                                    {formatCurrency(
-                                                                                        course.coursePrice
-                                                                                    )}
-                                                                                </Text>
-                                                                            </Group>
-                                                                        </Grid.Col>
-                                                                    </Grid>
-                                                                </Grid.Col>
-                                                            </Grid>
-                                                        </Card.Section>
-                                                    </Card>
-                                                    <Divider />
-                                                </Link>
+                                                                                    withPlaceholder
+                                                                                />
+                                                                            </Grid.Col>
+                                                                            <Grid.Col
+                                                                                span={
+                                                                                    10
+                                                                                }
+                                                                            >
+                                                                                <Grid>
+                                                                                    <Grid.Col
+                                                                                        span={
+                                                                                            7
+                                                                                        }
+                                                                                    >
+                                                                                        <Stack>
+                                                                                            <Text
+                                                                                                color="dark"
+                                                                                                fw={
+                                                                                                    700
+                                                                                                }
+                                                                                                fz="xl"
+                                                                                                lineClamp={
+                                                                                                    1
+                                                                                                }
+                                                                                            >
+                                                                                                {
+                                                                                                    course.courseName
+                                                                                                }
+                                                                                            </Text>
+                                                                                            <Text color="dimmed">
+                                                                                                {
+                                                                                                    course.courseDuration
+                                                                                                }{' '}
+                                                                                                giờ{' '}
+                                                                                                -{' '}
+                                                                                                {course.courseDuration /
+                                                                                                    2}{' '}
+                                                                                                buổi
+                                                                                                học
+                                                                                            </Text>
+                                                                                        </Stack>
+                                                                                    </Grid.Col>
+                                                                                    <Grid.Col
+                                                                                        span={
+                                                                                            5
+                                                                                        }
+                                                                                    >
+                                                                                        <Group position="apart">
+                                                                                            <Text
+                                                                                                color="dark"
+                                                                                                fz="xl"
+                                                                                                lineClamp={
+                                                                                                    1
+                                                                                                }
+                                                                                            >
+                                                                                                {course.rating ===
+                                                                                                'NaN'
+                                                                                                    ? 5
+                                                                                                    : parseFloat(
+                                                                                                          course.rating
+                                                                                                      ).toFixed(
+                                                                                                          1
+                                                                                                      )}
+                                                                                                <IconStarFilled
+                                                                                                    style={{
+                                                                                                        color: '#f6ad06',
+                                                                                                        marginTop:
+                                                                                                            '-5px',
+                                                                                                        marginLeft:
+                                                                                                            '5px'
+                                                                                                    }}
+                                                                                                />
+                                                                                            </Text>
+                                                                                            <Text
+                                                                                                color="dark"
+                                                                                                fz="lg"
+                                                                                                fw={
+                                                                                                    500
+                                                                                                }
+                                                                                            >
+                                                                                                {formatCurrency(
+                                                                                                    course.coursePrice
+                                                                                                )}
+                                                                                            </Text>
+                                                                                        </Group>
+                                                                                    </Grid.Col>
+                                                                                </Grid>
+                                                                            </Grid.Col>
+                                                                        </Grid>
+                                                                    </Card.Section>
+                                                                </Card>
+                                                                <Divider />
+                                                            </Link>
+                                                        </>
+                                                    )
+                                                )}
                                             </>
-                                        ))}
-                                    </>
-                                )}
-                            </Spoiler>
+                                        )}
+                                    </Spoiler>
+                                </>
+                            )}
                         </Box>
 
                         {/*  Comment */}
@@ -1307,6 +1387,7 @@ function CourseDetailClient() {
                                 Phản hồi người dùng
                             </Text>
 
+                            {/* Check if user purchase course */}
                             {course.isPurchase && (
                                 <Stack mb={8}>
                                     <Rating
@@ -1334,6 +1415,7 @@ function CourseDetailClient() {
                                         color="dark"
                                         size="md"
                                         ml="auto"
+                                        mb="lg"
                                         onClick={() => handleCreateEvaluate()}
                                     >
                                         Đánh giá khóa học
@@ -1392,7 +1474,6 @@ function CourseDetailClient() {
                                                                     <Divider />
                                                                     <Group>
                                                                         <Avatar
-                                                                            // src="https://images.unsplash.com/photo-1624298357597-fd92dfbec01d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=250&q=80"
                                                                             src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
                                                                             alt={
                                                                                 evaluate.studentName
@@ -1400,19 +1481,61 @@ function CourseDetailClient() {
                                                                             radius="xl"
                                                                         />
                                                                         <Stack spacing="xs">
-                                                                            <Text
-                                                                                size="sm"
-                                                                                m={
-                                                                                    0
-                                                                                }
-                                                                                p={
-                                                                                    0
-                                                                                }
+                                                                            <Group
+                                                                                w="100%"
+                                                                                position="apart"
                                                                             >
-                                                                                {
-                                                                                    evaluate.studentName
-                                                                                }
-                                                                            </Text>
+                                                                                <Text
+                                                                                    size="sm"
+                                                                                    m={
+                                                                                        0
+                                                                                    }
+                                                                                    p={
+                                                                                        0
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        evaluate.studentName
+                                                                                    }
+                                                                                </Text>
+                                                                                {user !==
+                                                                                null ? (
+                                                                                    <>
+                                                                                        {evaluate.studentId ===
+                                                                                            user.username && (
+                                                                                            <ActionIcon
+                                                                                                color="red"
+                                                                                                variant="light"
+                                                                                                onClick={() =>
+                                                                                                    handleDeleteEvaluate(
+                                                                                                        evaluate.evaluateId
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                <IconTrash size="1rem" />
+                                                                                            </ActionIcon>
+                                                                                        )}
+                                                                                        {/* {evaluate.studentId ===
+                                                                                            user.username && (
+                                                                                            <ActionIcon
+                                                                                                color="indigo"
+                                                                                                variant="light"
+                                                                                                onClick={() =>
+                                                                                                    handleUpdateEvaluate(
+                                                                                                        evaluate.evaluateId
+                                                                                                    )
+                                                                                                }
+                                                                                            >
+                                                                                                <IconPencil size="1rem" />
+                                                                                            </ActionIcon>
+                                                                                        )} */}
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+
+                                                                                    </>
+                                                                                )}
+                                                                            </Group>
                                                                             <Text
                                                                                 size="xs"
                                                                                 m={
@@ -1437,14 +1560,6 @@ function CourseDetailClient() {
                                                                                     0
                                                                                 }
                                                                             >
-                                                                                <Text
-                                                                                    color="dark"
-                                                                                    size="sm"
-                                                                                >
-                                                                                    {
-                                                                                        evaluate.rating
-                                                                                    }
-                                                                                </Text>
                                                                                 <Rating
                                                                                     fractions={
                                                                                         2
