@@ -128,6 +128,7 @@ public class GoogleDriveRepository {
 
 	// get id folder google drive
 	public String getFolderId(String folderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		String parentId = null;
 		String[] folderNames = folderName.split("/");
 
@@ -154,7 +155,7 @@ public class GoogleDriveRepository {
 		}
 		folderId = driveInstance.files().create(fileMetadata).setFields("id").execute().getId();
 		// Set folder permission to allow others to view
-		Permission permission = setPermission("anyone", "reader");
+		Permission permission = setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com");
 		driveInstance.permissions().create(folderId, permission).execute();
 		return folderId;
 	}
@@ -192,5 +193,51 @@ public class GoogleDriveRepository {
 	public void deleteFile(String fileId) throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		driveQuickstart.getInstance().files().delete(fileId).execute();
+	}
+
+	// Upload file student
+	public String uploadFileStudent(MultipartFile file, String className, String taskName, String studentName) throws Exception {
+		String folder = getFolderId("Tasks");
+		try {
+			if (null != file) {
+				// Tìm thư mục className
+				String classNameFolderId = findOrCreateFolder(folder, className,
+						driveQuickstart.getInstance());
+				
+				// Tìm thư mục taskName
+				String taskNameFolderId = findOrCreateFolder(classNameFolderId, taskName,
+						driveQuickstart.getInstance());
+				
+				// Tạo thư mục cho sinh viên
+				String studentNamebFolderId = findOrCreateFolder(taskNameFolderId, studentName,
+						driveQuickstart.getInstance());
+
+				// Kiểm tra xem file đã tồn tại trên Google Drive chưa
+				if (fileExists(file.getOriginalFilename(), studentNamebFolderId)) {
+					System.out.println("File already exists on Google Drive.");
+					return null;
+				}
+
+				// Tạo metadata cho tệp
+				File fileMetadata = new File();
+				fileMetadata.setParents(Collections.singletonList(studentNamebFolderId));
+				fileMetadata.setName(file.getOriginalFilename());
+
+				// Tạo tệp trên Google Drive
+				File uploadFile = driveQuickstart.getInstance().files().create(fileMetadata,
+						new InputStreamContent(file.getContentType(), new ByteArrayInputStream(file.getBytes())))
+						.setFields("id").execute();
+
+				System.out.println(uploadFile.getId());
+				// Đặt quyền truy cập cho tệp
+				driveQuickstart.getInstance().permissions()
+						.create(uploadFile.getId(), setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
+
+				return uploadFile.getId();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 }

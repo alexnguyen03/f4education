@@ -31,6 +31,7 @@ import ClassInformation from 'views/teacher/ClassInformation'
 import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
 import CourseProgress from '../../../f4education/frontend/src/views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
+import SubmitHomework from 'views/client/student/SubmitHomework'
 
 export var routes = [
     {
@@ -267,6 +268,13 @@ export const routesStudent = [
         name: 'Thông tin bài kiểm tra',
         icon: 'ni ni-planet text-blue',
         component: <QuizzClient />,
+        layout: '/student'
+    },
+    {
+        path: '/task',
+        name: 'Nộp bài tập',
+        icon: 'ni ni-planet text-blue',
+        component: <SubmitHomework />,
         layout: '/student'
     }
 ]

@@ -63,10 +63,6 @@ public class Student implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
 	List<RegisterCourse> registerCourses;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "student")
-	List<Cart> carts;
 	
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")

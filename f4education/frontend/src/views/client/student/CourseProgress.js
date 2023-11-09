@@ -151,9 +151,9 @@ const CourseProgress = () => {
         document.scrollingElement.scrollTop = 0
     }
 
-    const handleShowQuestion = (courseId, classId) => {
+    const handleShowQuestion = (classId) => {
         navigate({
-            pathname: '/student/quizz',
+            pathname: '/student/task',
             search: `?${createSearchParams({
                 classId: classId
             })}`
@@ -272,6 +272,20 @@ const CourseProgress = () => {
                                 }}
                             >
                                 Làm bài trắc nghiệm
+                            </Button>
+                            <Button
+                                variant="outline"
+                                color="indigo"
+                                size="lg"
+                                leftIcon={<IconZoomQuestion />}
+                                mt={10}
+                                onClick={() => {
+                                    handleShowQuestion(
+                                        selectedCourse.classes.classId
+                                    )
+                                }}
+                            >
+                                Xem bài tập
                             </Button>
                             <Button
                                 variant="outline"

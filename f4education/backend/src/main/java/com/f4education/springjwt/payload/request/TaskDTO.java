@@ -19,4 +19,8 @@ public class TaskDTO {
 	private Date startDate;
 
 	private Date endDate;
+	
+	private String className;
+	
+	private String teacherName;
 }
