@@ -19,8 +19,9 @@ import {
 import resourceApi from '../../../api/resourceApi'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
-
-function DownloadRecource({ courseName }) {
+import JSZip from 'jszip'
+const DownloadRecource = ({ courseName }) => {
+    const zip = new JSZip()
     const [recource, setRecource] = useState([{ id: '', name: '', type: '' }])
     const [selectedRecourceIds, setSelectedRecourceIds] = useState([])
     const [loadingDownload, setLoadingDownload] = useState(false)
@@ -86,13 +87,17 @@ function DownloadRecource({ courseName }) {
 
         try {
             const resp = await resourceApi.downloadFiles(fileIds)
+            console.log(
+                '🚀 ~ file: DownloadRecource.js:90 ~ handleOnClickDownloadFiles ~ resp:',
+                resp
+            )
             if (resp.status === 200) {
                 const blob = new Blob([resp.data], { type: 'application/zip' })
                 const url = window.URL.createObjectURL(blob)
                 // Tạo một thẻ <a> ẩn và kích hoạt tải về
                 const a = document.createElement('a')
                 a.href = url
-                a.download = 'Tai-nguyen.zip'
+                a.download = 'tai-nguyen.zip'
                 a.style.display = 'none'
                 document.body.appendChild(a)
                 a.click()

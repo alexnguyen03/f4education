@@ -76,6 +76,7 @@
     "dayjs": "^1.11.10",
     "embla-carousel-react": "^8.0.0-rc14",
     "gapi-script": "^1.2.0",
+    "jszip": "^3.10.1",
     "material-react-table": "^1.14.0",
     "material-table": "^2.0.5",
     "moment": "^2.29.4",

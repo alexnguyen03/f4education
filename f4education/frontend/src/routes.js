@@ -33,6 +33,7 @@ import CourseProgress from './views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
 import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
+import Points from './views/teacher/Points'
 
 export var routes = [
     {
@@ -241,15 +242,21 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/classes-infor',
+        path: '/class-info',
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
         layout: '/teacher'
     },
     {
-        path: '/classes-infor/:classId',
+        path: '/class-info/:classId',
         component: <ClassInformationDetail />,
+        layout: '/teacher'
+    },
+    {
+        path: '/class-info/point/:classId',
+        icon: 'ni ni-planet text-blue',
+        component: <Points />,
         layout: '/teacher'
     }
 ]
@@ -274,13 +281,6 @@ export const routesStudent = [
         name: 'Thông tin bài kiểm tra',
         icon: 'ni ni-planet text-blue',
         component: <QuizzClient />,
-        layout: '/student'
-    },
-    {
-        path: '/classes/recources/:classId',
-        name: 'Thông tin bài kiểm tra',
-        icon: 'ni ni-planet text-blue',
-        component: <DownloadRecource />,
         layout: '/student'
     }
 ]

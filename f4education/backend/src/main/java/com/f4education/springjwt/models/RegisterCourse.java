@@ -65,10 +65,6 @@ public class RegisterCourse implements Serializable {
     @JsonIgnore
     List<Evaluate> evaluates;
 
-    @OneToMany(mappedBy = "registerCourse")
-    @JsonIgnore
-    List<Point> points;
-
     @ManyToOne
     @JoinColumn(name = "student_id")
     @JsonIgnore

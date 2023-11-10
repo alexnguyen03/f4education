@@ -5,6 +5,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -39,22 +41,29 @@ public class Point {
 
 	@Column(name = "average_point")
 	private Float averagePoint;
-	
-	@OneToMany(mappedBy = "point1")
-	List<DetailPoint> detailPoints;
-	
+
+	@Column(name = "exercise_point")
+	private Float exercisePoint;
+
+	@Column(name = "quizz_point")
+	private Float quizzPoint;
+
+	@Column(name = "attendance_point")
+	private Float attendancePoint;
+
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "student_id")
-	Student student; 
-	
+	Student student;
+
+	@JsonIgnore
 	@ManyToOne
-	@JoinColumn(name = "register_course_id")
-	RegisterCourse registerCourse;
+	@JoinColumn(name = "class_id")
+	Classes classes;
 
 	@Override
 	public String toString() {
 		return "Point [pointId=" + pointId + ", averagePoint=" + averagePoint + "]";
-	} 
-	
-	
+	}
+
 }

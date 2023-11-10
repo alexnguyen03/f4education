@@ -396,41 +396,39 @@ const ClassDetail = () => {
                     <CardHeader>
                         <Row className=" d-flex justify-content-between">
                             {
-                                <>
-                                    <Col md={4}>
-                                        <Label>Chọn giáo viên phụ trách</Label>
-                                        <span>{listStudentInClass.length}</span>
-                                        <Select
-                                            // formatOptionLabel={(teacher) => (
-                                            //     <div className="d-flex">
-                                            //         <div className="country-option ">
-                                            //             <img
-                                            //                 width={'35'}
-                                            //                 height={'35'}
-                                            //                 className="rounded-circle"
-                                            //                 src={
-                                            //                     IMG_TEACHER_URL +
-                                            //                     teacher.image
-                                            //                 }
-                                            //                 alt="teacher-image"
-                                            //             />
-                                            //         </div>
-                                            //         <div className="d-flex flex-column justify-content-center ml-3">
-                                            //             {teacher.label}
-                                            //         </div>
-                                            //     </div>
-                                            // )}
-                                            options={listTeacher}
-                                            placeholder="Chọn giáo viên"
-                                            onChange={(val) => {
-                                                handleOnChangeTeacher(val)
-                                            }}
-                                            isSearchable={true}
-                                            className="form-control-alternative "
-                                            styles={{ outline: 'none' }}
-                                        />
-                                    </Col>
-                                </>
+                                <Col md={4}>
+                                    <Label>Chọn giáo viên phụ trách</Label>
+                                    <span>{listStudentInClass.length}</span>
+                                    <Select
+                                        // formatOptionLabel={(teacher) => (
+                                        //     <div className="d-flex">
+                                        //         <div className="country-option ">
+                                        //             <img
+                                        //                 width={'35'}
+                                        //                 height={'35'}
+                                        //                 className="rounded-circle"
+                                        //                 src={
+                                        //                     IMG_TEACHER_URL +
+                                        //                     teacher.image
+                                        //                 }
+                                        //                 alt="teacher-image"
+                                        //             />
+                                        //         </div>
+                                        //         <div className="d-flex flex-column justify-content-center ml-3">
+                                        //             {teacher.label}
+                                        //         </div>
+                                        //     </div>
+                                        // )}
+                                        options={listTeacher}
+                                        placeholder="Chọn giáo viên"
+                                        onChange={(val) => {
+                                            handleOnChangeTeacher(val)
+                                        }}
+                                        isSearchable={true}
+                                        className="form-control-alternative "
+                                        styles={{ outline: 'none' }}
+                                    />
+                                </Col>
                             }
                             <Col
                                 md={4}
