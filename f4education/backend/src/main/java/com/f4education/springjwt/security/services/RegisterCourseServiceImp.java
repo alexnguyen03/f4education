@@ -1,7 +1,6 @@
 package com.f4education.springjwt.security.services;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -14,21 +13,16 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.RegisterCourseService;
-import com.f4education.springjwt.models.ClassRoom;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Schedule;
-import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
-import com.f4education.springjwt.payload.request.ScheduleDTO;
-import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
-import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.ClassRoomRepository;
 import com.f4education.springjwt.repository.CourseRepository;
@@ -39,25 +33,25 @@ import com.f4education.springjwt.repository.StudentRepository;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
-	@Autowired
-	private RegisterCourseRepository registerCourseRepository;
-	@Autowired
-	private CourseRepository courseRepository;
-	@Autowired
-	private StudentRepository studentRepository;
+    @Autowired
+    private RegisterCourseRepository registerCourseRepository;
+    @Autowired
+    private CourseRepository courseRepository;
+    @Autowired
+    private StudentRepository studentRepository;
 
     @Autowired
     private ClassRepository classRepository;
 
-	@Autowired
-	private ScheduleRepository scheduleRepository;
-	
-	@Autowired
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
     private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
-	
+
     @Autowired
     SessionsRepository sessionsRepository;
-    
+
     @Autowired
     ClassRoomRepository classRoomRepository;
 
@@ -81,33 +75,33 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
         return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse by Student ID", responseDTOS);
     }
 
-	@Override
-	public List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId) {
-		List<RegisterCourse> registerCourses = registerCourseRepository.findCourseProgressByStudentId(studentId);
-		return registerCourses.stream().map(this::convertToCourseProgressResponseDTO).toList();
-	}
-
-	@Override
-    public List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId) {
-		List<Schedule> registerCourses = scheduleRepository.findAllScheduleByClassId(classId);
-		return registerCourses.stream().map(this::convertToScheduleCourseProgressDTO).toList();
+    @Override
+    public List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId) {
+        List<RegisterCourse> registerCourses = registerCourseRepository.findCourseProgressByStudentId(studentId);
+        return registerCourses.stream().map(this::convertToCourseProgressResponseDTO).toList();
     }
 
-	public ScheduleCourseProgressDTO convertToScheduleCourseProgressDTO(Schedule schedule) {
-		ScheduleCourseProgressDTO courseResponse = new ScheduleCourseProgressDTO();
-		courseResponse.setClassId(schedule.getClasses().getClassId());
-		courseResponse.setStudyDate(schedule.getStudyDate());
-		courseResponse.setScheduleId(schedule.getScheduleId());
-		return courseResponse;
-	}
-	
-	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
-		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
-		courseResponse.setCourse(registerCourse.getCourse());
-		courseResponse.setClasses(registerCourse.getClasses());
-		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
-		return courseResponse;
-	}
+    @Override
+    public List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId) {
+        List<Schedule> registerCourses = scheduleRepository.findAllScheduleByClassId(classId);
+        return registerCourses.stream().map(this::convertToScheduleCourseProgressDTO).toList();
+    }
+
+    public ScheduleCourseProgressDTO convertToScheduleCourseProgressDTO(Schedule schedule) {
+        ScheduleCourseProgressDTO courseResponse = new ScheduleCourseProgressDTO();
+        courseResponse.setClassId(schedule.getClasses().getClassId());
+        courseResponse.setStudyDate(schedule.getStudyDate());
+        courseResponse.setScheduleId(schedule.getScheduleId());
+        return courseResponse;
+    }
+
+    public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
+        CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
+        courseResponse.setCourse(registerCourse.getCourse());
+        courseResponse.setClasses(registerCourse.getClasses());
+        courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
+        return courseResponse;
+    }
 
     @Override
     public HandleResponseDTO<RegisterCourseResponseDTO> getRegisterCourseById(Integer registerCourseId) {
@@ -187,29 +181,29 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
         return registerCourseDTO;
     }
 
-	private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
-		RegisterCourse registerCourse = new RegisterCourse();
+    private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
+        RegisterCourse registerCourse = new RegisterCourse();
 
-		Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
-		Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
+        Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
+        Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
 
-		BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
+        BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
 
-		if (course != null) {
-			registerCourse.setCourse(course);
-			registerCourse.setCourseDuration(course.getCourseDuration());
-			registerCourse.setCoursePrice(course.getCoursePrice());
-			registerCourse.setImage(course.getImage());
-			registerCourse.setCourseDescription(course.getCourseDescription());
-			registerCourse.setNumberSession(course.getNumberSession());
-		}
+        if (course != null) {
+            registerCourse.setCourse(course);
+            registerCourse.setCourseDuration(course.getCourseDuration());
+            registerCourse.setCoursePrice(course.getCoursePrice());
+            registerCourse.setImage(course.getImage());
+            registerCourse.setCourseDescription(course.getCourseDescription());
+            registerCourse.setNumberSession(course.getNumberSession());
+        }
 
-		if (student != null) {
-			registerCourse.setStudent(student);
-		}
+        if (student != null) {
+            registerCourse.setStudent(student);
+        }
 
-		return registerCourse;
-	}
+        return registerCourse;
+    }
 
     private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO,
             RegisterCourse registerCourse) {
@@ -246,19 +240,38 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
             RegisterCourseRequestDTO registerCourseRequestDTO) {
         List<RegisterCourse> listRegisterCourse = registerCourseRepository
                 .findByCourseId(registerCourseRequestDTO.getCourseId());
-        List<Integer> listRegisterCourseId = registerCourseRequestDTO.getListRegisterCourseId();
-        List<RegisterCourse> filteredRegisterCourses = listRegisterCourse
-                .stream()
-                .filter(registerCourse -> listRegisterCourseId.contains(registerCourse.getRegisterCourseId()))
-                .collect(Collectors.toList());
-        Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
-        filteredRegisterCourses.forEach(registerCourse -> {
-            registerCourse.setClasses(foundClass);
-            registerCourse.setStudent(registerCourse.getStudent());
-            registerCourse.setCourse(registerCourse.getCourse());
-        });
+        List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
+        List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
 
-        return registerCourseRepository.saveAll(filteredRegisterCourses)
+        Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
+        List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
+        if (!listRegisterCourseIdToAdd.isEmpty()) {
+
+            filteredRegisterCoursesToAdd = listRegisterCourse
+                    .stream()
+                    .filter(registerCourse -> listRegisterCourseIdToAdd.contains(registerCourse.getRegisterCourseId()))
+                    .collect(Collectors.toList());
+            filteredRegisterCoursesToAdd.forEach(registerCourse -> {
+                registerCourse.setClasses(foundClass);
+            });
+            registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+        }
+        List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
+        if (!listRegisterCourseIdToDelete.isEmpty()) {
+
+            filteredRegisterCoursesToDelete = listRegisterCourse
+                    .stream()
+                    .filter(registerCourse -> listRegisterCourseIdToDelete
+                            .contains(registerCourse.getRegisterCourseId()))
+                    .collect(Collectors.toList());
+            filteredRegisterCoursesToDelete.forEach(registerCourse -> {
+                registerCourse.setClasses(null);
+
+            });
+            registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+        }
+
+        return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd)
                 .stream()
                 .map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
