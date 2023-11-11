@@ -22,9 +22,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.TaskService;
 import com.f4education.springjwt.payload.request.CourseDTO;
+import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.ResourceRequest;
 import com.f4education.springjwt.payload.request.ResourcesDTO;
 import com.f4education.springjwt.payload.request.TaskDTO;
+import com.f4education.springjwt.payload.request.TaskFileStudentDTO;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -45,8 +47,7 @@ public class TaskController {
 	@PostMapping(value = "/submit", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = {
 			MediaType.APPLICATION_JSON_VALUE })
 	public void submitTaskFile(@RequestParam("file") MultipartFile[] file, @RequestParam("className") String className,
-			@RequestParam("taskName") String taskName,
-			@RequestParam("studentName") String studentName) {
+			@RequestParam("taskName") String taskName, @RequestParam("studentName") String studentName) {
 
 		for (MultipartFile files : file) {
 			System.out.println(files);
@@ -58,4 +59,11 @@ public class TaskController {
 		}
 	}
 
+	@GetMapping("/file/{className}/{taskName}/{studentName}")
+	public ResponseEntity<?> getAllFilesInFolderTaskStudent(@PathVariable("className") String className,
+			@PathVariable("taskName") String taskName, @PathVariable("studentName") String studentName)
+			throws Exception {
+		List<TaskFileStudentDTO> lists = taskService.getAllFilesInFolderTaskStudent(className, taskName, studentName);
+		return ResponseEntity.ok(lists);
+	}
 }

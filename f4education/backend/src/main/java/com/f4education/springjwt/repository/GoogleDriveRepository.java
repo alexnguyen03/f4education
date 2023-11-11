@@ -240,4 +240,31 @@ public class GoogleDriveRepository {
 		}
 		return null;
 	}
+	
+	public List<File> getAllFilesInFolderTaskStudent(String className, String taskName, String studentName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+
+		// Lấy id thư mục "Tasks"
+		String taskId = getFolderId("Tasks");
+		
+		// Lấy id thư mục "className"
+		String subFolderClassNameId = searchFolderId(taskId, className, driveQuickstart.getInstance());
+		
+		// Lấy id thư mục "taskName"
+		String subFolderTaskNameId = searchFolderId(subFolderClassNameId, taskName, driveQuickstart.getInstance());
+		
+		// Lấy id thư mục "studentName"
+		String subFolderStudentNameId = searchFolderId(subFolderTaskNameId, studentName, driveQuickstart.getInstance());
+		
+		List<File> allFiles = new ArrayList<>();
+		FileList result = driveQuickstart.getInstance().files().list().setQ("'" + subFolderStudentNameId + "' in parents")
+				.setSpaces("drive").setFields("files(id, name, size)").execute();
+
+		List<File> files = result.getFiles();
+		if (files != null && !files.isEmpty()) {
+			allFiles.addAll(files);
+		}
+
+		return allFiles;
+	}
 }

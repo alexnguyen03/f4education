@@ -65,6 +65,20 @@ const Notify = {
                 render: 'Lỗi. Vui lòng thử lại sau !',
                 ...defaultOptions
             }
+        },
+        uploadFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Upload file thành công !',
+                ...defaultOptions
+            }
+        },
+        deleteFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Xóa file thành công !',
+                ...defaultOptions
+            }
         }
     }
 }
