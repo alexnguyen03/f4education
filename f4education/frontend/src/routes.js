@@ -33,6 +33,7 @@ import CourseProgress from './views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
 import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
+import CertificatePDF from 'views/PDF/CertificatePDF'
 
 export var routes = [
     {
@@ -217,14 +218,6 @@ export var routesClient = [
         component: <CourseRegisterClient />,
         layout: '/client'
     },
-    // {
-    //   path: "/course-register-detail/:courseId",
-    //   name: "khóa học đăng ký chi tiết",
-    //   icon: "ni ni-planet text-blue",
-    //   component: <CourseRegisterDetailClient />,
-    //   layout: "/client",
-    // },
-
     {
         path: '/course-progress',
         component: <CourseProgress />,
@@ -282,5 +275,13 @@ export const routesStudent = [
         icon: 'ni ni-planet text-blue',
         component: <DownloadRecource />,
         layout: '/student'
+    }
+]
+
+export const routesPDF = [
+    {
+        path: '/certificate/download',
+        component: <CertificatePDF />,
+        layout: '/pdf'
     }
 ]

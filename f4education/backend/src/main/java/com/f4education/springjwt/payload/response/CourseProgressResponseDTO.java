@@ -11,7 +11,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class CourseProgressResponseDTO {
-    private Course course;
-    private Classes classes;
-    private String teacherName;
+	private Course course;
+	private Classes classes;
+	private String teacherName;
+	private Integer registerCourseId;
 }

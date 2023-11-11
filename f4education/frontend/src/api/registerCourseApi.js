@@ -25,6 +25,11 @@ const registerCourseApi = {
     getCourseProgressByClassId: (classId) => {
         const url = `/register-course/student/progress/${classId}`
         return axiosClient.get(url)
+    },
+    checkIfEvaratePointGreaterThanFive: (studentId, classId, registerCourseId) => {
+        const url = `/register-course/student/is-done?studentId=${studentId}
+                &classId=${classId}&registerCourseId=${registerCourseId}`
+        return axiosClient.get(url)
     }
 }
 

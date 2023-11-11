@@ -1,7 +1,8 @@
 import { Container } from '@mantine/core'
 import React from 'react'
 import { Link } from 'react-router-dom'
-import logo from '../../assets/img/brand/f4-white.png'
+// import logo from '../../assets/img/brand/f4-white.png'
+import logo from '../../assets/img/new-logo-white.png'
 
 const ClientFooter = () => {
     return (

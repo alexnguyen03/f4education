@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Badge, Col, Row } from 'reactstrap'
-import logo from '../../assets/img/brand/f4.png'
+// import logo from '../../assets/img/brand/f4.png'
+import logo from '../../assets/img/brand/F4EDUCATION.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
 // reactstrap components
 
@@ -25,7 +26,6 @@ import {
     IconChevronDown,
     IconLayoutDashboard,
     IconLogout2,
-    IconProgressAlert,
     IconSchoolBell,
     IconSearch,
     IconUserBolt
@@ -161,7 +161,16 @@ const ClientNavbar = () => {
                 style={{ width: '100%', maxWidth: '1360px' }}
             >
                 <Link to={'/'} className="navbar-brand">
-                    <img src={logo} className="img-fluid" alt="" />
+                    <img
+                        src={logo}
+                        className="img-fluid"
+                        alt="F4 Education Center"
+                        style={{
+                            objectFit: 'cover',
+                            width:'120px',
+                            height:'35px'
+                        }}
+                    />
                 </Link>
                 <div
                     className="navbar-toggler"
@@ -659,7 +668,6 @@ const ClientNavbar = () => {
                 </div>
             </div>
         </nav>
-        // </Container>
     )
 }
 

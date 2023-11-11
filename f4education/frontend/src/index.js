@@ -12,6 +12,7 @@ import ClientLayout from './layouts/Client.js'
 import Teacher from './layouts/Teacher'
 import Student from './layouts/Student'
 import Provider from 'Provider'
+import PDFLayout from 'layouts/PDF.js'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
@@ -56,9 +57,13 @@ root.render(
             {/* Student Route */}
             <Route path="/student/*" element={<Student />} />
             <Route path="/*/:classId" element={<Student />} />
+
             {/* Teacher Route */}
             <Route path="/teacher/*" element={<Teacher />} />
             <Route path="/*/classes-infor/:classId" element={<Teacher />} />
+           
+            {/* PDF Route */}
+            <Route path="/pdf/*" element={<PDFLayout />} />
         </Routes>
     </BrowserRouter>
 )

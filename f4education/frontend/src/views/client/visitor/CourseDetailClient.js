@@ -127,7 +127,6 @@ function CourseDetailClient() {
 
     // Fetch AREA
     const fetchCurrentCourse = async () => {
-        setLoading(true)
         try {
             const resp = await courseApi.getCourseByCourseId(
                 params.courseId,
@@ -137,7 +136,6 @@ function CourseDetailClient() {
             console.log(resp.data)
             if (resp.status === 200) {
                 setCourse(resp.data)
-                setLoading(false)
             } else if (resp.status === 204) {
                 console.log('no content')
             }
@@ -147,7 +145,6 @@ function CourseDetailClient() {
     }
 
     const fetchNewestCourse = async () => {
-        setLoading(true)
         try {
             const resp = await courseApi.getNewestCourse(
                 user !== null ? user.username : 'nouser'
@@ -156,8 +153,6 @@ function CourseDetailClient() {
             if (resp.status === 200) {
                 setNewstCourse(resp.data)
                 console.log(resp.data)
-
-                setLoading(false)
             } else if (resp.status === 204) {
                 console.log('no content')
             }
@@ -167,12 +162,10 @@ function CourseDetailClient() {
     }
 
     const fetchListCourseContent = async () => {
-        setLoading(true)
         try {
             const resp = await courseDetailApi.getAllByCourseId(params.courseId)
             if (resp.status === 200) {
                 setListCourseContent(resp.data)
-                setLoading(false)
             } else console.log('Error at fetchCourseContent')
         } catch (error) {
             console.log(error)
@@ -180,13 +173,11 @@ function CourseDetailClient() {
     }
 
     const fetchListEvaluate = async () => {
-        setLoading(true)
         try {
             const resp = await evaluateApi.getAllByCourseId(params.courseId)
 
             if (resp.status === 200) {
                 setListEvaluate(resp.data)
-                setLoading(false)
             }
         } catch (error) {
             console.log(error)
@@ -204,6 +195,7 @@ function CourseDetailClient() {
             if (resp.status === 201 || resp.status === 200) {
                 toast.update(id, Notify.options.createSuccess())
                 fetchListEvaluate()
+                fetchCurrentCourse()
             }
         } catch (error) {
             toast.update(id, Notify.options.createError())
@@ -244,16 +236,6 @@ function CourseDetailClient() {
     const handleAddCart = (course) => {
         return new Promise((resolve, reject) => {
             const id = toast(Notify.msg.loading, Notify.options.loading())
-
-            // if (user === null) {
-            //     toast.update(
-            //         id,
-            //         Notify.options.createErrorParam(
-            //             'Vui lòng đăng nhập trước khi thanh toán'
-            //         )
-            //     )
-            //     return
-            // }
 
             try {
                 const userCart =

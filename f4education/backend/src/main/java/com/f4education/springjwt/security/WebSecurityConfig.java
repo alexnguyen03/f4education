@@ -101,6 +101,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/api/evaluate/**",
+                                        "/api/certificate/**",
                                         "/img/**")
                                 .permitAll()
                                 .requestMatchers(

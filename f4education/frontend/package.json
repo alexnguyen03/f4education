@@ -65,6 +65,7 @@
     "@mui/material": "^5.14.12",
     "@mui/styles": "^5.14.12",
     "@react-oauth/google": "^0.11.1",
+    "@react-pdf/renderer": "^3.1.14",
     "@tabler/icons-react": "^2.34.0",
     "@tiptap/extension-link": "^2.1.10",
     "@tiptap/react": "^2.1.10",
