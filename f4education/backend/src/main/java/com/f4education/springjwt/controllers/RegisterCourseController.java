@@ -1,20 +1,22 @@
 package com.f4education.springjwt.controllers;
 
-import com.f4education.springjwt.payload.request.CourseRequest;
-import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
-import com.f4education.springjwt.payload.request.TeacherDTO;
-import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
-import com.f4education.springjwt.payload.HandleResponseDTO;
-import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.api.client.googleapis.auth.clientlogin.ClientLogin.Response;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import com.f4education.springjwt.payload.HandleResponseDTO;
+import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
 
 @CrossOrigin("*")
 @RestController
@@ -28,6 +30,13 @@ public class RegisterCourseController {
 		return registerCourseService.getAllRegisterCourse();
 	}
 
+	// @GetMapping("/teacher")
+	// public ResponseEntity<?> findAllClassByTeacherId() {
+	// List<ClassesByTeacher> lst = registerCourseService
+	// .getRegisterCourseWithTeacherAndClasses();
+	// return ResponseEntity.ok(lst);
+	// }
+
 	@GetMapping("/distinc")
 	public ResponseEntity<?> findAllDistincByCourse_CourseName() {
 		List<RegisterCourseResponseDTO> list = registerCourseService.getAllRegisterCoursesByCourse_CourseName();
@@ -35,7 +44,7 @@ public class RegisterCourseController {
 	}
 
 	@GetMapping("/{studentId}")
-	public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllByStudentId(@PathVariable Integer studentId) {
+	public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllByStudentId(@PathVariable String studentId) {
 		return registerCourseService.findAllRegisterCourseByStudentId(studentId);
 	}
 

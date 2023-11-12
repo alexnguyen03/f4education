@@ -6,8 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Entity
 @AllArgsConstructor
@@ -19,23 +17,24 @@ public class Answer {
     @Column(name = "answer_id")
     private Integer answerId;
 
-    @Column(name = "text")
-    private String text;
+    @Column(name = "answer_content")
+    private String answerContent;
 
     @Column(name = "is_correct")
     private Boolean isCorrect;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
+    @JoinColumn(name = "question_detail_id")
     @JsonIgnore
-    Question question;
+    QuestionDetail questionDetail;
 
     @Override
     public String toString() {
         return "Answer{" +
                 "answerId=" + answerId +
-                ", text=" + text +
+                ", answerContent='" + answerContent + '\'' +
                 ", isCorrect=" + isCorrect +
+                ", questionDetail=" + questionDetail +
                 '}';
     }
 }

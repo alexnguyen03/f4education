@@ -4,9 +4,7 @@ import SubjectHeader from 'components/Headers/SubjectHeader'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { IconEyeSearch, IconCheck, IconListDetails } from '@tabler/icons-react'
-import { Notification } from '@mantine/core'
-
+import { IconEyeSearch, IconListDetails } from '@tabler/icons-react'
 // reactstrap components
 import {
     Badge,
@@ -18,15 +16,33 @@ import {
     Container,
     Input,
     Modal,
-    Row
+    Row,
+    UncontrolledTooltip
 } from 'reactstrap'
+
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
 
 // Axios
 import subjectApi from '../../api/subjectApi'
 import subjectHistoryApi from '../../api/subjectHistoryApi'
 import courseApi from '../../api/courseApi'
 
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
+
+const formatCurrency = (amount) => {
+    const formatter = new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND',
+        minimumFractionDigits: 0
+    })
+
+    return formatter.format(amount)
+}
+
 const Subjects = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // Main variable
     const [subjects, setSubjects] = useState([])
     const [subjectHistories, setSubjectHistories] = useState([])
@@ -41,12 +57,6 @@ const Subjects = () => {
     const [ModalHistory, setModalHistory] = useState(false)
     const [loadingPopupHistory, setLoadingPopupHistory] = useState(false)
     const [courseBySubject, setCourseBySubject] = useState(false)
-    const [showNotification, setShowNotification] = useState({
-        status: false,
-        title: '',
-        message: '',
-        color: ''
-    })
     const [subjectLoading, setSubjectLoading] = useState(false)
     const [subjectNameRecent, setSubjectNameRecent] = useState('')
 
@@ -56,13 +66,10 @@ const Subjects = () => {
         message: ''
     })
 
-    // Initial
-    // const storedUser = JSON.parse(localStorage.getItem("user"));
-
     // *************** Subject AREA
     const [subject, setSubject] = useState({
         subjectId: '',
-        adminId: '',
+        adminId: user.username,
         subjectName: '',
         createDate: new Date()
     })
@@ -96,9 +103,11 @@ const Subjects = () => {
             console.log(error)
         }
     }
+
     const reverseArray = (arr) => {
         return arr.reverse()
     }
+
     const fetchSubjectHistoryPerSubject = async (row) => {
         try {
             setLoadingPopupHistory(true)
@@ -125,9 +134,11 @@ const Subjects = () => {
                 subjectName.trim()
             )
 
-            if (resp.status === 200 && resp.data.length > 0) {
+            if (resp.status === 200) {
                 console.log(resp.data)
                 setCoursePerSubjectName(resp.data)
+            } else {
+                console.log('error')
             }
 
             setLoadingPopupHistory(false)
@@ -138,7 +149,7 @@ const Subjects = () => {
 
     // API_AREA > CRUD
     const handleCreateNewSubject = async () => {
-        subject.adminId = 'namnguyen'
+        subject.adminId = user.username
 
         const lastSubject = subjects.slice(-1)[0]
         const lastSubjectId = lastSubject.subjectId
@@ -154,17 +165,17 @@ const Subjects = () => {
         subject.subjectId = ''
         // const action = "add";
         if (validateForm()) {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
                 const body = subject
                 const resp = await subjectApi.createSubject(body)
-                console.log(resp.data)
-                notifycationAction(
-                    'Thêm mới môn học',
-                    'thêm mới môn học thành công!',
-                    'teal'
-                )
-                // Create SubjectHistory
-                // handleCreateNewSubjectHistory(subject, action);
+
+                if (resp.status === 201 || resp.status === 200) {
+                    toast.update(id, Notify.options.createSuccess())
+                } else {
+                    toast.update(id, Notify.options.createError())
+                }
             } catch (error) {
                 console.log(error)
             }
@@ -190,19 +201,20 @@ const Subjects = () => {
         setSubject(newSubjects[index])
 
         if (validateForm()) {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
-                subject.adminId = 'namnguyen'
+                subject.adminId = user.username
                 const body = subject
                 const resp = await subjectApi.updateSubject(
                     body,
                     subject.subjectId
                 )
-                console.log(resp.data)
-                notifycationAction(
-                    'Cập nhật môn học',
-                    'Cập nhật môn học thành công!',
-                    'indigo'
-                )
+                if (resp.status === 200) {
+                    toast.update(id, Notify.options.updateSuccess())
+                } else {
+                    toast.update(id, Notify.options.updateError())
+                }
                 // Add subjectHistory
                 // handleCreateNewSubjectHistory(subject, action);
             } catch (error) {
@@ -222,7 +234,7 @@ const Subjects = () => {
         setShowModal(true)
         setSubject({
             ...row.original,
-            adminId: row.original.adminName,
+            adminId: user.username,
             createDate: row.original.createDate
         })
         setUpdate(true)
@@ -232,21 +244,11 @@ const Subjects = () => {
     const resetForm = () => {
         setSubject({
             subjectId: '',
-            adminId: 'namnguyen',
+            adminId: user.username,
             subjectName: '',
             createDate: new Date()
         })
     }
-
-    const notifycationAction = (title, message, color) => {
-        setShowNotification({
-            status: true,
-            title: title,
-            message: message,
-            color: color
-        })
-    }
-
     // Validation area
     const validateForm = () => {
         if (subject.subjectName.length === 0) {
@@ -327,7 +329,9 @@ const Subjects = () => {
             // },
             {
                 accessorFn: (row) =>
-                    moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A'),
+                    row.createDate
+                        ? moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A')
+                        : 'Không có ngày khả dụng',
                 header: 'Ngày Tạo',
                 size: 120
             }
@@ -336,17 +340,7 @@ const Subjects = () => {
     )
 
     const displaySubjectName = (row) => {
-        return (
-            <div
-                onClick={() => {
-                    handleShowCourseBySubjectName(row.original)
-                }}
-                className="text-dark font-weight-600"
-                style={{ cursor: 'pointer' }}
-            >
-                {row.subjectName}
-            </div>
-        )
+        return <span>{row.subjectName}</span>
     }
 
     const columnSubjectHistory = useMemo(
@@ -394,15 +388,6 @@ const Subjects = () => {
     }
 
     // *************** Subject History AREA
-    // const [subjectHistory] = useState({
-    //   subjectHistoryId: "",
-    //   action: "",
-    //   modifyDate: new Date(),
-    //   adminId: "",
-    //   subjectName: "",
-    //   subjectId: "",
-    // });
-
     // API
     const fetchSubjectHistory = async () => {
         try {
@@ -421,43 +406,16 @@ const Subjects = () => {
         }
     }
 
-    // API_AREA > CRUD
-    // const handleCreateNewSubjectHistory = async (subject, action) => {
-    //   try {
-    //     subjectHistory.subjectName = subject.subjectName;
-    //     subjectHistory.subjectId = subject.subjectId;
-    //     subjectHistory.action = action === "add" ? "CREATE" : "UPDATE";
-    //     subjectHistory.adminId = subject.adminId;
-
-    //     const body = subjectHistory;
-    //     console.log(body);
-    //     const resp = await subjectHistoryApi.createSubjectHistory(body);
-    //     console.log(resp.data);
-    //   } catch (error) {
-    //     console.log(error);
-    //   }
-    //   fetchSubjectHistory();
-    // };
-
     // *************** Use effect area
     useEffect(() => {
         fetchSubjects()
         fetchSubjectHistory()
     }, [])
 
-    useEffect(() => {
-        const timeout = setTimeout(() => {
-            setShowNotification({
-                status: false,
-                title: '',
-                message: ''
-            })
-        }, 4000)
-        return () => clearTimeout(timeout)
-    }, [showNotification])
-
     return (
         <>
+            <ToastContainer />
+
             {/* HeaderSubject start */}
             <SubjectHeader />
             {/* HeaderSubject End */}
@@ -554,6 +512,7 @@ const Subjects = () => {
                                         </IconButton>
                                         <IconButton
                                             color="primary"
+                                            id="tooltip611234743"
                                             onClick={() => {
                                                 handleShowCourseBySubjectName(
                                                     row.original
@@ -562,6 +521,13 @@ const Subjects = () => {
                                         >
                                             <IconListDetails />
                                         </IconButton>
+                                        <UncontrolledTooltip
+                                            delay={0}
+                                            placement="top"
+                                            target="tooltip611234743"
+                                        >
+                                            Các khóa học theo môn học
+                                        </UncontrolledTooltip>
                                     </Box>
                                 )}
                                 // Top Add new Subject button
@@ -609,24 +575,6 @@ const Subjects = () => {
                         )}
                     </CardBody>
                 </Card>
-
-                {/* Notifycation */}
-                {showNotification.status && (
-                    <Notification
-                        icon={<IconCheck size="1.1rem" />}
-                        color={showNotification.color}
-                        title={showNotification.title}
-                        style={{
-                            position: 'fixed',
-                            top: '20px',
-                            right: '20px',
-                            zIndex: '2023',
-                            maxWidth: '400px'
-                        }}
-                    >
-                        {showNotification.message}
-                    </Notification>
-                )}
 
                 {/* Modal Add - Update Suject*/}
                 <Modal className="modal-dialog-centered" isOpen={showModal}>
@@ -787,7 +735,6 @@ const Subjects = () => {
                                 </h4>
                                 <Button
                                     color="default"
-                                    outline
                                     data-dismiss="modal"
                                     type="button"
                                     onClick={() => {
@@ -831,21 +778,22 @@ const Subjects = () => {
                                                                 <Card className="mb-2">
                                                                     <CardBody>
                                                                         <img
-                                                                            src="https://images.pexels.com/photos/1671436/pexels-photo-1671436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                                                            // src="https://images.pexels.com/photos/1671436/pexels-photo-1671436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
+                                                                            src={`${PUBLIC_IMAGE}/courses/${course.image}`}
                                                                             className="img-fluid"
                                                                             alt=""
                                                                             style={{
                                                                                 width: '100%',
-                                                                                height: '400px',
+                                                                                height: '250px',
                                                                                 objectFit:
                                                                                     'cover'
                                                                             }}
                                                                         />
-                                                                        <h3 className="font-weight-600 mt-2">
+                                                                        <h2 className="font-weight-600 mt-2">
                                                                             {
                                                                                 course.courseName
                                                                             }
-                                                                        </h3>
+                                                                        </h2>
                                                                         <div className="d-flex justify-content-start">
                                                                             <h4 className="text-muted">
                                                                                 <span className="mr-2">
@@ -855,9 +803,8 @@ const Subjects = () => {
                                                                                 <strong className="font-weight-500">
                                                                                     {
                                                                                         course.courseDuration
-                                                                                    }
-
-                                                                                    H
+                                                                                    }{' '}
+                                                                                    Giờ
                                                                                 </strong>
                                                                             </h4>
                                                                             <span className="font-weight-600 mx-3 mt--1">
@@ -869,16 +816,14 @@ const Subjects = () => {
                                                                                     khóa
                                                                                     học:
                                                                                 </span>
-                                                                                <strong className="text-danger font-weight-500">
+                                                                                <strong className="text-primary font-weight-700">
                                                                                     {
-                                                                                        course.coursePrice
+                                                                                        formatCurrency(course.coursePrice)
                                                                                     }
-
-                                                                                    đ
                                                                                 </strong>
                                                                             </h4>
                                                                         </div>
-                                                                        <hr className="text-muted" />
+                                                                        {/* <hr className="text-muted" /> */}
                                                                     </CardBody>
                                                                 </Card>
                                                             </Col>

@@ -1,30 +1,42 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
 import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.models.ClassRoom;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.RegisterCourse;
+import com.f4education.springjwt.models.Schedule;
+import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.request.ScheduleDTO;
+import com.f4education.springjwt.payload.request.TeacherDTO;
+import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.repository.ClassRepository;
+import com.f4education.springjwt.repository.ClassRoomRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
+import com.f4education.springjwt.repository.ScheduleRepository;
+import com.f4education.springjwt.repository.SessionsRepository;
 import com.f4education.springjwt.repository.StudentRepository;
 
 @Service
@@ -40,17 +52,28 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     @Autowired
     private ClassRepository classRepository;
 
+    @Autowired
+    private ScheduleRepository scheduleRepository;
+
+    @Autowired
+    private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
+
+    @Autowired
+    SessionsRepository sessionsRepository;
+
+    @Autowired
+    ClassRoomRepository classRoomRepository;
+
     @Override
     public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
         List<RegisterCourse> registerCourses = registerCourseRepository.findAll();
-        List<RegisterCourseResponseDTO> responseDTOs = registerCourses.stream()
-                .map(this::convertToResponseDTO)
+        List<RegisterCourseResponseDTO> responseDTOs = registerCourses.stream().map(this::convertToResponseDTO)
                 .collect(Collectors.toList());
         return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse", responseDTOs);
     }
 
     @Override
-    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(Integer studentId) {
+    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(String studentId) {
         List<RegisterCourse> registerCourses = registerCourseRepository.findByStudentId(studentId);
         if (registerCourses.isEmpty()) {
             return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student ID cannot be found", null);
@@ -59,6 +82,34 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                 .map(this::convertToResponseDTO)
                 .toList();
         return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse by Student ID", responseDTOS);
+    }
+
+    @Override
+    public List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId) {
+        List<RegisterCourse> registerCourses = registerCourseRepository.findCourseProgressByStudentId(studentId);
+        return registerCourses.stream().map(this::convertToCourseProgressResponseDTO).toList();
+    }
+
+    @Override
+    public List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId) {
+        List<Schedule> registerCourses = scheduleRepository.findAllScheduleByClassId(classId);
+        return registerCourses.stream().map(this::convertToScheduleCourseProgressDTO).toList();
+    }
+
+    public ScheduleCourseProgressDTO convertToScheduleCourseProgressDTO(Schedule schedule) {
+        ScheduleCourseProgressDTO courseResponse = new ScheduleCourseProgressDTO();
+        courseResponse.setClassId(schedule.getClasses().getClassId());
+        courseResponse.setStudyDate(schedule.getStudyDate());
+        courseResponse.setScheduleId(schedule.getScheduleId());
+        return courseResponse;
+    }
+
+    public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
+        CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
+        courseResponse.setCourse(registerCourse.getCourse());
+        courseResponse.setClasses(registerCourse.getClasses());
+        courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
+        return courseResponse;
     }
 
     @Override
@@ -141,9 +192,12 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
     private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
         RegisterCourse registerCourse = new RegisterCourse();
+
         Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
         Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
+
         BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
+
         if (course != null) {
             registerCourse.setCourse(course);
             registerCourse.setCourseDuration(course.getCourseDuration());
@@ -152,9 +206,11 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
             registerCourse.setCourseDescription(course.getCourseDescription());
             registerCourse.setNumberSession(course.getNumberSession());
         }
+
         if (student != null) {
             registerCourse.setStudent(student);
         }
+
         return registerCourse;
     }
 
@@ -199,8 +255,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                 .filter(registerCourse -> listRegisterCourseId.contains(registerCourse.getRegisterCourseId()))
                 .collect(Collectors.toList());
         Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
-
-        
 
         filteredRegisterCourses.forEach(registerCourse -> {
             registerCourse.setClasses(foundClass);

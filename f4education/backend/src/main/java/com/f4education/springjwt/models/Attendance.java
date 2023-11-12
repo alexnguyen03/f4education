@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -43,15 +45,18 @@ public class Attendance {
 	
 	@ManyToOne
 	@JoinColumn(name = "academic_id")
+	@JsonIgnore
 	Academic academic;
 	
 	@ManyToOne
 	@JoinColumn(name = "register_course_id")
+	@JsonIgnore
 	RegisterCourse registerCourse;
 	
 	@ManyToOne
 	@JoinColumn(name = "schedule_id")
-	Schedule schedule ;
+	@JsonIgnore
+	Schedule schedule;
 	
 	@Override
 	public String toString() {

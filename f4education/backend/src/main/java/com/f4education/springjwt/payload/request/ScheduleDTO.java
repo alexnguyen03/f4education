@@ -1,6 +1,9 @@
 package com.f4education.springjwt.payload.request;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,11 +13,16 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleDTO {
+	@JsonProperty("scheduleId")
 	private Integer scheduleId;
 
-	private Date schoolDay;
+	@JsonProperty("studyDate")
+	private OffsetDateTime studyDate;
 
+	@JsonProperty("content")
 	private String content;
-	
-	private String note;
+
+	@JsonProperty("isPractice")
+	private Boolean isPractice;
+
 }

@@ -27,6 +27,8 @@ public class CourseDTO {
     private Subject subject;
 
     private String image;
+    
+    private Boolean status;
 
     @Override
     public String toString() {

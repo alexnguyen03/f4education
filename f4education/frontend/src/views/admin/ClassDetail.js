@@ -98,28 +98,8 @@ const ClassDetail = () => {
     }
     // ! HANDLE FUNCTIONS
     const handleSave = async () => {
-        console.log(
-            '🚀 ~ file: ClassDetail.js:84 ~ handleSave ~ listCourse:',
-            convertStudentIdToRegisterCouserId(
-                dataTransfer[1].map((item) => {
-                    const { value } = { ...item }
-                    return value
-                })
-            )
-        )
-        setClassRequest((prev) => ({
-            ...prev,
-            classId: classDetail.classId,
-            courseId: classDetail.courseId,
-            teacherId: classDetail.teacher.teacherId,
-            listRegisterCourseId: convertStudentIdToRegisterCouserId(
-                dataTransfer[1].map((item) => {
-                    const { value } = { ...item }
-                    return value
-                })
-            )
-        }))
         const id = toast(Notify.msg.loading, Notify.options.loading())
+        console.log(classRequest)
         try {
             const resp = await registerCourseApi.updateRegisterCourse(
                 JSON.stringify(classRequest)
@@ -136,17 +116,8 @@ const ClassDetail = () => {
         }
     }
     const convertStudentIdToRegisterCouserId = (studentId) => {
-        console.log(
-            '🚀 ~ file: ClassDetail.js:121 ~ convertStudentIdToRegisterCouserId ~ studentId:',
-            studentId
-        )
         const matchingIds = []
         for (const registration of allRegisterCourses) {
-            console.log(
-                '🚀 ~ file: ClassDetail.js:123 ~ convertStudentIdToRegisterCouserId ~ registration:',
-                registration
-            )
-
             if (studentId.includes(registration.studentId)) {
                 matchingIds.push(registration.registerCourseId)
             }
@@ -230,13 +201,6 @@ const ClassDetail = () => {
                     (item) => item.classId !== parseInt(classIdParam)
                 )
 
-                // setListStudentInCourse(
-                //     convertRegisterToStudentArray(studentInCourse)
-                // )
-                // setListStudentInClass(
-                //     convertRegisterToStudentArray(studentInClass)
-                // )
-
                 setLoadingTransfer(false)
                 setDataTransfer([
                     convertRegisterToStudentArray(studentInCourse),
@@ -295,7 +259,7 @@ const ClassDetail = () => {
     const getClassByClassId = async () => {
         setLoadingGetClassDetail(true)
         try {
-            const resp = await classApi.getClassById(classIdParam)
+            const resp = await classApi.getByClassId(classIdParam)
 
             setClassDetail(resp.data)
             setLoadingGetClassDetail(false)
@@ -392,6 +356,21 @@ const ClassDetail = () => {
         getRegisterCourse()
     }, [])
     useEffect(() => {
+        setClassRequest((prev) => ({
+            ...prev,
+            classId: classDetail.classId,
+            courseId: classDetail.courseId,
+            teacherId: classDetail.teacher.teacherId,
+            listRegisterCourseId: convertStudentIdToRegisterCouserId(
+                dataTransfer[1].map((item) => {
+                    const { value } = { ...item }
+                    return value
+                })
+            )
+        }))
+    }, [dataTransfer])
+
+    useEffect(() => {
         if (!loadingGetClassDetail) {
             console.log(
                 '🚀 ~ file: ClassDetail.js:317 ~ useEffect ~ loadingGetClassDetail:',
@@ -435,7 +414,7 @@ const ClassDetail = () => {
                                             //     </div>
                                             // )}
                                             options={listTeacher}
-                                            placeholder="Chọn môn học"
+                                            placeholder="Chọn giáo viên"
                                             onChange={(val) => {
                                                 handleOnChangeTeacher(val)
                                             }}

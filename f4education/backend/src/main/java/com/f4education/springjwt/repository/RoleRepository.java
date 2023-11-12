@@ -9,6 +9,6 @@ import com.f4education.springjwt.models.ERole;
 import com.f4education.springjwt.models.Role;
 
 @Repository
-public interface RoleRepository extends JpaRepository<Role, Long> {
+public interface RoleRepository extends JpaRepository<Role, Integer> {
   Optional<Role> findByName(ERole name);
 }

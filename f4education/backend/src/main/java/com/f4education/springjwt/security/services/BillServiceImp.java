@@ -5,12 +5,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import com.f4education.springjwt.repository.BillDetailRepository;
-import com.f4education.springjwt.repository.StudentRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.BillService;
@@ -18,10 +14,10 @@ import com.f4education.springjwt.models.Bill;
 import com.f4education.springjwt.models.PaymentMethod;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
-import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.response.BillResponseDTO;
 import com.f4education.springjwt.repository.BillRepository;
 import com.f4education.springjwt.repository.PaymentMethodRepository;
+import com.f4education.springjwt.repository.StudentRepository;
 
 @Service
 public class BillServiceImp implements BillService {
@@ -96,13 +92,14 @@ public class BillServiceImp implements BillService {
 
 	private Bill convertRequestToEntity(BillRequestDTO billRequestDTO) {
 		Bill bill = new Bill();
-
+		System.out.println(billRequestDTO.getCheckoutMethodId());
 		PaymentMethod paymentMethod = paymentMethodRepository
-				.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
+				.findById(billRequestDTO.getCheckoutMethodId()).get();
 		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
 
 		BeanUtils.copyProperties(billRequestDTO, bill);
-
+		System.out.println(paymentMethod);
+		
 		bill.setTotalPrice(billRequestDTO.getTotalPrice());
 		bill.setPaymentMethod(paymentMethod);
 		bill.setStudent(student);
@@ -112,7 +109,7 @@ public class BillServiceImp implements BillService {
 
 	private void convertRequestToEntity(BillRequestDTO billRequestDTO, Bill bill) {
 		PaymentMethod paymentMethod = paymentMethodRepository
-				.findByPaymentMethodName(billRequestDTO.getCheckoutMethod());
+				.findById(billRequestDTO.getCheckoutMethodId()).get();
 
 		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
 

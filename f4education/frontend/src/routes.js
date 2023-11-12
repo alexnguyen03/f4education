@@ -1,28 +1,38 @@
 import Index from 'views/Index.js'
 import Register from 'views/examples/Register.js'
-import Subjects from 'views/admin/Subjects'
-import Sessions from 'views/admin/Sessions'
-import Courses from 'views/admin/Courses.js'
-import Teachers from 'views/admin/Teachers.js'
-import Classs from 'views/admin/Classs.js'
-import ClasssRoom from 'views/admin/ClasssRoom.js'
-import Resources from 'views/admin/Resources.js'
-import ResourceDetail from 'views/admin/ResourceDetail'
-import Questions from 'views/admin/Questions'
-import QuestionDetail from 'views/admin/QuestionDetail'
-import Home from 'views/client/visitor/Home'
-import CourseClient from 'views/client/visitor/CourseClient'
-import Cart from 'views/client/visitor/Cart'
-import Checkout from 'views/client/visitor/Checkout'
-import ClassDetail from 'views/admin/ClassDetail'
+import Subjects from './views/admin/Subjects'
+import Sessions from './views/admin/Sessions'
+import Courses from './views/admin/Courses.js'
+import Teachers from './views/admin/Teachers.js'
+import Classs from './views/admin/Classs.js'
+import ClasssRoom from './views/admin/ClasssRoom.js'
+import Resources from './views/admin/Resources.js'
+import ResourceDetail from './views/admin/ResourceDetail'
+import Questions from './views/admin/Questions'
+import QuestionDetail from './views/admin/QuestionDetail'
+import Home from './views/client/visitor/Home'
+import CourseClient from './views/client/visitor/CourseClient'
+import Cart from './views/client/visitor/Cart'
+import Checkout from './views/client/visitor/Checkout'
+import ClassDetail from './views/admin/ClassDetail'
 import Login from 'views/examples/Login'
-import CourseDetailClient from 'views/client/visitor/CourseDetailClient'
-import CourseRegisterClient from 'views/client/visitor/CourseRegisterClient'
-import CourseRegisterDetailClient from 'views/client/visitor/CourseRegisterDetailClient'
-import InformationTeacher from 'views/teacher/information'
+import CourseDetailClient from './views/client/visitor/CourseDetailClient'
+import CourseRegisterClient from './views/client/visitor/CourseRegisterClient'
+// import CourseRegisterDetailClient from './views/client/visitor/CourseRegisterDetailClient'/
+import InformationTeacher from './views/teacher/information'
+import StudentInformation from './views/client/visitor/StudentInformation'
+import QuizzClient from './views/client/visitor/QuizzClient'
 
-import Accounts from 'views/admin/Accounts'
-import Schedules from 'views/admin/Schedules'
+import Accounts from './views/admin/Accounts'
+import Schedules from './views/admin/Schedules'
+
+import Icons from './views/examples/Icons'
+import ClassInformation from './views/teacher/ClassInformation'
+import ClassInformationDetail from './views/teacher/ClassInformationDetail'
+import CourseProgress from './views/client/student/CourseProgress'
+import StudentHome from './views/client/student/StudentHome'
+import CoursesDetail from 'views/admin/CoursesDetail'
+import DownloadRecource from './views/client/student/DownloadRecource'
 
 export var routes = [
     {
@@ -32,7 +42,13 @@ export var routes = [
         component: <Index />,
         layout: '/admin'
     },
-
+    {
+        path: '/icons',
+        name: 'Icons',
+        icon: 'ni ni-planet text-blue',
+        component: <Icons />,
+        layout: '/admin'
+    },
     {
         path: '/register',
         name: 'Register',
@@ -69,6 +85,11 @@ export var routes = [
         layout: '/admin'
     },
     {
+        path: '/courses-detail/:courseId',
+        component: <CoursesDetail />,
+        layout: '/admin'
+    },
+    {
         path: '/class-room',
         name: 'Phòng học',
         icon: 'ni ni-single-02 text-yellow',
@@ -89,9 +110,8 @@ export var routes = [
         component: <Classs />,
         layout: '/admin'
     },
-
     {
-        path: '/class-detail',
+        path: '/class-detail/:classIdParam',
         name: 'Lớp học',
         icon: 'ni ni-single-02 text-yellow',
         component: <ClassDetail />,
@@ -113,18 +133,10 @@ export var routes = [
     },
 
     {
-        path: '/question-detail/:courseName',
+        path: '/question-detail/:questionId',
         component: <QuestionDetail />,
         layout: '/admin'
     },
-    {
-        path: '/class-detail/:classIdParam',
-        name: 'Chi tiết lớp học',
-        icon: 'ni ni-key-25 text-info',
-        component: <ClassDetail />,
-        layout: '/admin'
-    },
-
     {
         path: '/classsroom',
         name: 'Phòng học',
@@ -153,7 +165,7 @@ export var routes = [
         layout: '/admin'
     },
     {
-        path: '/question-detail/:courseName',
+        path: '/question-detail/:questionId',
         component: <QuestionDetail />,
         layout: '/admin'
     },
@@ -173,7 +185,7 @@ export var routesClient = [
         layout: '/client'
     },
     {
-        path: '/course',
+        path: '/courses',
         name: 'Khóa học',
         icon: 'ni ni-planet text-blue',
         component: <CourseClient />,
@@ -205,11 +217,17 @@ export var routesClient = [
         component: <CourseRegisterClient />,
         layout: '/client'
     },
+    // {
+    //   path: "/course-register-detail/:courseId",
+    //   name: "khóa học đăng ký chi tiết",
+    //   icon: "ni ni-planet text-blue",
+    //   component: <CourseRegisterDetailClient />,
+    //   layout: "/client",
+    // },
+
     {
-        path: '/course-register-detail/:courseId',
-        name: 'khóa học đăng ký chi tiết',
-        icon: 'ni ni-planet text-blue',
-        component: <CourseRegisterDetailClient />,
+        path: '/course-progress',
+        component: <CourseProgress />,
         layout: '/client'
     }
 ]
@@ -221,5 +239,48 @@ export const routesTeacher = [
         icon: 'ni ni-tv-2 text-primary',
         component: <InformationTeacher />,
         layout: '/teacher'
+    },
+    {
+        path: '/classes-infor',
+        name: 'Danh sách lớp học',
+        icon: 'ni ni-collection text-blue',
+        component: <ClassInformation />,
+        layout: '/teacher'
+    },
+    {
+        path: '/classes-infor/:classId',
+        component: <ClassInformationDetail />,
+        layout: '/teacher'
+    }
+]
+
+export const routesStudent = [
+    {
+        path: '/classes',
+        name: 'Trang chủ',
+        icon: 'ni ni-planet text-blue',
+        component: <StudentHome />,
+        layout: '/student'
+    },
+    {
+        path: '/student-information',
+        name: 'Thông tin học viên',
+        icon: 'ni ni-planet text-blue',
+        component: <StudentInformation />,
+        layout: '/student'
+    },
+    {
+        path: '/quizz',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <QuizzClient />,
+        layout: '/student'
+    },
+    {
+        path: '/classes/recources/:classId',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <DownloadRecource />,
+        layout: '/student'
     }
 ]

@@ -37,8 +37,8 @@ public class CartController {
 	}
 
 	@GetMapping("/{studentId}")
-	public ResponseEntity<?> findCartByStudentID(@PathVariable("studentId") Integer studentId) {
-		List<CartResponseDTO> lst = cartService.findAllCartByStudentId(studentId, false);
+	public ResponseEntity<?> findCartByStudentID(@PathVariable("studentId") String studentId) {
+		List<CartResponseDTO> lst = cartService.findAllCartByStudentId(studentId, true);
 		return ResponseEntity.ok(lst);
 	}
 

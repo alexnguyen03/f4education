@@ -37,10 +37,9 @@ public class CartServiceImp implements CartService {
 	}
 
 	@Override
-	public List<CartResponseDTO> findAllCartByStudentId(Integer studentId, boolean status) {
-		System.out.println(studentId);
-		status = false;
-		return cartRepository.findByStudentIdAndStatus(studentId, status).stream().map(this::convertToReponseDTO)
+	public List<CartResponseDTO> findAllCartByStudentId(String studentId, boolean status) {
+		status = false; 
+		return cartRepository.findByStudentIdAndStatus(studentId, true).stream().map(this::convertToReponseDTO)
 				.collect(Collectors.toList());
 	}
 
@@ -61,7 +60,7 @@ public class CartServiceImp implements CartService {
 		Cart cart = this.convertRequestToEntity(cartRequestDTO);
 
 		cart.setCreateDate(new Date());
-		cart.setStatus(false);
+		cart.setStatus(true);
 
 		Cart newCart = cartRepository.save(cart);
 
@@ -71,8 +70,8 @@ public class CartServiceImp implements CartService {
 	@Override
 	public CartResponseDTO updateCart(Integer cartId, CartRequestDTO cartRequestDTO) {
 		Cart exitCart = cartRepository.findById(cartId).get();
-
-		exitCart.setStatus(true);
+		System.out.println(exitCart);
+		exitCart.setStatus(false);
 
 		convertRequestToEntity(cartRequestDTO, exitCart);
 

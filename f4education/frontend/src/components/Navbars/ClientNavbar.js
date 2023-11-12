@@ -1,12 +1,10 @@
 import { useEffect, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Badge, Col, Row } from 'reactstrap'
 import logo from '../../assets/img/brand/f4.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
 // reactstrap components
 
-// API
-import cartApi from '../../api/cartApi'
 import {
     Autocomplete,
     Avatar,
@@ -27,125 +25,70 @@ import {
     IconChevronDown,
     IconLayoutDashboard,
     IconLogout2,
+    IconProgressAlert,
     IconSchoolBell,
     IconSearch,
     IconUserBolt
 } from '@tabler/icons-react'
-import { useDisclosure, useElementSize } from '@mantine/hooks'
+import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks'
 
 // css module
 import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 
+// API
+import courseApi from '../../api/courseApi'
+
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
-// Styled component
-// const NavbarCustom = styled.nav`
-//   clear: both;
-//   position: fixed;
-//   top: 0;
-//   left: 0;
-//   right: 0;
-//   background: #fff;
-//   box-shadow: #63636333 2px 2px 8px 0px;
-//   z-index: 1000;
-//   transition: all 0.3s linear;
-// `;
-
-// const CustomNavLink = styled.div`
-//   position: relative;
-//   color: #555555 !important;
-//   font-size: 18px;
-//   font-weight: 600 !important;
-//   transition: all 0.3s linear;
-
-//   &:hover {
-//     color:#212121,
-//     font-weight:600,
-//   }
-
-//   &:hover {
-//     &::after {
-//       display: block;
-//       transition: all 0.3s linear;
-//     }
-//   }
-
-//   .active {
-//     &::after {
-//     display: block;
-//     }
-//   }
-
-//   &::after {
-//     position: absolute;
-//     content: "";
-//     left: 0;
-//     bottom: -58%;
-//     background: #333;
-//     height: 4px;
-//     width: 100%;
-//     display: none;
-//     transition: all 0.3s linear;
-//   }
-
-//   @media (max-width: 991px) {
-//     &::after {
-//       position: absolute;
-//       content: "";
-//       left: 50%;
-//       transform: translateX(-50%);
-//       right: 0;
-//       bottom: 0;
-//       background: #333;
-//       height: 5px;
-//       width: 100px;
-//       text-align: center;
-//       transition: all 0.3s linear;
-//     }
-//   }
-
-//   @media (max-width: 991px) {
-//     & {
-//       position: relative;
-//       color: #555555 !important;
-//       font-size: 18px;
-//       margin-bottom: 10px;
-//       font-weight: 600 !important;
-//       transition: all 0.3s linear;
-//     }
-//   }
-// `;
+const category_1 = ['Java', 'C#', 'PHP', 'JavaScript']
+const category_2 = ['NextJS', 'ReactJS', 'AngularJS', 'NodeJS']
+const category_3 = ['SQL Server', 'MySQL', 'Xampp']
 
 const ClientNavbar = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+    const listCart = JSON.parse(localStorage.getItem('userCart')) || []
+
     const ref = useElementSize()
-    const [login, setLogin] = useState(false)
-    const [cartEmpty, setCartEmpty] = useState(true)
+    const navigate = useNavigate()
+    const smallScreen = useMediaQuery('(max-width: 500px)')
+    const [searchParams] = useSearchParams()
+
     const [lastScrollTop, setLastScrollTop] = useState(0)
     const [activeItems, setActiveItems] = useState([false, false, false])
-    const [opened, { toggle }] = useDisclosure(false)
+    const [opened, { toggle }] = useDisclosure(true)
 
     // *************** CART VARIABLE - AREA START
     const [carts, setCarts] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
-
-    // useEffect(() => {
-
-    // }, [searchParams]);
+    const [listCourse, setListCourse] = useState([])
 
     const fetchCart = async () => {
         try {
-            const resp = await cartApi.getAllCart()
-            setCarts(resp.data)
+            const userCart = JSON.parse(localStorage.getItem('userCart')) || []
+            console.log(userCart)
+            setCarts(userCart)
         } catch (error) {
             console.log(error)
         }
     }
 
+    // const fetchCourse = async () => {
+    //     try {
+    //         const resp = await courseApi.getAll()
+
+    //         if (resp.status === 200 && resp.data.length > 0) {
+    //             setListCourse(resp.data)
+    //         }
+    //     } catch (error) {
+    //         console.log(error)
+    //     }
+    // }
+
     useEffect(() => {
         // get Total Price from list totalCartItem
         let newTotalPrice = 0
         if (carts) {
-            carts.map((item) => (newTotalPrice += item.course.coursePrice))
+            carts.forEach((item) => (newTotalPrice += item.course.coursePrice))
             setTotalPrice(newTotalPrice)
         }
     }, [carts])
@@ -153,6 +96,10 @@ const ClientNavbar = () => {
     useEffect(() => {
         fetchCart()
     }, [])
+
+    useEffect(() => {
+        fetchCart()
+    }, [searchParams.get('checkoutComplete'), listCart.length])
 
     // *************** CART VARIABLE - AREA END
     const handleItemClick = (index) => {
@@ -166,48 +113,57 @@ const ClientNavbar = () => {
         setActiveItems(newActiveItems)
     }
 
-    const handleLogin = (prev) => {
-        setLogin(!prev)
+    const handleLogin = () => {
+        navigate('auth/login')
     }
 
-    const handleCartEmpty = (prev) => {
-        setCartEmpty(!prev)
+    const handleLogout = () => {
+        localStorage.removeItem('user')
+        fetchCart()
+        window.location.reload()
+        // const currentPath = window.location.pathname
+        // console.log('Địa chỉ (path) hiện tại của trang web là:', currentPath)
     }
 
     window.addEventListener('scroll', function () {
         const navbar = this.document.querySelector('#navbar-animate')
         let scrollTop = window.pageYOffset || document.documentElement.scrollTop
 
-        window.addEventListener('scroll', function () {
-            if (window.pageYOffset === 0) {
-                navbar.style.boxShadow = 'none'
-            } else {
-                navbar.style.boxShadow = '#63636333 2px 2px 8px 0px'
-            }
-        })
+        if (scrollTop && navbar) {
+            window.addEventListener('scroll', function () {
+                if (window.pageYOffset === 0) {
+                    navbar.style.boxShadow = 'none'
+                    navbar.style.top = 0
+                } else {
+                    navbar.style.boxShadow = '#63636333 2px 2px 8px 0px'
+                }
+            })
 
-        if (scrollTop === 0) {
-            navbar.style.top = 0
+            // if (scrollTop === 0) {
+            //   navbar.style.top = 0;
+            // }
+            if (scrollTop > lastScrollTop) {
+                navbar.style.top = '-80px'
+            } else {
+                navbar.style.top = 0
+            }
+            setLastScrollTop(scrollTop)
         }
-        if (scrollTop > lastScrollTop) {
-            navbar.style.top = '-80px'
-        } else {
-            navbar.style.top = 0
-        }
-        setLastScrollTop(scrollTop)
     })
 
     return (
-        // <Container size="30rem" px={0}>
         <nav
             className={`navbar navbar-expand-lg ${styles['navbar-animate']}`}
             id="navbar-animate"
         >
-            <div className="container-xl">
+            <div
+                className="container-xl"
+                style={{ width: '100%', maxWidth: '1360px' }}
+            >
                 <Link to={'/'} className="navbar-brand">
                     <img src={logo} className="img-fluid" alt="" />
                 </Link>
-                <button
+                <div
                     className="navbar-toggler"
                     type="button"
                     data-toggle="collapse"
@@ -217,8 +173,8 @@ const ClientNavbar = () => {
                     aria-label="Toggle navigation"
                     style={{ zIndex: '99999' }}
                 >
-                    <Burger opened={opened} onClick={toggle} />
-                </button>
+                    <Burger opened={!opened} onClick={toggle} />
+                </div>
 
                 {/* Content */}
                 <div
@@ -226,8 +182,8 @@ const ClientNavbar = () => {
                     id="navbarSupportedContent"
                 >
                     <ul
-                        className="navbar-nav mr-auto text-center d-md-flex d-sm-flex
-                        justify-content-md-center justify-content-sm-center"
+                        className="navbar-nav text-center d-md-flex d-sm-flex 
+                        justify-content-start "
                     >
                         <li className="nav-item">
                             <Link
@@ -247,7 +203,7 @@ const ClientNavbar = () => {
                         </li>
                         <li className="nav-item">
                             <Link
-                                to={'/course'}
+                                to={'/courses'}
                                 className={`
                 ${
                     activeItems[1]
@@ -261,22 +217,7 @@ const ClientNavbar = () => {
                                 Khóa học
                             </Link>
                         </li>
-                        <li className="nav-item">
-                            <Link
-                                to={'/cart'}
-                                className={`
-                ${
-                    activeItems[2]
-                        ? 'nav-link custom-nav-link active'
-                        : 'nav-link custom-nav-link'
-                }
-                ${styles['custom-nav-link']}
-                `}
-                                onClick={() => handleItemClick(2)}
-                            >
-                                Giỏ hàng
-                            </Link>
-                        </li>
+
                         <li className="nav-item">
                             <HoverCard
                                 width={'75vw'}
@@ -288,22 +229,22 @@ const ClientNavbar = () => {
                                 <HoverCard.Target>
                                     <Link
                                         to="#"
-                                        className="nav-link custom-nav-link d-flex align-items-center"
+                                        className={`
+                ${
+                    activeItems[2]
+                        ? 'nav-link custom-nav-link active'
+                        : 'nav-link custom-nav-link'
+                }
+                ${styles['custom-nav-link']}
+                `}
+                                        onClick={() => handleItemClick(2)}
                                     >
-                                        <Text
-                                            style={{
-                                                fontSize: '18px',
-                                                color: '#212121'
-                                            }}
-                                        >
-                                            Danh mục
-                                        </Text>
+                                        Danh mục
                                         <IconChevronDown
                                             style={{
                                                 width: rem(16),
                                                 height: rem(16),
-                                                marginLeft: '5px',
-                                                marginTop: '5px'
+                                                marginLeft: '5px'
                                             }}
                                             // color={theme.colors.black[6]}
                                         />
@@ -311,10 +252,13 @@ const ClientNavbar = () => {
                                 </HoverCard.Target>
 
                                 <HoverCard.Dropdown
-                                    style={{ overflow: 'hidden' }}
+                                    style={{
+                                        overflow: 'hidden',
+                                        maxWidth: '1000px'
+                                    }}
                                     mt="xl"
                                 >
-                                    <Group position="apart" p={rem('1.5rem')}>
+                                    <Group position="apart" px={rem('1.5rem')}>
                                         <Text fw={500}>Khóa học</Text>
                                         <Link to="/course" fz="xs">
                                             Tất cả khóa học
@@ -324,27 +268,35 @@ const ClientNavbar = () => {
                                     <Divider my="sm" />
 
                                     <Grid gutter="xl" p={rem('1.5rem')}>
-                                        <Grid.Col xl={4} lg={4} md={12} sm={12}>
-                                            <Title
-                                                order={3}
-                                                fw={700}
-                                                color="dark"
-                                            >
-                                                Các chủ đề khóa học phổ biến
-                                            </Title>
-                                            <Text color="dimmed">
-                                                Khám phá các khóa học miễn phí
-                                                hoặc trả phí về các chủ đề mà
-                                                bạn quan tâm.
-                                            </Text>
+                                        <Grid.Col
+                                            xl={4}
+                                            lg={4}
+                                            md={12}
+                                            sm={12}
+                                            style={{ height: '100%' }}
+                                        >
+                                            <div className="mb-auto">
+                                                <Title
+                                                    order={3}
+                                                    fw={700}
+                                                    color="dark"
+                                                >
+                                                    Các chủ đề khóa học phổ biến
+                                                </Title>
+                                                <Text color="dimmed">
+                                                    Khám phá các khóa học miễn
+                                                    phí hoặc trả phí về các chủ
+                                                    đề mà bạn quan tâm.
+                                                </Text>
+                                            </div>
                                             <Link
                                                 to="/course"
                                                 className="w-100"
                                             >
                                                 <Button
                                                     color="violet"
-                                                    mt="auto"
                                                     w="100%"
+                                                    mt="xl"
                                                 >
                                                     Khám phá khóa học
                                                 </Button>
@@ -353,66 +305,84 @@ const ClientNavbar = () => {
                                         {/* <Divider orientation="vertical" size="sm" /> */}
                                         <Grid.Col xl={8} lg={8} md={12} sm={12}>
                                             <SimpleGrid
-                                                cols={3}
+                                                cols={smallScreen ? 1 : 3}
                                                 spacing="xl"
                                                 verticalSpacing="sm"
                                             >
                                                 <Flex
                                                     justify={'center'}
-                                                    align={'start'}
+                                                    align={
+                                                        smallScreen
+                                                            ? 'center'
+                                                            : 'flex-start'
+                                                    }
                                                     direction={'column'}
                                                     gap={'xl'}
+                                                    ml="md"
                                                 >
-                                                    <Text color="dark" fw={700}>
-                                                        Java
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        C#
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        PHP
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        JavaScript
-                                                    </Text>
+                                                    {category_1.map(
+                                                        (c, index) => (
+                                                            <Link
+                                                                to={`/course`}
+                                                                key={index}
+                                                            >
+                                                                <Text
+                                                                    color="dark"
+                                                                    fw={700}
+                                                                >
+                                                                    {c}
+                                                                </Text>
+                                                            </Link>
+                                                        )
+                                                    )}
                                                 </Flex>
                                                 <Flex
                                                     justify={'center'}
-                                                    align={'start'}
+                                                    align={'center'}
                                                     direction={'column'}
                                                     gap={'xl'}
                                                 >
-                                                    <Text color="dark" fw={700}>
-                                                        NextJS
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        ReactJS
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        Angular
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        NodeJS
-                                                    </Text>
+                                                    {category_2.map(
+                                                        (c, index) => (
+                                                            <Link
+                                                                to={`/course`}
+                                                                key={index}
+                                                            >
+                                                                <Text
+                                                                    color="dark"
+                                                                    fw={700}
+                                                                >
+                                                                    {c}
+                                                                </Text>
+                                                            </Link>
+                                                        )
+                                                    )}
                                                 </Flex>
                                                 <Flex
                                                     justify={'center'}
-                                                    align={'start'}
+                                                    align={
+                                                        smallScreen
+                                                            ? 'center'
+                                                            : 'flex-end'
+                                                    }
                                                     direction={'column'}
                                                     gap={'xl'}
                                                 >
-                                                    <Text color="dark" fw={700}>
-                                                        SQL Server
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        My SQL
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        Porto...
-                                                    </Text>
-                                                    <Text color="dark" fw={700}>
-                                                        Xampp
-                                                    </Text>
+                                                    {category_3.map(
+                                                        (c, index) => (
+                                                            <Link
+                                                                to={`/course`}
+                                                                key={index}
+                                                            >
+                                                                <Text
+                                                                    color="dark"
+                                                                    fw={700}
+                                                                >
+                                                                    {c}
+                                                                </Text>
+                                                            </Link>
+                                                        )
+                                                    )}
                                                 </Flex>
                                             </SimpleGrid>
                                         </Grid.Col>
@@ -420,11 +390,32 @@ const ClientNavbar = () => {
                                 </HoverCard.Dropdown>
                             </HoverCard>
                         </li>
+
+                        {user === null && (
+                            <>
+                                <li className="nav-item">
+                                    <Link
+                                        to={'/cart'}
+                                        className={`
+                ${
+                    activeItems[1]
+                        ? 'nav-link custom-nav-link active'
+                        : 'nav-link custom-nav-link'
+                }
+                ${styles['custom-nav-link']}
+                `}
+                                        onClick={() => handleItemClick(1)}
+                                    >
+                                        Giỏ hàng
+                                    </Link>
+                                </li>
+                            </>
+                        )}
                     </ul>
 
                     <div
-                        className="d-flex justify-content-between
-              justify-content-md-center justify-content-sm-center text-center text-dark"
+                        className="d-flex justify-content-between justify-content-md-center 
+                        justify-content-sm-center text-center text-dark ml-auto"
                     >
                         <Autocomplete
                             placeholder="Tìm khóa học.."
@@ -432,14 +423,9 @@ const ClientNavbar = () => {
                             ref={ref}
                             style={{ width: rem(300) }}
                             icon={<IconSearch />}
-                            data={[
-                                'NextJS',
-                                'ReactJS',
-                                'PHP, Laravel',
-                                'Spring boot'
-                            ]}
+                            data={listCourse.map((c) => c.courseName)}
                         />
-                        {login ? (
+                        {user !== null ? (
                             <>
                                 <Link
                                     to="/cart"
@@ -467,20 +453,8 @@ const ClientNavbar = () => {
                                                     src={cartEmptyimage}
                                                     alt="cart Empty"
                                                     className="img-fluid"
-                                                    onClick={() =>
-                                                        handleCartEmpty(
-                                                            cartEmpty
-                                                        )
-                                                    }
                                                 />
-                                                <p
-                                                    className="mx-auto mb-3 text-muted font-weight-600 mx-auto"
-                                                    onClick={() =>
-                                                        handleCartEmpty(
-                                                            cartEmpty
-                                                        )
-                                                    }
-                                                >
+                                                <p className="mx-auto mb-3 text-muted font-weight-600 mx-auto">
                                                     Giỏ hàng trống.
                                                 </p>
                                             </>
@@ -625,34 +599,35 @@ const ClientNavbar = () => {
 
                                     <Menu.Dropdown>
                                         <Menu.Label>DASHBOARD</Menu.Label>
-                                        <Menu.Item
-                                            icon={
-                                                <IconLayoutDashboard
-                                                    size={14}
-                                                />
-                                            }
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
-                                        >
-                                            Hệ thống học tập
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            icon={<IconUserBolt size={14} />}
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
-                                        >
-                                            Tài khoản
-                                        </Menu.Item>
-                                        <Menu.Item
-                                            icon={<IconSchoolBell size={14} />}
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
-                                        >
-                                            Lịch học
-                                        </Menu.Item>
+                                        <Link to="/student/classes">
+                                            <Menu.Item
+                                                icon={
+                                                    <IconLayoutDashboard
+                                                        size={14}
+                                                    />
+                                                }
+                                            >
+                                                Hệ thống học tập
+                                            </Menu.Item>
+                                        </Link>
+                                        <Link to="/student/classes">
+                                            <Menu.Item
+                                                icon={
+                                                    <IconUserBolt size={14} />
+                                                }
+                                            >
+                                                Tài khoản
+                                            </Menu.Item>
+                                        </Link>
+                                        <Link to="/student/classes">
+                                            <Menu.Item
+                                                icon={
+                                                    <IconSchoolBell size={14} />
+                                                }
+                                            >
+                                                Lịch học
+                                            </Menu.Item>
+                                        </Link>
 
                                         <Menu.Divider />
 
@@ -660,6 +635,7 @@ const ClientNavbar = () => {
                                         <Menu.Item
                                             color="red"
                                             icon={<IconLogout2 size={14} />}
+                                            onClick={() => handleLogout()}
                                         >
                                             Đăng xuất
                                         </Menu.Item>
@@ -672,10 +648,8 @@ const ClientNavbar = () => {
                                     color="dark"
                                     uppercase
                                     className="mt-1 ml-2 font-weight-700"
-                                    onClick={() => handleLogin(login)}
+                                    onClick={() => handleLogin()}
                                     style={{ borderRadius: '2px' }}
-                                    // component="a"
-                                    // href="/auth/login"
                                 >
                                     Đăng nhập
                                 </Button>

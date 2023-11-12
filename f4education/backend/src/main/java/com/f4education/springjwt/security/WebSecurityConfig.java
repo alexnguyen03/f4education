@@ -43,6 +43,7 @@ import com.f4education.springjwt.security.services.UserDetailsServiceImpl;
 // prePostEnabled = true) // by default
 public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
 
+    @Autowired
     @Value("${f4education.app.jwtSecret}")
     private String key;
     @Autowired
@@ -99,6 +100,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/payment-method/**",
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
+                                        "/api/evaluate/**",
                                         "/img/**")
                                 .permitAll()
                                 .requestMatchers(
@@ -108,13 +110,17 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/courses-history/**",
                                         "/api/subject-history/**",
                                         "/api/courses/**",
+                                        "/api/courses-detail/**",
                                         "/api/classroom/**",
                                         "/api/sessions/**",
                                         "/api/classhistory/**",
                                         "/api/teachers/**",
+                                        "/api/students/**",
                                         "/api/sessions-history/**",
                                         "/api/resource/**",
                                         "/api/questions/**",
+                                        "/api/question-detail/**",
+                                        "/api/quizz-result/**",
                                         "/api/answers/**",
                                         "/api/cart/**",
                                         "/api/payment/**",
@@ -126,7 +132,8 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/api/accounts/**",
-                                        "/img/**")
+                                        "/api/schedule/**",
+                                        "/api/exam/**")
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

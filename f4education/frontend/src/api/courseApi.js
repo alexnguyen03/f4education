@@ -42,16 +42,20 @@ const courseApi = {
         const url = `/courses/course-detail/${courseId}`
         return axiosClient.get(url)
     },
-    getNewestCourse: () => {
-        const url = '/courses/newest-courses'
+    getNewestCourse: (studentId) => {
+        const url = `/courses/newest-courses?studentId=${studentId}`
         return axiosClient.get(url)
     },
-    getTopSellingCourse: () => {
-        const url = '/courses/top-selling'
+    getTopSellingCourse: (studentId) => {
+        const url = `/courses/top-selling?studentId=${studentId}`
         return axiosClient.get(url)
     },
     getCourseBySubjectName: (subjectName) => {
         const url = `/courses/${subjectName}`
+        return axiosClient.get(url)
+    },
+    getCourseByCourseId: (courseId, studentId) => {
+        const url = `/courses/detail/${courseId}?studentId=${studentId}`
         return axiosClient.get(url)
     }
 }

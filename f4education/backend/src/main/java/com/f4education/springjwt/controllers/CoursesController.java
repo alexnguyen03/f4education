@@ -5,8 +5,6 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,16 +49,30 @@ public class CoursesController {
 	}
 
 	@GetMapping("/newest-courses")
-	public ResponseEntity<?> getTop10NewsetCourse() {
-		List<CourseDTO> list = courseService.findNewestCourse();
+	public ResponseEntity<?> getTop10NewsetCourse(@RequestParam(value = "studentId") Optional<String> studentId) {
+		List<CourseResponse> list = courseService.findNewestCourse(studentId.get());
 		return ResponseEntity.ok(list);
 	}
 
-	@GetMapping("/top-selling")
-	public ResponseEntity<?> getTop10SoldCourse() {
-		List<CourseDTO> list = courseService.findTop10SoldCourse();
-		return ResponseEntity.ok(list);
+	@GetMapping("/detail/{courseId}")
+	public ResponseEntity<?> getTopCourseDetailByCourseId(@PathVariable Integer courseId,
+			@RequestParam(value = "studentId") Optional<String> studentId) {
+		CourseResponse course = courseService.findCourseByCourseId(courseId, studentId.get());
+
+		if (course == null) {
+			return ResponseEntity.noContent().build();
+		}
+
+		return ResponseEntity.ok(course);
 	}
+
+	// @GetMapping("/top-selling")
+	// public ResponseEntity<?> getTop10SoldCourse(@RequestParam(value =
+	// "studentId") Optional<String> studentId) {
+	// List<CourseResponse> list =
+	// courseService.findTop10SoldCourse(studentId.get());
+	// return ResponseEntity.ok(list);
+	// }
 
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
@@ -87,12 +100,21 @@ public class CoursesController {
 
 	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> updateCourse(@RequestPart("courseRequest") CourseRequest courseRequest,
+	public ResponseEntity<?> updateCourse(@RequestPart("courseRequest") String courseRequestString,
 			@RequestParam("file") Optional<MultipartFile> file) {
 
-		if (!file.isEmpty()) {
-			File savedFile = xfileService.save(file.orElse(null), "/courses");
-			courseRequest.setImage(savedFile.getName());
+		ObjectMapper mapper = new ObjectMapper();
+		CourseRequest courseRequest = new CourseRequest();
+		try {
+			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
+			if (!file.isEmpty()) {
+				File savedFile = xfileService.save(file.orElse(null), "/courses");
+				courseRequest.setImage(savedFile.getName());
+			}
+		} catch (JsonProcessingException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 
 		CourseDTO courseDTO = courseService.saveCourse(courseRequest);

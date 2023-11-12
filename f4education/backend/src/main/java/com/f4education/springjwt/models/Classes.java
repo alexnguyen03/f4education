@@ -33,47 +33,59 @@ import lombok.ToString;
 @NoArgsConstructor
 @Table(name = "Class")
 public class Classes implements Serializable {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "class_id")
-	private Integer classId;
-	@Column(name = "class_name")
-	private String className;
-	@Column(name = "start_date")
-	private Date startDate;
-	@Column(name = "end_date")
-	private Date endDate;
-	@Column(name = "maximum_quantity")
-	private Integer maximumQuantity;
-	private String status;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "class_id")
+    private Integer classId;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<ClassHistory> classHistories;
+    @Column(name = "class_name")
+    private String className;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<Comment> comments;
+    @Column(name = "start_date")
+    private Date startDate;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<Schedule> schedules;
+    @Column(name = "end_date")
+    private Date endDate;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<Task> tasks;
+    @Column(name = "maximum_quantity")
+    private Integer maximumQuantity;
 
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<RegisterCourse> registerCourses;
+    private String status;
 
-	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	private Admin admin;
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<ClassHistory> classHistories;
 
-	@JsonIgnore
-	@ManyToOne
-	@JoinColumn(name = "teacher_id")
-	private Teacher teacher;
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<Comment> comments;
+
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<Schedule> schedules;
+
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<Task> tasks;
+
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<RegisterCourse> registerCourses;
+
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<QuizResult> quizResults;
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<Examination> examinations;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    @JsonIgnore
+    Admin admin;
+
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
+    @JsonIgnore
+    Teacher teacher;
 }

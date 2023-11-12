@@ -1,11 +1,14 @@
 package com.f4education.springjwt.repository;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -218,7 +221,7 @@ public class GoogleDriveRepository {
 
 	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
-		
+
 		String folderId = getFolderId(folderName);
 		for (String email : emails) {
 			Permission permission = setPermission("user", "reader").setEmailAddress(email);
@@ -227,4 +230,60 @@ public class GoogleDriveRepository {
 			driveQuickstart.getInstance().permissions().create(folderId, permission).execute();
 		}
 	}
+
+	public byte[] downloadMultipleFiles(List<String> fileIds) {
+		DriveQuickstart driveService = new DriveQuickstart();
+		ByteArrayOutputStream zipOutputStream = new ByteArrayOutputStream();
+		ZipOutputStream zip = new ZipOutputStream(zipOutputStream);
+
+		for (String fileId : fileIds) {
+			File file;
+			try {
+				file = driveService.getInstance().files().get(fileId).execute();
+				// Tạo một entry mới trong tệp ZIP với tên là tên của tệp từ Google Drive
+				ZipEntry zipEntry = new ZipEntry(file.getName());
+				zip.putNextEntry(zipEntry);
+
+				// Tải dữ liệu từ tệp Google Drive và ghi vào tệp ZIP
+				ByteArrayOutputStream fileOutputStream = new ByteArrayOutputStream();
+				driveService.getInstance().files().get(fileId).executeMediaAndDownloadTo(fileOutputStream);
+				zip.write(fileOutputStream.toByteArray());
+				zip.closeEntry();
+			} catch (GeneralSecurityException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		}
+
+		try {
+			zip.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return zipOutputStream.toByteArray();
+	}
+
+	/*
+	 * @param course name is a name of the folder in drive
+	 */
+	public void createFolderWithoutUploadFile(String folderIdCreated) {
+		// thực hiện tạo mới thư mục với tên là tên khóa học và 2 thu mục con là BÀI HỌC
+		// và TÀI NGUYÊN
+		try {
+			String subFolderLessonId = this.findOrCreateFolder(folderIdCreated, "BÀI HỌC",
+					driveQuickstart.getInstance());
+			String subFolderResourceId = this.findOrCreateFolder(folderIdCreated, "TÀI NGUYÊN",
+					driveQuickstart.getInstance());
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }

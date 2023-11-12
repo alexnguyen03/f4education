@@ -17,7 +17,8 @@ const defaultOptions = {
 }
 const Notify = {
     msg: {
-        loading: 'Đang xử lý...'
+        loading: 'Đang xử lý...',
+        updateSuccess: 'Cập nhật thành công !'
     },
     options: {
         loading: () => {
@@ -50,10 +51,38 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        createSuccessParam: (msg) => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: msg,
+                ...defaultOptions
+            }
+        },
         createError: () => {
             return {
                 type: toast.TYPE.ERROR,
                 render: 'Thêm mới thất bại !',
+                ...defaultOptions
+            }
+        },
+        createErrorParam: (message) => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: message,
+                ...defaultOptions
+            }
+        },
+        deleteSuccess: ()=>{
+            return{
+                type:toast.TYPE.SUCCESS,
+                render:'Xóa thành công !',
+                ...defaultOptions
+            }
+        },
+        deleteError: ()=>{
+            return{
+                type:toast.TYPE.ERROR,
+                render:'Xóa thất bại !',
                 ...defaultOptions
             }
         },

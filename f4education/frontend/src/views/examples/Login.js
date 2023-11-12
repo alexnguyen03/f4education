@@ -34,7 +34,9 @@ const Login = () => {
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [account, setAccount] = useState({
-        username: 'namnhpc03517',
+        // username: 'johnpc03517', //teacher
+        // username: 'namnhpc03517', //admin
+        username: 'loinvpc04549', // student
         password: '123456789'
     })
     const [msgError, setMsgError] = useState({})
@@ -63,8 +65,8 @@ const Login = () => {
                 if (role === 'ROLE_ADMIN') {
                     navigate('/admin')
                 } else if (role === 'ROLE_TEACHER') {
-                    navigate('/teacher')
-                } else navigate('/')
+                    navigate('/teacher/classes')
+                } else navigate('/student/classes')
             }
             setLoading(false)
         } catch (error) {

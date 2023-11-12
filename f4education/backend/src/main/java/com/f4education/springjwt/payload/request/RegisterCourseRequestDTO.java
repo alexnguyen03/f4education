@@ -15,7 +15,7 @@ public class RegisterCourseRequestDTO {
 	@JsonProperty("courseId")
 	private Integer courseId;
 
-	private Integer studentId;
+	private String studentId;
 
 	@JsonProperty("teacherId")
 	private String teacherId;

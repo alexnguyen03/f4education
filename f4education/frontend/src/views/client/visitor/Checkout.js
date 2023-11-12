@@ -1,5 +1,10 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import {
+    createSearchParams,
+    Link,
+    useNavigate,
+    useSearchParams
+} from 'react-router-dom'
 import { Button, Col, Modal, ModalBody, Row } from 'reactstrap'
 
 import logoVnPay from '../../../assets/img/logo-vnpay.png'
@@ -8,7 +13,6 @@ import cartEmptyimage from '../../../assets/img/cart-empty.png'
 
 // API
 import paymentApi from '../../../api/paymentApi'
-import cartApi from '../../../api/cartApi'
 import billApi from '../../../api/billApi'
 import registerCourseApi from '../../../api/registerCourseApi'
 import Paypal from './PayPal'
@@ -16,9 +20,13 @@ import moment from 'moment'
 
 // CSS Module
 import styles from '../../../assets/css/custom-client-css/Payment.module.css'
+import { Container, Rating } from '@mantine/core'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const Checkout = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+    const currentDate = moment(new Date()).format('DD-MM-yyyy, h:mm:ss A')
+
     // router Variable
     const [listCart] = useState(
         JSON.parse(localStorage.getItem('cartCheckout'))
@@ -26,8 +34,10 @@ const Checkout = () => {
     let navigate = useNavigate()
 
     // *************** Action Variable
-    const [checkOutMethod, setCheckOutMethod] = useState('vnpay')
+    const [checkOutMethod, setCheckOutMethod] = useState(1)
     const [totalPrice, setTotalPrice] = useState(0)
+    const [isCheckoutPayPalComplete, setCheckoutPayPalComplete] =
+        useState(false)
 
     //  VNPAY + PAYPAL
     const [transactionNo, setTransactionNo] = useState('')
@@ -50,41 +60,43 @@ const Checkout = () => {
 
     // *************** FORM Variable
     const [bill, setBill] = useState({
-        totalPrice: totalPrice,
-        checkoutMethod: checkOutMethod,
-        studentId: 1
+        totalPrice: '',
+        checkoutMethodId: checkOutMethod,
+        studentId: ''
     })
 
     //  *************** Action && Logic UI AREA
     const handleChangeCheckoutMethod = (e) => {
-        if (e.id === 'vnpay') {
-            setCheckOutMethod('vnpay')
-            return
-        } else if (e.id === 'paypal') {
-            setCheckOutMethod('paypal')
-            return
+        if (e.target.id === 'vnpay') {
+            setPayPalCheckout(false)
+            setShowingPayPal(false)
+            setCheckOutMethod(1)
+        } else if (e.target.id === 'paypal') {
+            setCheckOutMethod(2)
         }
     }
 
-    const handleCreatePayment = async (checkOutMethod) => {
+    const handleCreatePayment = async () => {
         localStorage.setItem('billCheckout', JSON.stringify(bill))
-        if (checkOutMethod === 'paypal') {
-            setPayPalCheckout(true)
-            setShowingPayPal(true)
-            return
-        }
-        if (checkOutMethod === '') {
-            alert('Choose checkout method bro!')
-            return
-        } else {
+
+        if (checkOutMethod === 1) {
+            setPayPalCheckout(false)
+            setShowingPayPal(false)
+            setCheckOutMethod('vnpay')
+
             // API direct to VNPay checkout
             try {
                 const resp = await paymentApi.createPayment(bill)
-                const url = resp.url
+                const url = resp.data.url
                 window.location.href = url
             } catch (error) {
                 console.log(error)
             }
+            return
+        } else if (checkOutMethod === 2) {
+            setPayPalCheckout(true)
+            setShowingPayPal(true)
+            setCheckOutMethod('paypal')
         }
     }
 
@@ -94,22 +106,25 @@ const Checkout = () => {
         setBill({
             totalPrice: totalPrice,
             checkoutMethod: checkOutMethod,
-            studentId: 1
+            studentId: user.username
         })
-    }, [totalPrice, checkOutMethod])
+    }, [totalPrice, checkOutMethod, user.username, isCheckoutPayPalComplete])
 
     useEffect(() => {
-        setCheckOutMethod(checkOutMethod)
+        console.log(checkOutMethod)
     }, [checkOutMethod])
 
     // get total price
     useEffect(() => {
         // get Total Price from list totalCartItem
         let newTotalPrice = 0
-        listCart !== null &&
-            listCart.map((item) => (newTotalPrice += item.course.coursePrice))
+        if (listCart.length > 0) {
+            listCart.forEach(
+                (item) => (newTotalPrice += item.course.coursePrice)
+            )
+        }
         setTotalPrice(newTotalPrice)
-    }, [listCart])
+    }, [listCart, isCheckoutPayPalComplete])
 
     // get and handle response checkout
     useEffect(() => {
@@ -121,46 +136,73 @@ const Checkout = () => {
 
     const [paypalPaymentAt, setPayPalPaymentAt] = useState('')
 
-    const handlePaymentPayPalComplete = useCallback((order) => {
-        setPayPalCheckout(true)
-        setShowModal(true)
-        setCheckoutComplete({
-            status: 'success',
-            infor: 'Thanh toán thành công!'
-        })
+    const handlePaymentPayPalComplete = useCallback(
+        (order, isCancle, isError) => {
+            console.log(isCancle)
+            console.log(isError)
 
-        setTransactionNo(order.id)
-        setPayPalPaymentAt(new Date().toLocaleString())
-        setPaymentType('PayPal')
-        setBankCheckout('PayPal Wallet')
+            if (isCancle || isError) {
+                setPayPalCheckout(true)
+                setShowModal(true)
+                setCheckoutComplete({
+                    status: 'error',
+                    infor: 'Có lỗi khi thanh toán!'
+                })
+                return
+            }
 
-        const listCar = JSON.parse(localStorage.getItem('cartCheckout'))
+            setPayPalCheckout(true)
+            setShowModal(true)
+            setCheckoutComplete({
+                status: 'success',
+                infor: 'Thanh toán thành công!'
+            })
 
-        if (listCar !== null) {
-            const updateCartRequest = listCar.map((cart) => ({
-                cartId: cart.cartId,
-                courseId: cart.course.courseId,
-                createDate: cart.createDate
-            }))
+            setTransactionNo(order.id)
+            setPayPalPaymentAt(new Date().toLocaleString())
+            setPaymentType('PayPal')
+            setBankCheckout('PayPal Wallet')
 
-            // Create RegisterCoures
-            handleCreateRegisterCourse(updateCartRequest)
+            const listCar = JSON.parse(localStorage.getItem('cartCheckout'))
 
-            // Create Bill
-            handleCreateBillAndBillDetail(updateCartRequest)
+            let totalPriceBill = 0
+            if (listCar !== null) {
+                listCart.forEach(
+                    (item) => (totalPriceBill += item.course.coursePrice)
+                )
 
-            // Update Cart
-            handleUpdateCart(updateCartRequest)
-            localStorage.removeItem('cartCheckout')
+                console.log(totalPriceBill)
 
-            // PayPal checkout logic
-            setShowingPayPal(false)
-            setPayPalCheckout(false)
-        } else {
-            return console.log('Other Error')
-        }
-        // Xử lý dữ liệu từ thành phần con tại đây
-    }, [])
+                const updateCartRequest = listCar.map((cart) => ({
+                    courseId: cart.course.courseId,
+                    createDate: cart.createDate,
+                    totalPrice: totalPriceBill,
+                    studentId: user.username
+                }))
+
+                // Create RegisterCoures
+                handleCreateRegisterCourse(updateCartRequest)
+
+                // Create Bill
+                handleCreateBillAndBillDetail(updateCartRequest, totalPrice)
+
+                // Update Cart
+                handleUpdateCart(updateCartRequest)
+                localStorage.removeItem('cartCheckout')
+
+                // PayPal checkout logic
+                setShowingPayPal(false)
+                setPayPalCheckout(false)
+            } else {
+                return console.log('Other Error')
+            }
+        },
+        []
+    )
+
+    useEffect(() => {
+        setCheckoutPayPalComplete(true)
+    }, [handlePaymentPayPalComplete])
 
     useEffect(() => {
         if (responseCode !== null) {
@@ -189,16 +231,20 @@ const Checkout = () => {
 
                     if (listCar !== null) {
                         const updateCartRequest = listCar.map((cart) => ({
-                            cartId: cart.cartId,
                             courseId: cart.course.courseId,
-                            createDate: cart.createDate
+                            createDate: cart.createDate,
+                            totalPrice: totalPrice,
+                            studentId: user.username
                         }))
 
                         // Create RegisterCoures
                         handleCreateRegisterCourse(updateCartRequest)
 
                         // Create Bill
-                        handleCreateBillAndBillDetail(updateCartRequest)
+                        handleCreateBillAndBillDetail(
+                            updateCartRequest,
+                            totalPrice
+                        )
 
                         // Update Cart
                         handleUpdateCart(updateCartRequest)
@@ -219,13 +265,11 @@ const Checkout = () => {
     const handleCreateRegisterCourse = async (updateCartRequest) => {
         const registerCourseRequest = updateCartRequest.map((rc) => ({
             courseId: rc.courseId,
-            studentId: 1
+            studentId: user.username
         }))
 
-        console.log(registerCourseRequest[0])
-
         try {
-            const resp = await registerCourseApi.createRegisterCourse(
+            await registerCourseApi.createRegisterCourse(
                 registerCourseRequest[0]
             )
         } catch (error) {
@@ -235,7 +279,17 @@ const Checkout = () => {
 
     const handleCreateBillAndBillDetail = async (updateCartRequest) => {
         try {
-            const resp = await billApi.createBill(bill)
+            const billRequest = {
+                totalPrice: updateCartRequest[0].totalPrice,
+                checkoutMethodId: checkOutMethod,
+                studentId: user.username
+            }
+
+            // console.log(updateCartRequest[0].totalPrice)
+            // console.log(totalPrice)
+            console.log('Bill: ' + JSON.stringify(billRequest))
+
+            await billApi.createBill(billRequest)
         } catch (error) {
             console.log('Bill: ' + error)
         }
@@ -244,13 +298,15 @@ const Checkout = () => {
 
         // create bill Request for add bill and bill Detail
         const billDetailRequest = updateCartRequest.map((detail) => ({
-            totalPrice: totalPrice,
+            totalPrice: updateCartRequest[0].totalPrice,
             courseId: detail.courseId
         }))
 
         // Bill detail
         try {
-            const resp = await billApi.createBillDetail(billDetailRequest)
+            // console.log('BillDetail: ' + JSON.stringify(billDetailRequest))
+
+            await billApi.createBillDetail(billDetailRequest)
         } catch (error) {
             console.log('BillDetail: ' + error)
         }
@@ -258,13 +314,22 @@ const Checkout = () => {
 
     // update cart
     const handleUpdateCart = (updateCartRequest) => {
-        updateCartRequest.map(async (request) => {
-            try {
-                const resp = await cartApi.updateCart(request, request.cartId)
-            } catch (error) {
-                console.log('Cart: ' + error)
+        const userCart = JSON.parse(localStorage.getItem('userCart')) || []
+
+        if (userCart !== null) {
+            const indexToDelete = userCart.findIndex(
+                (cart) => cart.course.courseId === updateCartRequest[0].courseId
+            )
+
+            if (indexToDelete !== -1) {
+                userCart.splice(indexToDelete, 1)
+                localStorage.setItem('userCart', JSON.stringify(userCart))
+            } else {
+                console.log('cannot find cart')
             }
-        })
+        }
+
+        console.log('remove cart complete')
     }
 
     useEffect(() => {
@@ -281,7 +346,12 @@ const Checkout = () => {
     useEffect(() => {
         const timeoutRedirect = setTimeout(() => {
             if (checkoutComplete.status === 'success') {
-                return navigate('/cart')
+                return navigate({
+                    pathname: '/cart',
+                    search: `?${createSearchParams({
+                        checkoutComplete: true
+                    })}`
+                })
             }
         }, 9000)
         return () => clearTimeout(timeoutRedirect)
@@ -304,21 +374,21 @@ const Checkout = () => {
     }, [checkoutComplete, showModal, handlePaymentPayPalComplete])
 
     return (
-        <>
+        <Container size="xl">
             {/* Title */}
             <div>
                 <h1 className="font-weight-800 text-dark my-5 display-2">
                     Thanh toán
                 </h1>
                 <Link to="/cart">
-                    <h3 className="text-muted mt--4">
+                    <h3 className="text-muted mt--5">
                         <i className="bx bx-chevrons-left mr-2"></i>trở về
                     </h3>
                 </Link>
             </div>
 
             {/* content */}
-            <div className="mt-5">
+            <div className="mt-5 pb-5">
                 <Row>
                     {listCart !== null ? (
                         <>
@@ -346,23 +416,18 @@ const Checkout = () => {
                                                         data-target="#collapseOne"
                                                         aria-expanded="true"
                                                         aria-controls="collapseOne"
-                                                        onChange={(e) =>
-                                                            handleChangeCheckoutMethod(
-                                                                e.target
-                                                            )
-                                                        }
-                                                        htmlFor="vnpay"
                                                     >
                                                         <input
                                                             id="vnpay"
                                                             type="radio"
                                                             name="checkoutMethod"
-                                                            checked
+                                                            checked={
+                                                                checkOutMethod ===
+                                                                1
+                                                            }
                                                             className="mr-3"
-                                                            onChange={(e) =>
-                                                                handleChangeCheckoutMethod(
-                                                                    e.target
-                                                                )
+                                                            onChange={
+                                                                handleChangeCheckoutMethod
                                                             }
                                                         />
                                                         <label htmlFor="vnpay">
@@ -405,22 +470,18 @@ const Checkout = () => {
                                                         data-target="#collapseTwo"
                                                         aria-expanded="false"
                                                         aria-controls="collapseTwo"
-                                                        onChange={(e) =>
-                                                            handleChangeCheckoutMethod(
-                                                                e.target
-                                                            )
-                                                        }
-                                                        htmlFor="paypal"
                                                     >
                                                         <input
                                                             id="paypal"
                                                             type="radio"
                                                             name="checkoutMethod"
+                                                            checked={
+                                                                checkOutMethod ===
+                                                                2
+                                                            }
                                                             className="mr-3"
-                                                            onChange={(e) =>
-                                                                handleChangeCheckoutMethod(
-                                                                    e.target
-                                                                )
+                                                            onChange={
+                                                                handleChangeCheckoutMethod
                                                             }
                                                         />
                                                         <label htmlFor="paypal">
@@ -429,7 +490,7 @@ const Checkout = () => {
                                                                 width="50px"
                                                                 height="50px"
                                                                 className="img-fluid"
-                                                                alt="logo vnpay"
+                                                                alt="logo paypal"
                                                             />
                                                         </label>
                                                     </button>
@@ -455,37 +516,118 @@ const Checkout = () => {
                                     <h2 className="font-weight-800 text-dark">
                                         Chi tiết hóa đơn
                                     </h2>
-                                    {listCart.map((cart) => (
-                                        <Row className="mb-2" key={cart.cartId}>
-                                            <Col lg="2" xl="2" md="2" sm="2">
-                                                <img
-                                                    src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                                    width={'100%'}
-                                                    style={{
-                                                        maxHeight: '100px'
-                                                    }}
-                                                    className="img-fluid"
-                                                    alt={cart.course.courseName}
-                                                />
-                                            </Col>
-                                            <Col lg="8" xl="8" md="8" sm="8">
-                                                <h4 className="font-weight-800 text-dark">
-                                                    {cart.course.courseName}
-                                                </h4>
-                                            </Col>
-                                            <Col lg="2" xl="2" md="2" sm="2">
-                                                <h4 className="text-muted">
-                                                    {cart.course.coursePrice.toLocaleString(
-                                                        'it-IT',
-                                                        {
-                                                            style: 'currency',
-                                                            currency: 'VND'
+                                    {listCart !== null &&
+                                        listCart.map((cart, index) => (
+                                            <Row className="mb-2" key={index}>
+                                                <Col
+                                                    lg="2"
+                                                    xl="2"
+                                                    md="2"
+                                                    sm="2"
+                                                >
+                                                    <img
+                                                        src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                                        width={'100%'}
+                                                        style={{
+                                                            maxHeight: '100px'
+                                                        }}
+                                                        className="img-fluid"
+                                                        alt={
+                                                            cart.course
+                                                                .courseName
                                                         }
-                                                    )}
-                                                </h4>
-                                            </Col>
-                                        </Row>
-                                    ))}
+                                                    />
+                                                </Col>
+                                                <Col
+                                                    lg="8"
+                                                    xl="8"
+                                                    md="8"
+                                                    sm="8"
+                                                >
+                                                    <h4 className="font-weight-800 text-dark">
+                                                        {cart.course.courseName}
+                                                    </h4>
+                                                    <div className="d-flex text-dark">
+                                                        <span className="font-weight-600">
+                                                            {cart.course
+                                                                .rating ===
+                                                            'NaN'
+                                                                ? 5
+                                                                : parseFloat(
+                                                                      cart
+                                                                          .course
+                                                                          .rating
+                                                                  ).toFixed(1)}
+                                                        </span>
+                                                        <div className="mx-2">
+                                                            <Rating
+                                                                fractions={2}
+                                                                defaultValue={5}
+                                                                value={
+                                                                    cart.course
+                                                                        .rating ===
+                                                                    'NaN'
+                                                                        ? 5
+                                                                        : parseFloat(
+                                                                              cart
+                                                                                  .course
+                                                                                  .rating
+                                                                          ).toFixed(
+                                                                              1
+                                                                          )
+                                                                }
+                                                                readOnly
+                                                            />
+                                                        </div>
+                                                        <span className="text-muted">
+                                                            (
+                                                            {
+                                                                cart.course
+                                                                    .reviewNumber
+                                                            }{' '}
+                                                            đánh giá) - từ{' '}
+                                                            {
+                                                                cart.course
+                                                                    .totalStudent
+                                                            }{' '}
+                                                            học viên
+                                                        </span>
+                                                    </div>
+                                                    <div className="d-flex justify-content-start">
+                                                        <span className="text-muted">
+                                                            Tổng{' '}
+                                                            {
+                                                                cart.course
+                                                                    .courseDuration
+                                                            }{' '}
+                                                            Giờ học
+                                                        </span>
+                                                        <span className="mx-2">
+                                                            -
+                                                        </span>
+                                                        <span className="text-muted">
+                                                            Mọi trình độ
+                                                        </span>
+                                                    </div>
+                                                </Col>
+                                                <Col
+                                                    lg="2"
+                                                    xl="2"
+                                                    md="2"
+                                                    sm="2"
+                                                >
+                                                    <h3 className="text-primary">
+                                                        {cart.course.coursePrice.toLocaleString(
+                                                            'it-IT',
+                                                            {
+                                                                style: 'currency',
+                                                                currency: 'VND'
+                                                            }
+                                                        )}
+                                                    </h3>
+                                                </Col>
+                                            </Row>
+                                        ))}
                                 </div>
                             </Col>
                             <Col
@@ -602,9 +744,7 @@ const Checkout = () => {
                                                                     '3px'
                                                             }}
                                                             onClick={() =>
-                                                                handleCreatePayment(
-                                                                    checkOutMethod
-                                                                )
+                                                                handleCreatePayment()
                                                             }
                                                         >
                                                             Tiếp tục
@@ -698,7 +838,13 @@ const Checkout = () => {
                                                     Tổng thanh toán:
                                                 </div>
                                                 <div className="font-weight-600">
-                                                    {totalPrice}
+                                                    {totalPrice.toLocaleString(
+                                                        'it-IT',
+                                                        {
+                                                            style: 'currency',
+                                                            currency: 'VND'
+                                                        }
+                                                    )}
                                                 </div>
                                             </div>
                                             <hr />
@@ -715,7 +861,9 @@ const Checkout = () => {
                                                     Hình thức thanh toán:
                                                 </div>
                                                 <div className="font-weight-600">
-                                                    {checkOutMethod.toUpperCase()}
+                                                    {checkOutMethod === 1
+                                                        ? 'VNPay'
+                                                        : 'PayPal'}
                                                 </div>
                                             </div>
                                             <div className="d-flex justify-content-between">
@@ -742,7 +890,11 @@ const Checkout = () => {
                                                 Thời gian thanh toán:
                                             </div>
                                             <div className="font-weight-600">
-                                                {moment(paypalPaymentAt).format(
+                                                {moment(
+                                                    paypalPaymentAt
+                                                        ? paypalPaymentAt
+                                                        : currentDate
+                                                ).format(
                                                     'DD-MM-yyyy, h:mm:ss A'
                                                 )}
                                             </div>
@@ -766,7 +918,21 @@ const Checkout = () => {
                                     >
                                         <Button
                                             color="primary"
-                                            onClick={() => setShowModal(false)}
+                                            onClick={() => {
+                                                setShowModal(false)
+                                                if (
+                                                    checkoutComplete.status ===
+                                                    'success'
+                                                ) {
+                                                    navigate('/cart', {
+                                                        search: `?${createSearchParams(
+                                                            {
+                                                                checkoutComplete: true
+                                                            }
+                                                        )}`
+                                                    })
+                                                }
+                                            }}
                                         >
                                             {checkoutComplete.status ===
                                             'success'
@@ -780,7 +946,7 @@ const Checkout = () => {
                     )}
                 </ModalBody>
             </Modal>
-        </>
+        </Container>
     )
 }
 

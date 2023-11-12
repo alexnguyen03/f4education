@@ -5,7 +5,7 @@ import {
     Search
 } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
-import courseApi from 'api/courseApi'
+import courseApi from '../../api/courseApi'
 import moment from 'moment'
 import CoursesHeader from 'components/Headers/CoursesHeader'
 import { MaterialReactTable } from 'material-react-table'
@@ -47,9 +47,13 @@ import { IconEyeSearch } from '@tabler/icons-react'
 import ReactLoading from 'react-loading'
 import { Timeline, Event } from 'react-timeline-scribble'
 import { Warning } from '@material-ui/icons'
+import { formatDate } from '../../utils/formater'
+import { Link } from 'react-router-dom'
+import Notify from '../../utils/Notify'
+import { ToastContainer, toast } from 'react-toastify'
 const IMG_URL = '/courses/'
 const Courses = () => {
-    const user = JSON.parse(localStorage.getItem('user') | '')
+    const user = JSON.parse(localStorage.getItem('user'))
     const [image, setImage] = useState(null)
 
     const [imgData, setImgData] = useState(null)
@@ -421,17 +425,23 @@ const Courses = () => {
             courseDuration: course.courseDuration,
             courseDescription: course.courseDescription,
             numberSession: parseInt(course.numberSession),
-            image: image,
+            image: course.image,
             subjectId: parseInt(selectedSubject.value),
             adminId: user.username
         }
+
+        console.log(
+            '🚀 ~ file: Courses.js:431 ~ handleSubmitForm ~ user.username:',
+            user.username
+        )
         const formData = new FormData()
         console.log(
             '🚀 ~ file: Courses.js:472 ~ addCourse ~ courseRequest:',
             courseRequest
         )
-        formData.append('courseRequest', courseRequest)
+        formData.append('courseRequest', JSON.stringify(courseRequest))
         formData.append('file', image)
+        handleResetForm()
 
         if (update) {
             updateCourse(formData)
@@ -466,31 +476,45 @@ const Courses = () => {
     }
     const addCourse = async (formData) => {
         try {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             const resp = await courseApi.addCourse(formData)
+
             console.log('🚀 ~ file: Courses.js:468 ~ addCourse ~ resp:', resp)
-            getAllCourse()
+            if (resp.status === 200) {
+                toast(id, Notify.options.createSuccess())
+                setCourses([resp.data, ...courses])
+            }
+            // getAllCourse()
         } catch (error) {
+            toast(Notify.options.createError())
             console.log('failed to fetch data', error)
         }
     }
 
-    const updateCourse = async (courseRequest) => {
-        const formData = new FormData()
-        formData.append('courseRequest', courseRequest)
-        console.log(
-            '🚀 ~ file: Courses.js:462 ~ updateCourse ~ courseRequest:',
-            courseRequest
-        )
-        formData.append('file', image)
-
-        // try {
-        //     const resp = await courseApi.updateCourse(formData)
-        //     handleResetForm()
-        //     getAllCourse()
-        //     console.log('get all')
-        // } catch (error) {
-        //     console.log('failed to fetch data', error)
-        // }
+    const updateCourse = async (formData) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        try {
+            const resp = await courseApi.updateCourse(formData)
+            console.log(
+                '🚀 ~ file: Courses.js:489 ~ updateCourse ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.updateSuccess())
+                setCourses(
+                    courses.map((item) => {
+                        if (item.courseId === course.courseId) {
+                            return resp.data
+                        }
+                        return item
+                    })
+                )
+            }
+        } catch (error) {
+            toast.update(Notify.options.updateError())
+            console.log('failed to fetch data', error)
+        }
     }
 
     //chọn 1 môn học trong select box
@@ -514,6 +538,7 @@ const Courses = () => {
             courseDuration: course.numberSession * 2
         })
     }, [course])
+    useEffect(() => {}, [courses])
 
     useEffect(() => {
         if (courses.length > 0) return
@@ -532,6 +557,8 @@ const Courses = () => {
 
     return (
         <>
+            <ToastContainer />
+
             <CoursesHeader />
 
             <Container className="mt--7" fluid>
@@ -574,7 +601,7 @@ const Courses = () => {
                                 displayColumnDefOptions={{
                                     'mrt-row-actions': {
                                         header: 'Thao tác',
-                                        size: 20
+                                        size: 70
                                         // Something else here
                                     },
                                     'mrt-row-numbers': {
@@ -621,6 +648,13 @@ const Courses = () => {
                                         >
                                             <IconEyeSearch />
                                         </IconButton>
+                                        <Link
+                                            to={`/admin/courses-detail/${row.original.courseId}`}
+                                        >
+                                            <IconButton color="info">
+                                                <i className="bx bx-layer-plus"></i>
+                                            </IconButton>
+                                        </Link>
                                     </Box>
                                 )}
                                 muiTablePaginationProps={{
@@ -975,10 +1009,8 @@ const Courses = () => {
                                             <Event
                                                 interval={
                                                     <span className="fw-bold fs-3">
-                                                        {moment(
+                                                        {formatDate(
                                                             item.modifyDate
-                                                        ).format(
-                                                            'DD/MM/yyyy, h:mm A'
                                                         )}
                                                     </span>
                                                 }

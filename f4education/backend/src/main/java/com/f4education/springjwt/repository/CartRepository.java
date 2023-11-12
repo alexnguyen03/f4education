@@ -12,5 +12,5 @@ public interface CartRepository extends JpaRepository<Cart, Integer> {
 	List<Cart> findAllByStatus(boolean status);
 
 	@Query("SELECT c FROM Cart c WHERE c.student.studentId = :studentId AND c.status = :status")
-	List<Cart> findByStudentIdAndStatus(@Param("studentId") Integer studentId, @Param("status") boolean status);
+	List<Cart> findByStudentIdAndStatus(@Param("studentId") String studentId, @Param("status") boolean status);
 }

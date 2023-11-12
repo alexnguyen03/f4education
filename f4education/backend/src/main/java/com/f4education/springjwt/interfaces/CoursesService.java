@@ -4,13 +4,16 @@ import java.util.List;
 
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.response.CourseResponse;
 
 public interface CoursesService {
 	List<CourseDTO> findAllCourseDTO();
 
-	List<CourseDTO> findNewestCourse();
+	List<CourseResponse> findNewestCourse(String studentId);
 
-	List<CourseDTO> findTop10SoldCourse();
+	CourseResponse findCourseByCourseId(Integer courseId,String studentId);
+
+	List<CourseResponse> findTop10SoldCourse(String studentId);
 
 	CourseDTO findById(Integer id);
 

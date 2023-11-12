@@ -11,8 +11,17 @@ import java.util.List;
 @Repository
 public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, Integer> {
 	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.student.studentId = :studentId")
-	List<RegisterCourse> findByStudentId(@Param("studentId") Integer studentId);
+	List<RegisterCourse> findByStudentId(@Param("studentId") String studentId);
 
 	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.course.courseId = :courseId")
 	List<RegisterCourse> findByCourseId(@Param("courseId") Integer courseId);
+
+	@Query("SELECT rc FROM RegisterCourse rc JOIN rc.classes WHERE rc.student.studentId = :studentId")
+	List<RegisterCourse> findCourseProgressByStudentId(@Param("studentId") String studentId);
+
+	//
+	// @Query("SELECT new com.f4education.springjwt.models.ClassesByTeacher(rc,c,t)
+	// FROM RegisterCourse rc JOIN rc.classes c JOIN c.teacher t")
+	// List<ClassesByTeacher> getRegisterCourseWithTeacherAndClasses();
+	List<RegisterCourse> findRegisterCoursesByStudent_StudentId(String studentId);
 }

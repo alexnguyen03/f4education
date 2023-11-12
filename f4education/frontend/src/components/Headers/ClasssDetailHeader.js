@@ -34,7 +34,7 @@ const ClasssDetailHeader = () => {
     let { classIdParam } = useParams()
     const getClassByClassId = async () => {
         try {
-            const resp = await classApi.getClassById(classIdParam)
+            const resp = await classApi.getByClassId(classIdParam)
 
             setClassDetail(resp.data)
         } catch (error) {

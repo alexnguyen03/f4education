@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -55,31 +57,31 @@ public class RegisterCourse implements Serializable {
 
     private String image;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "registerCourse")
+    @JsonIgnore
     List<Certificate> certificate;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "registerCourse")
+    @JsonIgnore
     List<Evaluate> evaluates;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "registerCourse")
+    @JsonIgnore
     List<Point> points;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "student_id")
+    @JsonIgnore
     Student student;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "course_id")
+    @JsonIgnore
     Course course;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "class_id")
+    @JsonIgnore
     Classes classes;
 
     @Override

@@ -24,9 +24,10 @@ import AdminNavbar from 'components/Navbars/AdminNavbar.js'
 import AdminFooter from 'components/Footers/AdminFooter.js'
 import Sidebar from 'components/Sidebar/Sidebar.js'
 
-import '../assets/css/custom-admin-css/Index.css'
+// import "../assets/css/custom-admin-css/Index.css";
 
 import { routes } from 'routes.js'
+import { ToastContainer } from 'react-toastify'
 
 const Admin = (props) => {
     const mainContent = useRef(null)

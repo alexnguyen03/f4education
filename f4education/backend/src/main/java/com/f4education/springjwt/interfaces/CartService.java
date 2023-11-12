@@ -11,7 +11,7 @@ import com.f4education.springjwt.payload.response.CartResponseDTO;
 public interface CartService {
 	List<CartResponseDTO> getAllCartByStatus();
 
-	List<CartResponseDTO> findAllCartByStudentId(Integer studentId, boolean status);
+	List<CartResponseDTO> findAllCartByStudentId(String studentId, boolean status);
 
 	CartResponseDTO getCartById(Integer cartId);
 
