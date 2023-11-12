@@ -70,8 +70,24 @@ public class CourseServiceImpl implements CoursesService {
 		String action = "CREATE";
 		Course course = this.convertRequestToEntity(courseRequest);
 		Integer idCourse = courseRequest.getCourseId();
+		try {
+			// thực hiện tạo mới thư mục với tên là tên khóa học
+			String folderIdCreated = googleDriveRepository.getFolderId(course.getCourseName());
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		if (idCourse != null) {
 			action = "UPDATE";
+			Course foundCourse = courseRepository.findById(idCourse).get();
+			if (!course.getCourseName().equalsIgnoreCase(foundCourse.getCourseName())) {
+				try {
+					googleDriveRepository.renameFolder(foundCourse.getCourseName(), course.getCourseName());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		Subject subject = subjectRepository.findById(courseRequest.getSubjectId()).get();
 		course.setAdmin(subject.getAdmin());

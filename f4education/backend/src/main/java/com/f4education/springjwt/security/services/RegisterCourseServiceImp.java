@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import com.f4education.springjwt.interfaces.RegisterCourseService;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.HandleResponseDTO;
@@ -198,6 +199,9 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                 .filter(registerCourse -> listRegisterCourseId.contains(registerCourse.getRegisterCourseId()))
                 .collect(Collectors.toList());
         Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
+
+        
+
         filteredRegisterCourses.forEach(registerCourse -> {
             registerCourse.setClasses(foundClass);
             registerCourse.setStudent(registerCourse.getStudent());
@@ -211,8 +215,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
     }
 
-	@Override
-	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
-		googleDriveRepository.grantPermissionsByEmails(folderName, emails);
-	}
+    @Override
+    public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
+        googleDriveRepository.grantPermissionsByEmails(folderName, emails);
+    }
 }

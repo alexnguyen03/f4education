@@ -35,7 +35,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/api/courses")
-@RequiredArgsConstructor
 public class CoursesController {
 	@Autowired
 	CourseServiceImpl courseService;
@@ -88,22 +87,12 @@ public class CoursesController {
 
 	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> updateCourse(@RequestPart("courseRequest") String courseRequestString,
+	public ResponseEntity<?> updateCourse(@RequestPart("courseRequest") CourseRequest courseRequest,
 			@RequestParam("file") Optional<MultipartFile> file) {
-		ObjectMapper mapper = new ObjectMapper();
-		CourseRequest courseRequest = new CourseRequest();
 
-		try {
-			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
-			if (!file.isEmpty()) {
-				File savedFile = xfileService.save(file.orElse(null), "/courses");
-				courseRequest.setImage(savedFile.getName());
-			}
-
-		} catch (JsonProcessingException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (!file.isEmpty()) {
+			File savedFile = xfileService.save(file.orElse(null), "/courses");
+			courseRequest.setImage(savedFile.getName());
 		}
 
 		CourseDTO courseDTO = courseService.saveCourse(courseRequest);
@@ -147,7 +136,7 @@ public class CoursesController {
 		CourseDTO course = courseService.findById(courseId);
 		return ResponseEntity.ok(course);
 	}
-	
+
 	@GetMapping("/renameFolder")
 	public String renameFolder(String courseName, String newCoursename) throws Exception {
 		return courseService.renameFolder(courseName, newCoursename);
