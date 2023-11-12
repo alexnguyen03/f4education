@@ -72,17 +72,17 @@ const Notify = {
                 ...defaultOptions
             }
         },
-        deleteSuccess: ()=>{
-            return{
-                type:toast.TYPE.SUCCESS,
-                render:'Xóa thành công !',
+        deleteSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Xóa thành công !',
                 ...defaultOptions
             }
         },
-        deleteError: ()=>{
-            return{
-                type:toast.TYPE.ERROR,
-                render:'Xóa thất bại !',
+        deleteError: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Xóa thất bại !',
                 ...defaultOptions
             }
         },
@@ -91,6 +91,14 @@ const Notify = {
             return {
                 type: toast.TYPE.ERROR,
                 render: 'Lỗi. Vui lòng thử lại sau !',
+                ...defaultOptions
+            }
+        },
+        warningParam: (param) => {
+            // loi chung thi dung ong nay
+            return {
+                type: toast.TYPE.WARNING,
+                render: param,
                 ...defaultOptions
             }
         }

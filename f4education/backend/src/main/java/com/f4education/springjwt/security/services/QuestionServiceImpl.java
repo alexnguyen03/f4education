@@ -78,6 +78,7 @@ public class QuestionServiceImpl implements QuestionService {
 		questionDTO.setQuestionId(question.getQuestionId());
 		questionDTO.setSubjectName(question.getSubject().getSubjectName());
 		questionDTO.setCourseName(question.getCourse().getCourseName());
+		questionDTO.setCourseImage(question.getCourse().getImage());
 
 		return questionDTO;
 	}

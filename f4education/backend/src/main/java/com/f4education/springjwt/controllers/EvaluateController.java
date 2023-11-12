@@ -72,7 +72,7 @@ public class EvaluateController {
 		EvaluateResponse evaluate = evaluateService.updateEvaluateDTO(evaluateId, evaluateRequest);
 
 		if (evaluate == null) {
-			return ResponseEntity.ok("");
+			return ResponseEntity.noContent().build();
 		}
 
 		return ResponseEntity.ok(evaluate);

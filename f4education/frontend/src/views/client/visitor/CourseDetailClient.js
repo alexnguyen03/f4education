@@ -31,6 +31,7 @@ import {
     IconDeviceMobile,
     IconDeviceTvOld,
     IconInfinity,
+    IconPencil,
     IconSourceCode,
     IconStarFilled,
     IconTrash,
@@ -106,20 +107,30 @@ function CourseDetailClient() {
     // ACTION VARIABLE
     const [loading, setLoading] = useState(false)
     const [evaluateRequest, setEvaluateRequest] = useState({
+        evaluateId: '',
         rating: '',
         content: '',
         studentId: '',
         registerCourseId: ''
     })
+    const [isUpdateEvaluate, setIsUpdateEvaluate] = useState(false)
 
     // PAGINATION
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 6
 
-    const totalItems = listEvaluate.length
+    // Move a evaluate that got a student ID = curentUser login to top of array
+    const sortedListEvaluate = [...listEvaluate].sort((a, b) => {
+        if (a.studentId === user.username) return -1
+        if (b.studentId === user.username) return 1
+        return 0
+    })
+
+    const totalItems = sortedListEvaluate.length
+    const totalPages = Math.ceil(totalItems / itemsPerPage)
     const lastIndex = currentPage * itemsPerPage
     const firstIndex = lastIndex - itemsPerPage
-    const currentItems = listEvaluate.slice(firstIndex, lastIndex)
+    const currentItems = sortedListEvaluate.slice(firstIndex, lastIndex)
 
     const handlePaginationChange = (page) => {
         setCurrentPage(page)
@@ -202,6 +213,36 @@ function CourseDetailClient() {
         }
     }
 
+    const handleUpdateEvaluate = async () => {
+        evaluateRequest.studentId = user.username
+        evaluateRequest.registerCourseId = course.registerCourseId
+
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        try {
+            const resp = await evaluateApi.updateEvaluate(
+                evaluateRequest,
+                evaluateRequest.evaluateId
+            )
+            if (resp.status === 200) {
+                toast.update(
+                    id,
+                    Notify.options.createSuccessParam(
+                        'Cập nhật phản hồi thành công'
+                    )
+                )
+                fetchListEvaluate()
+                fetchCurrentCourse()
+                handleResetEvaluate()
+                setIsUpdateEvaluate(false)
+            }
+        } catch (error) {
+            toast.update(
+                id,
+                Notify.options.createErrorParam('Cập nhật phản hồi thất bại')
+            )
+        }
+    }
+
     const handleDeleteEvaluate = async (evaluateId) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
         try {
@@ -219,7 +260,10 @@ function CourseDetailClient() {
             if (resp.status === 204 || resp.status === 200) {
                 toast.update(id, Notify.options.deleteSuccess())
                 fetchListEvaluate()
+                setIsUpdateEvaluate(false)
             }
+
+            setIsUpdateEvaluate(false)
         } catch (error) {
             toast.update(id, Notify.options.deleteError())
         }
@@ -230,6 +274,24 @@ function CourseDetailClient() {
             ...prev,
             [e.target.name]: e.target.value
         }))
+    }
+
+    const handleEditEvaluate = (evaluate) => {
+        setEvaluateRequest({
+            evaluateId: evaluate.evaluateId,
+            content: evaluate.content,
+            rating: evaluate.rating
+        })
+    }
+
+    const handleResetEvaluate = () => {
+        setEvaluateRequest({
+            evaluateId: '',
+            rating: '',
+            content: '',
+            studentId: '',
+            registerCourseId: ''
+        })
     }
 
     // CART - CHECK OUT
@@ -1375,7 +1437,11 @@ function CourseDetailClient() {
                                     <Rating
                                         fractions={2}
                                         defaultValue={0}
-                                        value={evaluateRequest.rating}
+                                        value={
+                                            isUpdateEvaluate
+                                                ? ''
+                                                : evaluateRequest.rating
+                                        }
                                         onChange={(newValue) =>
                                             setEvaluateRequest({
                                                 ...evaluateRequest,
@@ -1387,7 +1453,11 @@ function CourseDetailClient() {
                                         minRows={2}
                                         placeholder="Đánh giá khóa học"
                                         name="content"
-                                        value={evaluateRequest.content}
+                                        value={
+                                            isUpdateEvaluate
+                                                ? ''
+                                                : evaluateRequest.content
+                                        }
                                         onChange={(e) =>
                                             handleOnChangeEvaluate(e)
                                         }
@@ -1497,20 +1567,24 @@ function CourseDetailClient() {
                                                                                                 <IconTrash size="1rem" />
                                                                                             </ActionIcon>
                                                                                         )}
-                                                                                        {/* {evaluate.studentId ===
+                                                                                        {evaluate.studentId ===
                                                                                             user.username && (
                                                                                             <ActionIcon
                                                                                                 color="indigo"
                                                                                                 variant="light"
-                                                                                                onClick={() =>
-                                                                                                    handleUpdateEvaluate(
-                                                                                                        evaluate.evaluateId
+                                                                                                onClick={() => {
+                                                                                                    handleResetEvaluate()
+                                                                                                    handleEditEvaluate(
+                                                                                                        evaluate
                                                                                                     )
-                                                                                                }
+                                                                                                    setIsUpdateEvaluate(
+                                                                                                        !isUpdateEvaluate
+                                                                                                    )
+                                                                                                }}
                                                                                             >
                                                                                                 <IconPencil size="1rem" />
                                                                                             </ActionIcon>
-                                                                                        )} */}
+                                                                                        )}
                                                                                     </>
                                                                                 ) : (
                                                                                     <>
@@ -1542,27 +1616,113 @@ function CourseDetailClient() {
                                                                                     0
                                                                                 }
                                                                             >
-                                                                                <Rating
-                                                                                    fractions={
-                                                                                        2
-                                                                                    }
-                                                                                    defaultValue={
-                                                                                        evaluate.rating
-                                                                                    }
-                                                                                    readOnly
-                                                                                />
+                                                                                {isUpdateEvaluate &&
+                                                                                evaluate.studentId ===
+                                                                                    user.username &&
+                                                                                evaluate.evaluateId ===
+                                                                                    evaluateRequest.evaluateId ? (
+                                                                                    <>
+                                                                                        <Rating
+                                                                                            fractions={
+                                                                                                2
+                                                                                            }
+                                                                                            defaultValue={
+                                                                                                0
+                                                                                            }
+                                                                                            value={
+                                                                                                evaluateRequest.rating
+                                                                                            }
+                                                                                            onChange={(
+                                                                                                newValue
+                                                                                            ) =>
+                                                                                                setEvaluateRequest(
+                                                                                                    {
+                                                                                                        ...evaluateRequest,
+                                                                                                        rating: newValue
+                                                                                                    }
+                                                                                                )
+                                                                                            }
+                                                                                        />
+                                                                                    </>
+                                                                                ) : (
+                                                                                    <>
+                                                                                        <Rating
+                                                                                            fractions={
+                                                                                                2
+                                                                                            }
+                                                                                            value={
+                                                                                                evaluate.rating
+                                                                                            }
+                                                                                            readOnly
+                                                                                        />
+                                                                                    </>
+                                                                                )}
                                                                             </Group>
                                                                         </Stack>
                                                                     </Group>
-                                                                    <Text
-                                                                        pl={54}
-                                                                        size="md"
-                                                                        color="dark"
-                                                                    >
-                                                                        {
-                                                                            evaluate.content
-                                                                        }
-                                                                    </Text>
+                                                                    {isUpdateEvaluate &&
+                                                                    evaluate.studentId ===
+                                                                        user.username &&
+                                                                    evaluate.evaluateId ===
+                                                                        evaluateRequest.evaluateId ? (
+                                                                        <>
+                                                                            <Textarea
+                                                                                minRows={
+                                                                                    2
+                                                                                }
+                                                                                value={
+                                                                                    evaluateRequest.content
+                                                                                }
+                                                                                onChange={(
+                                                                                    event
+                                                                                ) =>
+                                                                                    setEvaluateRequest(
+                                                                                        (
+                                                                                            prevEvaluateRequest
+                                                                                        ) => ({
+                                                                                            ...prevEvaluateRequest,
+                                                                                            content:
+                                                                                                event
+                                                                                                    .target
+                                                                                                    .value
+                                                                                        })
+                                                                                    )
+                                                                                }
+                                                                            />
+
+                                                                            <Button
+                                                                                variant="filled"
+                                                                                color="violet"
+                                                                                mr="auto"
+                                                                                onClick={() =>
+                                                                                    handleUpdateEvaluate()
+                                                                                }
+                                                                            >
+                                                                                Cập
+                                                                                nhật
+                                                                            </Button>
+                                                                        </>
+                                                                    ) : (
+                                                                        <>
+                                                                            <Text
+                                                                                pl={
+                                                                                    54
+                                                                                }
+                                                                                size="md"
+                                                                                color="dark"
+                                                                                lineClamp={
+                                                                                    2
+                                                                                }
+                                                                                mah={
+                                                                                    80
+                                                                                }
+                                                                            >
+                                                                                {
+                                                                                    evaluate.content
+                                                                                }
+                                                                            </Text>
+                                                                        </>
+                                                                    )}
                                                                 </Stack>
                                                             </Grid.Col>
                                                         </>
@@ -1574,10 +1734,10 @@ function CourseDetailClient() {
                                 </>
                             )}
 
-                            {listEvaluate.length > itemsPerPage && (
+                            {totalPages > 1 && (
                                 <Center mt={20}>
                                     <Pagination
-                                        total={totalItems}
+                                        total={totalPages}
                                         color="violet"
                                         withEdges
                                         value={currentPage}

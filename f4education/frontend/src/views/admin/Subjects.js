@@ -85,8 +85,6 @@ const Subjects = () => {
     // API Area
     const fetchSubjects = async () => {
         try {
-            setSubjectLoading(true)
-
             const resp = await subjectApi.getAllSubject()
 
             if (resp.status === 200 && resp.data.length > 0) {
@@ -97,8 +95,6 @@ const Subjects = () => {
             } else {
                 console.log('Loi goi ban oi')
             }
-
-            setSubjectLoading(false)
         } catch (error) {
             console.log(error)
         }
@@ -408,8 +404,12 @@ const Subjects = () => {
 
     // *************** Use effect area
     useEffect(() => {
-        fetchSubjects()
-        fetchSubjectHistory()
+        const fetchData = async () => {
+            setSubjectLoading(true)
+            await Promise.all([fetchSubjects(), fetchSubjectHistory()])
+            setSubjectLoading(false)
+        }
+        fetchData()
     }, [])
 
     return (
@@ -817,9 +817,9 @@ const Subjects = () => {
                                                                                     học:
                                                                                 </span>
                                                                                 <strong className="text-primary font-weight-700">
-                                                                                    {
-                                                                                        formatCurrency(course.coursePrice)
-                                                                                    }
+                                                                                    {formatCurrency(
+                                                                                        course.coursePrice
+                                                                                    )}
                                                                                 </strong>
                                                                             </h4>
                                                                         </div>

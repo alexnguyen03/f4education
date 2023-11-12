@@ -1,4 +1,5 @@
 import {
+    Accordion,
     Blockquote,
     Center,
     Checkbox,
@@ -36,9 +37,17 @@ import Notify from '../../utils/Notify'
 
 // API
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
-import { IconBookUpload, IconPhoto, IconUpload, IconX } from '@tabler/icons-react'
+import {
+    IconBookUpload,
+    IconPhoto,
+    IconUpload,
+    IconX
+} from '@tabler/icons-react'
 import answersApi from '../../api/answersApi'
 import questionApi from '../../api/questionApi'
+
+// IMAGE PATH
+const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const QuestionDetail = () => {
     // ************* Route and Params
@@ -81,7 +90,7 @@ const QuestionDetail = () => {
 
     // *************** PAGINATION AND SEARCH START
     const [currentPage, setCurrentPage] = useState(1)
-    const itemsPerPage = 4
+    const itemsPerPage = 10
 
     const filteredQuestion = questions.filter((item) => {
         const questionTitle = item.questionTitle
@@ -106,6 +115,7 @@ const QuestionDetail = () => {
         filteredQuestion.length
     )
     const currentItems = filteredQuestion.slice(firstIndex, lastIndex)
+    const totalPages = Math.ceil(filteredQuestion.length / itemsPerPage)
 
     // *************** PAGINATION AND SEARCH END
 
@@ -174,7 +184,6 @@ const QuestionDetail = () => {
             try {
                 questionRequest.questionTitle = questionTitle
                 questionRequest.answers = handleDataTranferAnswers()
-                console.log(questionRequest)
 
                 const body = questionRequest
                 const resp = await questionApi.createQuestionDetail(body)
@@ -312,7 +321,6 @@ const QuestionDetail = () => {
         }
         newAnswers = []
         setDeleteAnswer([])
-        fetchQuestionDetail()
     }
 
     const handleDeleteQuestion = async (questionDetail) => {
@@ -705,131 +713,159 @@ const QuestionDetail = () => {
     // *************** CREATE NEW QUESTION - ANSWER - END
 
     // *************** RENDER QUESTION AND ANSWER - START
+    const [openItemIndex, setOpenItemIndex] = useState(null)
+
+    const handleAccordionChange = (index) => {
+        setOpenItemIndex(openItemIndex === index ? null : index)
+    }
+
     // + render UI questions
     const renderGroupsQuestion = () => {
-        return currentItems.map((questionDetail, index) => (
-            <>
-                <Col
-                    lg={12}
-                    xl={12}
-                    md={12}
-                    sm={12}
-                    key={index}
-                    className="mb-3"
-                >
-                    <Card
-                        style={{
-                            minWidth: '380px',
-                            minHeight: '400px'
-                        }}
+        return (
+            <Accordion
+                variant="separated"
+                radius="xs"
+                mb={10}
+                w="100%"
+                defaultValue="0"
+                onChange={handleAccordionChange}
+            >
+                {currentItems.map((questionDetail, index) => (
+                    <Accordion.Item
+                        value={`${index}`}
+                        opened={openItemIndex === index}
                     >
-                        <CardBody>
-                            {/* Title Question */}
-                            <h4
-                                className="p-2 d-flex align-items-center"
-                                style={{
-                                    background: '#f1f1f1',
-                                    borderRadius: '5px',
-                                    minHeight: '80px',
-                                    overflow: 'auto'
-                                }}
-                            >
-                                {/* Display question title */}
-                                {editQuestion &&
-                                questionDetail.questionDetailId ===
-                                    editQuestionId ? (
-                                    <Textarea
-                                        label={`Câu hỏi: ${index + 1}`}
-                                        className="w-100"
-                                        autosize
-                                        minRows={2}
-                                        onChange={(e) => {
-                                            questionRequest.questionTitle =
-                                                questionDetail.questionTitle
-                                            handleOnchangeInputQuestionTitle(
-                                                e.target.value,
-                                                questionDetail.questionDetailId
-                                            )
-                                        }}
-                                        value={questionRequest.questionTitle}
-                                    />
-                                ) : (
-                                    <span className="text-dark font-weight-600">
-                                        <strong>Question {index + 1}: </strong>
-                                        <span className="text-muted">
-                                            {questionDetail.questionTitle}
-                                        </span>
+                        <Accordion.Control bg="#fff">
+                            <h4 className="p-2 d-flex align-items-center">
+                                <span className="text-muted font-weight-500">
+                                    <strong>Câu hỏi số {index + 1} : </strong>
+                                    <span className="text-dark">
+                                        {questionDetail.questionTitle}
                                     </span>
-                                )}
+                                </span>
                             </h4>
-                            {/* Answer Display Area */}
-                            <div
-                                className="mt-3"
+                        </Accordion.Control>
+                        <Accordion.Panel>
+                            <Card
                                 style={{
-                                    height: editQuestion ? 'auto' : '220px',
-                                    overflowY: 'auto'
+                                    minWidth: '380px',
+                                    minHeight: '400px'
                                 }}
                             >
-                                <Row className="w-100">
-                                    {/* if answer.questionId === qs.questionId */}
-                                    {/* {handleRenderAnswerByQuestionId(
+                                <CardBody>
+                                    {/* Title Question */}
+                                    <h4
+                                        className="p-2 d-flex align-items-center"
+                                        style={{
+                                            textDecoration: editQuestion
+                                                ? 'none'
+                                                : 'underline'
+                                        }}
+                                    >
+                                        {/* Display question title */}
+                                        {editQuestion &&
+                                        questionDetail.questionDetailId ===
+                                            editQuestionId ? (
+                                            <Textarea
+                                                label={`Tiêu đề câu hỏi: `}
+                                                className="w-100"
+                                                autosize
+                                                minRows={2}
+                                                onChange={(e) => {
+                                                    questionRequest.questionTitle =
+                                                        questionDetail.questionTitle
+                                                    handleOnchangeInputQuestionTitle(
+                                                        e.target.value,
+                                                        questionDetail.questionDetailId
+                                                    )
+                                                }}
+                                                value={
+                                                    questionRequest.questionTitle
+                                                }
+                                            />
+                                        ) : (
+                                            <span className="text-muted font-weight-500">
+                                                <strong>
+                                                    Tiêu đề câu hỏi :{' '}
+                                                </strong>
+                                                <span className="text-dark">
+                                                    {
+                                                        questionDetail.questionTitle
+                                                    }
+                                                </span>
+                                            </span>
+                                        )}
+                                    </h4>
+                                    {/* Answer Display Area */}
+                                    <div
+                                        className="mt-3"
+                                        style={{
+                                            height: editQuestion
+                                                ? 'auto'
+                                                : '220px',
+                                            overflowY: 'auto'
+                                        }}
+                                    >
+                                        <Row className="w-100">
+                                            {/* if answer.questionId === qs.questionId */}
+                                            {/* {handleRenderAnswerByQuestionId(
                                         questionDetail
                                     )} */}
-                                    {renderGroupAnswerIntoQuestion(
-                                        questionDetail
-                                    )}
+                                            {renderGroupAnswerIntoQuestion(
+                                                questionDetail
+                                            )}
+                                            {editQuestion &&
+                                            questionDetail.questionDetailId ===
+                                                editQuestionId ? (
+                                                <Button
+                                                    color="dark"
+                                                    outline
+                                                    className="mt-2 ml-3"
+                                                    onClick={() =>
+                                                        handleAddAnswer(
+                                                            questionDetail.answers
+                                                        )
+                                                    }
+                                                >
+                                                    <i className="bx bx-list-plus"></i>{' '}
+                                                    Thêm câu trả lời
+                                                </Button>
+                                            ) : (
+                                                <></>
+                                            )}
+                                        </Row>
+                                    </div>
+                                </CardBody>
+                                {/* Action Area */}
+                                <CardFooter>
+                                    {/* Update button */}
                                     {editQuestion &&
                                     questionDetail.questionDetailId ===
                                         editQuestionId ? (
                                         <Button
-                                            color="dark"
-                                            outline
-                                            className="mt-2 ml-3"
-                                            onClick={() =>
-                                                handleAddAnswer(
-                                                    questionDetail.answers
-                                                )
-                                            }
+                                            color="primary"
+                                            role="button"
+                                            className="float-left"
+                                            onClick={handleUpdateQuestion}
                                         >
-                                            <i className="bx bx-list-plus"></i>{' '}
-                                            Thêm câu trả lời
+                                            Cập nhật
                                         </Button>
                                     ) : (
-                                        <></>
+                                        <>
+                                            <Button
+                                                color="dark"
+                                                disabled
+                                                role="button"
+                                                className="float-left"
+                                                onClick={handleUpdateQuestion}
+                                            >
+                                                Cập nhật
+                                            </Button>
+                                        </>
                                     )}
-                                </Row>
-                            </div>
-                        </CardBody>
-                        {/* Action Area */}
-                        <CardFooter>
-                            {/* Update button */}
-                            {editQuestion &&
-                            questionDetail.questionDetailId ===
-                                editQuestionId ? (
-                                <Button
-                                    color="primary"
-                                    role="button"
-                                    className="float-left"
-                                    onClick={handleUpdateQuestion}
-                                >
-                                    Cập nhật
-                                </Button>
-                            ) : (
-                                <>
-                                    <Button
-                                        color="dark"
-                                        disabled
-                                        role="button"
-                                        className="float-left"
-                                        onClick={handleUpdateQuestion}
-                                    >
-                                        Cập nhật
-                                    </Button>
-                                </>
-                            )}
 
-                            {/* Add button */}
-                            {/* <Tooltip
+                                    {/* Add button */}
+                                    {/* <Tooltip
                                 label="Thêm đáp án"
                                 color="teal"
                                 withArrow
@@ -849,70 +885,72 @@ const QuestionDetail = () => {
                                 </IconButton>
                             </Tooltip> */}
 
-                            {/* Edit button */}
-                            <Tooltip
-                                label="Chỉnh sửa câu hỏi"
-                                color="grape"
-                                withArrow
-                                arrowPosition="center"
-                            >
-                                <IconButton
-                                    color="secondary"
-                                    className="float-right"
-                                    onClick={() => {
-                                        handleEditQuestionDetailByQuestionDetailId(
-                                            questionDetail
-                                        )
-                                    }}
-                                >
-                                    <EditIcon />
-                                </IconButton>
-                            </Tooltip>
-
-                            {/* Delete button */}
-
-                            {editQuestion &&
-                            questionDetail.questionDetailId ===
-                                editQuestionId ? (
-                                <Tooltip
-                                    label="Xóa câu hỏi"
-                                    color="red"
-                                    withArrow
-                                    arrowPosition="center"
-                                >
-                                    <IconButton
-                                        className="float-right text-gray"
-                                        disabled
-                                    >
-                                        <DeleteIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            ) : (
-                                <>
+                                    {/* Edit button */}
                                     <Tooltip
-                                        label="Xóa câu hỏi ?"
-                                        color="red"
+                                        label="Chỉnh sửa câu hỏi"
+                                        color="grape"
                                         withArrow
                                         arrowPosition="center"
                                     >
                                         <IconButton
-                                            className="float-right text-danger"
-                                            onClick={() =>
-                                                handleDeleteQuestion(
+                                            color="secondary"
+                                            className="float-right"
+                                            onClick={() => {
+                                                handleEditQuestionDetailByQuestionDetailId(
                                                     questionDetail
                                                 )
-                                            }
+                                            }}
                                         >
-                                            <DeleteIcon />
+                                            <EditIcon />
                                         </IconButton>
                                     </Tooltip>
-                                </>
-                            )}
-                        </CardFooter>
-                    </Card>
-                </Col>
-            </>
-        ))
+
+                                    {/* Delete button */}
+
+                                    {editQuestion &&
+                                    questionDetail.questionDetailId ===
+                                        editQuestionId ? (
+                                        <Tooltip
+                                            label="Xóa câu hỏi"
+                                            color="red"
+                                            withArrow
+                                            arrowPosition="center"
+                                        >
+                                            <IconButton
+                                                className="float-right text-gray"
+                                                disabled
+                                            >
+                                                <DeleteIcon />
+                                            </IconButton>
+                                        </Tooltip>
+                                    ) : (
+                                        <>
+                                            <Tooltip
+                                                label="Xóa câu hỏi ?"
+                                                color="red"
+                                                withArrow
+                                                arrowPosition="center"
+                                            >
+                                                <IconButton
+                                                    className="float-right text-danger"
+                                                    onClick={() =>
+                                                        handleDeleteQuestion(
+                                                            questionDetail
+                                                        )
+                                                    }
+                                                >
+                                                    <DeleteIcon />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </>
+                                    )}
+                                </CardFooter>
+                            </Card>
+                        </Accordion.Panel>
+                    </Accordion.Item>
+                ))}
+            </Accordion>
+        )
     }
 
     const renderGroupAnswerIntoQuestion = (questionDetail) => {
@@ -1034,9 +1072,9 @@ const QuestionDetail = () => {
         fetchQuestionPrev()
     }, [])
 
-    useEffect(() => {
-        setEditQuestionId(editQuestionId)
-    }, [editQuestionId])
+    // useEffect(() => {
+    //     setEditQuestionId(editQuestionId)
+    // }, [editQuestionId])
 
     return (
         <>
@@ -1049,12 +1087,11 @@ const QuestionDetail = () => {
             <div style={{ minHeight: '80vh' }}>
                 {/* Top tollbar and title */}
                 <div className="container-fluid mt-3">
-                    <div className="bg-white p-4">
-                        {/* BreadCum */}
-                        <div className="d-flex justify-content-between mt-3 mb-5">
+                    <div className="bg-white p-2 mb-3">
+                        <div className="d-flex justify-content-between">
                             <Link
                                 to="/admin/questions"
-                                className="blockquote-footer"
+                                className="blockquote-footer my-auto"
                             >
                                 Câu hỏi / Câu hỏi chi tiết
                             </Link>
@@ -1072,6 +1109,9 @@ const QuestionDetail = () => {
                                 </Button>
                             </div>
                         </div>
+                    </div>
+
+                    <div className="bg-white p-4">
                         {/* Header Title */}
                         <div className="d-flex align-items-center justify-content-between flex-wrap">
                             <div className="d-flex align-items-center">
@@ -1104,8 +1144,8 @@ const QuestionDetail = () => {
                                     <>
                                         <div>
                                             <img
-                                                src="https://i.pinimg.com/originals/ec/04/8f/ec048fa1e083df7aeb49c06d7b75bcfc.jpg"
-                                                alt=""
+                                                src={`${PUBLIC_IMAGE}/courses/${questionPrev.courseImage}`}
+                                                alt={questionPrev.courseName}
                                                 className="course-image rounded-circle overflow-hidden"
                                                 width="70px"
                                                 height="70px"
@@ -1180,7 +1220,7 @@ const QuestionDetail = () => {
 
                 {/* Main content start */}
                 <main className="container-fluid">
-                    <Row className="mt-3">
+                    <Row className="mt-5">
                         {/* Item */}
                         {loading ? (
                             <>
@@ -1203,11 +1243,11 @@ const QuestionDetail = () => {
                                     </h2>
                                 )}
 
-                                {questions.length > itemsPerPage && (
+                                {totalPages > 1 && (
                                     <Center w="100%" mt={20} mx="auto">
                                         <Pagination
                                             mx="auto"
-                                            total={filteredQuestion.length}
+                                            total={totalPages}
                                             color="green"
                                             withEdges
                                             value={currentPage}
