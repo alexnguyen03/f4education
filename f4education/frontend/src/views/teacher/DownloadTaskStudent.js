@@ -1,258 +1,688 @@
 import {
-    Alert,
-    Badge,
-    Box,
-    Button,
     Center,
-    Flex,
     Grid,
-    Group,
-    Image,
-    Input,
-    Loader,
-    MediaQuery,
-    Paper,
-    rem,
-    Skeleton,
-    Stack,
+    Anchor,
     Text,
-    ThemeIcon,
+    Breadcrumbs,
     Title,
-    Tooltip
+    Group,
+    Paper,
+    Button,
+    Collapse,
+    rem,
+    useMantineTheme,
+    Loader,
+    Stack,
+    Badge,
+    Flex
 } from '@mantine/core'
-import { IconColorSwatch, IconFilterSearch } from '@tabler/icons-react'
-import moment from 'moment'
-import React, { useEffect, useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { DatePicker } from '@mantine/dates'
+import { useEffect, useState, useMemo } from 'react'
+import { useSearchParams, useNavigate } from 'react-router-dom'
+import BookmarkIcon from '@mui/icons-material/Bookmark'
+import { MaterialReactTable } from 'material-react-table'
+import { Delete as DeleteIcon } from '@mui/icons-material'
+import { Box, IconButton } from '@mui/material'
+import { Dropzone } from '@mantine/dropzone'
+import {
+    IconBookUpload,
+    IconUpload,
+    IconPhoto,
+    IconX,
+    IconEye
+} from '@tabler/icons-react'
+import { Modal } from 'reactstrap'
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
 
-// API
-import classApi from '../../api/classApi'
+import taskApi from 'api/taskApi'
+import resourceApi from 'api/resourceApi'
 
-// scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
 
-const teacherId = 'nguyenhoainam121nTC'
+const user = JSON.parse(localStorage.getItem('user'))
 
 const DownloadTaskStudent = () => {
-    // ********** Param Variable
     let navigate = useNavigate()
 
-    // ********** Main Variable
-    const [listClasses, setListClasses] = useState([])
+    const [selectedDate, setSelectedDate] = useState(null)
+    const [openedIndexes, setOpenedIndexes] = useState([])
+    const [showModal, setShowModal] = useState(false)
+    const [showModalConfirm, setShowModalConfirm] = useState(false)
+    const [showNotification, setShowNotification] = useState(false)
+    const [showNotificationSearch, setShowNotificationSearch] = useState(false)
+    const [loading, setLoading] = useState(true)
+    const [loadingFileStudent, setLoadingFileStudent] = useState(false)
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [selectedFile, setSelectedFile] = useState([null])
+    const theme = useMantineTheme()
+    const [allFilesInFolderTaskStudent, setAllFilesInFolderTaskStudent] =
+        useState([])
 
-    // ********** Action Variable
-    const [loading, setLoading] = useState(false)
-    const [searchTerm, setSearchTerm] = useState('')
+    const redirectTo = () => {
+        return navigate('/teacher/classes-infor/' + searchParams.get('classId'))
+    }
 
-    //  ******** Fetch AREA
-    const fetchClassByTeacher = async () => {
+    const [tasks, setTasks] = useState([
+        {
+            taskId: 0,
+            title: '',
+            description: '',
+            startDate: '',
+            endDate: '',
+            className: '',
+            teacherName: ''
+        }
+    ])
+
+    // bảng file task
+    const columnFileTask = useMemo(
+        () => [
+            {
+                accessorKey: 'id',
+                header: 'ID File',
+                size: 150
+            },
+            {
+                accessorKey: 'name',
+                header: 'Tên File',
+                size: 200
+            },
+            {
+                accessorKey: 'size',
+                header: 'Size',
+                size: 50
+            }
+        ],
+        []
+    )
+
+    const getAllTaskByClassId = async () => {
         try {
             setLoading(true)
-            const resp = await classApi.getAllClassByTeacherId(teacherId)
+            const resp = await taskApi.getAllTaskByClassId(
+                searchParams.get('classId')
+            )
             if (resp.status === 200 && resp.data.length > 0) {
-                setListClasses(resp.data.reverse())
+                setTasks(resp.data)
+                setLoading(false)
             }
-            console.log(resp.data)
-            setLoading(false)
+            if (resp.data.length === 0) {
+                setShowNotification(true)
+            }
+            console.log(resp.data.length)
         } catch (error) {
             console.log(error)
         }
     }
 
-    useEffect(() => {
-        fetchClassByTeacher()
-    }, [])
-
-    // ********** Action
-    const handleChangeSearchClass = (e) => {
-        setSearchTerm(e.target.value)
+    const getAllFilesInFolderTaskStudent = async (
+        className,
+        taskName,
+        studentName
+    ) => {
+        try {
+            setLoadingFileStudent(true)
+            const resp = await taskApi.getAllFilesInFolderTaskStudent(
+                className,
+                taskName,
+                studentName
+            )
+            if (resp.status === 200) {
+                setAllFilesInFolderTaskStudent(resp.data)
+                setLoadingFileStudent(false)
+            }
+            if (resp.data.length === undefined) {
+                setLoadingFileStudent(false)
+            }
+        } catch (error) {
+            console.log(error)
+        }
     }
 
-    const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/classes-infor/' + classId)
+    const submitTask = async (className, taskName) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        const formData = new FormData()
+        formData.append('className', className)
+        formData.append('taskName', taskName)
+        formData.append('studentName', user.id + ' - ' + user.fullName)
+        for (var i = 0; i < selectedFile.length; i++) {
+            formData.append('file', selectedFile[i])
+        }
+        console.log([...formData])
+        try {
+            const resp = await taskApi.submitTaskFile(formData)
+            if (resp.status === 200) {
+                setShowModal(false)
+                getAllFilesInFolderTaskStudent(
+                    className,
+                    taskName,
+                    user.id + ' - ' + user.fullName
+                )
+                toast.update(id, Notify.options.uploadFileSuccess())
+            }
+        } catch (error) {
+            console.log('Nộp bài thất bại', error)
+        }
     }
 
-    const filteredClasses = listClasses.filter((item) => {
-        const className = item.classes.className
-        const startDate = item.classes.startDate
-        const endDate = item.classes.endDate
-        const courseName = item.courseName[0]
+    // delete file
+    const handleDeleteRow = async (row, className, taskName, studentName) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        try {
+            setLoadingFileStudent(true)
+            let fileId = row.original.id
+            const resp = await resourceApi.deleteFileById(fileId)
+            getAllFilesInFolderTaskStudent(className, taskName, studentName)
+            setShowModalConfirm(false)
+            setLoadingFileStudent(false)
+            toast.update(id, Notify.options.deleteFileSuccess())
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-        // console.log(className, startDate, endDate, courseName);
+    const moment = require('moment')
 
-        const lowerSearchTerm = searchTerm.toLowerCase()
-
-        return (
-            className.toLowerCase().includes(lowerSearchTerm) ||
-            courseName.toLowerCase().includes(lowerSearchTerm) ||
-            startDate.includes(lowerSearchTerm) ||
-            endDate.includes(lowerSearchTerm)
+    const isCurrentDateInRange = (startDateTime, endDateTime) => {
+        const currentDateTime = moment().format('DD-MM-yyyy h:mm:ss')
+        return moment(currentDateTime, 'DD-MM-yyyy h:mm:ss').isBetween(
+            moment(startDateTime, 'DD-MM-yyyy h:mm:ss'),
+            moment(endDateTime, 'DD-MM-yyyy h:mm:ss'),
+            null,
+            '[]'
         )
-    })
+    }
 
-    // ************** Render UI
-    const classInformationList = filteredClasses.map((c) => (
-        <Grid.Col xl={3} lg={4} md={4} sm={6} key={c.classes.classId}>
-            {loading ? (
-                <>
-                    <Skeleton
-                        radius={'sm'}
-                        mb="lg"
-                        mt="md"
-                        width={rem('3rem')}
-                        height={rem('3rem')}
-                    />
-                    <Skeleton width={'100%'} height={rem('2rem')} mb="sm" />
-                    <Skeleton width={'100%'} height={rem('1rem')} mb="sm" />
-                    <Skeleton width={'100%'} height={rem('1rem')} mb="sm" />
-                </>
-            ) : (
-                <>
-                    <Paper
-                        withBorder
-                        radius="md"
-                        p={0}
-                        className={styles.card}
-                        onClick={() =>
-                            navigateToClassInformationDetail(c.classes.classId)
-                        }
-                    >
-                        <Flex justify={'space-between'} align="center" mt="md">
-                            <ThemeIcon
-                                size="xl"
-                                radius="md"
-                                variant="gradient"
-                                gradient={{
-                                    deg: 0,
-                                    from: 'pink',
-                                    to: 'violet'
-                                }}
-                            >
-                                <IconColorSwatch
-                                    style={{ width: rem(28), height: rem(28) }}
-                                    stroke={1.5}
-                                />
-                            </ThemeIcon>
-                            <Tooltip label="Tổng số sinh viên" position="top">
-                                <Alert
-                                    title={c.numberStudent}
-                                    color="indigo"
-                                ></Alert>
-                            </Tooltip>
-                        </Flex>
-                        <Title order={3} fw={500} mt="md">
-                            Tên Lớp: {c.classes.className}
-                        </Title>
-                        <Text size="lg" mt="sm" c="dimmed" lineClamp={2}>
-                            Khóa học: {c.courseName[0]}
-                        </Text>
-                        <Text size="lg" mt="sm" c="dimmed">
-                            Thời gian dạy:{' '}
-                            <strong>
-                                {moment(c.classes.startDate).format(
-                                    'DD/mm/yyyy'
-                                )}{' '}
-                                -{' '}
-                                {moment(c.classes.endDate).format('DD/mm/yyyy')}
-                            </strong>
-                        </Text>
-                        <Flex justify="start" align="center" gap={5} mb={10}>
-                            <Text size="lg" mt="sm" c="dimmed">
-                                Trạng thái:
-                            </Text>
-                            <Badge color="indigo" mt={12}>
-                                {c.classes.status}
-                            </Badge>
-                        </Flex>
-                    </Paper>
-                </>
-            )}
-        </Grid.Col>
-    ))
+    const toggle = (index) => {
+        if (openedIndexes.includes(index)) {
+            setOpenedIndexes(openedIndexes.filter((i) => i !== index))
+        } else {
+            setOpenedIndexes([index])
+        }
+    }
+
+    const [filteredTasks, setFilteredTasks] = useState(tasks)
+
+    useEffect(() => {
+        if (selectedDate !== null) {
+            const filteredTasks = tasks.filter((task) => {
+                const startDate = new Date(task.startDate)
+                const endDate = new Date(task.endDate)
+                return selectedDate >= startDate && selectedDate <= endDate
+            })
+            if (filteredTasks.length === 0) {
+                setShowNotificationSearch(true)
+            } else {
+                setShowNotificationSearch(false)
+                setFilteredTasks(filteredTasks)
+            }
+        } else {
+            setShowNotificationSearch(false)
+            setFilteredTasks(tasks)
+        }
+    }, [selectedDate, tasks])
+
+    useEffect(() => {
+        getAllTaskByClassId()
+    }, [])
 
     return (
         <>
-            <Box className={styles.box} p={rem('2rem')}>
-                {loading ? (
-                    <>
-                        <Stack mt={250} mx="auto" align="center">
-                            <Title order={2} color="dark">
-                                <Loader color="rgba(46, 46, 46, 1)" />
-                            </Title>
-                            <Text c="dimmed" fz="lg">
-                                Vui lòng chờ trong giây lát...
-                            </Text>
-                        </Stack>
-                    </>
-                ) : (
-                    <>
-                        {/* Header section */}
-                        {listClasses.length === 0 ? (
+            <ToastContainer />
+            <Box my={'md'} className={styles['box-header']}>
+                <Group position="apart" px={'lg'} py={'md'}>
+                    <div
+                        onClick={() => redirectTo()}
+                        style={{ cursor: 'pointer' }}
+                    >
+                        <i className="fa-solid fa-arrow-left"></i>
+                    </div>
+                    <Title order={3} color="dark">
+                        Chi tiết lớp học:
+                    </Title>
+                </Group>
+            </Box>
+            <Grid>
+                <Grid.Col span={3} mx={40}>
+                    <Center>
+                        <DatePicker
+                            // defaultValue={new Date()}
+                            onChange={(date) => setSelectedDate(date)}
+                            size="lg"
+                            bg={'#FFFFFF'}
+                        />
+                    </Center>
+                </Grid.Col>
+                <Grid.Col span={8} bg={'#ebebeb'}>
+                    {showNotification && (
+                        <Center>
+                            <Stack align="center">
+                                <i
+                                    className="bx bxl-dropbox"
+                                    style={{
+                                        fontSize: '5rem',
+                                        marginTop: '50px'
+                                    }}
+                                />
+                                <br />
+                                <Title
+                                    order={2}
+                                    color="dark"
+                                    maw={600}
+                                    align="center"
+                                >
+                                    Bạn chưa có Task nào trong lớp học
+                                </Title>
+                            </Stack>
+                        </Center>
+                    )}
+                    {showNotificationSearch && (
+                        <Center>
+                            <Stack align="center">
+                                <i
+                                    className="bx bxl-dropbox"
+                                    style={{
+                                        fontSize: '5rem',
+                                        marginTop: '50px'
+                                    }}
+                                />
+                                <br />
+                                <Title
+                                    order={2}
+                                    color="dark"
+                                    maw={600}
+                                    align="center"
+                                >
+                                    Không tìm thấy Task trong lớp học
+                                </Title>
+                            </Stack>
+                        </Center>
+                    )}
+                    {loading && showNotification === false && (
+                        <>
+                            <Stack mt={100} mx="auto" align="center">
+                                <Title order={2} color="dark">
+                                    <Loader color="rgba(46, 46, 46, 1)" />
+                                </Title>
+                                <Text c="dimmed" fz="lg">
+                                    Vui lòng chờ trong giây lát...
+                                </Text>
+                            </Stack>
+                        </>
+                    )}
+                    {loading === false &&
+                        showNotification === false &&
+                        showNotificationSearch === false && (
                             <>
-                                <Stack mx="auto" mt={200} align="center">
-                                    <Title
-                                        order={3}
-                                        color="dark"
-                                        style={{ zIndex: '1' }}
-                                    >
-                                        Hiện không có lớp học nào để hiển thị.
-                                    </Title>
-                                    <Image
-                                        src="https://i.pinimg.com/originals/40/fd/d2/40fdd2c61203798836ab2c55583726aa.png"
-                                        width={270}
-                                        height={270}
-                                        mt={rem('-3rem')}
+                                <Group>
+                                    <BookmarkIcon
+                                        style={{
+                                            display: 'inline-block',
+                                            transform: 'rotate(270deg)'
+                                        }}
+                                        fontSize="large"
+                                        color="success"
                                     />
-                                    <Link to="/teacher/information">
-                                        <Button
-                                            variant={'default'}
-                                            color="violet"
-                                            size="lg"
-                                        >
-                                            Trở lại trang chủ
-                                        </Button>
-                                    </Link>
-                                </Stack>
-                            </>
-                        ) : (
-                            <>
-                                <Group position="apart" mb="xl">
-                                    <Title order={2} fw={700} color="dark">
-                                        Danh sách lớp học
+                                    <Title order={2}>
+                                        {tasks[0].className}- Task
                                     </Title>
-                                    <MediaQuery
-                                        query="max-width: (780px)"
-                                        styles={{ width: '100%' }}
-                                    >
-                                        <Group position="right">
-                                            <Input
-                                                id="search-input"
-                                                icon={<IconFilterSearch />}
-                                                size="md"
-                                                maw={270}
-                                                placeholder="Tìm lớp học"
-                                                onChange={(e) =>
-                                                    handleChangeSearchClass(e)
-                                                }
-                                            />
-                                            <Button color="violet" size="md">
-                                                Tìm kiếm
-                                            </Button>
-                                        </Group>
-                                    </MediaQuery>
                                 </Group>
 
-                                <Grid gutter="md">
-                                    {/* List Class */}
-                                    {classInformationList}
-                                </Grid>
+                                {filteredTasks.map((task, indexTask) => (
+                                    <Paper
+                                        shadow="xs"
+                                        px="xl"
+                                        py={10}
+                                        my={20}
+                                        mx={20}
+                                        key={indexTask}
+                                    >
+                                        <Title my={5} order={3}>
+                                            {task.title}
+                                        </Title>
+                                        <Text my={5}>{task.description}</Text>
+                                        <Text my={5}>
+                                            Thời gian:{' '}
+                                            {moment(task.startDate).format(
+                                                'DD/MM/yyyy, h:mm:ss A'
+                                            )}{' '}
+                                            -{' '}
+                                            {moment(task.endDate).format(
+                                                'DD/MM/yyyy, h:mm:ss A'
+                                            )}
+                                        </Text>
+                                        <Text my={5}>
+                                            Giáo viên: {task.teacherName}
+                                        </Text>
+                                        <Badge
+                                            variant="outline"
+                                            color="teal"
+                                            size="lg"
+                                            mt={10}
+                                        >
+                                            {isCurrentDateInRange(
+                                                task.startDate,
+                                                task.endDate
+                                            )
+                                                ? 'Đang diễn ra'
+                                                : 'Đã kết thúc'}
+                                        </Badge>
+                                        <Text ta={'right'}>
+                                            <Button
+                                                variant="filled"
+                                                onClick={() => {
+                                                    toggle(indexTask)
+                                                    getAllFilesInFolderTaskStudent(
+                                                        task.className,
+                                                        task.title,
+                                                        user.id +
+                                                            ' - ' +
+                                                            user.fullName
+                                                    )
+                                                }}
+                                                mr={5}
+                                                mb={10}
+                                            >
+                                                <IconEye /> Xem file
+                                            </Button>
+                                            <Button
+                                                disabled={isCurrentDateInRange(
+                                                    task.startDate,
+                                                    task.endDate
+                                                )}
+                                                variant="filled"
+                                                color="teal"
+                                                mt={5}
+                                                onClick={() => {
+                                                    setShowModal(true)
+                                                }}
+                                            >
+                                                <IconBookUpload /> Nộp bài
+                                            </Button>
+                                        </Text>
+                                        <Collapse
+                                            in={openedIndexes.includes(
+                                                indexTask
+                                            )}
+                                            onEntered={() => toggle(indexTask)}
+                                        >
+                                            <Text fw={700}>
+                                                Bài tập của tôi
+                                            </Text>
+                                            <hr className="my-3" />
+                                            <MaterialReactTable
+                                                displayColumnDefOptions={{
+                                                    'mrt-row-actions': {
+                                                        header: 'Xóa',
+                                                        size: 80
+                                                    }
+                                                }}
+                                                enableRowNumbers
+                                                columns={columnFileTask}
+                                                data={
+                                                    allFilesInFolderTaskStudent
+                                                }
+                                                initialState={{
+                                                    columnVisibility: {
+                                                        id: false
+                                                    }
+                                                }}
+                                                positionActionsColumn="last"
+                                                state={{
+                                                    isLoading:
+                                                        loadingFileStudent
+                                                }}
+                                                enableRowActions={isCurrentDateInRange(
+                                                    task.startDate,
+                                                    task.endDate
+                                                )}
+                                                renderRowActions={({
+                                                    row,
+                                                    table
+                                                }) => (
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexWrap: 'nowrap',
+                                                            gap: '5px'
+                                                        }}
+                                                    >
+                                                        <IconButton
+                                                            color="secondary"
+                                                            onClick={() => {
+                                                                setShowModalConfirm(
+                                                                    true
+                                                                )
+                                                            }}
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                        <Modal
+                                                            className="modal-dialog-centered modal-lg"
+                                                            isOpen={
+                                                                showModalConfirm
+                                                            }
+                                                            backdrop={'static'}
+                                                        >
+                                                            <div className="modal-header">
+                                                                <h1
+                                                                    className="modal-title"
+                                                                    id="modal-title-default"
+                                                                >
+                                                                    Thông báo
+                                                                </h1>
+                                                                <button
+                                                                    aria-label="Close"
+                                                                    className="close"
+                                                                    data-dismiss="modal"
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setShowModalConfirm(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <span
+                                                                        aria-hidden={
+                                                                            true
+                                                                        }
+                                                                    >
+                                                                        ×
+                                                                    </span>
+                                                                </button>
+                                                            </div>
+                                                            <div className="modal-body">
+                                                                <Title
+                                                                    order={2}
+                                                                >
+                                                                    Bạn có chắc
+                                                                    chắn muốn
+                                                                    xóa file ???
+                                                                </Title>
+                                                            </div>
+                                                            <div className="modal-footer">
+                                                                <Button
+                                                                    color="default"
+                                                                    outline
+                                                                    data-dismiss="modal"
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setShowModalConfirm(
+                                                                            false
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    Hủy
+                                                                </Button>
+                                                                <Button
+                                                                    color="red"
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        handleDeleteRow(
+                                                                            row,
+                                                                            task.className,
+                                                                            task.title,
+                                                                            user.id +
+                                                                                ' - ' +
+                                                                                user.fullName
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    Xóa
+                                                                </Button>
+                                                            </div>
+                                                        </Modal>
+                                                    </Box>
+                                                )}
+                                            />
+                                        </Collapse>
+                                        <Modal
+                                            className="modal-dialog-centered modal-lg"
+                                            isOpen={showModal}
+                                            backdrop={'static'}
+                                        >
+                                            <div className="modal-header">
+                                                <h3
+                                                    className="modal-title"
+                                                    id="modal-title-default"
+                                                >
+                                                    Nộp bài tập
+                                                </h3>
+                                                <button
+                                                    aria-label="Close"
+                                                    className="close"
+                                                    data-dismiss="modal"
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setShowModal(false)
+                                                    }
+                                                >
+                                                    <span aria-hidden={true}>
+                                                        ×
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <div className="modal-body">
+                                                <Dropzone
+                                                    onDrop={(files) => {
+                                                        const selectedFiles =
+                                                            Array.from(files)
+                                                        setSelectedFile(
+                                                            selectedFiles
+                                                        )
+                                                    }}
+                                                    maxSize={3 * 1024 ** 2}
+                                                    name="excelFile"
+                                                >
+                                                    <Group
+                                                        position="center"
+                                                        spacing="xl"
+                                                        style={{
+                                                            minHeight: rem(220),
+                                                            pointerEvents:
+                                                                'none'
+                                                        }}
+                                                    >
+                                                        <Dropzone.Accept>
+                                                            <IconUpload
+                                                                size="3.2rem"
+                                                                stroke={1.5}
+                                                                color={
+                                                                    theme
+                                                                        .colors[
+                                                                        theme
+                                                                            .primaryColor
+                                                                    ][
+                                                                        theme.colorScheme ===
+                                                                        'dark'
+                                                                            ? 4
+                                                                            : 6
+                                                                    ]
+                                                                }
+                                                            />
+                                                        </Dropzone.Accept>
+                                                        <Dropzone.Reject>
+                                                            <IconX
+                                                                size="3.2rem"
+                                                                stroke={1.5}
+                                                                color={
+                                                                    theme.colors
+                                                                        .red[
+                                                                        theme.colorScheme ===
+                                                                        'dark'
+                                                                            ? 4
+                                                                            : 6
+                                                                    ]
+                                                                }
+                                                            />
+                                                        </Dropzone.Reject>
+                                                        <Dropzone.Idle>
+                                                            <IconPhoto
+                                                                size="3.2rem"
+                                                                stroke={1.5}
+                                                            />
+                                                        </Dropzone.Idle>
+
+                                                        <div>
+                                                            <Text
+                                                                size="xl"
+                                                                inline
+                                                            >
+                                                                Thả files excel
+                                                                vào đây hoặc
+                                                                click vào để
+                                                                chọn files
+                                                            </Text>
+                                                            <Text
+                                                                size="sm"
+                                                                color="dimmed"
+                                                                inline
+                                                                mt={7}
+                                                            >
+                                                                Thả mỗi lần một
+                                                                file, lưu ý dung
+                                                                lượng file phải
+                                                                dưới 5MB
+                                                            </Text>
+                                                        </div>
+                                                    </Group>
+                                                </Dropzone>
+                                            </div>
+                                            <div className="modal-footer">
+                                                <Button
+                                                    color="default"
+                                                    outline
+                                                    data-dismiss="modal"
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowModal(false)
+                                                    }}
+                                                >
+                                                    Trở lại
+                                                </Button>
+                                                <Button
+                                                    color={'teal'}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        submitTask(
+                                                            task.className,
+                                                            task.title
+                                                        )
+                                                    }}
+                                                >
+                                                    Nộp
+                                                </Button>
+                                            </div>
+                                        </Modal>
+                                    </Paper>
+                                ))}
                             </>
                         )}
-                    </>
-                )}
-            </Box>
+                </Grid.Col>
+            </Grid>
         </>
     )
 }
-
 export default DownloadTaskStudent

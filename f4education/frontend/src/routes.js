@@ -34,6 +34,7 @@ import StudentHome from './views/client/student/StudentHome'
 import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
 import CertificatePDF from 'views/PDF/CertificatePDF'
+import DownloadTaskStudent from 'views/teacher/DownloadTaskStudent'
 
 export var routes = [
     {
@@ -243,6 +244,11 @@ export const routesTeacher = [
     {
         path: '/classes-infor/:classId',
         component: <ClassInformationDetail />,
+        layout: '/teacher'
+    },
+    {
+        path: '/download-task-student',
+        component: <DownloadTaskStudent />,
         layout: '/teacher'
     }
 ]

@@ -18,7 +18,7 @@ import {
 import { MaterialReactTable } from 'material-react-table'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { createSearchParams, useNavigate, useParams } from 'react-router-dom'
 
 // API
 import classApi from '../../api/classApi'
@@ -248,6 +248,15 @@ const ClassInformationDetail = () => {
         []
     )
 
+    const handleShowTask = (classId) => {
+        navigate({
+            pathname: '/teacher/download-task-student',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
+
     // Use Effect Area
     useEffect(() => {
         fetchClass()
@@ -415,6 +424,16 @@ const ClassInformationDetail = () => {
                                 </Button>
                                 <Button color="cyan" size="md" mb="md">
                                     Giao bài tập
+                                </Button>
+                                <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        handleShowTask(classInfor.classId)
+                                    }}
+                                >
+                                    Tải bài tập
                                 </Button>
                             </Stack>
                         </Card>
