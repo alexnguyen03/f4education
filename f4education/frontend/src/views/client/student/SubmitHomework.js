@@ -13,17 +13,16 @@ import {
     useMantineTheme,
     Loader,
     Stack,
-    Badge
+    Badge,
+    Flex
 } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
-import { useDisclosure } from '@mantine/hooks'
 import { MaterialReactTable } from 'material-react-table'
 import { Delete as DeleteIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
-import moment from 'moment'
 import { Dropzone } from '@mantine/dropzone'
 import {
     IconBookUpload,
@@ -51,10 +50,12 @@ const SubmitHomework = () => {
         </Anchor>
     ))
 
-    // const [opened, { toggle }] = useDisclosure(false)
+    const [selectedDate, setSelectedDate] = useState(null)
     const [openedIndexes, setOpenedIndexes] = useState([])
     const [showModal, setShowModal] = useState(false)
     const [showModalConfirm, setShowModalConfirm] = useState(false)
+    const [showNotification, setShowNotification] = useState(false)
+    const [showNotificationSearch, setShowNotificationSearch] = useState(false)
     const [loading, setLoading] = useState(true)
     const [loadingFileStudent, setLoadingFileStudent] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
@@ -108,6 +109,7 @@ const SubmitHomework = () => {
                 setLoading(false)
             }
             if (resp.data.length === 0) {
+                setShowNotification(true)
             }
             console.log(resp.data.length)
         } catch (error) {
@@ -129,6 +131,9 @@ const SubmitHomework = () => {
             )
             if (resp.status === 200) {
                 setAllFilesInFolderTaskStudent(resp.data)
+                setLoadingFileStudent(false)
+            }
+            if (resp.data.length === undefined) {
                 setLoadingFileStudent(false)
             }
         } catch (error) {
@@ -179,18 +184,46 @@ const SubmitHomework = () => {
         }
     }
 
-    const isCurrentDateInRange = (startDate, endDate) => {
-        const currentDate = moment()
-        return currentDate.isBetween(startDate, endDate, 'day', '[]')
+    const moment = require('moment')
+
+    const isCurrentDateInRange = (startDateTime, endDateTime) => {
+        const currentDateTime = moment().format('DD-MM-yyyy h:mm:ss')
+        return moment(currentDateTime, 'DD-MM-yyyy h:mm:ss').isBetween(
+            moment(startDateTime, 'DD-MM-yyyy h:mm:ss'),
+            moment(endDateTime, 'DD-MM-yyyy h:mm:ss'),
+            null,
+            '[]'
+        )
     }
 
     const toggle = (index) => {
         if (openedIndexes.includes(index)) {
             setOpenedIndexes(openedIndexes.filter((i) => i !== index))
         } else {
-            setOpenedIndexes([...openedIndexes, index])
+            setOpenedIndexes([index])
         }
     }
+
+    const [filteredTasks, setFilteredTasks] = useState(tasks)
+
+    useEffect(() => {
+        if (selectedDate !== null) {
+            const filteredTasks = tasks.filter((task) => {
+                const startDate = new Date(task.startDate)
+                const endDate = new Date(task.endDate)
+                return selectedDate >= startDate && selectedDate <= endDate
+            })
+            if (filteredTasks.length === 0) {
+                setShowNotificationSearch(true)
+            } else {
+                setShowNotificationSearch(false)
+                setFilteredTasks(filteredTasks)
+            }
+        } else {
+            setShowNotificationSearch(false)
+            setFilteredTasks(tasks)
+        }
+    }, [selectedDate, tasks])
 
     useEffect(() => {
         getAllTaskByClassId()
@@ -209,14 +242,59 @@ const SubmitHomework = () => {
                 <Grid.Col span={3} mx={40}>
                     <Center>
                         <DatePicker
-                            defaultValue={new Date()}
+                            // defaultValue={new Date()}
+                            onChange={(date) => setSelectedDate(date)}
                             size="lg"
                             bg={'#FFFFFF'}
                         />
                     </Center>
                 </Grid.Col>
                 <Grid.Col span={8} bg={'#ebebeb'}>
-                    {loading ? (
+                    {showNotification && (
+                        <Center>
+                            <Stack align="center">
+                                <i
+                                    className="bx bxl-dropbox"
+                                    style={{
+                                        fontSize: '5rem',
+                                        marginTop: '50px'
+                                    }}
+                                />
+                                <br />
+                                <Title
+                                    order={2}
+                                    color="dark"
+                                    maw={600}
+                                    align="center"
+                                >
+                                    Bạn chưa có Task nào trong lớp học
+                                </Title>
+                            </Stack>
+                        </Center>
+                    )}
+                    {showNotificationSearch && (
+                        <Center>
+                            <Stack align="center">
+                                <i
+                                    className="bx bxl-dropbox"
+                                    style={{
+                                        fontSize: '5rem',
+                                        marginTop: '50px'
+                                    }}
+                                />
+                                <br />
+                                <Title
+                                    order={2}
+                                    color="dark"
+                                    maw={600}
+                                    align="center"
+                                >
+                                    Không tìm thấy Task trong lớp học
+                                </Title>
+                            </Stack>
+                        </Center>
+                    )}
+                    {loading && showNotification === false && (
                         <>
                             <Stack mt={100} mx="auto" align="center">
                                 <Title order={2} color="dark">
@@ -227,356 +305,377 @@ const SubmitHomework = () => {
                                 </Text>
                             </Stack>
                         </>
-                    ) : (
-                        <>
-                            <Group>
-                                <BookmarkIcon
-                                    style={{
-                                        display: 'inline-block',
-                                        transform: 'rotate(270deg)'
-                                    }}
-                                    fontSize="large"
-                                    color="success"
-                                />
-                                <Title order={2}>
-                                    {tasks[0].className}- Task
-                                </Title>
-                            </Group>
-
-                            {tasks.map((task, indexTask) => (
-                                <Paper
-                                    shadow="xs"
-                                    px="xl"
-                                    py={10}
-                                    my={20}
-                                    mx={20}
-                                    key={indexTask}
-                                >
-                                    <Title my={5} order={3}>
-                                        {task.title}
+                    )}
+                    {loading === false &&
+                        showNotification === false &&
+                        showNotificationSearch === false && (
+                            <>
+                                <Group>
+                                    <BookmarkIcon
+                                        style={{
+                                            display: 'inline-block',
+                                            transform: 'rotate(270deg)'
+                                        }}
+                                        fontSize="large"
+                                        color="success"
+                                    />
+                                    <Title order={2}>
+                                        {tasks[0].className}- Task
                                     </Title>
-                                    <Text my={5}>{task.description}</Text>
-                                    <Text my={5}>
-                                        Thời gian:{' '}
-                                        {moment(task.startDate).format(
-                                            'DD/MM/yyyy'
-                                        )}{' '}
-                                        -{' '}
-                                        {moment(task.endDate).format(
-                                            'DD/MM/yyyy'
-                                        )}
-                                    </Text>
-                                    <Text my={5}>
-                                        Giáo viên: {task.teacherName}
-                                    </Text>
-                                    <Badge
-                                        variant="outline"
-                                        color="teal"
-                                        size="lg"
-                                        mt={10}
+                                </Group>
+
+                                {filteredTasks.map((task, indexTask) => (
+                                    <Paper
+                                        shadow="xs"
+                                        px="xl"
+                                        py={10}
+                                        my={20}
+                                        mx={20}
+                                        key={indexTask}
                                     >
-                                        {isCurrentDateInRange(
-                                            task.startDate,
-                                            task.endDate
-                                        )
-                                            ? 'Đang diễn ra'
-                                            : 'Đã kết thúc'}
-                                    </Badge>
-                                    <Text ta="right">
-                                        <Button
-                                            variant="filled"
-                                            onClick={() => {
-                                                toggle(indexTask)
-                                                getAllFilesInFolderTaskStudent(
-                                                    task.className,
-                                                    task.title,
-                                                    user.id +
-                                                        ' - ' +
-                                                        user.fullName
-                                                )
-                                            }}
-                                            mr={5}
-                                            mb={10}
-                                        >
-                                            <IconEye /> Xem file
-                                        </Button>
-                                        <Button
-                                            disabled={
-                                                !isCurrentDateInRange(
-                                                    task.startDate,
-                                                    task.endDate
-                                                )
-                                            }
-                                            variant="filled"
+                                        <Title my={5} order={3}>
+                                            {task.title}
+                                        </Title>
+                                        <Text my={5}>{task.description}</Text>
+                                        <Text my={5}>
+                                            Thời gian:{' '}
+                                            {moment(task.startDate).format(
+                                                'DD/MM/yyyy, h:mm:ss A'
+                                            )}{' '}
+                                            -{' '}
+                                            {moment(task.endDate).format(
+                                                'DD/MM/yyyy, h:mm:ss A'
+                                            )}
+                                        </Text>
+                                        <Text my={5}>
+                                            Giáo viên: {task.teacherName}
+                                        </Text>
+                                        <Badge
+                                            variant="outline"
                                             color="teal"
-                                            mt={5}
-                                            onClick={() => {
-                                                setShowModal(true)
-                                            }}
+                                            size="lg"
+                                            mt={10}
                                         >
-                                            <IconBookUpload /> Nộp bài
-                                        </Button>
-                                    </Text>
-                                    <Collapse
-                                        in={openedIndexes.includes(indexTask)}
-                                    >
-                                        <Text fw={700}>Bài tập của tôi</Text>
-                                        <hr className="my-3" />
-                                        <MaterialReactTable
-                                            displayColumnDefOptions={{
-                                                'mrt-row-actions': {
-                                                    header: 'Xóa',
-                                                    size: 80
-                                                }
-                                            }}
-                                            enableRowNumbers
-                                            columns={columnFileTask}
-                                            data={allFilesInFolderTaskStudent}
-                                            initialState={{
-                                                columnVisibility: { id: false }
-                                            }}
-                                            positionActionsColumn="last"
-                                            state={{
-                                                isLoading: loadingFileStudent
-                                            }}
-                                            enableRowActions={isCurrentDateInRange(
+                                            {isCurrentDateInRange(
                                                 task.startDate,
                                                 task.endDate
+                                            )
+                                                ? 'Đang diễn ra'
+                                                : 'Đã kết thúc'}
+                                        </Badge>
+                                        <Text ta={'right'}>
+                                            <Button
+                                                variant="filled"
+                                                onClick={() => {
+                                                    toggle(indexTask)
+                                                    getAllFilesInFolderTaskStudent(
+                                                        task.className,
+                                                        task.title,
+                                                        user.id +
+                                                            ' - ' +
+                                                            user.fullName
+                                                    )
+                                                }}
+                                                mr={5}
+                                                mb={10}
+                                            >
+                                                <IconEye /> Xem file
+                                            </Button>
+                                            <Button
+                                                disabled={
+                                                    isCurrentDateInRange(
+                                                        task.startDate,
+                                                        task.endDate
+                                                    )
+                                                }
+                                                variant="filled"
+                                                color="teal"
+                                                mt={5}
+                                                onClick={() => {
+                                                    setShowModal(true)
+                                                }}
+                                            >
+                                                <IconBookUpload /> Nộp bài
+                                            </Button>
+                                        </Text>
+                                        <Collapse
+                                            in={openedIndexes.includes(
+                                                indexTask
                                             )}
-                                            renderRowActions={({
-                                                row,
-                                                table
-                                            }) => (
-                                                <Box
-                                                    sx={{
-                                                        display: 'flex',
-                                                        flexWrap: 'nowrap',
-                                                        gap: '5px'
-                                                    }}
-                                                >
-                                                    <IconButton
-                                                        color="secondary"
-                                                        onClick={() => {
-                                                            setShowModalConfirm(
-                                                                true
-                                                            )
+                                            onEntered={() => toggle(indexTask)}
+                                        >
+                                            <Text fw={700}>
+                                                Bài tập của tôi
+                                            </Text>
+                                            <hr className="my-3" />
+                                            <MaterialReactTable
+                                                displayColumnDefOptions={{
+                                                    'mrt-row-actions': {
+                                                        header: 'Xóa',
+                                                        size: 80
+                                                    }
+                                                }}
+                                                enableRowNumbers
+                                                columns={columnFileTask}
+                                                data={
+                                                    allFilesInFolderTaskStudent
+                                                }
+                                                initialState={{
+                                                    columnVisibility: {
+                                                        id: false
+                                                    }
+                                                }}
+                                                positionActionsColumn="last"
+                                                state={{
+                                                    isLoading:
+                                                        loadingFileStudent
+                                                }}
+                                                enableRowActions={isCurrentDateInRange(
+                                                    task.startDate,
+                                                    task.endDate
+                                                )}
+                                                renderRowActions={({
+                                                    row,
+                                                    table
+                                                }) => (
+                                                    <Box
+                                                        sx={{
+                                                            display: 'flex',
+                                                            flexWrap: 'nowrap',
+                                                            gap: '5px'
                                                         }}
                                                     >
-                                                        <DeleteIcon />
-                                                    </IconButton>
-                                                    <Modal
-                                                        className="modal-dialog-centered modal-lg"
-                                                        isOpen={
-                                                            showModalConfirm
-                                                        }
-                                                        backdrop={'static'}
-                                                    >
-                                                        <div className="modal-header">
-                                                            <h1
-                                                                className="modal-title"
-                                                                id="modal-title-default"
-                                                            >
-                                                                Thông báo
-                                                            </h1>
-                                                            <button
-                                                                aria-label="Close"
-                                                                className="close"
-                                                                data-dismiss="modal"
-                                                                type="button"
-                                                                onClick={() =>
-                                                                    setShowModalConfirm(
-                                                                        false
-                                                                    )
-                                                                }
-                                                            >
-                                                                <span
-                                                                    aria-hidden={
-                                                                        true
+                                                        <IconButton
+                                                            color="secondary"
+                                                            onClick={() => {
+                                                                setShowModalConfirm(
+                                                                    true
+                                                                )
+                                                            }}
+                                                        >
+                                                            <DeleteIcon />
+                                                        </IconButton>
+                                                        <Modal
+                                                            className="modal-dialog-centered modal-lg"
+                                                            isOpen={
+                                                                showModalConfirm
+                                                            }
+                                                            backdrop={'static'}
+                                                        >
+                                                            <div className="modal-header">
+                                                                <h1
+                                                                    className="modal-title"
+                                                                    id="modal-title-default"
+                                                                >
+                                                                    Thông báo
+                                                                </h1>
+                                                                <button
+                                                                    aria-label="Close"
+                                                                    className="close"
+                                                                    data-dismiss="modal"
+                                                                    type="button"
+                                                                    onClick={() =>
+                                                                        setShowModalConfirm(
+                                                                            false
+                                                                        )
                                                                     }
                                                                 >
-                                                                    ×
-                                                                </span>
-                                                            </button>
-                                                        </div>
-                                                        <div className="modal-body">
-                                                            <Title order={2}>
-                                                                Bạn có chắc chắn
-                                                                muốn xóa file
-                                                                ???
-                                                            </Title>
-                                                        </div>
-                                                        <div className="modal-footer">
-                                                            <Button
-                                                                color="default"
-                                                                outline
-                                                                data-dismiss="modal"
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    setShowModalConfirm(
-                                                                        false
-                                                                    )
-                                                                }}
+                                                                    <span
+                                                                        aria-hidden={
+                                                                            true
+                                                                        }
+                                                                    >
+                                                                        ×
+                                                                    </span>
+                                                                </button>
+                                                            </div>
+                                                            <div className="modal-body">
+                                                                <Title
+                                                                    order={2}
+                                                                >
+                                                                    Bạn có chắc
+                                                                    chắn muốn
+                                                                    xóa file ???
+                                                                </Title>
+                                                            </div>
+                                                            <div className="modal-footer">
+                                                                <Button
+                                                                    color="default"
+                                                                    outline
+                                                                    data-dismiss="modal"
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        setShowModalConfirm(
+                                                                            false
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    Hủy
+                                                                </Button>
+                                                                <Button
+                                                                    color="red"
+                                                                    type="button"
+                                                                    onClick={() => {
+                                                                        handleDeleteRow(
+                                                                            row,
+                                                                            task.className,
+                                                                            task.title,
+                                                                            user.id +
+                                                                                ' - ' +
+                                                                                user.fullName
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    Xóa
+                                                                </Button>
+                                                            </div>
+                                                        </Modal>
+                                                    </Box>
+                                                )}
+                                            />
+                                        </Collapse>
+                                        <Modal
+                                            className="modal-dialog-centered modal-lg"
+                                            isOpen={showModal}
+                                            backdrop={'static'}
+                                        >
+                                            <div className="modal-header">
+                                                <h3
+                                                    className="modal-title"
+                                                    id="modal-title-default"
+                                                >
+                                                    Nộp bài tập
+                                                </h3>
+                                                <button
+                                                    aria-label="Close"
+                                                    className="close"
+                                                    data-dismiss="modal"
+                                                    type="button"
+                                                    onClick={() =>
+                                                        setShowModal(false)
+                                                    }
+                                                >
+                                                    <span aria-hidden={true}>
+                                                        ×
+                                                    </span>
+                                                </button>
+                                            </div>
+                                            <div className="modal-body">
+                                                <Dropzone
+                                                    onDrop={(files) => {
+                                                        const selectedFiles =
+                                                            Array.from(files)
+                                                        setSelectedFile(
+                                                            selectedFiles
+                                                        )
+                                                    }}
+                                                    maxSize={3 * 1024 ** 2}
+                                                    name="excelFile"
+                                                >
+                                                    <Group
+                                                        position="center"
+                                                        spacing="xl"
+                                                        style={{
+                                                            minHeight: rem(220),
+                                                            pointerEvents:
+                                                                'none'
+                                                        }}
+                                                    >
+                                                        <Dropzone.Accept>
+                                                            <IconUpload
+                                                                size="3.2rem"
+                                                                stroke={1.5}
+                                                                color={
+                                                                    theme
+                                                                        .colors[
+                                                                        theme
+                                                                            .primaryColor
+                                                                    ][
+                                                                        theme.colorScheme ===
+                                                                        'dark'
+                                                                            ? 4
+                                                                            : 6
+                                                                    ]
+                                                                }
+                                                            />
+                                                        </Dropzone.Accept>
+                                                        <Dropzone.Reject>
+                                                            <IconX
+                                                                size="3.2rem"
+                                                                stroke={1.5}
+                                                                color={
+                                                                    theme.colors
+                                                                        .red[
+                                                                        theme.colorScheme ===
+                                                                        'dark'
+                                                                            ? 4
+                                                                            : 6
+                                                                    ]
+                                                                }
+                                                            />
+                                                        </Dropzone.Reject>
+                                                        <Dropzone.Idle>
+                                                            <IconPhoto
+                                                                size="3.2rem"
+                                                                stroke={1.5}
+                                                            />
+                                                        </Dropzone.Idle>
+
+                                                        <div>
+                                                            <Text
+                                                                size="xl"
+                                                                inline
                                                             >
-                                                                Hủy
-                                                            </Button>
-                                                            <Button
-                                                                color="red"
-                                                                type="button"
-                                                                onClick={() => {
-                                                                    handleDeleteRow(
-                                                                        row,
-                                                                        task.className,
-                                                                        task.title,
-                                                                        user.id +
-                                                                            ' - ' +
-                                                                            user.fullName
-                                                                    )
-                                                                }}
+                                                                Thả files excel
+                                                                vào đây hoặc
+                                                                click vào để
+                                                                chọn files
+                                                            </Text>
+                                                            <Text
+                                                                size="sm"
+                                                                color="dimmed"
+                                                                inline
+                                                                mt={7}
                                                             >
-                                                                Xóa
-                                                            </Button>
+                                                                Thả mỗi lần một
+                                                                file, lưu ý dung
+                                                                lượng file phải
+                                                                dưới 5MB
+                                                            </Text>
                                                         </div>
-                                                    </Modal>
-                                                </Box>
-                                            )}
-                                        />
-                                    </Collapse>
-                                    <Modal
-                                        className="modal-dialog-centered modal-lg"
-                                        isOpen={showModal}
-                                        backdrop={'static'}
-                                    >
-                                        <div className="modal-header">
-                                            <h3
-                                                className="modal-title"
-                                                id="modal-title-default"
-                                            >
-                                                Nộp bài tập
-                                            </h3>
-                                            <button
-                                                aria-label="Close"
-                                                className="close"
-                                                data-dismiss="modal"
-                                                type="button"
-                                                onClick={() =>
-                                                    setShowModal(false)
-                                                }
-                                            >
-                                                <span aria-hidden={true}>
-                                                    ×
-                                                </span>
-                                            </button>
-                                        </div>
-                                        <div className="modal-body">
-                                            <Dropzone
-                                                onDrop={(files) => {
-                                                    const selectedFiles =
-                                                        Array.from(files)
-                                                    setSelectedFile(
-                                                        selectedFiles
-                                                    )
-                                                }}
-                                                maxSize={3 * 1024 ** 2}
-                                                name="excelFile"
-                                            >
-                                                <Group
-                                                    position="center"
-                                                    spacing="xl"
-                                                    style={{
-                                                        minHeight: rem(220),
-                                                        pointerEvents: 'none'
+                                                    </Group>
+                                                </Dropzone>
+                                            </div>
+                                            <div className="modal-footer">
+                                                <Button
+                                                    color="default"
+                                                    outline
+                                                    data-dismiss="modal"
+                                                    type="button"
+                                                    onClick={() => {
+                                                        setShowModal(false)
                                                     }}
                                                 >
-                                                    <Dropzone.Accept>
-                                                        <IconUpload
-                                                            size="3.2rem"
-                                                            stroke={1.5}
-                                                            color={
-                                                                theme.colors[
-                                                                    theme
-                                                                        .primaryColor
-                                                                ][
-                                                                    theme.colorScheme ===
-                                                                    'dark'
-                                                                        ? 4
-                                                                        : 6
-                                                                ]
-                                                            }
-                                                        />
-                                                    </Dropzone.Accept>
-                                                    <Dropzone.Reject>
-                                                        <IconX
-                                                            size="3.2rem"
-                                                            stroke={1.5}
-                                                            color={
-                                                                theme.colors
-                                                                    .red[
-                                                                    theme.colorScheme ===
-                                                                    'dark'
-                                                                        ? 4
-                                                                        : 6
-                                                                ]
-                                                            }
-                                                        />
-                                                    </Dropzone.Reject>
-                                                    <Dropzone.Idle>
-                                                        <IconPhoto
-                                                            size="3.2rem"
-                                                            stroke={1.5}
-                                                        />
-                                                    </Dropzone.Idle>
-
-                                                    <div>
-                                                        <Text size="xl" inline>
-                                                            Thả files excel vào
-                                                            đây hoặc click vào
-                                                            để chọn files
-                                                        </Text>
-                                                        <Text
-                                                            size="sm"
-                                                            color="dimmed"
-                                                            inline
-                                                            mt={7}
-                                                        >
-                                                            Thả mỗi lần một
-                                                            file, lưu ý dung
-                                                            lượng file phải dưới
-                                                            5MB
-                                                        </Text>
-                                                    </div>
-                                                </Group>
-                                            </Dropzone>
-                                        </div>
-                                        <div className="modal-footer">
-                                            <Button
-                                                color="default"
-                                                outline
-                                                data-dismiss="modal"
-                                                type="button"
-                                                onClick={() => {
-                                                    setShowModal(false)
-                                                }}
-                                            >
-                                                Trở lại
-                                            </Button>
-                                            <Button
-                                                color={'teal'}
-                                                type="button"
-                                                onClick={() => {
-                                                    submitTask(
-                                                        task.className,
-                                                        task.title
-                                                    )
-                                                }}
-                                            >
-                                                Nộp
-                                            </Button>
-                                        </div>
-                                    </Modal>
-                                </Paper>
-                            ))}
-                        </>
-                    )}
+                                                    Trở lại
+                                                </Button>
+                                                <Button
+                                                    color={'teal'}
+                                                    type="button"
+                                                    onClick={() => {
+                                                        submitTask(
+                                                            task.className,
+                                                            task.title
+                                                        )
+                                                    }}
+                                                >
+                                                    Nộp
+                                                </Button>
+                                            </div>
+                                        </Modal>
+                                    </Paper>
+                                ))}
+                            </>
+                        )}
                 </Grid.Col>
             </Grid>
         </>

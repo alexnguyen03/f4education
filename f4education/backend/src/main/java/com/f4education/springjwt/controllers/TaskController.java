@@ -61,9 +61,14 @@ public class TaskController {
 
 	@GetMapping("/file/{className}/{taskName}/{studentName}")
 	public ResponseEntity<?> getAllFilesInFolderTaskStudent(@PathVariable("className") String className,
-			@PathVariable("taskName") String taskName, @PathVariable("studentName") String studentName)
-			throws Exception {
-		List<TaskFileStudentDTO> lists = taskService.getAllFilesInFolderTaskStudent(className, taskName, studentName);
+			@PathVariable("taskName") String taskName, @PathVariable("studentName") String studentName) {
+		List<TaskFileStudentDTO> lists = null;
+		try {
+			lists = taskService.getAllFilesInFolderTaskStudent(className, taskName, studentName);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
 		return ResponseEntity.ok(lists);
 	}
 }
