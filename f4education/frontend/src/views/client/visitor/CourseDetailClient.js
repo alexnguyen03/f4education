@@ -121,8 +121,10 @@ function CourseDetailClient() {
 
     // Move a evaluate that got a student ID = curentUser login to top of array
     const sortedListEvaluate = [...listEvaluate].sort((a, b) => {
-        if (a.studentId === user.username) return -1
-        if (b.studentId === user.username) return 1
+        if (a.studentId === (user === null ? '' : user.username))
+            return -1
+        if (b.studentId === (user === null ? '' : user.username))
+            return 1
         return 0
     })
 

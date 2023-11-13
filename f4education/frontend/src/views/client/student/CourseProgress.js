@@ -246,8 +246,6 @@ const CourseProgress = () => {
             startDate: course.startDate ? course.startDate : '',
             endDate: course.endDate ? course.endDate : '',
             registerCourseId: course.registerCourseId
-                ? course.registerCourseId
-                : ''
         })
 
         setShowingDetail(true)
@@ -305,13 +303,13 @@ const CourseProgress = () => {
         }
     }
 
-    const handleCheckIfCertificateIsCreated = async () => {
+    const handleCheckIfCertificateIsCreated = async (progress) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
-
+        console.log(progress.registerCourseId)
         try {
             const resp =
                 await certificateApi.getAllCertificateByRegisterCourseAndStudentId(
-                    selectedCourse.registerCourseId,
+                    progress.registerCourseId,
                     user.username
                 )
 
@@ -1575,7 +1573,7 @@ const CourseProgress = () => {
                                                                                     setSelectedCourse(
                                                                                         progress
                                                                                     )
-                                                                                    handleCheckIfCertificateIsCreated()
+                                                                                    handleCheckIfCertificateIsCreated(progress)
                                                                                 }}
                                                                             >
                                                                                 Lấy

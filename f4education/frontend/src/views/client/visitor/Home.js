@@ -109,6 +109,7 @@ const Home = () => {
     const [scroll, scrollTo] = useWindowScroll()
 
     const fetchNewestCourse = async () => {
+        setLoading(true)
         try {
             const resp = await courseApi.getNewestCourse(
                 user !== null ? user.username : ''
@@ -120,12 +121,14 @@ const Home = () => {
             } else {
                 console.log('cannot get data')
             }
+            setLoading(false)
         } catch (error) {
             console.log(error)
         }
     }
 
     const fetchTopBestSellingCourse = async () => {
+        setLoading(true)
         try {
             const resp = await courseApi.getTopSellingCourse(
                 user !== null ? user.username : ''
@@ -137,6 +140,7 @@ const Home = () => {
             } else {
                 console.log('cannot get data best selling')
             }
+            setLoading(false)
         } catch (error) {
             console.log(error)
         }
@@ -530,16 +534,18 @@ const Home = () => {
 
     // UseEffect AREA
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true)
-            await Promise.all([
-                fetchNewestCourse(),
-                fetchTopBestSellingCourse()
-            ])
-            setLoading(false)
-        }
+        // const fetchData = async () => {
+        //     setLoading(true)
+        //     await Promise.all([
+        //         fetchNewestCourse(),
+        //         fetchTopBestSellingCourse()
+        //     ])
+        //     setLoading(false)
+        // }
 
-        fetchData()
+        // fetchData()
+        fetchNewestCourse()
+        fetchTopBestSellingCourse()
     }, [])
 
     return (
