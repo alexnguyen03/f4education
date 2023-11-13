@@ -99,7 +99,7 @@ const CourseProgress = () => {
     const fetchCourseProgress = async () => {
         try {
             const resp = await registerCoursecAPI.getAllCourseProgress(
-                user.username
+               'loinvpc04549'
             )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
@@ -257,6 +257,24 @@ const CourseProgress = () => {
         })
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
+    }
+
+    const handleShowQuestion = (classId) => {
+        navigate({
+            pathname: '/student/task',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
+
+    const handleShowQuestion = (classId) => {
+        navigate({
+            pathname: '/student/task',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
     }
 
     const formatDateWithDayOfWeek = (date) => {
