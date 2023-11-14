@@ -58,6 +58,6 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher findByUserId(String userId) {
-        return null; // vi ma hien tai la tu tang nen chua lay duoc
+        return teacherRepository.findById(userId).get(); // vi ma hien tai la tu tang nen chua lay duoc
     }
 }

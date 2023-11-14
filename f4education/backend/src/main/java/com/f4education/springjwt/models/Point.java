@@ -40,16 +40,16 @@ public class Point {
 	private Integer pointId;
 
 	@Column(name = "average_point")
-	private Float averagePoint;
+	private Double averagePoint;
 
 	@Column(name = "exercise_point")
-	private Float exercisePoint;
+	private Double exercisePoint;
 
 	@Column(name = "quizz_point")
-	private Float quizzPoint;
+	private Double quizzPoint;
 
 	@Column(name = "attendance_point")
-	private Float attendancePoint;
+	private Double attendancePoint;
 
 	@JsonIgnore
 	@ManyToOne
@@ -63,7 +63,8 @@ public class Point {
 
 	@Override
 	public String toString() {
-		return "Point [pointId=" + pointId + ", averagePoint=" + averagePoint + "]";
+		return "Point [pointId=" + pointId + ", attendancePoint=" + attendancePoint + ", averagePoint=" + averagePoint
+				+ "]";
 	}
 
 }

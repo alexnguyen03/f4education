@@ -31,9 +31,12 @@ public interface RegisterCourseService {
 
         List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName();
 
-        HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId, RegisterCourseRequestDTO registerCourseRequestDTO);
+        HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId,
+                        RegisterCourseRequestDTO registerCourseRequestDTO);
 
         List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId);
-    
+
+        Boolean getRegisterCourseHasClass(Integer classId);
+
         List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId);
 }

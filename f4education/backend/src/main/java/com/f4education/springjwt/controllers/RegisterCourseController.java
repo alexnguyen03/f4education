@@ -61,15 +61,20 @@ public class RegisterCourseController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/check-course-has-class/{classId}")
+    public ResponseEntity<?> checkRegisterCourseHasClass(@PathVariable("classId") Integer classId) {
+        return ResponseEntity.ok(registerCourseService.getRegisterCourseHasClass(classId));
+    }
+
     @GetMapping("/student/{studentId}")
-	public ResponseEntity<?> findAllCourseProgressByStudentId(@PathVariable String studentId) {
-		List<CourseProgressResponseDTO> lst = registerCourseService.getCourseProgressByStudentID(studentId);
-		return ResponseEntity.ok(lst);
-	}
+    public ResponseEntity<?> findAllCourseProgressByStudentId(@PathVariable String studentId) {
+        List<CourseProgressResponseDTO> lst = registerCourseService.getCourseProgressByStudentID(studentId);
+        return ResponseEntity.ok(lst);
+    }
 
     @GetMapping("/student/progress/{classId}")
     public ResponseEntity<?> getAllScheduleByClassId(@PathVariable("classId") Integer classId) {
-    	List<ScheduleCourseProgressDTO> scheduleResponse = registerCourseService.findAllScheduleByClassId(classId);
+        List<ScheduleCourseProgressDTO> scheduleResponse = registerCourseService.findAllScheduleByClassId(classId);
         return ResponseEntity.ok(scheduleResponse);
     }
 

@@ -19,9 +19,7 @@ import {
 import resourceApi from '../../../api/resourceApi'
 import React, { useState } from 'react'
 import { useEffect } from 'react'
-import JSZip from 'jszip'
 const DownloadRecource = ({ courseName }) => {
-    const zip = new JSZip()
     const [recource, setRecource] = useState([{ id: '', name: '', type: '' }])
     const [selectedRecourceIds, setSelectedRecourceIds] = useState([])
     const [loadingDownload, setLoadingDownload] = useState(false)

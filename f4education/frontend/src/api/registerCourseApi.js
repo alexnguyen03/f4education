@@ -25,6 +25,10 @@ const registerCourseApi = {
     getCourseProgressByClassId: (classId) => {
         const url = `/register-course/student/progress/${classId}`
         return axiosClient.get(url)
+    },
+    checkRegisterCourseHasClass: (classId) => {
+        const url = `/register-course/check-course-has-class/${classId}`
+        return axiosClient.get(url)
     }
 }
 

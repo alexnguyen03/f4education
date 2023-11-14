@@ -175,4 +175,9 @@ public class ClassServiceImpl implements ClassService {
 	public Classes findById(Integer classId) {
 		return classRepository.findById(classId).get();
 	}
+
+	@Override
+	public Classes saveOneClass(Classes classes) {
+		return classRepository.save(classes);
+	}
 }

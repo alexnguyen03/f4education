@@ -15,12 +15,12 @@ public class StudentInPointDTO {
     @JsonProperty("studentId")
     private String studentId;
     @JsonProperty("quizzPoint")
-    private Float quizzPoint;
+    private Double quizzPoint;
     @JsonProperty("averagePoint")
-    private Float averagePoint;
+    private Double averagePoint;
     @JsonProperty("attendancePoint")
-    private Float attendancePoint;
+    private Double attendancePoint;
     @JsonProperty("exercisePoint")
-    private Float exercisePoint;
+    private Double exercisePoint;
 
 }

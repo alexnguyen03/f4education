@@ -33,9 +33,7 @@ public class Schedule implements Serializable {
 	private String contents;
 	@Column(name = "is_practice")
 	private Boolean isPractice;
-	@JsonIgnore
-	@OneToMany(mappedBy = "schedule")
-	List<Attendance> attendances;
+
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")

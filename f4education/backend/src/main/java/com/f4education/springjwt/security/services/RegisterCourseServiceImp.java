@@ -12,12 +12,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.interfaces.PointService;
 import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.models.Student;
+import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
@@ -30,6 +35,7 @@ import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.ScheduleRepository;
 import com.f4education.springjwt.repository.SessionsRepository;
 import com.f4education.springjwt.repository.StudentRepository;
+import com.f4education.springjwt.repository.TeacherRepository;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
@@ -53,7 +59,18 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
     SessionsRepository sessionsRepository;
 
     @Autowired
+    TeacherService teacherService;
+
+    @Autowired
+    TeacherRepository teacherRepository;
+    @Autowired
     ClassRoomRepository classRoomRepository;
+
+    @Autowired
+    PointService pointService;
+
+    @Autowired
+    ClassService classService;
 
     @Override
     public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
@@ -225,9 +242,9 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
     @Override
     public List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName() {
-        return registerCourseRepository.findAll()
+        return registerCourseRepository.findAllNotHasClass()
                 .stream()
-                .collect(Collectors.toMap(registration -> registration.getCourse().getCourseId(),
+                .collect(Collectors.toMap(registration -> registration.getCourse().getCourseName(),
                         registration -> registration, (a, b) -> a))
                 .values()
                 .stream()
@@ -242,8 +259,11 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                 .findByCourseId(registerCourseRequestDTO.getCourseId());
         List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
         List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
-
+        List<Point> listPoint = new ArrayList<Point>();
         Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
+        Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
+        foundClass.setTeacher(foundTeacher);
+        classService.saveOneClass(foundClass);
         List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
         if (!listRegisterCourseIdToAdd.isEmpty()) {
 
@@ -253,7 +273,16 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                     .collect(Collectors.toList());
             filteredRegisterCoursesToAdd.forEach(registerCourse -> {
                 registerCourse.setClasses(foundClass);
+                Point point = new Point();
+                point.setClasses(foundClass);
+                point.setStudent(registerCourse.getStudent());
+                point.setAttendancePoint((double) 0);
+                point.setExercisePoint((double) 0);
+                point.setAveragePoint((double) 0);
+                point.setQuizzPoint((double) 0);
+                listPoint.add(point);
             });
+            pointService.save(listPoint);
             registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
         }
         List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
@@ -277,4 +306,12 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
                 .collect(Collectors.toList());
 
     }
+
+    @Override
+    public Boolean getRegisterCourseHasClass(Integer classId) {
+        List<RegisterCourse> listRegisterCourses = new ArrayList<>();
+        listRegisterCourses = registerCourseRepository.getRegisterCourseHasClass(classId);
+        return !listRegisterCourses.isEmpty();// false thì sẽ thì lớp đã tồn tại
+    }
+
 }

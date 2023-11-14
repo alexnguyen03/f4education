@@ -15,13 +15,13 @@ import lombok.NoArgsConstructor;
 public class PointDTO {
     private Integer pointId;
 
-    private Float averagePoint;
+    private Double averagePoint;
 
-    private Float exercisePoint;
+    private Double exercisePoint;
 
-    private Float quizzPoint;
+    private Double quizzPoint;
 
-    private Float attendancePoint;
+    private Double attendancePoint;
 
     private String studentName;
 

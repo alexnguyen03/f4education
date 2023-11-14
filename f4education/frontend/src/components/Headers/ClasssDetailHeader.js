@@ -7,8 +7,8 @@ const ClasssDetailHeader = () => {
     const [className, setClassName] = useState('')
     const [classDetail, setClassDetail] = useState({
         classId: 0,
-        courseName: '',
-        className: '',
+        courseName: 'Đang tải...',
+        className: 'Đang tải...',
         courseId: 0,
         startDate: '',
         endDate: '',
@@ -35,8 +35,9 @@ const ClasssDetailHeader = () => {
     const getClassByClassId = async () => {
         try {
             const resp = await classApi.getByClassId(classIdParam)
-
-            setClassDetail(resp.data)
+            if (resp.status === 200) {
+                setClassDetail(resp.data)
+            }
         } catch (error) {
             console.log(error)
         }
@@ -77,7 +78,9 @@ const ClasssDetailHeader = () => {
                             <div className="font-weight-bold mb-0 bg-primary rounded py-3 ">
                                 <h3 className="text-white mb-0 text-center">
                                     <span> Khóa học: </span>
-                                    {classDetail.courseName}
+                                    {classDetail.courseName
+                                        ? classDetail.courseName
+                                        : 'Chưa chọn'}
                                 </h3>
                             </div>
                         </Col>

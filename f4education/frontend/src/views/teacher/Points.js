@@ -7,18 +7,19 @@ import {
     NumberInput,
     Paper,
     Stack,
-    ThemeIcon,
     Title,
     Tooltip
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { Edit as EditIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
+import { IconDeviceFloppy } from '@tabler/icons-react'
 import MaterialReactTable from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import pointApi from '../../api/pointApi'
-import { IconDeviceFloppy } from '@tabler/icons-react'
+import Notify from '../../utils/Notify'
+import { ToastContainer, toast } from 'react-toastify'
 
 const Points = () => {
     const params = useParams()
@@ -112,11 +113,8 @@ const Points = () => {
         }
     }
     const handleAgreeEditPoint = () => {
-        console.log(
-            '🚀 ~ file: Points.js:115 ~ Points ~ ...editPoint:',
-            editPoint
-        )
-        // var foundPoint = listPoint.find((item) => item.pointId === pointId)
+        handlersEditModal.close()
+
         setListPoint(
             listPoint.map((item) => {
                 if (item.pointId === editPoint.pointId) {
@@ -156,16 +154,17 @@ const Points = () => {
     }
     const handleSavePoint = async () => {
         try {
+            toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
             console.log(listEditedPoint)
-            const pointRequest = {
-                classId: params.classId,
-                listPointOfStudent: listEditedPoint
-            }
-            const resp = await pointApi.savePoint(pointRequest)
-            console.log(
-                '🚀 ~ file: Points.js:165 ~ handleSavePoint ~ resp:',
-                resp
-            )
+            // const pointRequest = {
+            //     classId: params.classId,
+            //     listPointOfStudent: listEditedPoint
+            // }
+            // const resp = await pointApi.savePoint(pointRequest)
+            // console.log(
+            //     '🚀 ~ file: Points.js:165 ~ handleSavePoint ~ resp:',
+            //     resp
+            // )
         } catch (error) {
             console.log(
                 '🚀 ~ file: Points.js:155 ~ handleSavePoint ~ error:',
@@ -242,7 +241,7 @@ const Points = () => {
     }, [])
     return (
         <div>
-            {' '}
+            <ToastContainer />{' '}
             <MaterialReactTable
                 muiTableBodyProps={{
                     sx: {
@@ -396,6 +395,14 @@ const Points = () => {
                                     value={editPoint.exercisePoint}
                                     onChange={(val) => {
                                         handleOnChangeExercisePoint(val)
+                                    }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleAgreeEditPoint()
+                                        }
+                                    }}
+                                    onFocus={(e) => {
+                                        e.target.select()
                                     }}
                                 />
                             </Group>
