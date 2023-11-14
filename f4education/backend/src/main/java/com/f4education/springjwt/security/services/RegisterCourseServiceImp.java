@@ -263,19 +263,50 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			RegisterCourseRequestDTO registerCourseRequestDTO) {
 		List<RegisterCourse> listRegisterCourse = registerCourseRepository
 				.findByCourseId(registerCourseRequestDTO.getCourseId());
-		List<Integer> listRegisterCourseId = registerCourseRequestDTO.getListRegisterCourseId();
-		List<RegisterCourse> filteredRegisterCourses = listRegisterCourse
-				.stream()
-				.filter(registerCourse -> listRegisterCourseId.contains(registerCourse.getRegisterCourseId()))
-				.collect(Collectors.toList());
+		List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
+		List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
+		List<Point> listPoint = new ArrayList<Point>();
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
-		filteredRegisterCourses.forEach(registerCourse -> {
-			registerCourse.setClasses(foundClass);
-			registerCourse.setStudent(registerCourse.getStudent());
-			registerCourse.setCourse(registerCourse.getCourse());
-		});
+		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
+		foundClass.setTeacher(foundTeacher);
+		classService.saveOneClass(foundClass);
+		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
+		if (!listRegisterCourseIdToAdd.isEmpty()) {
 
-		return registerCourseRepository.saveAll(filteredRegisterCourses)
+			filteredRegisterCoursesToAdd = listRegisterCourse
+					.stream()
+					.filter(registerCourse -> listRegisterCourseIdToAdd.contains(registerCourse.getRegisterCourseId()))
+					.collect(Collectors.toList());
+			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
+				registerCourse.setClasses(foundClass);
+				Point point = new Point();
+				point.setClasses(foundClass);
+				point.setStudent(registerCourse.getStudent());
+				point.setAttendancePoint((double) 0);
+				point.setExercisePoint((double) 0);
+				point.setAveragePoint((double) 0);
+				point.setQuizzPoint((double) 0);
+				listPoint.add(point);
+			});
+			pointService.save(listPoint);
+			registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+		}
+		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
+		if (!listRegisterCourseIdToDelete.isEmpty()) {
+
+			filteredRegisterCoursesToDelete = listRegisterCourse
+					.stream()
+					.filter(registerCourse -> listRegisterCourseIdToDelete
+							.contains(registerCourse.getRegisterCourseId()))
+					.collect(Collectors.toList());
+			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
+				registerCourse.setClasses(null);
+
+			});
+			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+		}
+
+		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd)
 				.stream()
 				.map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
@@ -284,7 +315,10 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public Boolean getRegisterCourseHasClass(Integer classId) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException("Unimplemented method 'getRegisterCourseHasClass'");
+		List<RegisterCourse> listRegisterCourses = new ArrayList<>();
+		listRegisterCourses = registerCourseRepository.getRegisterCourseHasClass(classId);
+		return !listRegisterCourses.isEmpty();// false thì sẽ thì lớp đã tồn tại throw new
+												// UnsupportedOperationException("Unimplemented method
+												// 'getRegisterCourseHasClass'");
 	}
 }
