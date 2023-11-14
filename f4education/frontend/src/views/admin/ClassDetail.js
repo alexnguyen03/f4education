@@ -1,8 +1,7 @@
 import ClasssDetailHeader from 'components/Headers/ClasssDetailHeader'
-import React, { useEffect } from 'react'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import Select from 'react-select'
 import {
-    Alert,
     Badge,
     Button,
     Card,
@@ -11,29 +10,19 @@ import {
     Col,
     Container,
     Label,
-    Modal,
     Row
 } from 'reactstrap'
-import Select from 'react-select'
 
-import { makeStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid'
-import List from '@material-ui/core/List'
-import ListItem from '@material-ui/core/ListItem'
-import ListItemText from '@material-ui/core/ListItemText'
-import ListItemIcon from '@material-ui/core/ListItemIcon'
-import Checkbox from '@material-ui/core/Checkbox'
-import Divider from '@material-ui/core/Divider'
 import { Avatar, Group, Loader, Text, TransferList } from '@mantine/core'
+import Checkbox from '@material-ui/core/Checkbox'
 
+import { useRef } from 'react'
+import { useParams, useSearchParams } from 'react-router-dom'
+import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import courseApi from '../../api/courseApi'
-import teacherApi from '../../api/teacherApi'
-import { useParams } from 'react-router-dom'
 import classApi from '../../api/classApi'
 import registerCourseApi from '../../api/registerCourseApi'
-import { ToastContainer, toast } from 'react-toastify'
-import { useRef } from 'react'
+import teacherApi from '../../api/teacherApi'
 import Notify from '../../utils/Notify'
 const IMG_TEACHER_URL = process.env.REACT_APP_IMAGE_URL + '/teachers/'
 const ClassDetail = () => {
@@ -43,8 +32,10 @@ const ClassDetail = () => {
     const [showConfirmModal, setShowConfirmModal] = useState(false)
     const [loadingGetClassDetail, setLoadingGetClassDetail] = useState(true)
     const [allRegisterCourses, setAllRegisterCourse] = useState([])
-    const toastId = useRef(null)
-
+    const [searchParams, setSearchParams] = useSearchParams()
+    const [registed, setRegisted] = useState(false) // lớp đã có khóa học hay chưa
+    const [addListRegisterId, setAddListRegisterId] = useState([])
+    const [deleteListRegisterId, setDeleteListRegisterId] = useState([])
     const [classDetail, setClassDetail] = useState({
         classId: 0,
         className: '',
@@ -52,8 +43,8 @@ const ClassDetail = () => {
         courseId: 0,
         startDate: '',
         endDate: '',
-        maximumQuantity: 0,
-        status: '',
+        maximumQuantity: 'Đang tải...',
+        status: '-',
         admin: {
             adminId: '',
             fullname: '',
@@ -67,14 +58,14 @@ const ClassDetail = () => {
         students: [],
         teacher: {
             teacherId: '',
-            fullname: ''
+            fullname: 'Đang tải...',
+            gender: true
         }
     })
-    const [classRequest, setClassRequest] = useState({
-        classId: '',
-        courseId: '',
-        teacherId: '',
-        listRegisterCourseId: [] //lay register course de cap nhat
+
+    const [selectedTeacher, setSelectedTeacher] = useState({
+        fullname: '',
+        teacherId: ''
     })
     const [listCourse, setListCourse] = useState([])
     const [listStudentInCourse, setListStudentInCourse] = useState([{}])
@@ -83,70 +74,106 @@ const ClassDetail = () => {
         listStudentInCourse,
         listStudentInClass
     ])
-    const notifi_loading = () => {
-        toast('Notify.msg.loading', {
-            type: toast.TYPE.DEFAULT,
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            closeButton: true,
-            pauseOnHover: true,
-            theme: 'colored',
-            isLoading: true
-        })
-    }
+
     // ! HANDLE FUNCTIONS
     const handleSave = async () => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
-        console.log(classRequest)
+
+        console.log(addListRegisterId)
+        console.log(deleteListRegisterId)
+        const classRequest = {
+            classId: classDetail.classId,
+            courseId: classDetail.courseId,
+            teacherId: selectedTeacher.teacherId,
+            listRegisterCourseIdToAdd: addListRegisterId.map((item) =>
+                item.value.trim()
+            ),
+            listRegisterCourseIdToDelete: deleteListRegisterId.map((item) =>
+                item.value.trim()
+            )
+        }
+        console.log(
+            '🚀 ~ file: ClassDetail.js:130 ~ handleSave ~ classRequest:',
+            classRequest
+        )
         try {
             const resp = await registerCourseApi.updateRegisterCourse(
-                JSON.stringify(classRequest)
+                classRequest
             )
             if (resp.status === 200) {
                 toast.update(id, Notify.options.createSuccess())
             }
         } catch (error) {
-            toast.update(id, Notify.options.updateError())
+            // toast.update(id, Notify.options.updateError())
             console.log(
                 '🚀 ~ file: ClassDetail.js:94 ~ handleSave ~ error:',
                 error
             )
         }
     }
-    const convertStudentIdToRegisterCouserId = (studentId) => {
-        const matchingIds = []
-        for (const registration of allRegisterCourses) {
-            if (studentId.includes(registration.studentId)) {
-                matchingIds.push(registration.registerCourseId)
-            }
-        }
-        return matchingIds
-    }
+
     const handleOnChangeTransferList = (dataInList) => {
         setShowConfirmModal(true)
-        setListStudentInCourse(dataInList[0])
         setDataTransfer(dataInList)
-        setListStudentInClass(dataInList[1])
-        setClassRequest((prev) => ({
-            ...prev,
-            classId: classDetail.classId,
-            courseId: classDetail.courseId,
-            teacherId: classDetail.teacher.teacherId,
-            listRegisterCourseId: convertStudentIdToRegisterCouserId(
-                dataTransfer[1].map((item) => {
-                    const { value } = { ...item }
-                    return value
-                })
-            )
-        }))
+        let tempAddElement = dataInList[1].filter(
+            (item1) =>
+                !listStudentInClass
+                    .map((item2) => {
+                        return item2.value + ' '
+                    })
+                    .includes(item1.value + ' ')
+        )
+
+        setAddListRegisterId([...tempAddElement])
+
+        let tempDeleteElement = listStudentInClass.filter(
+            (item1) =>
+                !dataInList[1]
+                    .map((item2) => item2.value + ' ')
+                    .includes(item1.value + ' ')
+        )
+
+        setDeleteListRegisterId([...tempDeleteElement])
     }
 
+    const handleOnChangeRegisterCoure = (val) => {
+        const registeCourseSelected = allRegisterCourses.find((item) => {
+            return item.registerCourseId === val.value
+        })
+
+        const studentInCourse = allRegisterCourses.filter((item) => {
+            return item.courseId === registeCourseSelected.courseId
+        })
+
+        setListStudentInCourse([
+            ...convertRegisterToStudentArray(studentInCourse)
+        ])
+        setDataTransfer([convertRegisterToStudentArray(studentInCourse), []])
+    }
     //! CALL APIS
+
+    const checkRegisterCourseHasClass = async () => {
+        try {
+            const resp = await registerCourseApi.checkRegisterCourseHasClass(
+                classIdParam
+            )
+            if (!resp.data) {
+                getRegisterCourse()
+            }
+        } catch (error) {
+            console.log(
+                '🚀 ~ file: ClassDetail.js:141 ~ checkRegisterCourseHasClass ~ error:',
+                error
+            )
+        }
+    }
     const getRegisterCourse = async () => {
         try {
             const resp = await registerCourseApi.getRegisterCourseDistinc()
+            console.log(
+                '🚀 ~ file: ClassDetail.js:150 ~ getRegisterCourse ~ resp:',
+                resp
+            )
             if (resp.status === 200 && resp.data.length > 0) {
                 setListCourse(
                     resp.data.map((item) => {
@@ -170,10 +197,13 @@ const ClassDetail = () => {
         }
     }
     const convertRegisterToStudentArray = (arr) => {
-        const convertedArray = arr.map((item) => ({
-            value: item.studentId,
-            label: item.studentName
-        }))
+        const convertedArray = arr.map((item) => {
+            return {
+                value: item.registerCourseId + ' ',
+                label: item.studentName,
+                description: item.studentId
+            }
+        })
         return convertedArray
     }
     const getAllStudentInCourse = async () => {
@@ -201,12 +231,13 @@ const ClassDetail = () => {
                     (item) => item.classId !== parseInt(classIdParam)
                 )
 
-                // setListStudentInCourse(
-                //     convertRegisterToStudentArray(studentInCourse)
-                // )
-                // setListStudentInClass(
-                //     convertRegisterToStudentArray(studentInClass)
-                // )
+                setListStudentInCourse([
+                    ...convertRegisterToStudentArray(studentInCourse)
+                ])
+
+                setListStudentInClass([
+                    ...convertRegisterToStudentArray(studentInClass)
+                ])
 
                 setLoadingTransfer(false)
                 setDataTransfer([
@@ -237,7 +268,7 @@ const ClassDetail = () => {
                         }
                         return {
                             value: teacherId,
-                            label: `${gender ? 'Thầy ' : 'Cô '} ${fullname}`,
+                            label: fullname + ' - ' + teacherId,
                             image: image
                         }
                     })
@@ -254,19 +285,20 @@ const ClassDetail = () => {
     //! HANDLE FUNCTIONS
     const handleOnChangeTeacher = (val) => {
         const { value, label } = { ...val }
-        setClassDetail((prevState) => ({
-            ...prevState,
-            teacher: {
-                ...prevState.teacher,
-                teacherId: value,
-                fullname: label
-            }
-        }))
+        var fullname = label.split('-')[0].trim()
+        setSelectedTeacher({
+            fullname: fullname,
+            teacherId: value
+        })
     }
     const getClassByClassId = async () => {
         setLoadingGetClassDetail(true)
         try {
             const resp = await classApi.getByClassId(classIdParam)
+            console.log(
+                '🚀 ~ file: ClassDetail.js:267 ~ getClassByClassId ~ resp:',
+                resp
+            )
 
             setClassDetail(resp.data)
             setLoadingGetClassDetail(false)
@@ -283,25 +315,47 @@ const ClassDetail = () => {
                         {status}
                     </Badge>
                 )
-                break
             case 'Đang diễn ra':
                 return (
                     <Badge className="font-weight-bold" color="primary">
                         {status}
                     </Badge>
                 )
-                break
             case 'Kết thúc':
                 return (
                     <Badge className="font-weight-bold" color="success">
                         {status}
                     </Badge>
                 )
-                break
 
             default:
-                break
+                return (
+                    <Badge className="font-weight-bold" color="success">
+                        Đang tải...
+                    </Badge>
+                )
         }
+    }
+    const TransferListItem = ({ data, selected }) => {
+        return (
+            <Group noWrap>
+                <Avatar src={data.image} radius="xl" size="lg" />
+                <div style={{ flex: 1 }}>
+                    <Text size="sm" weight={500}>
+                        {data.label}
+                    </Text>
+                    <Text size="xs" color="dimmed" weight={400}>
+                        Mã HV: {data.description}
+                    </Text>
+                </div>
+                <Checkbox
+                    checked={selected}
+                    onChange={() => {}}
+                    tabIndex={-1}
+                    sx={{ pointerEvents: 'none' }}
+                />
+            </Group>
+        )
     }
     const renderTransferData = () => {
         if (loadingTransfer) {
@@ -319,23 +373,7 @@ const ClassDetail = () => {
                 className="mt-2"
                 value={dataTransfer}
                 itemComponent={React.memo(({ data, selected }) => (
-                    <Group noWrap>
-                        <Avatar src={data.image} radius="xl" size="lg" />
-                        <div style={{ flex: 1 }}>
-                            <Text size="sm" weight={500}>
-                                {data.label}
-                            </Text>
-                            <Text size="xs" color="dimmed" weight={400}>
-                                {data.description}
-                            </Text>
-                        </div>
-                        <Checkbox
-                            checked={selected}
-                            onChange={() => {}}
-                            tabIndex={-1}
-                            sx={{ pointerEvents: 'none' }}
-                        />
-                    </Group>
+                    <TransferListItem data={data} selected={selected} />
                 ))}
                 onChange={handleOnChangeTransferList}
                 searchPlaceholder={[
@@ -360,32 +398,23 @@ const ClassDetail = () => {
     useEffect(() => {
         getClassByClassId()
         getAllTeachers()
-        getRegisterCourse()
+
+        checkRegisterCourseHasClass()
     }, [])
-    useEffect(() => {
-        setClassRequest((prev) => ({
-            ...prev,
-            classId: classDetail.classId,
-            courseId: classDetail.courseId,
-            teacherId: classDetail.teacher.teacherId,
-            listRegisterCourseId: convertStudentIdToRegisterCouserId(
-                dataTransfer[1].map((item) => {
-                    const { value } = { ...item }
-                    return value
-                })
-            )
-        }))
-    }, [dataTransfer])
 
     useEffect(() => {
-        if (!loadingGetClassDetail) {
-            console.log(
-                '🚀 ~ file: ClassDetail.js:317 ~ useEffect ~ loadingGetClassDetail:',
-                loadingGetClassDetail
-            )
-            getAllStudentInCourse()
-        }
-    }, [loadingGetClassDetail])
+        getAllStudentInCourse()
+    }, [classDetail.courseId])
+    useEffect(() => {
+        setClassDetail((prevState) => ({
+            ...prevState,
+            teacher: {
+                ...prevState.teacher,
+                teacherId: selectedTeacher.teacherId,
+                fullname: selectedTeacher.fullname
+            }
+        }))
+    }, [selectedTeacher])
 
     return (
         <>
@@ -395,42 +424,35 @@ const ClassDetail = () => {
                 <Card>
                     <CardHeader>
                         <Row className=" d-flex justify-content-between">
+                            {listCourse.length === 0 ? null : (
+                                <Col md={4}>
+                                    <Label>Chọn khóa học</Label>
+                                    <Select
+                                        options={listCourse}
+                                        placeholder="Chọn khóa học"
+                                        onChange={(val) => {
+                                            handleOnChangeRegisterCoure(val)
+                                        }}
+                                        isSearchable={true}
+                                        className="form-control-alternative "
+                                        styles={{ outline: 'none' }}
+                                    />
+                                </Col>
+                            )}
                             {
-                                <>
-                                    <Col md={4}>
-                                        <Label>Chọn giáo viên phụ trách</Label>
-                                        <span>{listStudentInClass.length}</span>
-                                        <Select
-                                            // formatOptionLabel={(teacher) => (
-                                            //     <div className="d-flex">
-                                            //         <div className="country-option ">
-                                            //             <img
-                                            //                 width={'35'}
-                                            //                 height={'35'}
-                                            //                 className="rounded-circle"
-                                            //                 src={
-                                            //                     IMG_TEACHER_URL +
-                                            //                     teacher.image
-                                            //                 }
-                                            //                 alt="teacher-image"
-                                            //             />
-                                            //         </div>
-                                            //         <div className="d-flex flex-column justify-content-center ml-3">
-                                            //             {teacher.label}
-                                            //         </div>
-                                            //     </div>
-                                            // )}
-                                            options={listTeacher}
-                                            placeholder="Chọn giáo viên"
-                                            onChange={(val) => {
-                                                handleOnChangeTeacher(val)
-                                            }}
-                                            isSearchable={true}
-                                            className="form-control-alternative "
-                                            styles={{ outline: 'none' }}
-                                        />
-                                    </Col>
-                                </>
+                                <Col md={4}>
+                                    <Label>Chọn giáo viên phụ trách</Label>
+                                    <Select
+                                        options={listTeacher}
+                                        placeholder="Chọn giáo viên"
+                                        onChange={(val) => {
+                                            handleOnChangeTeacher(val)
+                                        }}
+                                        isSearchable={true}
+                                        className="form-control-alternative "
+                                        styles={{ outline: 'none' }}
+                                    />
+                                </Col>
                             }
                             <Col
                                 md={4}
@@ -475,9 +497,16 @@ const ClassDetail = () => {
                                                 className="font-weight-bold"
                                                 color="info"
                                             >
-                                                {dataTransfer[1] &&
-                                                    classDetail.maximumQuantity -
-                                                        dataTransfer[1].length}
+                                                {!isNaN(
+                                                    dataTransfer[1] &&
+                                                        classDetail.maximumQuantity -
+                                                            dataTransfer[1]
+                                                                .length
+                                                )
+                                                    ? dataTransfer[1] &&
+                                                      classDetail.maximumQuantity -
+                                                          dataTransfer[1].length
+                                                    : 'Đang tải...'}
                                             </Badge>
                                         </div>
                                     </div>
@@ -506,7 +535,10 @@ const ClassDetail = () => {
                                             >
                                                 {classDetail.teacher != null
                                                     ? classDetail.teacher
-                                                          .fullname
+                                                          .fullname +
+                                                      ' - ' +
+                                                      classDetail.teacher
+                                                          .teacherId
                                                     : 'Chưa có giáo viên'}
                                             </Badge>
                                         </div>

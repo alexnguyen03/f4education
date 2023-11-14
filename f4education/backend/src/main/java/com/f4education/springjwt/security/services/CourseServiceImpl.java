@@ -188,6 +188,7 @@ public class CourseServiceImpl implements CoursesService {
 	@Override
 	public CourseDTO saveCourse(CourseRequest courseRequest) {
 		String action = "CREATE";
+
 		Course course = this.convertRequestToEntity(courseRequest);
 		Integer idCourse = courseRequest.getCourseId();
 		if (idCourse != null) {

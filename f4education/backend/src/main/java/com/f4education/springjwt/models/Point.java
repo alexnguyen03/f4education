@@ -1,6 +1,9 @@
 package com.f4education.springjwt.models;
 
 import java.util.List;
+import java.util.Set;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -27,15 +30,23 @@ public class Point {
 	private Integer pointId;
 
 	@Column(name = "average_point")
-	private Float averagePoint;
+	private Double averagePoint;
 
-	@OneToMany(mappedBy = "point1")
-	List<DetailPoint> detailPoints;
+	@Column(name = "exercise_point")
+	private Double exercisePoint;
 
+	@Column(name = "quizz_point")
+	private Double quizzPoint;
+
+	@Column(name = "attendance_point")
+	private Double attendancePoint;
+
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "student_id")
 	Student student;
 
+	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "class_id")
 	Classes classes;

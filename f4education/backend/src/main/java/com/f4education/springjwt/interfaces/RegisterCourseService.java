@@ -32,7 +32,10 @@ public interface RegisterCourseService {
 
 	List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId);
 
+	Boolean getRegisterCourseHasClass(Integer classId);
+
 	List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId);
 
 	Boolean checkIfCourseIsDone(String studentId, Integer classId, Integer RegisterCourseId);
+
 }

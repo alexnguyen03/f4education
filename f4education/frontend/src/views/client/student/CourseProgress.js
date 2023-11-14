@@ -365,7 +365,9 @@ const CourseProgress = () => {
     }, [selectedCourse])
 
     useEffect(() => {
-        checkActivedExamByTodayAndClassId()
+        if (searchParams.get('classId') !== null) {
+            checkActivedExamByTodayAndClassId()
+        }
     }, [searchParams])
 
     useEffect(() => {
@@ -1573,7 +1575,9 @@ const CourseProgress = () => {
                                                                                     setSelectedCourse(
                                                                                         progress
                                                                                     )
-                                                                                    handleCheckIfCertificateIsCreated(progress)
+                                                                                    handleCheckIfCertificateIsCreated(
+                                                                                        progress
+                                                                                    )
                                                                                 }}
                                                                             >
                                                                                 Lấy

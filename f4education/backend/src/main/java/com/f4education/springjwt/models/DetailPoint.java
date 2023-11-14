@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,16 +40,19 @@ public class DetailPoint {
 	@Column(name = "entry_date")
 	private Date entryDate;
 
-	private Float point;
-	
-	@ManyToOne
-	@JoinColumn(name = "point_id")
-	Point point1;
+	@Column(name = "type")
+	private String type;
+
+	private Float pointDetail;
+
+	// @JsonIgnore
+	// @ManyToOne
+	// @JoinColumn(name = "point_id")
+	// Point point;
 
 	@Override
 	public String toString() {
-		return "DetailPoint [detailPointId=" + detailPointId + ", entryDate=" + entryDate + ", point=" + point + "]";
-	} 	
-	
-	
+		return "DetailPoint [detailPointId=" + detailPointId + ", entryDate=" + entryDate + "]";
+	}
+
 }

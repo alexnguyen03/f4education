@@ -462,7 +462,7 @@ const Courses = () => {
 
     const updateCourse = async () => {
         const formData = new FormData()
-        formData.append('courseRequest', JSON.stringify(courseRequest))
+        formData.append('courseRequest', courseRequest)
         console.log(
             '🚀 ~ file: Courses.js:462 ~ updateCourse ~ courseRequest:',
             courseRequest
@@ -638,7 +638,9 @@ const Courses = () => {
                                         >
                                             <IconEyeSearch />
                                         </IconButton>
-                                        <Link to={`/admin/courses-detail/${row.original.courseId}`}>
+                                        <Link
+                                            to={`/admin/courses-detail/${row.original.courseId}`}
+                                        >
                                             <IconButton color="info">
                                                 <i className="bx bx-layer-plus"></i>
                                             </IconButton>

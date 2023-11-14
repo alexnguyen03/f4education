@@ -46,4 +46,9 @@ public class StudentServiceImpl implements StudentService {
 		return new StudentDTO(student.getStudentId(), student.getFullname(), student.getGender(), student.getAddress(),
 				student.getPhone(), student.getImage());
 	}
+
+	@Override
+	public Student findById(String studentId) {
+		return studentRepository.findById(studentId).get();
+	}
 }

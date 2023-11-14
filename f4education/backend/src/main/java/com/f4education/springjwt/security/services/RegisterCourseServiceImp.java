@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,12 +12,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.interfaces.PointService;
 import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.models.Student;
+import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
@@ -29,6 +35,7 @@ import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.ScheduleRepository;
 import com.f4education.springjwt.repository.SessionsRepository;
 import com.f4education.springjwt.repository.StudentRepository;
+import com.f4education.springjwt.repository.TeacherRepository;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
@@ -52,7 +59,18 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	SessionsRepository sessionsRepository;
 
 	@Autowired
+	TeacherService teacherService;
+
+	@Autowired
+	TeacherRepository teacherRepository;
+	@Autowired
 	ClassRoomRepository classRoomRepository;
+
+	@Autowired
+	PointService pointService;
+
+	@Autowired
+	ClassService classService;
 
 	@Override
 	public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
@@ -102,12 +120,9 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
 		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
-
 		courseResponse.setCourse(registerCourse.getCourse());
 		courseResponse.setClasses(registerCourse.getClasses());
 		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
-		courseResponse.setRegisterCourseId(registerCourse.getRegisterCourseId());
-
 		return courseResponse;
 	}
 
@@ -233,10 +248,14 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName() {
-		return registerCourseRepository.findAll().stream()
+		return registerCourseRepository.findAll()
+				.stream()
 				.collect(Collectors.toMap(registration -> registration.getCourse().getCourseId(),
 						registration -> registration, (a, b) -> a))
-				.values().stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+				.values()
+				.stream()
+				.map(this::convertToResponseDTO)
+				.collect(Collectors.toList());
 	}
 
 	@Override
@@ -245,7 +264,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		List<RegisterCourse> listRegisterCourse = registerCourseRepository
 				.findByCourseId(registerCourseRequestDTO.getCourseId());
 		List<Integer> listRegisterCourseId = registerCourseRequestDTO.getListRegisterCourseId();
-		List<RegisterCourse> filteredRegisterCourses = listRegisterCourse.stream()
+		List<RegisterCourse> filteredRegisterCourses = listRegisterCourse
+				.stream()
 				.filter(registerCourse -> listRegisterCourseId.contains(registerCourse.getRegisterCourseId()))
 				.collect(Collectors.toList());
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
@@ -255,9 +275,16 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCourse(registerCourse.getCourse());
 		});
 
-		return registerCourseRepository.saveAll(filteredRegisterCourses).stream().map(this::convertToResponseDTO)
+		return registerCourseRepository.saveAll(filteredRegisterCourses)
+				.stream()
+				.map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
 
 	}
 
+	@Override
+	public Boolean getRegisterCourseHasClass(Integer classId) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException("Unimplemented method 'getRegisterCourseHasClass'");
+	}
 }

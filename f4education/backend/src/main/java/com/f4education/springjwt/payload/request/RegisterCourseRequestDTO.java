@@ -22,6 +22,9 @@ public class RegisterCourseRequestDTO {
 
 	private Integer classId;
 
-	@JsonProperty("listRegisterCourseId")
-	private List<Integer> listRegisterCourseId;
+	@JsonProperty("listRegisterCourseIdToAdd")
+	private List<Integer> listRegisterCourseIdToAdd;
+
+	@JsonProperty("listRegisterCourseIdToDelete")
+	private List<Integer> listRegisterCourseIdToDelete;
 }

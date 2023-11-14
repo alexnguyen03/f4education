@@ -27,7 +27,6 @@ import classApi from '../../api/classApi'
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
 import { useDisclosure } from '@mantine/hooks'
 import questionApi from '../../api/questionApi'
-import { selectClasses } from '@mui/material'
 import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Notify from '../../utils/Notify'
@@ -408,10 +407,23 @@ const ClassInformationDetail = () => {
                                     mb="md"
                                     disabled={
                                         activedExam ||
-                                        selectClasses.status === 'Đang diễn ra'
+                                        classInfor.status === 'Đang diễn ra'
                                     }
                                 >
                                     Tạo quiz
+                                </Button>
+                                <Button
+                                    color="indigo"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        navigate(
+                                            '/teacher/class-info/point/' +
+                                                classInfor.classId
+                                        )
+                                    }}
+                                >
+                                    Nhập điểm
                                 </Button>
                                 <Button color="cyan" size="md" mb="md">
                                     Giao bài tập

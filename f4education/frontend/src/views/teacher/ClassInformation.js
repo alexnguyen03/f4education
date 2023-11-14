@@ -69,7 +69,7 @@ const ClassInformation = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/classes-infor/' + classId)
+        navigate('/teacher/class-info/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {
