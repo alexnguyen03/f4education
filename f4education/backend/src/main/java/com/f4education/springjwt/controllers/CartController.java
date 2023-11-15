@@ -27,79 +27,84 @@ import com.f4education.springjwt.security.services.CartServiceImp;
 @RestController
 @RequestMapping("/api/cart")
 public class CartController {
-	@Autowired
-	CartServiceImp cartService;
+	// @Autowired
+	// CartServiceImp cartService;
 
-	@GetMapping
-	public ResponseEntity<?> findAll() {
-		List<CartResponseDTO> lst = cartService.getAllCartByStatus();
-		return ResponseEntity.ok(lst);
-	}
+	// @GetMapping
+	// public ResponseEntity<?> findAll() {
+	// List<CartResponseDTO> lst = cartService.getAllCartByStatus();
+	// return ResponseEntity.ok(lst);
+	// }
 
-	@GetMapping("/{studentId}")
-	public ResponseEntity<?> findCartByStudentID(@PathVariable("studentId") String studentId) {
-		List<CartResponseDTO> lst = cartService.findAllCartByStudentId(studentId, false);
-		return ResponseEntity.ok(lst);
-	}
+	// // @GetMapping("/{studentId}")
+	// // public ResponseEntity<?> findCartByStudentID(@PathVariable("studentId")
+	// // String studentId) {
+	// // List<CartResponseDTO> lst = cartService.findAllCartByStudentId(studentId,
+	// // false);
+	// // return ResponseEntity.ok(lst);
+	// // }
 
-	@PostMapping
-	public ResponseEntity<?> createCart(@RequestBody CartRequestDTO cartRequestDTO) {
-		if (cartRequestDTO == null) {
-			return ResponseEntity.badRequest().body("Invalid request data");
-		}
+	// @PostMapping
+	// public ResponseEntity<?> createCart(@RequestBody CartRequestDTO
+	// cartRequestDTO) {
+	// if (cartRequestDTO == null) {
+	// return ResponseEntity.badRequest().body("Invalid request data");
+	// }
 
-		CartResponseDTO cart = cartService.createCart(cartRequestDTO);
+	// CartResponseDTO cart = cartService.createCart(cartRequestDTO);
 
-		if (cart == null) {
-			return ResponseEntity.badRequest().build();
-		}
+	// if (cart == null) {
+	// return ResponseEntity.badRequest().build();
+	// }
 
-		// create URI
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{cartId}").buildAndExpand(cart.getCartId())
-				.toUri();
+	// // create URI
+	// URI uri =
+	// ServletUriComponentsBuilder.fromCurrentRequest().path("/{cartId}").buildAndExpand(cart.getCartId())
+	// .toUri();
 
-		return ResponseEntity.created(uri).body(cart);
-	}
+	// return ResponseEntity.created(uri).body(cart);
+	// }
 
-	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteCart(@PathVariable("id") Integer id) {
+	// @DeleteMapping("/{id}")
+	// public ResponseEntity<?> deleteCart(@PathVariable("id") Integer id) {
 
-		if (id == null) {
-			return ResponseEntity.badRequest().build();
-		} else {
+	// if (id == null) {
+	// return ResponseEntity.badRequest().build();
+	// } else {
 
-			CartResponseDTO cart = cartService.getCartById(id);
+	// CartResponseDTO cart = cartService.getCartById(id);
 
-			if (cart == null) {
-				Map<String, String> response = new HashMap<>();
-				response.put("status", "" + HttpStatus.NO_CONTENT);
-				response.put("message", "it NULL BILL, tf u giving me bro?");
-				return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
-			}
+	// if (cart == null) {
+	// Map<String, String> response = new HashMap<>();
+	// response.put("status", "" + HttpStatus.NO_CONTENT);
+	// response.put("message", "it NULL BILL, tf u giving me bro?");
+	// return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+	// }
 
-			cartService.deleteCartItem(id);
-			
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("course have been delete");
-		}
-	}
+	// cartService.deleteCartItem(id);
 
-	@PutMapping("/{cartId}")
-	public ResponseEntity<?> updateCart(@PathVariable("cartId") Integer cartId,
-			@RequestBody CartRequestDTO cartRequest) {
-		if (cartId == null) {
-			return ResponseEntity.badRequest().body("message: where my id? u kd m?");
-		} else {
-			CartResponseDTO cart = cartService.updateCart(cartId, cartRequest);
+	// return ResponseEntity.status(HttpStatus.NO_CONTENT).body("course have been
+	// delete");
+	// }
+	// }
 
-			if (cart == null) {
-				Map<String, String> response = new HashMap<>();
-				response.put("status", "" + HttpStatus.NO_CONTENT);
-				response.put("message", "it NULL BILL, tf u giving me bro?");
-				return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
-			}
+	// @PutMapping("/{cartId}")
+	// public ResponseEntity<?> updateCart(@PathVariable("cartId") Integer cartId,
+	// @RequestBody CartRequestDTO cartRequest) {
+	// if (cartId == null) {
+	// return ResponseEntity.badRequest().body("message: where my id? u kd m?");
+	// } else {
+	// CartResponseDTO cart = cartService.updateCart(cartId, cartRequest);
 
-			return ResponseEntity.ok(cart);
-		}
-	}
+	// if (cart == null) {
+	// Map<String, String> response = new HashMap<>();
+	// response.put("status", "" + HttpStatus.NO_CONTENT);
+	// response.put("message", "it NULL BILL, tf u giving me bro?");
+	// return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
+	// }
+
+	// return ResponseEntity.ok(cart);
+	// }
+	// }
 
 }

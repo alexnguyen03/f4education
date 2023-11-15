@@ -118,6 +118,7 @@ const Schedule = (props) => {
                 new Date(item.studyDate.substring(0, 10)) < new Date(today) // test
             )
         })
+
         let newScheduleInTable = []
 
         // val is number of date

@@ -21,7 +21,7 @@ import CourseRegisterClient from '../../../f4education/frontend/src/views/client
 // import CourseRegisterDetailClient from '../../../f4education/frontend/src/views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from 'views/teacher/information'
 import StudentInformation from 'views/client/visitor/StudentInformation'
-import QuizzClient from 'views/client/visitor/QuizzClient';
+import QuizzClient from 'views/client/visitor/QuizzClient'
 
 import Accounts from 'views/admin/Accounts'
 import Schedules from 'views/admin/Schedules'
@@ -29,6 +29,8 @@ import Schedules from 'views/admin/Schedules'
 import Icons from 'views/examples/Icons'
 import ClassInformation from 'views/teacher/ClassInformation'
 import ClassInformationDetail from 'views/teacher/ClassInformationDetail'
+import TeacherSchedule from 'views/teacher/TeacherSchedule'
+import TaskTeacher from 'views/teacher/TaskTeacher'
 import CourseProgress from 'views/client/student/CourseProgress'
 
 export var routes = [
@@ -250,6 +252,20 @@ export const routesTeacher = [
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
+        layout: '/teacher'
+    },
+    {
+        path: '/schedule',
+        name: 'Lịch dạy',
+        icon: 'ni ni-collection text-blue',
+        component: <TeacherSchedule />,
+        layout: '/teacher'
+    },
+    {
+        path: '/task',
+        name: 'Giao bài tập',
+        icon: 'ni ni-collection text-blue',
+        component: <TaskTeacher />,
         layout: '/teacher'
     },
     {

@@ -127,6 +127,7 @@ public class GoogleDriveRepository {
 	}
 
 	// get id folder google drive
+	// ("TASK/classNam/taskName")
 	public String getFolderId(String folderName) throws Exception {
 		String parentId = null;
 		String[] folderNames = folderName.split("/");
