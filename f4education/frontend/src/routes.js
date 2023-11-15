@@ -1,5 +1,6 @@
 import Index from 'views/Index.js'
 import Register from 'views/examples/Register.js'
+import ClientRegister from 'views/client/visitor/Register.js'
 import Subjects from 'views/admin/Subjects'
 import Sessions from 'views/admin/Sessions'
 import Courses from 'views/admin/Courses.js'
@@ -12,7 +13,9 @@ import Questions from 'views/admin/Questions'
 import QuestionDetail from 'views/admin/QuestionDetail'
 import Home from '../../../f4education/frontend/src/views/client/visitor/Home'
 import CourseClient from '../../../f4education/frontend/src/views/client/visitor/CourseClient'
+import TeacherResources from 'views/teacher/TeacherResources'
 import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
+import CheckMail from 'views/client/visitor/CheckMail'
 import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
 import Login from 'views/examples/Login'
@@ -226,6 +229,20 @@ export var routesClient = [
         layout: '/client'
     },
     {
+        path: '/check-mail',
+        name: 'Thông tin email',
+        icon: 'ni ni-planet text-blue',
+        component: <CheckMail />,
+        layout: '/client'
+    },
+    {
+        path: '/client-register/:email',
+        name: 'Thông tin tài khoản',
+        icon: 'ni ni-planet text-blue',
+        component: <ClientRegister />,
+        layout: '/client'
+    },
+    {
         path: '/quizz',
         name: 'Thông tin bài kiểm tra',
         icon: 'ni ni-planet text-blue',
@@ -252,6 +269,13 @@ export const routesTeacher = [
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
+        layout: '/teacher'
+    },
+    {
+        path: '/resources',
+        name: 'Tài nguyên',
+        icon: 'ni ni-collection text-blue',
+        component: <TeacherResources />,
         layout: '/teacher'
     },
     {

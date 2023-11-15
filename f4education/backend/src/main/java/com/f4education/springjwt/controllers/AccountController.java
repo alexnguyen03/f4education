@@ -26,12 +26,14 @@ import com.f4education.springjwt.models.Teacher;
 
 import com.f4education.springjwt.payload.request.AccountDTO;
 import com.f4education.springjwt.payload.response.MessageResponse;
+import com.f4education.springjwt.security.services.MailerServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @CrossOrigin("*")
 @RestController
@@ -48,6 +50,9 @@ public class AccountController {
     @Autowired
     PasswordEncoder encoder;
 
+    @Autowired
+	MailerServiceImpl mailer;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<AccountDTO> getAllAccountsDTO() {
@@ -60,6 +65,8 @@ public class AccountController {
         List<AccountDTO> list = accountService.getAllAccountsDTOByRole(role);
         return ResponseEntity.ok(list);
     }
+
+    
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
@@ -81,9 +88,20 @@ public class AccountController {
                     .badRequest()
                     .body(new MessageResponse("1"));
         }
+        // return ResponseEntity.ok(null);
         return ResponseEntity.ok(accountService.createAccount(accountDTO));
+    }
 
-        // return accountService.updateAccount(accountDTO);
+    @PostMapping(value = "/checkEmail")
+    public ResponseEntity<?> checkMail(@RequestBody AccountDTO accountDTO) {
+        Boolean checkEmailExit = accountService.existsByEmail(accountDTO.getEmail().trim());
+        if (checkEmailExit) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("1"));
+        }
+        mailer.queue(accountDTO.getEmail(), "", "");
+        return ResponseEntity.ok().body(new MessageResponse("2"));
     }
 
     // ! Chuyển đổi json sang DTO và set img vào DTO nếu có file có tồn tại
@@ -94,7 +112,12 @@ public class AccountController {
             accountDTO = mapper.readValue(teacherRequestString,
                     AccountDTO.class);
             File savedFile = null;
-            String id = accountDTO.getEmail().substring(0, accountDTO.getEmail().indexOf("@"));
+            String id = null;
+            try {
+                id = accountDTO.getEmail().substring(0, accountDTO.getEmail().indexOf("@"));
+            } catch (Exception e) {
+
+            }
             accountDTO.setUsername(id);
             if (create) {
                 accountDTO.setPassword(encoder.encode(accountDTO.getPassword()));
