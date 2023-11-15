@@ -112,16 +112,16 @@ const LearningResult = () => {
             const className = item.className
             const status = item.status
             const teacherName = item.teacherName
-            const startDate = item.startDate
-            const endDate = item.endDate
+            const startDate = moment(item.startDate).format('DD-MM-yyyy')
+            const endDate = moment(item.endDate).format('DD-MM-yyyy')
             const lowerSearchTerm = searchTerm.toLowerCase()
 
             return (
                 className.toLowerCase().includes(lowerSearchTerm) ||
                 status.toLowerCase().includes(lowerSearchTerm) ||
                 teacherName.toLowerCase().includes(lowerSearchTerm) ||
-                startDate.toLowerCase().includes(lowerSearchTerm) ||
-                endDate.toLowerCase().includes(lowerSearchTerm)
+                startDate.includes(lowerSearchTerm) ||
+                endDate.includes(lowerSearchTerm)
             )
         })
     } else {
@@ -261,7 +261,7 @@ const LearningResult = () => {
                                 </Button>
                             </Group>
                         </Box>
-                        {filteredClasses.length === 0 ? (
+                        {listClasses.length === 0 ? (
                             <>
                                 <Center w="100%">
                                     <Title
