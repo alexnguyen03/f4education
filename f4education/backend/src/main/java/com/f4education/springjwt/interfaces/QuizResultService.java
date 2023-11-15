@@ -7,7 +7,7 @@ import com.f4education.springjwt.payload.request.QuizResultDTO;
 import com.f4education.springjwt.payload.request.QuizResultRequest;
 
 public interface QuizResultService {
-	QuizResultDTO createQuizzResult(QuizResultRequest quizResultRequest);
+    QuizResultDTO createQuizzResult(QuizResultRequest quizResultRequest);
 
-	List<Object[]> getQuizInfoByClassId(Integer classId);
+    List<Object[]> getQuizInfoByClassId(Integer classId);
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.security.services.RegisterCourseServiceImp;

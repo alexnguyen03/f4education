@@ -28,6 +28,10 @@ root.render(
                 element={<AdminLayout />}
             />
             <Route
+                path="/admin/*/:courseName/:folderId"
+                element={<AdminLayout />}
+            />
+            <Route
                 path="/admin"
                 element={<Navigate to="/admin/index" replace />}
             />
@@ -54,7 +58,7 @@ root.render(
             <Route path="*/point/:classId" element={<Teacher />} />
             <Route path="/teacher/*" element={<Teacher />} />
             <Route path="/*/classes-infor/:classId" element={<Teacher />} />
-           
+
             {/* PDF Route */}
             <Route path="/pdf/*" element={<PDFLayout />} />
         </Routes>

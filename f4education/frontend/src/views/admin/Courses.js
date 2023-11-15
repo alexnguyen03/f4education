@@ -49,9 +49,11 @@ import { Timeline, Event } from 'react-timeline-scribble'
 import { Warning } from '@material-ui/icons'
 import { formatDate } from '../../utils/formater'
 import { Link } from 'react-router-dom'
+import Notify from '../../utils/Notify'
+import { ToastContainer, toast } from 'react-toastify'
 const IMG_URL = '/courses/'
 const Courses = () => {
-    const user = JSON.parse(localStorage.getItem('user') | '')
+    const user = JSON.parse(localStorage.getItem('user'))
     const [image, setImage] = useState(null)
 
     const [imgData, setImgData] = useState(null)
@@ -97,18 +99,6 @@ const Courses = () => {
         }
     })
 
-    const [courseRequest, setCourseRequest] = useState({
-        subjectId: 0,
-        adminId: '',
-        courseId: '',
-        courseName: '',
-        coursePrice: 0,
-        courseDuration: 100,
-        courseDescription: '',
-        numberSession: 0,
-        image: ''
-    })
-
     // Thực hiện binding data
     const handelOnChangeInput = (e) => {
         setCourse({
@@ -119,86 +109,96 @@ const Courses = () => {
     }
 
     const validate = () => {
+        const esxistCourseName = courses.some((item) => {
+            return item.courseName === course.courseName
+        })
+        console.log(
+            '🚀 ~ file: Courses.js:114 ~ esxistCourseName ~ esxistCourseName:',
+            esxistCourseName
+        )
+
+        // console.log('🚀 ~ file: Courses.js:122 ~ validate ~ courses:', courses)
+        let isValid = true
         if (course.courseName === '') {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 courseNameErr: 'Vui lòng nhập Tên khóa học'
             }))
+            isValid = false
         } else if (course.courseName.length < 10) {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 courseNameErr: 'Tên khóa học không hợp lệ (quá ngắn)'
             }))
+            isValid = false
         } else {
-            setMsgError((preErr) => ({ ...preErr, courseNameErr: '' }))
+            setMsgError((prevErr) => ({ ...prevErr, courseNameErr: '' }))
         }
         if (course.courseDuration === '') {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 courseDurationErr: 'Vui lòng nhập Thời lượng của khóa học'
             }))
+            isValid = false
         } else if (
             course.courseDuration === '0' ||
             parseInt(course.courseDuration) < 0
         ) {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 courseDurationErr: 'Thời lượng khóa học phải lớn hơn 0 '
             }))
+            isValid = false
         } else {
-            setMsgError((preErr) => ({ ...preErr, courseDurationErr: '' }))
+            setMsgError((prevErr) => ({ ...prevErr, courseDurationErr: '' }))
         }
         if (course.coursePrice === '') {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 coursePriceErr: 'Vui lòng nhập Học phí của khóa học'
             }))
+            isValid = false
         } else if (
             course.coursePrice === '0' ||
             parseInt(course.coursePrice) < 0
         ) {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 coursePriceErr: 'Học phí phải lớn hơn 0'
             }))
+            isValid = false
         } else {
-            setMsgError((preErr) => ({ ...preErr, coursePriceErr: '' }))
+            setMsgError((prevErr) => ({ ...prevErr, coursePriceErr: '' }))
         }
         if (course.image === '') {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 imgErr: 'Vui lòng chọn ảnh cho khóa học'
             }))
+            isValid = false
         } else {
-            setMsgError((preErr) => ({ ...preErr, imgErr: '' }))
+            setMsgError((prevErr) => ({ ...prevErr, imgErr: '' }))
         }
         if (course.hourPerSession === '') {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 hourPerSessionErr: 'Vui lòng chọn số giờ cho ca học'
             }))
+            isValid = false
         } else {
-            setMsgError((preErr) => ({ ...preErr, hourPerSessionErr: '' }))
+            setMsgError((prevErr) => ({ ...prevErr, hourPerSessionErr: '' }))
         }
 
         if (course.courseDescription === '') {
-            setMsgError((preErr) => ({
-                ...preErr,
+            setMsgError((prevErr) => ({
+                ...prevErr,
                 courseDescriptionErr: 'Vui lòng nhập mô tả cho khóa học'
             }))
+            isValid = false
         } else {
-            setMsgError((preErr) => ({ ...preErr, courseDescriptionErr: '' }))
+            setMsgError((prevErr) => ({ ...prevErr, courseDescriptionErr: '' }))
         }
-        if (
-            msgError.courseNameErr != '' ||
-            msgError.courseDescriptionErr != '' ||
-            msgError.courseDurationErr != '' ||
-            msgError.imgErr != '' ||
-            msgError.coursePriceErr != ''
-        ) {
-            return false
-        }
-        return true
+        return isValid
     }
     const onChangePicture = (e) => {
         setImage(null)
@@ -380,9 +380,10 @@ const Courses = () => {
         setImgData(null)
         setCourse({
             courseName: '',
-            courseDuration: 100,
+            courseDuration: 0,
             coursePrice: 6000000,
             courseDescription: '',
+            numberSession: 0,
             image: '',
             subject: {
                 subjectId: 0,
@@ -405,20 +406,42 @@ const Courses = () => {
         setShowForm((pre) => !pre)
         setUpdate(false)
         handleSelect(options[0])
-        console.log(courseRequest)
     }
     const handleSubmitForm = (e) => {
         e.preventDefault()
-        validate()
-        if (!validate) {
-            return
+        console.log('save')
+        if (!validate()) return
+
+        const courseRequest = {
+            courseId: course.courseId,
+            courseName: course.courseName,
+            coursePrice: course.coursePrice,
+            courseDuration: course.courseDuration,
+            courseDescription: course.courseDescription,
+            numberSession: parseInt(course.numberSession),
+            image: course.image,
+            subjectId: parseInt(selectedSubject.value),
+            adminId: user.username
         }
+
+        console.log(
+            '🚀 ~ file: Courses.js:431 ~ handleSubmitForm ~ user.username:',
+            user.username
+        )
+        const formData = new FormData()
+        console.log(
+            '🚀 ~ file: Courses.js:472 ~ addCourse ~ courseRequest:',
+            courseRequest
+        )
+        formData.append('courseRequest', JSON.stringify(courseRequest))
+        formData.append('file', image)
+        handleResetForm()
+
         if (update) {
-            updateCourse()
+            updateCourse(formData)
             console.log('updated')
         } else {
-            console.log(courseRequest)
-            addCourse()
+            addCourse(formData)
             console.log('add')
         }
     }
@@ -445,66 +468,71 @@ const Courses = () => {
             console.log('failed to fetch data', error)
         }
     }
-    const addCourse = async () => {
-        const formData = new FormData()
-        formData.append('courseRequest', JSON.stringify(courseRequest))
-        formData.append('file', image)
-        if (!validate()) {
-            return
-        }
+    const addCourse = async (formData) => {
         try {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             const resp = await courseApi.addCourse(formData)
-            getAllCourse()
+
+            console.log('🚀 ~ file: Courses.js:468 ~ addCourse ~ resp:', resp)
+            if (resp.status === 200) {
+                toast(id, Notify.options.createSuccess())
+                setCourses([resp.data, ...courses])
+            }
+            // getAllCourse()
         } catch (error) {
+            toast(Notify.options.createError())
             console.log('failed to fetch data', error)
         }
     }
 
-    const updateCourse = async () => {
-        const formData = new FormData()
-        formData.append('courseRequest', courseRequest)
-        console.log(
-            '🚀 ~ file: Courses.js:462 ~ updateCourse ~ courseRequest:',
-            courseRequest
-        )
-        formData.append('file', image)
-
-        // try {
-        //     const resp = await courseApi.updateCourse(formData)
-        //     handleResetForm()
-        //     getAllCourse()
-        //     console.log('get all')
-        // } catch (error) {
-        //     console.log('failed to fetch data', error)
-        // }
+    const updateCourse = async (formData) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        try {
+            const resp = await courseApi.updateCourse(formData)
+            console.log(
+                '🚀 ~ file: Courses.js:489 ~ updateCourse ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.updateSuccess())
+                setCourses(
+                    courses.map((item) => {
+                        if (item.courseId === course.courseId) {
+                            return resp.data
+                        }
+                        return item
+                    })
+                )
+            }
+        } catch (error) {
+            toast.update(Notify.options.updateError())
+            console.log('failed to fetch data', error)
+        }
     }
 
     //chọn 1 môn học trong select box
     function handleSelect(data) {
         setSelectedSubject(data)
-        if (selectedSubject != undefined) {
-            setCourseRequest((pre) => ({
-                ...pre,
-                subjectId: parseInt(selectedSubject.value)
-            }))
-        }
+        // if (selectedSubject != undefined) {
+        //     setCourseRequest((pre) => ({
+        //         ...pre,
+        //         subjectId: parseInt(selectedSubject.value)
+        //     }))
+        // }
         // console.log(courseRequest);
     }
 
-    // useLayoutEffect(() => {
-    //     setCourse({
-    //         ...course,
-    //         courseDuration: 2 * course.numberSession
-    //     })
-    // }, [course.numberSession])
-
     useEffect(() => {
         setListHistoryById([...listHistoryById])
-        console.log(
-            '🚀 ~ file: Courses.js:330 ~ useEffect ~ listHistoryById:',
-            listHistoryById
-        )
     }, [loadingHistoryInfo])
+    useEffect(() => {
+        setCourse({
+            ...course,
+            courseDuration: course.numberSession * 2
+        })
+    }, [course])
+    useEffect(() => {}, [courses])
 
     useEffect(() => {
         if (courses.length > 0) return
@@ -521,34 +549,10 @@ const Courses = () => {
         setOptions(convertedOptions)
     }, [subjects, selectedSubject]) // nếu có thì thực hiện khi có sử thay đổi
 
-    useEffect(() => {
-        const {
-            courseId,
-            courseName,
-            coursePrice,
-            courseDuration,
-            courseDescription,
-            numberSession,
-            image,
-            hourPerSession
-        } = { ...course }
-        if (selectedSubject !== undefined) {
-            setCourseRequest({
-                courseId: courseId,
-                courseName: courseName,
-                coursePrice: coursePrice,
-                courseDuration: courseDuration,
-                courseDescription: courseDescription,
-                numberSession: parseInt(numberSession),
-                image: image,
-                subjectId: parseInt(selectedSubject.value),
-                adminId: user.username,
-                hourPerSession: parseInt(hourPerSession)
-            })
-        }
-    }, [course, selectedSubject])
     return (
         <>
+            <ToastContainer />
+
             <CoursesHeader />
 
             <Container className="mt--7" fluid>
@@ -880,8 +884,7 @@ const Courses = () => {
                                                 name="numberSession"
                                                 placeholder="Số ca học"
                                                 onBlur={handelOnChangeInput}
-                                                // onChange={handelOnChangeInput}
-                                                onKeyDown={handelOnChangeInput}
+                                                onChange={handelOnChangeInput}
                                             />
                                             {msgError.coursePriceErr && (
                                                 <p className="text-danger mt-1">
@@ -905,7 +908,7 @@ const Courses = () => {
                                                 // readOnly
                                                 value={course.courseDuration}
                                                 name="courseDuration"
-                                                onChange={handelOnChangeInput}
+                                                onChange={() => {}}
                                             />
                                             {msgError.courseDurationErr && (
                                                 <p className="text-danger mt-1">

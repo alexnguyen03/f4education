@@ -9,6 +9,7 @@ import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 
 @Service
 public interface RegisterCourseService {

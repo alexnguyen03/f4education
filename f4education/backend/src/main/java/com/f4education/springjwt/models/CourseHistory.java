@@ -24,7 +24,7 @@ public class CourseHistory {
 	@Column(name = "course_price")
 	private Float coursePrice;
 	@Column(name = "course_duration")
-	private String courseDuration;
+	private Integer courseDuration;
 	@Column(name = "course_description")
 	private String courseDescription;
 	@Column(name = "number_session")

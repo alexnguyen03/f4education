@@ -10,6 +10,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.CourseHistory;
@@ -24,6 +25,7 @@ import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
 
@@ -40,6 +42,8 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Autowired
 	CourseHistoryRepository courseHistoryRepository;
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
 
 	@Autowired
 	RegisterCourseRepository registerCourseRepository;
@@ -165,11 +169,11 @@ public class CourseServiceImpl implements CoursesService {
 			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
 			courseResponses.add(courseResponse);
 		}
-		
-//		for (Course course : courses) {
-//			CourseResponse courseResponse = convertToResponseDTO(course, false, null);
-//			courseResponses.add(courseResponse);
-//		}
+
+		// for (Course course : courses) {
+		// CourseResponse courseResponse = convertToResponseDTO(course, false, null);
+		// courseResponses.add(courseResponse);
+		// }
 
 		return courseResponses;
 	}
@@ -191,12 +195,35 @@ public class CourseServiceImpl implements CoursesService {
 
 		Course course = this.convertRequestToEntity(courseRequest);
 		Integer idCourse = courseRequest.getCourseId();
+
+		course.setStatus(true);
+
 		if (idCourse != null) {
 			action = "UPDATE";
+			Course foundCourse = courseRepository.findById(idCourse).get();
+			if (!course.getCourseName().equalsIgnoreCase(foundCourse.getCourseName())) {
+				try {
+					googleDriveRepository.renameFolder(foundCourse.getCourseName(), course.getCourseName());
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		} else {
+			try {
+				String folderIdCreated = googleDriveRepository.getFolderId(course.getCourseName());
+
+				googleDriveRepository.createFolderWithoutUploadFile(folderIdCreated);
+
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 		Subject subject = subjectRepository.findById(courseRequest.getSubjectId()).get();
 		course.setAdmin(subject.getAdmin());
 		course.setSubject(subject);
+		course.setCourseDuration(courseRequest.getCourseDuration());
 		Course savedCourse = courseRepository.save(course);
 		this.saveCourseHistory(savedCourse, action);
 		return this.convertEntityToDTO(savedCourse);
@@ -261,9 +288,10 @@ public class CourseServiceImpl implements CoursesService {
 	private void saveCourseHistory(Course course, String action) {
 		CourseHistory courseHistory = new CourseHistory();
 		BeanUtils.copyProperties(course, courseHistory);
-		courseHistory.setCourse(course);
 		courseHistory.setModifyDate(new Date());
 		courseHistory.setAction(action);
+		courseHistory.setCourseDuration(course.getCourseDuration());
+		courseHistory.setCourse(course);
 		courseHistoryRepository.save(courseHistory);
 	}
 
@@ -318,4 +346,8 @@ public class CourseServiceImpl implements CoursesService {
 		return list;
 	}
 
+	@Override
+	public String renameFolder(String folderName, String newFolderName) throws Exception {
+		return googleDriveRepository.renameFolder(folderName, newFolderName);
+	}
 }

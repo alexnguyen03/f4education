@@ -1,6 +1,8 @@
 package com.f4education.springjwt.security.services;
 
 import java.util.ArrayList;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -16,21 +18,27 @@ import com.f4education.springjwt.interfaces.ClassService;
 import com.f4education.springjwt.interfaces.PointService;
 import com.f4education.springjwt.interfaces.RegisterCourseService;
 import com.f4education.springjwt.interfaces.TeacherService;
+import com.f4education.springjwt.models.ClassRoom;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Schedule;
+import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.request.ScheduleDTO;
+import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.ClassRoomRepository;
 import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.ScheduleRepository;
 import com.f4education.springjwt.repository.SessionsRepository;
@@ -45,7 +53,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	private CourseRepository courseRepository;
 	@Autowired
 	private StudentRepository studentRepository;
-
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
 	@Autowired
 	private ClassRepository classRepository;
 
@@ -321,4 +330,10 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 												// UnsupportedOperationException("Unimplemented method
 												// 'getRegisterCourseHasClass'");
 	}
+
+	// @Override
+	// public void grantPermissionsByEmails(String folderName, List<String> emails)
+	// throws Exception {
+	// googleDriveRepository.grantPermissionsByEmails(folderName, emails);
+	// }
 }

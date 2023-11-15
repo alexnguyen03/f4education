@@ -26,6 +26,7 @@ import {
     IconChevronDown,
     IconLayoutDashboard,
     IconLogout2,
+    IconProgressAlert,
     IconSchoolBell,
     IconSearch,
     IconUserBolt

@@ -71,7 +71,7 @@ public class EvaluateServiceImpl implements EvaluateService {
 	public EvaluateResponse updateEvaluateDTO(Integer evaluateId, EvaluateRequestDTO evaluateDTO) {
 		Optional<Evaluate> existingEvaluate = evaluateRepository.findById(evaluateId);
 
-		if (existingEvaluate.isPresent()) {	
+		if (existingEvaluate.isPresent()) {
 			Evaluate newEvaluate = existingEvaluate.get();
 			newEvaluate.setReviewDate(new Date());
 
