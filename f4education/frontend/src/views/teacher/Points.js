@@ -156,15 +156,15 @@ const Points = () => {
         try {
             toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
             console.log(listEditedPoint)
-            // const pointRequest = {
-            //     classId: params.classId,
-            //     listPointOfStudent: listEditedPoint
-            // }
-            // const resp = await pointApi.savePoint(pointRequest)
-            // console.log(
-            //     '🚀 ~ file: Points.js:165 ~ handleSavePoint ~ resp:',
-            //     resp
-            // )
+            const pointRequest = {
+                classId: params.classId,
+                listPointOfStudent: listEditedPoint
+            }
+            const resp = await pointApi.savePoint(pointRequest)
+            console.log(
+                '🚀 ~ file: Points.js:165 ~ handleSavePoint ~ resp:',
+                resp
+            )
         } catch (error) {
             console.log(
                 '🚀 ~ file: Points.js:155 ~ handleSavePoint ~ error:',

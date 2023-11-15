@@ -1,14 +1,14 @@
 package com.f4education.springjwt.interfaces;
 
-import com.f4education.springjwt.models.PaymentMethod;
-import com.f4education.springjwt.payload.request.PaymentMethodDTO;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.f4education.springjwt.payload.request.PaymentMethodDTO;
 
 @Service
 public interface PaymentMethodService {
-    List<PaymentMethodDTO> getAllPaymentMethod();
+	List<PaymentMethodDTO> getAllPaymentMethod();
 
     PaymentMethodDTO createPaymentMethod(PaymentMethodDTO paymentMethodDTO);
 

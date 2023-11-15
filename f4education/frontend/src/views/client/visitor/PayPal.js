@@ -24,18 +24,21 @@ export default function Paypal({ totalPrice, handlePaymentPayPalComplete }) {
                     })
                 },
                 onApprove: async (data, actions) => {
-                    const order = await actions.order.capture()
-                    handlePaymentPayPalComplete(order, null, null)
+                    const order = await actions.order.capture();
+                    handlePaymentPayPalComplete(order, null, null);
                 },
                 onError: (err) => {
-                    const isError = true
-                    handlePaymentPayPalComplete(null, null, isError)
-                    console.log(err)
+                    // Handle network errors or other errors here
+                    const isError = true;
+                    handlePaymentPayPalComplete(null, null, isError);
+    
+                    // Log the error for further investigation
+                    console.error('PayPal SDK Error:', err);
                 },
-                oncancel: (data) => {
-                    const isCancle = true
-                    handlePaymentPayPalComplete(null, isCancle, null)
-                    console.log(data)
+                onCancel: (data) => {
+                    const isCancel = true;
+                    handlePaymentPayPalComplete(null, isCancel, null);
+                    console.log(data);
                 }
             })
             .render(paypal.current)

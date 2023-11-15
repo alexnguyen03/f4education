@@ -12,11 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.payload.request.ClassDTO;
 import com.f4education.springjwt.payload.response.ClassesByTeacherResponse;
+import com.f4education.springjwt.payload.response.LearningResultResponse;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -47,8 +50,7 @@ public class ClassController {
 	}
 
 	@PutMapping("/{id}")
-	public ClassDTO updateSubject(@PathVariable("id") Integer classId,
-			@RequestBody ClassDTO classDTO) {
+	public ClassDTO updateSubject(@PathVariable("id") Integer classId, @RequestBody ClassDTO classDTO) {
 		return classService.updateClass(classId, classDTO);
 	}
 
@@ -60,6 +62,12 @@ public class ClassController {
 	@GetMapping("/student/{studentId}")
 	public ResponseEntity<?> getClassByStudentId(@PathVariable("studentId") String studentId) {
 		return ResponseEntity.ok(classService.getClassByStudentId(studentId));
+	}
+
+	@GetMapping("/student/result/{studentId}")
+	public ResponseEntity<?> getLearningResult(@PathVariable("studentId") String studentId) {
+		List<LearningResultResponse> classes = classService.getAllClassLearningResult(studentId);
+		return ResponseEntity.ok(classes); 
 	}
 
 }

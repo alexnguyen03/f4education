@@ -63,9 +63,7 @@ public class Classes implements Serializable {
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<Point> points;
-    @OneToMany(mappedBy = "classes")
-    @JsonIgnore
-    List<Examination> examinations;
+
     @ManyToOne
     @JoinColumn(name = "admin_id")
     @JsonIgnore
@@ -74,4 +72,10 @@ public class Classes implements Serializable {
     @JoinColumn(name = "teacher_id")
     @JsonIgnore
     Teacher teacher;
+
+    @Override
+    public String toString() {
+        return "Classes [classId=" + classId + ", className=" + className + ", startDate=" + startDate + ", endDate="
+                + endDate + ", maximumQuantity=" + maximumQuantity + ", status=" + status + "]";
+    }
 }

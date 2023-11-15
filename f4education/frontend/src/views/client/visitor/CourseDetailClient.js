@@ -40,7 +40,6 @@ import {
 import { useEffect } from 'react'
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import moment from 'moment/moment'
 
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../../utils/Notify'
@@ -396,6 +395,33 @@ function CourseDetailClient() {
             setIsActive(true)
         } else {
             setIsActive(false)
+        }
+    }
+
+    const formatTimeAgo = (reviewDate) => {
+        const currentDate = new Date();
+        const targetDate = new Date(reviewDate);
+        
+        const timeDifference = currentDate - targetDate;
+        const seconds = Math.floor(timeDifference / 1000);
+        const minutes = Math.floor(seconds / 60);
+        const hours = Math.floor(minutes / 60);
+        const days = Math.floor(hours / 24);
+        const months = Math.floor(days / 30);
+        const years = Math.floor(months / 12);
+    
+        if (years > 0) {
+            return years === 1 ? '1 năm trước' : `${years} năm trước`;
+        } else if (months > 0) {
+            return months === 1 ? '1 tháng trước' : `${months} tháng trước`;
+        } else if (days > 0) {
+            return days === 1 ? '1 ngày trước' : `${days} ngày trước`;
+        } else if (hours > 0) {
+            return hours === 1 ? '1 giờ trước' : `${hours} giờ trước`;
+        } else if (minutes > 0) {
+            return minutes === 1 ? '1 phút trước' : `${minutes} phút trước`;
+        } else {
+            return 'vừa mới';
         }
     }
 
@@ -1602,11 +1628,13 @@ function CourseDetailClient() {
                                                                                 }
                                                                                 c="dimmed"
                                                                             >
-                                                                                {moment(
+                                                                                {/* {moment(
                                                                                     evaluate.reviewDate
                                                                                 ).format(
                                                                                     'DD-MM-yyyy h:m:s A'
-                                                                                )}
+                                                                                )} */}
+                                                                                Đã đánh giá{' '}
+                                                                                {formatTimeAgo(evaluate.reviewDate)}
                                                                             </Text>
                                                                             <Group
                                                                                 m={

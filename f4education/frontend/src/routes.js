@@ -18,7 +18,6 @@ import ClassDetail from './views/admin/ClassDetail'
 import Login from 'views/examples/Login'
 import CourseDetailClient from './views/client/visitor/CourseDetailClient'
 import CourseRegisterClient from './views/client/visitor/CourseRegisterClient'
-// import CourseRegisterDetailClient from './views/client/visitor/CourseRegisterDetailClient'/
 import InformationTeacher from './views/teacher/information'
 import StudentInformation from './views/client/visitor/StudentInformation'
 import QuizzClient from './views/client/visitor/QuizzClient'
@@ -35,6 +34,7 @@ import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
 import CertificatePDF from 'views/PDF/CertificatePDF'
 import Points from './views/teacher/Points'
+import LearningResult from 'views/client/student/LearningResult'
 
 export var routes = [
     {
@@ -281,6 +281,13 @@ export const routesStudent = [
         name: 'Thông tin bài kiểm tra',
         icon: 'ni ni-planet text-blue',
         component: <DownloadRecource />,
+        layout: '/student'
+    },
+    {
+        path: '/result',
+        name: 'Kết quả học tập',
+        icon: 'ni ni-planet text-primary',
+        component: <LearningResult />,
         layout: '/student'
     }
 ]

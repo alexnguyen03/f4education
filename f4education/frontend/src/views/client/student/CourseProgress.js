@@ -306,10 +306,13 @@ const CourseProgress = () => {
     const handleCheckIfCertificateIsCreated = async (progress) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
         console.log(progress.registerCourseId)
+        console.log(selectedCourse)
         try {
             const resp =
                 await certificateApi.getAllCertificateByRegisterCourseAndStudentId(
-                    progress.registerCourseId,
+                    progress.registerCourseId === undefined
+                        ? selectedCourse.registerCourseId
+                        : progress.registerCourseId,
                     user.username
                 )
 
@@ -327,7 +330,6 @@ const CourseProgress = () => {
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
-                        registerCourseId: selectedCourse.registerCourseId,
                         studentId: user.username ? user.username : '',
                         certificateId: existCertificate.certificateId
                     })}`
@@ -845,7 +847,11 @@ const CourseProgress = () => {
                                 variant="filled"
                                 color="indigo"
                                 mt="xl"
-                                onClick={handleCheckIfCertificateIsCreated}
+                                onClick={() =>
+                                    handleCheckIfCertificateIsCreated(
+                                        selectedCourse.registerCourseId
+                                    )
+                                }
                             >
                                 Lấy chứng chỉ
                             </Button>
@@ -903,8 +909,191 @@ const CourseProgress = () => {
                                         {courseProgresses.map(
                                             (progress, index) => (
                                                 <>
-                                                    {selectedCourse !==
-                                                    progress ? (
+                                                    {courseProgresses.length >
+                                                    1 ? (
+                                                        <>
+                                                            {selectedCourse !==
+                                                            progress ? (
+                                                                <>
+                                                                    <Grid.Col
+                                                                        xl={3}
+                                                                        lg={3}
+                                                                        md={4}
+                                                                        sm={6}
+                                                                        // component='a'
+                                                                        // href={`?classId=${progress.classId}`}
+                                                                        onClick={() =>
+                                                                            handleShowCourseProgress(
+                                                                                progress,
+                                                                                index
+                                                                            )
+                                                                        }
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                    >
+                                                                        {loading ? (
+                                                                            <>
+                                                                                <Skeleton
+                                                                                    width="100%"
+                                                                                    height={rem(
+                                                                                        '20rem'
+                                                                                    )}
+                                                                                />
+                                                                                <Skeleton
+                                                                                    width="30%"
+                                                                                    height={
+                                                                                        15
+                                                                                    }
+                                                                                    mt={
+                                                                                        8
+                                                                                    }
+                                                                                />
+                                                                                <Skeleton
+                                                                                    width="100%"
+                                                                                    height={
+                                                                                        20
+                                                                                    }
+                                                                                    mt={
+                                                                                        8
+                                                                                    }
+                                                                                />
+                                                                                <Skeleton
+                                                                                    width="60%"
+                                                                                    height={
+                                                                                        15
+                                                                                    }
+                                                                                    mt={
+                                                                                        8
+                                                                                    }
+                                                                                />
+                                                                            </>
+                                                                        ) : (
+                                                                            <Card
+                                                                                shadow="sm"
+                                                                                padding="lg"
+                                                                                radius="md"
+                                                                                withBorder
+                                                                                className={
+                                                                                    styles.card
+                                                                                }
+                                                                            >
+                                                                                <Card.Section>
+                                                                                    <Image
+                                                                                        // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
+                                                                                        src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
+                                                                                        height={
+                                                                                            160
+                                                                                        }
+                                                                                        alt="Norway"
+                                                                                        withPlaceholder
+                                                                                    />
+                                                                                </Card.Section>
+
+                                                                                <Group position="apart">
+                                                                                    <Text
+                                                                                        c="dimmed"
+                                                                                        fz="md"
+                                                                                        mt="md"
+                                                                                    >
+                                                                                        HƯỚNG
+                                                                                        DẪN
+                                                                                    </Text>
+                                                                                    <Badge
+                                                                                        color="violet"
+                                                                                        size="lg"
+                                                                                        radius={
+                                                                                            5
+                                                                                        }
+                                                                                        mt="sm"
+                                                                                    >
+                                                                                        Lớp:{' '}
+                                                                                        {
+                                                                                            progress
+                                                                                                .classes
+                                                                                                .className
+                                                                                        }
+                                                                                    </Badge>
+                                                                                </Group>
+                                                                                <Text
+                                                                                    fz="lg"
+                                                                                    color="dark"
+                                                                                    fw={
+                                                                                        500
+                                                                                    }
+                                                                                    lineClamp={
+                                                                                        2
+                                                                                    }
+                                                                                    mt="md"
+                                                                                >
+                                                                                    {
+                                                                                        progress
+                                                                                            .course
+                                                                                            .courseName
+                                                                                    }
+                                                                                </Text>
+                                                                                <Text
+                                                                                    size="sm"
+                                                                                    color="dimmed"
+                                                                                >
+                                                                                    <strong>
+                                                                                        {
+                                                                                            progress.lessonsAttended
+                                                                                        }
+                                                                                    </strong>{' '}
+                                                                                    trên{' '}
+                                                                                    <strong>
+                                                                                        {progress
+                                                                                            .course
+                                                                                            .courseDuration /
+                                                                                            2}
+                                                                                    </strong>{' '}
+                                                                                    bài
+                                                                                    đã
+                                                                                    học.
+                                                                                </Text>
+
+                                                                                <Stack
+                                                                                    mt={
+                                                                                        8
+                                                                                    }
+                                                                                >
+                                                                                    <Text
+                                                                                        fw={
+                                                                                            'bolder'
+                                                                                        }
+                                                                                        color="dark"
+                                                                                        fz="xl"
+                                                                                        align="right"
+                                                                                        m={
+                                                                                            0
+                                                                                        }
+                                                                                        p={
+                                                                                            0
+                                                                                        }
+                                                                                    >
+                                                                                        {
+                                                                                            progress.totalProgress
+                                                                                        }
+
+                                                                                        %
+                                                                                    </Text>
+                                                                                    <Progress
+                                                                                        value={
+                                                                                            progress.totalProgress
+                                                                                        }
+                                                                                        size="xl"
+                                                                                        radius="xl"
+                                                                                        striped
+                                                                                    />
+                                                                                </Stack>
+                                                                            </Card>
+                                                                        )}
+                                                                    </Grid.Col>
+                                                                </>
+                                                            ) : null}
+                                                        </>
+                                                    ) : (
                                                         <>
                                                             <Grid.Col
                                                                 xl={3}
@@ -1080,7 +1269,7 @@ const CourseProgress = () => {
                                                                 )}
                                                             </Grid.Col>
                                                         </>
-                                                    ) : null}
+                                                    )}
                                                 </>
                                             )
                                         )}

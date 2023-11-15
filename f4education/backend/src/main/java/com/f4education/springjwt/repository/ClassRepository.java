@@ -22,4 +22,7 @@ public interface ClassRepository extends JpaRepository<Classes, Integer> {
 	@Query("SELECT c FROM Classes c WHERE c.teacher.teacherId <> 'NULL' and	c.classId = :classId")
 	Classes findAllActiveClassesByClassId(@Param("classId") Integer classId);
 
+	@Query("SELECT cl FROM Classes cl JOIN cl.registerCourses rg WHERE rg.student.studentId = :studentId")
+	List<Classes> findClassByStudentId(@Param("studentId") String studentId);
+
 }

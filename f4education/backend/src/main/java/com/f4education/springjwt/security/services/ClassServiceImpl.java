@@ -5,6 +5,7 @@ import com.f4education.springjwt.models.*;
 import com.f4education.springjwt.payload.request.AdminDTO;
 import com.f4education.springjwt.payload.request.ClassDTO;
 import com.f4education.springjwt.payload.response.ClassesByTeacherResponse;
+import com.f4education.springjwt.payload.response.LearningResultResponse;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.ClassHistoryRepository;
 import com.f4education.springjwt.repository.ClassRepository;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -146,16 +148,14 @@ public class ClassServiceImpl implements ClassService {
 	@Override
 	public List<ClassDTO> findAllActiveClasses() {
 		List<Classes> list = classRepository.findAll();
-		List<Classes> filteredList = list.stream()
-				.filter(obj -> {
-					if (obj instanceof Classes) {
-						Classes item = obj;
-						return item.getTeacher() != null;
-					}
+		List<Classes> filteredList = list.stream().filter(obj -> {
+			if (obj instanceof Classes) {
+				Classes item = obj;
+				return item.getTeacher() != null;
+			}
 
-					return false;
-				})
-				.collect(Collectors.toList());
+			return false;
+		}).collect(Collectors.toList());
 		return filteredList.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 
@@ -164,10 +164,8 @@ public class ClassServiceImpl implements ClassService {
 		List<RegisterCourse> registerCourses = registerCourseRepository
 				.findRegisterCoursesByStudent_StudentId(studentId);
 
-		List<Classes> classesList = registerCourses.stream()
-				.map(RegisterCourse::getClasses)
+		List<Classes> classesList = registerCourses.stream().map(RegisterCourse::getClasses)
 				.collect(Collectors.toList());
-
 		return classesList;
 	}
 
@@ -179,5 +177,36 @@ public class ClassServiceImpl implements ClassService {
 	@Override
 	public Classes saveOneClass(Classes classes) {
 		return classRepository.save(classes);
+	}
+
+	@Override
+	public List<LearningResultResponse> getAllClassLearningResult(String studentId) {
+		List<Classes> classes = classRepository.findClassByStudentId(studentId);
+		return classes.stream().map(this::convertToResponseResultOutCome).collect(Collectors.toList());
+	}
+
+	private LearningResultResponse convertToResponseResultOutCome(Classes classes) {
+		LearningResultResponse classResponse = new LearningResultResponse();
+
+		BeanUtils.copyProperties(classes, classResponse);
+
+		// Get list Student
+		List<RegisterCourse> registerCourses = classes.getRegisterCourses();
+
+		classResponse.setClassName(classes.getClassName());
+		classResponse.setMaximumQuantity(classes.getMaximumQuantity());
+		classResponse.setStatus(classes.getStatus());
+		classResponse.setStartDate(classes.getStartDate());
+		classResponse.setEndDate(classes.getEndDate());
+		classResponse.setTeacherName(classes.getTeacher().getFullname());
+		classResponse.setTeacherImage(classes.getTeacher().getImage());
+
+		for (RegisterCourse rg : registerCourses) {
+			if (rg.getClasses().getClassId().equals(classes.getClassId())) {
+				classResponse.setCourseDuration(rg.getCourseDuration());
+			}
+		}
+
+		return classResponse;
 	}
 }
