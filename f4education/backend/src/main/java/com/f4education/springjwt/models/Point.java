@@ -1,7 +1,5 @@
 package com.f4education.springjwt.models;
 
-import java.util.List;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -9,7 +7,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,8 +26,14 @@ public class Point {
 	@Column(name = "average_point")
 	private Float averagePoint;
 
-	@OneToMany(mappedBy = "point1")
-	List<DetailPoint> detailPoints;
+	@Column(name = "attendance_point")
+	private Float attendancePoint;
+
+	@Column(name = "exercise_point")
+	private Float exercisePoint;
+
+	@Column(name = "quizz_point")
+	private Float quizzPoint;
 
 	@ManyToOne
 	@JoinColumn(name = "student_id")
