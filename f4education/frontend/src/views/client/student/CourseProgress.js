@@ -259,7 +259,7 @@ const CourseProgress = () => {
         document.scrollingElement.scrollTop = 0
     }
 
-    const handleShowQuestion = (classId) => {
+    const handleShowTask = (classId) => {
         navigate({
             pathname: '/student/task',
             search: `?${createSearchParams({

@@ -2,15 +2,28 @@ package com.f4education.springjwt.repository;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -199,18 +212,18 @@ public class GoogleDriveRepository {
 	}
 
 	// Upload file student
-	public String uploadFileStudent(MultipartFile file, String className, String taskName, String studentName) throws Exception {
+	public String uploadFileStudent(MultipartFile file, String className, String taskName, String studentName)
+			throws Exception {
 		String folder = getFolderId("Tasks");
 		try {
 			if (null != file) {
 				// Tìm thư mục className
-				String classNameFolderId = findOrCreateFolder(folder, className,
-						driveQuickstart.getInstance());
-				
+				String classNameFolderId = findOrCreateFolder(folder, className, driveQuickstart.getInstance());
+
 				// Tìm thư mục taskName
 				String taskNameFolderId = findOrCreateFolder(classNameFolderId, taskName,
 						driveQuickstart.getInstance());
-				
+
 				// Tạo thư mục cho sinh viên
 				String studentNamebFolderId = findOrCreateFolder(taskNameFolderId, studentName,
 						driveQuickstart.getInstance());
@@ -233,8 +246,8 @@ public class GoogleDriveRepository {
 
 				System.out.println(uploadFile.getId());
 				// Đặt quyền truy cập cho tệp
-				driveQuickstart.getInstance().permissions()
-						.create(uploadFile.getId(), setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
+				driveQuickstart.getInstance().permissions().create(uploadFile.getId(),
+						setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
 
 				return uploadFile.getId();
 			}
@@ -243,25 +256,27 @@ public class GoogleDriveRepository {
 		}
 		return null;
 	}
-	
-	public List<File> getAllFilesInFolderTaskStudent(String className, String taskName, String studentName) throws Exception {
+
+	public List<File> getAllFilesInFolderTaskStudent(String className, String taskName, String studentName)
+			throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 
 		// Lấy id thư mục "Tasks"
 		String taskId = getFolderId("Tasks");
-		
+
 		// Lấy id thư mục "className"
 		String subFolderClassNameId = searchFolderId(taskId, className, driveQuickstart.getInstance());
-		
+
 		// Lấy id thư mục "taskName"
 		String subFolderTaskNameId = searchFolderId(subFolderClassNameId, taskName, driveQuickstart.getInstance());
-		
+
 		// Lấy id thư mục "studentName"
 		String subFolderStudentNameId = searchFolderId(subFolderTaskNameId, studentName, driveQuickstart.getInstance());
-		
+
 		List<File> allFiles = new ArrayList<>();
-		FileList result = driveQuickstart.getInstance().files().list().setQ("'" + subFolderStudentNameId + "' in parents")
-				.setSpaces("drive").setFields("files(id, name, size)").execute();
+		FileList result = driveQuickstart.getInstance().files().list()
+				.setQ("'" + subFolderStudentNameId + "' in parents").setSpaces("drive")
+				.setFields("files(id, name, size)").execute();
 
 		List<File> files = result.getFiles();
 		if (files != null && !files.isEmpty()) {
@@ -306,5 +321,128 @@ public class GoogleDriveRepository {
 			e.printStackTrace();
 		}
 		return zipOutputStream.toByteArray();
+	}
+
+	public ResponseEntity<FileSystemResource> downloadTaskFolder(String className, String taskName) throws Exception {
+		String tasksId = getFolderId("Tasks");
+		String classNameFolderId = findOrCreateFolder(tasksId, className, driveQuickstart.getInstance());
+		String taskNameFolderId = findOrCreateFolder(classNameFolderId, taskName, driveQuickstart.getInstance());
+
+		String targetFolderPath = "\\tmp\\" + taskName;
+
+		// Download toàn bộ nội dung trong Task_MayTinh và lưu vào thư mục đích trên máy
+		// tính
+		downloadFolder(taskNameFolderId, targetFolderPath);
+
+//		// Nén thư mục đích thành một tệp tin ZIP
+		String zipFilePath = "/tmp/" + taskName + ".zip";
+		zipFolder(targetFolderPath, zipFilePath);
+
+		// Trả về tệp tin ZIP như là một phản hồi
+		java.io.File zipFile = new java.io.File(zipFilePath);
+		FileSystemResource resource = new FileSystemResource(zipFile);
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + zipFile.getName() + "\"");
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentLength(zipFile.length());
+
+		return ResponseEntity.ok().headers(headers).body(resource);
+	}
+
+	public void deleteFoldelTmp() throws InterruptedException {
+		String directoryPath = "/tmp"; // Đường dẫn của thư mục cần xóa
+
+		try {
+			Thread.sleep(5000);
+
+			Path path = Paths.get(directoryPath);
+			if (Files.exists(path)) {
+				Files.walk(path).sorted((a, b) -> b.toString().length() - a.toString().length()).forEach(p -> {
+					try {
+						Files.delete(p);
+					} catch (IOException e) {
+						System.err.println("Failed to delete file: " + p);
+					}
+				});
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void zipFolder(String sourceFolderPath, String zipFilePath) throws IOException {
+		try (ZipOutputStream zipOutputStream = new ZipOutputStream(new FileOutputStream(zipFilePath))) {
+			java.io.File sourceFolder = new java.io.File(sourceFolderPath);
+			zipFile(sourceFolder, sourceFolder.getName(), zipOutputStream);
+		}
+	}
+
+	private void zipFile(java.io.File fileToZip, String fileName, ZipOutputStream zipOutputStream) throws IOException {
+		if (fileToZip.isDirectory()) {
+			java.io.File[] files = fileToZip.listFiles();
+			if (files != null) {
+				for (java.io.File file : files) {
+					zipFile(file, fileName + "/" + file.getName(), zipOutputStream);
+				}
+			}
+		} else {
+			byte[] buffer = new byte[1024];
+			try (FileInputStream fileInputStream = new FileInputStream(fileToZip)) {
+				zipOutputStream.putNextEntry(new ZipEntry(fileName));
+				int length;
+				while ((length = fileInputStream.read(buffer)) > 0) {
+					zipOutputStream.write(buffer, 0, length);
+				}
+			}
+		}
+	}
+
+	private void downloadFolder(String folderId, String targetFolderPath) throws IOException, GeneralSecurityException {
+		// Lấy danh sách tệp tin và thư mục con trong thư mục hiện tại
+		List<File> filesAndFolders = getFilesAndFoldersInFolder(folderId);
+
+		// Download từng tệp tin và thư mục con
+		for (File item : filesAndFolders) {
+			if (item.getMimeType().equals("application/vnd.google-apps.folder")) {
+				// Nếu là thư mục, tạo đường dẫn tới thư mục con tương ứng trong thư mục đích
+				// trên máy tính
+				String subFolderPath = targetFolderPath + "/" + item.getName();
+
+				// Đảm bảo thư mục đích tồn tại trên máy tính
+				java.io.File subFolder = new java.io.File(subFolderPath);
+				if (!subFolder.exists()) {
+					subFolder.mkdirs();
+				}
+
+				// Đệ quy download thư mục con
+				downloadFolder(item.getId(), subFolderPath);
+			} else {
+				// Nếu là tệp tin, download tệp tin và lưu vào thư mục đích trên máy tính
+				downloadFile(item.getId(), item.getName(), targetFolderPath);
+			}
+		}
+	}
+
+	private List<File> getFilesAndFoldersInFolder(String folderId) throws IOException, GeneralSecurityException {
+		DriveQuickstart driveService = new DriveQuickstart();
+		String query = "'" + folderId + "' in parents";
+		FileList fileList = driveService.getInstance().files().list().setQ(query).execute();
+		return fileList.getFiles();
+	}
+
+	private void downloadFile(String fileId, String fileName, String targetFolderPath)
+			throws IOException, GeneralSecurityException {
+		DriveQuickstart driveService = new DriveQuickstart();
+		// Xác định đường dẫn tới tệp tin trên máy tính
+		String filePath = targetFolderPath + "/" + fileName;
+
+		// Tạo luồng ghi tệp tin đích
+		OutputStream outputStream = new FileOutputStream(filePath);
+
+		// Download tệp tin
+		driveService.getInstance().files().get(fileId).executeMediaAndDownloadTo(outputStream);
+
+		outputStream.close();
 	}
 }

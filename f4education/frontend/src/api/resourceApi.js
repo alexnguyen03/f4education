@@ -29,7 +29,17 @@ const resourceApi = {
         return axiosClient.get(url, {
             responseType: 'arraybuffer'
         })
-    }
+    },
+    downloadFilesStudent: (className, taskName) => {
+        const url = `/resource/download-multiple-student/${className}/${taskName}`
+        return axiosClient.get(url, {
+            responseType: 'arraybuffer'
+        })
+    },
+    deleteFoldelTmp: () => {
+        const url = '/resource/delete-foldel-tmp'
+        return axiosClient.get(url)
+    },
 }
 
 export default resourceApi

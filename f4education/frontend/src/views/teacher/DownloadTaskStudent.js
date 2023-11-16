@@ -20,18 +20,9 @@ import { DatePicker } from '@mantine/dates'
 import { useEffect, useState, useMemo } from 'react'
 import { useSearchParams, useNavigate } from 'react-router-dom'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
-import { MaterialReactTable } from 'material-react-table'
-import { Delete as DeleteIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
-import { Dropzone } from '@mantine/dropzone'
-import {
-    IconBookUpload,
-    IconUpload,
-    IconPhoto,
-    IconX,
-    IconEye
-} from '@tabler/icons-react'
-import { Modal } from 'reactstrap'
+import moment from 'moment'
+import { IconBookUpload } from '@tabler/icons-react'
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
@@ -39,6 +30,7 @@ import taskApi from 'api/taskApi'
 import resourceApi from 'api/resourceApi'
 
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
+import { Try } from '@mui/icons-material'
 
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -46,18 +38,10 @@ const DownloadTaskStudent = () => {
     let navigate = useNavigate()
 
     const [selectedDate, setSelectedDate] = useState(null)
-    const [openedIndexes, setOpenedIndexes] = useState([])
-    const [showModal, setShowModal] = useState(false)
-    const [showModalConfirm, setShowModalConfirm] = useState(false)
     const [showNotification, setShowNotification] = useState(false)
     const [showNotificationSearch, setShowNotificationSearch] = useState(false)
     const [loading, setLoading] = useState(true)
-    const [loadingFileStudent, setLoadingFileStudent] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
-    const [selectedFile, setSelectedFile] = useState([null])
-    const theme = useMantineTheme()
-    const [allFilesInFolderTaskStudent, setAllFilesInFolderTaskStudent] =
-        useState([])
 
     const redirectTo = () => {
         return navigate('/teacher/classes-infor/' + searchParams.get('classId'))
@@ -101,7 +85,8 @@ const DownloadTaskStudent = () => {
         try {
             setLoading(true)
             const resp = await taskApi.getAllTaskByClassId(
-                searchParams.get('classId')
+                6
+                // searchParams.get('classId')
             )
             if (resp.status === 200 && resp.data.length > 0) {
                 setTasks(resp.data)
@@ -116,91 +101,56 @@ const DownloadTaskStudent = () => {
         }
     }
 
-    const getAllFilesInFolderTaskStudent = async (
-        className,
-        taskName,
-        studentName
-    ) => {
+    const handleOnClickDownloadFiles = async (className, taskName) => {
         try {
-            setLoadingFileStudent(true)
-            const resp = await taskApi.getAllFilesInFolderTaskStudent(
+            const resp = await resourceApi.downloadFilesStudent(
                 className,
-                taskName,
-                studentName
+                taskName
             )
+            alert(resp.status)
             if (resp.status === 200) {
-                setAllFilesInFolderTaskStudent(resp.data)
-                setLoadingFileStudent(false)
-            }
-            if (resp.data.length === undefined) {
-                setLoadingFileStudent(false)
+                const blob = new Blob([resp.data], { type: 'application/zip' })
+                const url = window.URL.createObjectURL(blob)
+                // Tạo một thẻ <a> ẩn và kích hoạt tải về
+                const a = document.createElement('a')
+                a.href = url
+                a.download = taskName + '.zip'
+                a.style.display = 'none'
+                document.body.appendChild(a)
+                a.click()
+
+                // Xóa thẻ <a> và URL tạo ra sau khi tải xong
+                document.body.removeChild(a)
+                window.URL.revokeObjectURL(url)
+                deleteFoldelTmp()
             }
         } catch (error) {
-            console.log(error)
+            console.error('Failed to download files:', error)
         }
     }
 
-    const submitTask = async (className, taskName) => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
-        const formData = new FormData()
-        formData.append('className', className)
-        formData.append('taskName', taskName)
-        formData.append('studentName', user.id + ' - ' + user.fullName)
-        for (var i = 0; i < selectedFile.length; i++) {
-            formData.append('file', selectedFile[i])
-        }
-        console.log([...formData])
+    const deleteFoldelTmp = async () => {
         try {
-            const resp = await taskApi.submitTaskFile(formData)
-            if (resp.status === 200) {
-                setShowModal(false)
-                getAllFilesInFolderTaskStudent(
-                    className,
-                    taskName,
-                    user.id + ' - ' + user.fullName
-                )
-                toast.update(id, Notify.options.uploadFileSuccess())
-            }
+            const resp = await resourceApi.deleteFoldelTmp()
         } catch (error) {
-            console.log('Nộp bài thất bại', error)
+            console.error('Failed to delete files:', error)
         }
     }
-
-    // delete file
-    const handleDeleteRow = async (row, className, taskName, studentName) => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-        try {
-            setLoadingFileStudent(true)
-            let fileId = row.original.id
-            const resp = await resourceApi.deleteFileById(fileId)
-            getAllFilesInFolderTaskStudent(className, taskName, studentName)
-            setShowModalConfirm(false)
-            setLoadingFileStudent(false)
-            toast.update(id, Notify.options.deleteFileSuccess())
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
-    const moment = require('moment')
 
     const isCurrentDateInRange = (startDateTime, endDateTime) => {
-        const currentDateTime = moment().format('DD-MM-yyyy h:mm:ss')
+        const currentDateTime = moment(new Date()).format('DD-MM-yyyy h:mm:ss')
+        const startDate = moment(new Date(startDateTime)).format(
+            'DD-MM-yyyy h:mm:ss'
+        )
+        const endDate = moment(new Date(endDateTime)).format(
+            'DD-MM-yyyy h:mm:ss'
+        )
         return moment(currentDateTime, 'DD-MM-yyyy h:mm:ss').isBetween(
-            moment(startDateTime, 'DD-MM-yyyy h:mm:ss'),
-            moment(endDateTime, 'DD-MM-yyyy h:mm:ss'),
+            moment(startDate, 'DD-MM-yyyy h:mm:ss'),
+            moment(endDate, 'DD-MM-yyyy h:mm:ss'),
             null,
             '[]'
         )
-    }
-
-    const toggle = (index) => {
-        if (openedIndexes.includes(index)) {
-            setOpenedIndexes(openedIndexes.filter((i) => i !== index))
-        } else {
-            setOpenedIndexes([index])
-        }
     }
 
     const [filteredTasks, setFilteredTasks] = useState(tasks)
@@ -240,11 +190,11 @@ const DownloadTaskStudent = () => {
                         <i className="fa-solid fa-arrow-left"></i>
                     </div>
                     <Title order={3} color="dark">
-                        Chi tiết lớp học:
+                        Chi tiết lớp học: {tasks[0].className}
                     </Title>
                 </Group>
             </Box>
-            <Grid>
+            <Grid mt={50}>
                 <Grid.Col span={3} mx={40}>
                     <Center>
                         <DatePicker
@@ -346,19 +296,23 @@ const DownloadTaskStudent = () => {
                                         <Text my={5}>
                                             Thời gian:{' '}
                                             {moment(task.startDate).format(
-                                                'DD/MM/yyyy, h:mm:ss A'
+                                                'DD/MM/yyyy, hh:mm A'
                                             )}{' '}
                                             -{' '}
                                             {moment(task.endDate).format(
-                                                'DD/MM/yyyy, h:mm:ss A'
+                                                'DD/MM/yyyy, hh:mm A'
                                             )}
-                                        </Text>
-                                        <Text my={5}>
-                                            Giáo viên: {task.teacherName}
                                         </Text>
                                         <Badge
                                             variant="outline"
-                                            color="teal"
+                                            color={
+                                                isCurrentDateInRange(
+                                                    task.startDate,
+                                                    task.endDate
+                                                )
+                                                    ? 'teal'
+                                                    : 'red'
+                                            }
                                             size="lg"
                                             mt={10}
                                         >
@@ -372,310 +326,19 @@ const DownloadTaskStudent = () => {
                                         <Text ta={'right'}>
                                             <Button
                                                 variant="filled"
-                                                onClick={() => {
-                                                    toggle(indexTask)
-                                                    getAllFilesInFolderTaskStudent(
-                                                        task.className,
-                                                        task.title,
-                                                        user.id +
-                                                            ' - ' +
-                                                            user.fullName
-                                                    )
-                                                }}
-                                                mr={5}
-                                                mb={10}
-                                            >
-                                                <IconEye /> Xem file
-                                            </Button>
-                                            <Button
-                                                disabled={isCurrentDateInRange(
-                                                    task.startDate,
-                                                    task.endDate
-                                                )}
-                                                variant="filled"
                                                 color="teal"
                                                 mt={5}
+                                                mb={10}
                                                 onClick={() => {
-                                                    setShowModal(true)
+                                                    handleOnClickDownloadFiles(
+                                                        task.className,
+                                                        task.title
+                                                    )
                                                 }}
                                             >
-                                                <IconBookUpload /> Nộp bài
+                                                <IconBookUpload /> Tải bài tập
                                             </Button>
                                         </Text>
-                                        <Collapse
-                                            in={openedIndexes.includes(
-                                                indexTask
-                                            )}
-                                            onEntered={() => toggle(indexTask)}
-                                        >
-                                            <Text fw={700}>
-                                                Bài tập của tôi
-                                            </Text>
-                                            <hr className="my-3" />
-                                            <MaterialReactTable
-                                                displayColumnDefOptions={{
-                                                    'mrt-row-actions': {
-                                                        header: 'Xóa',
-                                                        size: 80
-                                                    }
-                                                }}
-                                                enableRowNumbers
-                                                columns={columnFileTask}
-                                                data={
-                                                    allFilesInFolderTaskStudent
-                                                }
-                                                initialState={{
-                                                    columnVisibility: {
-                                                        id: false
-                                                    }
-                                                }}
-                                                positionActionsColumn="last"
-                                                state={{
-                                                    isLoading:
-                                                        loadingFileStudent
-                                                }}
-                                                enableRowActions={isCurrentDateInRange(
-                                                    task.startDate,
-                                                    task.endDate
-                                                )}
-                                                renderRowActions={({
-                                                    row,
-                                                    table
-                                                }) => (
-                                                    <Box
-                                                        sx={{
-                                                            display: 'flex',
-                                                            flexWrap: 'nowrap',
-                                                            gap: '5px'
-                                                        }}
-                                                    >
-                                                        <IconButton
-                                                            color="secondary"
-                                                            onClick={() => {
-                                                                setShowModalConfirm(
-                                                                    true
-                                                                )
-                                                            }}
-                                                        >
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                        <Modal
-                                                            className="modal-dialog-centered modal-lg"
-                                                            isOpen={
-                                                                showModalConfirm
-                                                            }
-                                                            backdrop={'static'}
-                                                        >
-                                                            <div className="modal-header">
-                                                                <h1
-                                                                    className="modal-title"
-                                                                    id="modal-title-default"
-                                                                >
-                                                                    Thông báo
-                                                                </h1>
-                                                                <button
-                                                                    aria-label="Close"
-                                                                    className="close"
-                                                                    data-dismiss="modal"
-                                                                    type="button"
-                                                                    onClick={() =>
-                                                                        setShowModalConfirm(
-                                                                            false
-                                                                        )
-                                                                    }
-                                                                >
-                                                                    <span
-                                                                        aria-hidden={
-                                                                            true
-                                                                        }
-                                                                    >
-                                                                        ×
-                                                                    </span>
-                                                                </button>
-                                                            </div>
-                                                            <div className="modal-body">
-                                                                <Title
-                                                                    order={2}
-                                                                >
-                                                                    Bạn có chắc
-                                                                    chắn muốn
-                                                                    xóa file ???
-                                                                </Title>
-                                                            </div>
-                                                            <div className="modal-footer">
-                                                                <Button
-                                                                    color="default"
-                                                                    outline
-                                                                    data-dismiss="modal"
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        setShowModalConfirm(
-                                                                            false
-                                                                        )
-                                                                    }}
-                                                                >
-                                                                    Hủy
-                                                                </Button>
-                                                                <Button
-                                                                    color="red"
-                                                                    type="button"
-                                                                    onClick={() => {
-                                                                        handleDeleteRow(
-                                                                            row,
-                                                                            task.className,
-                                                                            task.title,
-                                                                            user.id +
-                                                                                ' - ' +
-                                                                                user.fullName
-                                                                        )
-                                                                    }}
-                                                                >
-                                                                    Xóa
-                                                                </Button>
-                                                            </div>
-                                                        </Modal>
-                                                    </Box>
-                                                )}
-                                            />
-                                        </Collapse>
-                                        <Modal
-                                            className="modal-dialog-centered modal-lg"
-                                            isOpen={showModal}
-                                            backdrop={'static'}
-                                        >
-                                            <div className="modal-header">
-                                                <h3
-                                                    className="modal-title"
-                                                    id="modal-title-default"
-                                                >
-                                                    Nộp bài tập
-                                                </h3>
-                                                <button
-                                                    aria-label="Close"
-                                                    className="close"
-                                                    data-dismiss="modal"
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setShowModal(false)
-                                                    }
-                                                >
-                                                    <span aria-hidden={true}>
-                                                        ×
-                                                    </span>
-                                                </button>
-                                            </div>
-                                            <div className="modal-body">
-                                                <Dropzone
-                                                    onDrop={(files) => {
-                                                        const selectedFiles =
-                                                            Array.from(files)
-                                                        setSelectedFile(
-                                                            selectedFiles
-                                                        )
-                                                    }}
-                                                    maxSize={3 * 1024 ** 2}
-                                                    name="excelFile"
-                                                >
-                                                    <Group
-                                                        position="center"
-                                                        spacing="xl"
-                                                        style={{
-                                                            minHeight: rem(220),
-                                                            pointerEvents:
-                                                                'none'
-                                                        }}
-                                                    >
-                                                        <Dropzone.Accept>
-                                                            <IconUpload
-                                                                size="3.2rem"
-                                                                stroke={1.5}
-                                                                color={
-                                                                    theme
-                                                                        .colors[
-                                                                        theme
-                                                                            .primaryColor
-                                                                    ][
-                                                                        theme.colorScheme ===
-                                                                        'dark'
-                                                                            ? 4
-                                                                            : 6
-                                                                    ]
-                                                                }
-                                                            />
-                                                        </Dropzone.Accept>
-                                                        <Dropzone.Reject>
-                                                            <IconX
-                                                                size="3.2rem"
-                                                                stroke={1.5}
-                                                                color={
-                                                                    theme.colors
-                                                                        .red[
-                                                                        theme.colorScheme ===
-                                                                        'dark'
-                                                                            ? 4
-                                                                            : 6
-                                                                    ]
-                                                                }
-                                                            />
-                                                        </Dropzone.Reject>
-                                                        <Dropzone.Idle>
-                                                            <IconPhoto
-                                                                size="3.2rem"
-                                                                stroke={1.5}
-                                                            />
-                                                        </Dropzone.Idle>
-
-                                                        <div>
-                                                            <Text
-                                                                size="xl"
-                                                                inline
-                                                            >
-                                                                Thả files excel
-                                                                vào đây hoặc
-                                                                click vào để
-                                                                chọn files
-                                                            </Text>
-                                                            <Text
-                                                                size="sm"
-                                                                color="dimmed"
-                                                                inline
-                                                                mt={7}
-                                                            >
-                                                                Thả mỗi lần một
-                                                                file, lưu ý dung
-                                                                lượng file phải
-                                                                dưới 5MB
-                                                            </Text>
-                                                        </div>
-                                                    </Group>
-                                                </Dropzone>
-                                            </div>
-                                            <div className="modal-footer">
-                                                <Button
-                                                    color="default"
-                                                    outline
-                                                    data-dismiss="modal"
-                                                    type="button"
-                                                    onClick={() => {
-                                                        setShowModal(false)
-                                                    }}
-                                                >
-                                                    Trở lại
-                                                </Button>
-                                                <Button
-                                                    color={'teal'}
-                                                    type="button"
-                                                    onClick={() => {
-                                                        submitTask(
-                                                            task.className,
-                                                            task.title
-                                                        )
-                                                    }}
-                                                >
-                                                    Nộp
-                                                </Button>
-                                            </div>
-                                        </Modal>
                                     </Paper>
                                 ))}
                             </>
