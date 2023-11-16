@@ -10,6 +10,7 @@ import {
     Image,
     Modal,
     rem,
+    SegmentedControl,
     Skeleton,
     Stack,
     Text,
@@ -22,6 +23,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 // API
 import classApi from '../../api/classApi'
+import attendanceApi from '../../api/attendanceApi'
 
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
@@ -36,7 +38,7 @@ const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const ClassInformationDetail = () => {
-    // ************* Param Variable
+    // ************* Routes Variable
     const data = useParams()
     let navigate = useNavigate()
 
@@ -60,18 +62,11 @@ const ClassInformationDetail = () => {
         onClose: () => console.log('Closed')
     })
 
-    const [isPresent, setIsPresent] = useState(false)
     const [activedExam, setActivedExam] = useState(false)
-    const [seletedStudent, setSletedStudent] = useState({
-        studentId: '',
-        fullname: '',
-        image: ''
-    })
 
     // ************* fetch Area
     const fetchClass = async () => {
         try {
-            setLoading(true)
             const resp = await classApi.getByClassId(data.classId)
 
             if (resp.status === 200 && resp.data != null) {
@@ -79,8 +74,6 @@ const ClassInformationDetail = () => {
             } else {
                 console.log('Error')
             }
-
-            setLoading(false)
         } catch (error) {
             console.log(error)
         }
@@ -88,13 +81,20 @@ const ClassInformationDetail = () => {
 
     const fetchClassByTeacher = async () => {
         try {
-            setLoading(true)
             const resp = await classApi.getAllClassByTeacherId(teacherId)
             if (resp.status === 200 && resp.data.length > 0) {
-                setStudents(resp.data[0].students)
+                const studentRespData = resp.data[0].students
+
+                const newData = studentRespData.map((data) => {
+                    return {
+                        ...data,
+                        isPresent: true
+                    }
+                })
+
+                setStudents(newData)
                 setCourseName(resp.data[0].courseName[0])
             }
-            setLoading(false)
         } catch (error) {
             console.log(error)
         }
@@ -129,6 +129,7 @@ const ClassInformationDetail = () => {
         checkActivedExam()
         handlers.close()
     }
+
     const checkActivedExam = async () => {
         const classId = data.classId
 
@@ -147,31 +148,66 @@ const ClassInformationDetail = () => {
             )
         }
     }
+
     const redirectTo = () => {
         return navigate('/teacher/classes-infor')
     }
 
     // ********* Action Area
-    const handleAttandance = (e, studentId) => {
-        students.map((student) => {
-            if (
-                e.target.innerText.trim() === 'Có mặt' &&
-                student.studentId.toLowerCase() === studentId.toLowerCase()
-            ) {
-                console.log('Co mat')
-            }
-            if (
-                e.target.innerText.trim() === 'Vắng mặt' &&
-                student.studentId.toLowerCase() === studentId.toLowerCase()
-            ) {
-                console.log('vang mat')
-                const newStudent = students.find(
-                    (st) => st.studentId.trim() === studentId.trim()
-                )
-                console.log(newStudent)
-                setSletedStudent(newStudent)
+    const handlCheckAttandance = (e, studentIdParam) => {
+        setStudents((prevStudents) =>
+            prevStudents.map((student) => {
+                if (student.studentId.trim() === studentIdParam.trim()) {
+                    if (e.target.defaultValue === 'present') {
+                        console.log('ok')
+                        return {
+                            ...student,
+                            isPresent: true
+                        }
+                    } else if (e.target.defaultValue === 'absent') {
+                        console.log('ok')
+                        return {
+                            ...student,
+                            isPresent: false
+                        }
+                    }
+                }
+                return student
+            })
+        )
+    }
+
+    const handleSaveAttendance = async () => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        const listAbsent = students.filter((student) => !student.isPresent)
+
+        const body = listAbsent.map((lst) => {
+            return {
+                classId: parseInt(data.classId),
+                studentId: lst.studentId
             }
         })
+
+        console.log(body)
+
+        try {
+            const resp = await attendanceApi.createAttendance(body)
+
+            console.log(resp)
+
+            if (resp.status === 200) {
+                toast.update(
+                    id,
+                    Notify.options.createSuccessParam('Điểm danh thành công')
+                )
+            }
+        } catch (error) {
+            toast.update(
+                id,
+                Notify.options.createErrorParam('Điểm danh thất bại')
+            )
+            console.log(error)
+        }
     }
 
     // ********* Material table variable
@@ -212,33 +248,18 @@ const ClassInformationDetail = () => {
                 accessorFn: (row) => row,
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
+
                     return (
-                        <Button.Group>
-                            <Button
-                                id="present"
-                                variant="filled"
-                                color="green"
-                                onClick={(e) => {
-                                    handleAttandance(e, row.studentId)
-                                }}
-                            >
-                                Có mặt
-                            </Button>
-                            <Button
-                                id="absent"
-                                variant="outline"
-                                color={
-                                    seletedStudent.studentId === row.studentId
-                                        ? 'red'
-                                        : 'gray'
-                                }
-                                onClick={(e) => {
-                                    handleAttandance(e, row.studentId)
-                                }}
-                            >
-                                Vắng mặt
-                            </Button>
-                        </Button.Group>
+                        <SegmentedControl
+                            color="teal"
+                            data={[
+                                { label: 'Có mặt', value: 'present' },
+                                { label: 'Vắng mặt', value: 'absent' }
+                            ]}
+                            onClick={(e) => {
+                                handlCheckAttandance(e, row.studentId)
+                            }}
+                        />
                     )
                 },
                 header: 'Có / Vắng',
@@ -250,9 +271,17 @@ const ClassInformationDetail = () => {
 
     // Use Effect Area
     useEffect(() => {
-        fetchClass()
-        fetchClassByTeacher()
-        checkActivedExam()
+        const fetchData = async () => {
+            setLoading(true)
+            await Promise.all([
+                fetchClass(),
+                fetchClassByTeacher(),
+                checkActivedExam()
+            ])
+            setLoading(false)
+        }
+
+        fetchData()
     }, [])
 
     return (
@@ -367,11 +396,19 @@ const ClassInformationDetail = () => {
                                 Từ ngày{' '}
                                 {moment(classInfor.startDate).format(
                                     'DD/MM/yyyy'
-                                )}{' '}
+                                ) === 'Invalid date'
+                                    ? 'ngày không khả dụng'
+                                    : moment(classInfor.startDate).format(
+                                          'DD/MM/yyyy'
+                                      )}{' '}
                                 -{' '}
                                 {moment(classInfor.endDate).format(
                                     'DD/MM/yyyy'
-                                )}
+                                ) === 'Invalid date'
+                                    ? 'ngày không khả dụng'
+                                    : moment(classInfor.endDate).format(
+                                          'DD/MM/yyyy'
+                                      )}
                             </Text>
                             <Flex
                                 align={'center'}
@@ -436,9 +473,18 @@ const ClassInformationDetail = () => {
                         ) : (
                             <>
                                 <Flex justify="space-between" align="center">
-                                    <Button color="violet" size="md" mb="lg">
-                                        Lưu điểm danh
-                                    </Button>
+                                    <Group position="left">
+                                        <Button
+                                            color="violet"
+                                            size="md"
+                                            mb="lg"
+                                            onClick={() =>
+                                                handleSaveAttendance()
+                                            }
+                                        >
+                                            Lưu điểm danh
+                                        </Button>
+                                    </Group>
 
                                     <Text color="dark" fz="lg" fw={500}>
                                         Tổng sinh viên:{' '}

@@ -76,6 +76,10 @@ public class Classes implements Serializable {
 	@JsonIgnore
 	List<Point> points;
 
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	List<Attendance> attendances;
+
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	@JsonIgnore

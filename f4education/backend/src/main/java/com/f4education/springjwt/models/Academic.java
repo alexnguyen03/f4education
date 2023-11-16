@@ -45,9 +45,6 @@ public class Academic {
 	@Column(name = "end_date")
 	private Date endDate;
 
-	@OneToMany(mappedBy = "academic")
-	List<Attendance> attendance;
-
 	@Override
 	public String toString() {
 		return "Academic{" +
