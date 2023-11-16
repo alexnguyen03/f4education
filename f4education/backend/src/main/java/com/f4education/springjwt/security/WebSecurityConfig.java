@@ -103,6 +103,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/evaluate/**",
                                         "/api/certificate/**",
                                         "/api/point/**",
+                                        "/api/attendance/**",
                                         "/img/**")
                                 .permitAll()
                                 .requestMatchers(

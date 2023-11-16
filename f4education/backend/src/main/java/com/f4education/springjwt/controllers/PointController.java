@@ -19,6 +19,7 @@ import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.PointRequest;
 import com.f4education.springjwt.payload.request.StudentInPointDTO;
+import com.f4education.springjwt.payload.response.PointDTO;
 import com.f4education.springjwt.payload.request.PointRequestDTO;
 import com.f4education.springjwt.security.services.ClassServiceImpl;
 import com.f4education.springjwt.security.services.PointServiceImpl;
@@ -29,62 +30,62 @@ import com.f4education.springjwt.security.services.StudentServiceImpl;
 @RequestMapping("/api/points")
 public class PointController {
 
-    @Autowired(required = true)
-    ClassServiceImpl classService;
-    @Autowired(required = true)
-    PointServiceImpl pointService;
+	@Autowired(required = true)
+	ClassServiceImpl classService;
+	@Autowired(required = true)
+	PointServiceImpl pointService;
 
-    @Autowired
-    StudentServiceImpl studentService;
+	@Autowired
+	StudentServiceImpl studentService;
 
-    // @PreAuthorize("hasRole('TEACHER')")
-    // @GetMapping(value = "")
-    // public ResponseEntity<?> getAll() {
-    // return ResponseEntity.ok(pointService.findAll());
-    // }
+	// @PreAuthorize("hasRole('TEACHER')")
+	// @GetMapping(value = "")
+	// public ResponseEntity<?> getAll() {
+	// return ResponseEntity.ok(pointService.findAll());
+	// }
 
-    @GetMapping("/result")
-    public ResponseEntity<?> findPointByStudentAndClass(@RequestParam("studentId") String studentId,
-            @RequestParam("classId") Integer classId) {
-        List<PointRequestDTO> lst = pointService.getAllPointByStudentIdAndClassId(studentId, classId);
-        System.out.println(lst);
-        return ResponseEntity.ok(lst);
-    }
+	@GetMapping("/result")
+	public ResponseEntity<?> findPointByStudentAndClass(@RequestParam("studentId") String studentId,
+			@RequestParam("classId") Integer classId) {
+		List<PointDTO> lst = pointService.getAllPointByStudentIdAndClassId(studentId, classId);
+		System.out.println(lst);
+		return ResponseEntity.ok(lst);
+	}
 
-    // @PreAuthorize("hasRole('TEACHER')")
-    @GetMapping(value = "/classes/{classId}")
-    public ResponseEntity<?> getAllByClassId(@PathVariable("classId") Integer classId) {
-        return ResponseEntity.ok(pointService.findAllByClassId(classId));
-    }
+	// @PreAuthorize("hasRole('TEACHER')")
+	@GetMapping(value = "/classes/{classId}")
+	public ResponseEntity<?> getAllByClassId(@PathVariable("classId") Integer classId) {
+		return ResponseEntity.ok(pointService.findAllByClassId(classId));
+	}
 
-    // @PreAuthorize("hasRole('TEACHER')")
-    @GetMapping(value = "/student/{studentId}")
-    public ResponseEntity<?> getAllByStudent(@PathVariable("studentId") String studentId) {
-        return ResponseEntity.ok(pointService.findAllByStudentId(studentId));
-    }
+	// @PreAuthorize("hasRole('TEACHER')")
+	@GetMapping(value = "/student/{studentId}")
+	public ResponseEntity<?> getAllByStudent(@PathVariable("studentId") String studentId) {
+		return ResponseEntity.ok(pointService.findAllByStudentId(studentId));
+	}
 
-    // @PreAuthorize("hasRole('TEACHER')")
-    @PostMapping(value = "")
-    public ResponseEntity<?> save(@RequestBody PointRequest pointRequest) {
+	// @PreAuthorize("hasRole('TEACHER')")
+	@PostMapping(value = "")
+	public ResponseEntity<?> save(@RequestBody PointRequest pointRequest) {
 
-        Classes classes = classService.findById(pointRequest.getClassId());
-        List<StudentInPointDTO> listPointsOfStudent = pointRequest.getListPointOfStudent();
-        List<Point> listPoint = new ArrayList<>();
-        listPointsOfStudent.forEach(pointOfStudent -> {
-            Point point = new Point();
-            if (pointOfStudent.getPointId() != null) {
-                point.setPointId(pointOfStudent.getPointId());
-            }
-            Student student = studentService.findById(pointOfStudent.getStudentId());
-            point.setAttendancePoint(pointOfStudent.getAttendancePoint());
-            point.setAveragePoint(pointOfStudent.getAveragePoint());
-            point.setClasses(classes);
-            point.setExercisePoint(pointOfStudent.getExercisePoint());
-            point.setQuizzPoint(pointOfStudent.getQuizzPoint());
-            point.setStudent(student);
-            listPoint.add(point);
-        });
-        return ResponseEntity.ok(pointService.save(listPoint));
-    }
+		Classes classes = classService.findById(pointRequest.getClassId());
+		List<StudentInPointDTO> listPointsOfStudent = pointRequest.getListPointOfStudent();
+		List<Point> listPoint = new ArrayList<>();
+		listPointsOfStudent.forEach(pointOfStudent -> {
+			Point point = new Point();
+			if (pointOfStudent.getPointId() != null) {
+				point.setPointId(pointOfStudent.getPointId());
+			}
+			Student student = studentService.findById(pointOfStudent.getStudentId());
+			point.setAttendancePoint(pointOfStudent.getAttendancePoint());
+			point.setAveragePoint(pointOfStudent.getAveragePoint());
+			point.setClasses(classes);
+			point.setExercisePoint(pointOfStudent.getExercisePoint());
+			point.setQuizzPoint(pointOfStudent.getQuizzPoint());
+			point.setStudent(student);
+			listPoint.add(point);
+		});
+		return ResponseEntity.ok(pointService.save(listPoint));
+	}
 
 }

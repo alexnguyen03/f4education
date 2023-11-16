@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AttendanceDTO {
-	private Integer academicId;
-	
-	private String academicName;
+	private Integer attendanceId;
 
-	private Date startDate;
+	private Date attendanceDate;
 
-	private Date endDate;
+	private Integer classId;
+
+	private String studentId;
 }

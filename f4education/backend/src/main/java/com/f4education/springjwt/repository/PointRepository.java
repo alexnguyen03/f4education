@@ -15,7 +15,7 @@ public interface PointRepository extends JpaRepository<Point, Integer> {
     public List<Point> findAllByClassId(@Param("classId") Integer classId);
 
     @Query("SELECT p FROM Point p WHERE p.student.studentId = :studentId AND p.classes.classId = :classId")
-    List<Point> findByStudentIdAndCLassId(@Param("studentId") String studentId, @Param("classId") Integer classId);
+	List<Point> findByStudentIdAndCLassId(@Param("studentId") String studentId, @Param("classId") Integer classId);
 
     @Query("SELECT p FROM Point p WHERE p.student.studentId = :studentId")
     public List<Point> findAllByStudentId(@Param("studentId") String studentId);
