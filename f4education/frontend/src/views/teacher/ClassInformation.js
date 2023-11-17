@@ -30,9 +30,9 @@ import classApi from '../../api/classApi'
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
 
-const teacherId = 'nguyenhoainam121nTC'
-
 const ClassInformation = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // ********** Param Variable
     let navigate = useNavigate()
 
@@ -47,7 +47,7 @@ const ClassInformation = () => {
     const fetchClassByTeacher = async () => {
         try {
             setLoading(true)
-            const resp = await classApi.getAllClassByTeacherId(teacherId)
+            const resp = await classApi.getAllClassByTeacherId(user.username)
             if (resp.status === 200 && resp.data.length > 0) {
                 setListClasses(resp.data.reverse())
             }
@@ -68,7 +68,7 @@ const ClassInformation = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/class-info/' + classId)
+        navigate('/teacher/class-infor/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {

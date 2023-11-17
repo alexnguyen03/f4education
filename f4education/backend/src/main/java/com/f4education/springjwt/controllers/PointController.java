@@ -20,7 +20,6 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.PointRequest;
 import com.f4education.springjwt.payload.request.StudentInPointDTO;
 import com.f4education.springjwt.payload.response.PointDTO;
-import com.f4education.springjwt.payload.request.PointRequestDTO;
 import com.f4education.springjwt.security.services.ClassServiceImpl;
 import com.f4education.springjwt.security.services.PointServiceImpl;
 import com.f4education.springjwt.security.services.StudentServiceImpl;
@@ -48,7 +47,6 @@ public class PointController {
 	public ResponseEntity<?> findPointByStudentAndClass(@RequestParam("studentId") String studentId,
 			@RequestParam("classId") Integer classId) {
 		List<PointDTO> lst = pointService.getAllPointByStudentIdAndClassId(studentId, classId);
-		System.out.println(lst);
 		return ResponseEntity.ok(lst);
 	}
 

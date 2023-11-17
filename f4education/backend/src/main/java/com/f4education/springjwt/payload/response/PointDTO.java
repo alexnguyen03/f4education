@@ -25,6 +25,8 @@ public class PointDTO {
 
     private String studentName;
 
+    private String studentImage;
+    
     private String studentId;
 
 }

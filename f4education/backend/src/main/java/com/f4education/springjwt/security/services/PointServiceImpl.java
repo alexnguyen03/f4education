@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -7,14 +8,17 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.f4education.springjwt.interfaces.AttendanceService;
 import com.f4education.springjwt.interfaces.PointService;
 import com.f4education.springjwt.interfaces.QuizResultService;
-import com.f4education.springjwt.interfaces.AttendanceService;
 import com.f4education.springjwt.models.AttendanceInfo;
+import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.QuizResultInfo;
 import com.f4education.springjwt.payload.response.PointDTO;
 import com.f4education.springjwt.payload.response.PointResponse;
+import com.f4education.springjwt.payload.response.TeacherResultOfStudentResponse;
+import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.PointRepository;
 
 @Service
@@ -28,6 +32,9 @@ public class PointServiceImpl implements PointService {
 
 	@Autowired(required = true)
 	AttendanceService attendanceService;
+	
+	@Autowired()
+	ClassRepository classRepository;
 
 	@Override
 	public PointDTO findAllByPointId(Integer pointId) {
@@ -100,6 +107,7 @@ public class PointServiceImpl implements PointService {
 		pointDTO.setStudentId(entity.getStudent().getStudentId());
 		pointDTO.setExercisePoint(entity.getExercisePoint());
 		pointDTO.setStudentName(entity.getStudent().getFullname());
+		pointDTO.setStudentImage(entity.getStudent().getImage());
 		return pointDTO;
 	}
 
@@ -116,4 +124,38 @@ public class PointServiceImpl implements PointService {
 
 		return pointDTO;
 	}
+	
+	private List<TeacherResultOfStudentResponse> convertToTeacherResultOfStudentResponse(Classes classes,
+			Integer classId) {
+		List<TeacherResultOfStudentResponse> resultList = new ArrayList<>();
+
+		if (classes.getClassId().equals(classId)) {
+			for (Point po : classes.getPoints()) {
+				TeacherResultOfStudentResponse result = new TeacherResultOfStudentResponse();
+				
+//				result.setClasses(classes);
+				result.setStudentId(po.getStudent().getStudentId());
+				result.setStudentName(po.getStudent().getFullname());
+				result.setStudentImg(po.getStudent().getImage());
+				result.setAveragePoint(po.getAveragePoint());
+				result.setExercisePoint(po.getExercisePoint());
+				result.setAttendancePoint(po.getAttendancePoint());
+				result.setQuizzPoint(po.getQuizzPoint());
+
+				// Add the result to the list
+				resultList.add(result);
+			}
+		}
+
+		return resultList;
+	}
+
+	@Override
+	public List<TeacherResultOfStudentResponse> getLearningResultOfStudent(Integer classId) {
+		List<Classes> lst = classRepository.getClassWithStudentsAndPoints(classId);
+		return lst.stream().flatMap(classes -> convertToTeacherResultOfStudentResponse(classes, classId).stream())
+				.collect(Collectors.toList());
+	}
 }
+
+
