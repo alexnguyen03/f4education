@@ -336,7 +336,7 @@ const DownloadTaskStudent = () => {
                                                     )
                                                 }}
                                             >
-                                                <IconBookUpload /> Tải bài tập
+                                                <IconBookUpload /> Download
                                             </Button>
                                         </Text>
                                     </Paper>

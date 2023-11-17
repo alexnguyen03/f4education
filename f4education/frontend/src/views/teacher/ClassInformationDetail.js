@@ -433,7 +433,7 @@ const ClassInformationDetail = () => {
                                         handleShowTask(classInfor.classId)
                                     }}
                                 >
-                                    Tải bài tập
+                                    Download bài tập
                                 </Button>
                             </Stack>
                         </Card>
