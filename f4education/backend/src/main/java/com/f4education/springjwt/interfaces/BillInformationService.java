@@ -11,5 +11,5 @@ import com.f4education.springjwt.payload.response.BillResponseDTO;
 
 @Service
 public interface BillInformationService {
-	List<BillInformation> getAllByBillInformation(String studentId, Integer courseId);
+	List<BillInformation> getAllByBillInformation(String studentId);
 }

@@ -18,7 +18,6 @@ public interface BillRepository extends JpaRepository<Bill, Integer> {
 			+ "FROM Bill hd " + "JOIN BillDetail hdct ON hd.billId = hdct.bill.billId "
 			+ "JOIN Course sp ON hdct.course.courseId = sp.courseId "
 			+ "JOIN PaymentMethod pttt ON hd.paymentMethod.paymentMethodId = pttt.paymentMethodId "
-			+ "WHERE hd.student.studentId = :studentId AND sp.courseId = :courseId")
-	public List<BillInformation> getAllByBillInformation(@Param("studentId") String studentId,
-			@Param("courseId") Integer courseId);
+			+ "WHERE hd.student.studentId = :studentId")
+	public List<BillInformation> getAllByBillInformation(@Param("studentId") String studentId);
 }

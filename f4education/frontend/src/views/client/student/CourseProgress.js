@@ -30,7 +30,6 @@ import {
     useSearchParams
 } from 'react-router-dom'
 import { IconDatabasePlus } from '@tabler/icons-react'
-import { IconEyeCheck } from '@tabler/icons-react'
 import { useDisclosure } from '@mantine/hooks'
 
 import moment from 'moment'
@@ -57,7 +56,6 @@ import Notify from '../../../utils/Notify'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
-    const [opened, { open, close }] = useDisclosure(false)
     const today = new Date('2024-01-04').toDateString().substring(4, 16)
 
     const [downloadRecource, downloadRecourceHandlers] = useDisclosure(false, {
@@ -93,17 +91,6 @@ const CourseProgress = () => {
         registerCourseId: ''
     })
 
-    const [billInformation, setBillInformation] = useState([
-        {
-            billId: 0,
-            courseName: '',
-            createDate: '',
-            status: '',
-            coursePrice: 0.0,
-            totalPrice: 0.0,
-            paymentMethodName: ''
-        }
-    ])
     const [numberOfCourseComplete, setNumberOfCourseComplete] = useState(0)
 
     const [newestCourse, setNewestCourse] = useState([])
@@ -373,27 +360,7 @@ const CourseProgress = () => {
         }
     }
 
-    const getAllByBillInformation = async () => {
-        try {
-            const resp = await billApi.getAllByBillInformation(
-                'loinvpc04549',
-                12359
-            )
-
-            if (resp.status === 200) {
-                setBillInformation(resp.data)
-                console.log('billinformation: ' + resp.data)
-            }
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     // ************ USE EFECT AREA
-    useEffect(() => {
-        getAllByBillInformation()
-    }, [])
-
     useEffect(() => {
         setSelectedCourse(selectedCourse)
         console.log(
@@ -565,16 +532,6 @@ const CourseProgress = () => {
                                         onClick={downloadRecourceHandlers.open}
                                     >
                                         Tải tài nguyên
-                                    </Button>
-                                    <Button
-                                        variant="outline"
-                                        color="indigo"
-                                        size="lg"
-                                        leftIcon={<IconEyeCheck />}
-                                        mt={10}
-                                        onClick={open}
-                                    >
-                                        Thông tin thanh toán
                                     </Button>
                                 </Group>
                             </Stack>
@@ -1869,74 +1826,6 @@ const CourseProgress = () => {
                         </Modal.Body>
                     </Modal.Content>
                 </Modal.Root>
-                <Modal size="70%" opened={opened} onClose={close} centered>
-                    <Title order={2} ta="center">
-                        THÔNG TIN THANH TOÁN
-                    </Title>
-                    {billInformation.map((bill, index) => (
-                        <Grid my={50} columns={24} key={index}>
-                            <Grid.Col span={24}>
-                                <Text size={25} fw={600} ml={40} mb={20}>
-                                    Mã hóa đơn: {bill.billId}
-                                </Text>
-                            </Grid.Col>
-                            <Grid.Col span={12}>
-                                <Text c="dimmed" size={20} fw={600} ml={40}>
-                                    Tên khóa học
-                                </Text>
-                                <Text size={25} fw={600} ml={40}>
-                                    {bill.courseName}
-                                </Text>
-                            </Grid.Col>
-
-                            <Grid.Col span={6}>
-                                <Text c="dimmed" size={20} fw={600}>
-                                    Ngày thanh toán
-                                </Text>
-                                <Text c="dimmed" size={25} fw={600}>
-                                    {moment(bill.createDate).format(
-                                        'DD-MM-yyyy h:mm'
-                                    )}
-                                </Text>
-                            </Grid.Col>
-                            <Grid.Col span={6}>
-                                <Text c="dimmed" size={20} fw={600}>
-                                    Trạng thái
-                                </Text>
-                                <Text size={25} color="yellow" fw={600}>
-                                    {bill.status}
-                                </Text>
-                            </Grid.Col>
-                            <Grid.Col span={12} mt={20}>
-                                <Text c="dimmed" size={20} fw={600} ml={40}>
-                                    Hình thức thanh toán
-                                </Text>
-                                <Text c="dimmed" size={25} fw={600} ml={40}>
-                                    {bill.paymentMethodName}
-                                </Text>
-                            </Grid.Col>
-                            <Grid.Col span={6} mt={20}>
-                                <Text c="dimmed" size={20} fw={600}>
-                                    Giá khóa học
-                                </Text>
-                                <Text c="dimmed" size={25} fw={600}>
-                                    {bill.coursePrice} VND
-                                </Text>
-                            </Grid.Col>
-                            <Grid.Col span={6} mt={20}>
-                                <Text c="dimmed" size={20} fw={600}>
-                                    Tổng tiền
-                                </Text>
-                                <Text size={25} fw={600}>
-                                    {bill.totalPrice} VND
-                                </Text>
-                            </Grid.Col>
-                            <Grid.Col span={24} mt={20}>
-                                <Divider size="xl" mx={40} color="orange" />
-                            </Grid.Col>
-                        </Grid>
-                    ))}
-                </Modal>
             </Container>
         </>
     )

@@ -29,8 +29,8 @@ public class BillInformationServiceImp implements BillInformationService {
 	private BillRepository billRepository;
 
 	@Override
-	public List<BillInformation> getAllByBillInformation(String studentId, Integer courseId) {
-		List<BillInformation> billInformation = billRepository.getAllByBillInformation(studentId, courseId);
+	public List<BillInformation> getAllByBillInformation(String studentId) {
+		List<BillInformation> billInformation = billRepository.getAllByBillInformation(studentId);
 		return billInformation;
 	}
 }

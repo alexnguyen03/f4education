@@ -95,8 +95,8 @@ public class BillController {
 	}
 	
 	@GetMapping("/{studentId}/{courseId}")
-	public ResponseEntity<?> getAllByBillInformation(@PathVariable("studentId") String studentId, @PathVariable("courseId") Integer courseId) {
-		List<BillInformation> billInformation = billInformationServiceImp.getAllByBillInformation(studentId, courseId);
+	public ResponseEntity<?> getAllByBillInformation(@PathVariable("studentId") String studentId) {
+		List<BillInformation> billInformation = billInformationServiceImp.getAllByBillInformation(studentId);
 		return ResponseEntity.ok(billInformation);
 	}
 }
