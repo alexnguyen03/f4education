@@ -1,5 +1,8 @@
 package com.f4education.springjwt.interfaces;
 
+import java.util.Date;
+import java.util.List;
+
 import com.f4education.springjwt.models.MailInfo;
 
 import jakarta.mail.MessagingException;
@@ -21,7 +24,7 @@ public interface MailerService {
      * @param body    nội dung email
      * @throws MessagingException lỗi gửi email
      */
-    void send(String to, String subject, String body) throws MessagingException;
+    void send(String[] to, String subject, String body) throws MessagingException;
 
     /**
      * Xếp mail vào hàng đợi
@@ -37,5 +40,5 @@ public interface MailerService {
      * @param subject tiêu đề email
      * @param body    nội dung email
      */
-    void queue(String to, String subject, String body);
+    void queue(String[] to, String subject, String body, Date date);
 }

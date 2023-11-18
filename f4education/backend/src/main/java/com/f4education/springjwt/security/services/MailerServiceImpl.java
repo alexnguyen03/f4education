@@ -2,6 +2,7 @@ package com.f4education.springjwt.security.services;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -54,7 +55,7 @@ public class MailerServiceImpl implements MailerService {
     }
 
     @Override
-    public void send(String to, String subject, String body)
+    public void send(String[] to, String subject, String body)
             throws MessagingException {
         this.send(new MailInfo(to, subject, body));
     }
@@ -65,14 +66,14 @@ public class MailerServiceImpl implements MailerService {
     }
 
     @Override
-    public void queue(String to, String subject, String body) {
+    public void queue(String[] to, String subject, String body, Date date) {
         String link = "http://localhost:3000/client-register/" + to;
         body = "" +
                 "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
                 +
                 "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n" +
                 "    <div style=\"border-bottom:1px solid #eee\">\n" +
-                "      <a href='" + link //! Linh website
+                "      <a href='" + link // ! Linh website
                 + "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">LOVE CAKE</a>\n"
                 +
                 "    </div>\n" +
@@ -92,19 +93,35 @@ public class MailerServiceImpl implements MailerService {
                 "  </div>\n" +
                 "</div>";
         subject = "Thư chào mừng";
-        queue(new MailInfo(to, subject, body));
+        queue(new MailInfo(to, subject, body, date));
     }
 
     @Scheduled(fixedDelay = 5000)
     public void run() {
         while (!list.isEmpty()) {
-            MailInfo mail = list.remove(0);
-            try {
-                this.send(mail);
+            MailInfo mail = list.get(0);
+
+            if (mail.getDate() == null) {
+                mail = list.remove(0);
+                sendMail(mail);
                 System.out.println("Đã gửi mail");
-            } catch (Exception e) {
-                e.printStackTrace();
+            } else {
+                Date date = new Date();
+                if (date.after(mail.getDate())) {
+                    sendMail(mail);
+                    System.out.println("Đã gửi mail có ngày");
+                }
             }
+        }
+    }
+
+    private boolean sendMail(MailInfo mail) {
+        try {
+            this.send(mail);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 }

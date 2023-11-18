@@ -29,6 +29,9 @@ public class TaskServiceImpl implements TaskService {
     @Autowired
     ScheduleServiceImpl scheduleServiceImpl;
 
+    @Autowired
+    MailerServiceImpl mailer;
+
     @Override
     public List<Task> getAll(Integer id) {
         return taskRepository.getAll(id);
@@ -47,14 +50,25 @@ public class TaskServiceImpl implements TaskService {
         task.setClasses(classes);
 
         if (task.getTaskId() == null) {
-
             String idFolder = null;
-
             try {
                 String linkFoler = "Tasks/" + task.getClasses().getClassName() + "/" + task.getTitle();
                 idFolder = googleDriveRepository.getFolderId(linkFoler);
+                List<String> mails = null;
+                // mails.add(accountDTO.getEmail());
+
+                // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
+
+                String[] mail = mails.toArray(new String[0]);
+                mailer.queue(mail, "", "", null);
+
             } catch (Exception e) {
                 e.printStackTrace();
+            }
+        } else {
+            Task taskNew = taskRepository.findById(task.getTaskId()).get();
+            if (taskNew.getTitle().equals(task.getTitle())) {
+                // ! Tiến hành đổi tên folder cũ
             }
         }
         // return null;

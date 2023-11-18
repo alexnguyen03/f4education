@@ -51,7 +51,7 @@ public class AccountController {
     PasswordEncoder encoder;
 
     @Autowired
-	MailerServiceImpl mailer;
+    MailerServiceImpl mailer;
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -65,8 +65,6 @@ public class AccountController {
         List<AccountDTO> list = accountService.getAllAccountsDTOByRole(role);
         return ResponseEntity.ok(list);
     }
-
-    
 
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
@@ -100,7 +98,11 @@ public class AccountController {
                     .badRequest()
                     .body(new MessageResponse("1"));
         }
-        mailer.queue(accountDTO.getEmail(), "", "");
+        List<String> mails = null;
+        mails.add(accountDTO.getEmail());
+
+        String[] mail = mails.toArray(new String[0]);
+        mailer.queue(mail, "", "", null);
         return ResponseEntity.ok().body(new MessageResponse("2"));
     }
 
