@@ -40,6 +40,12 @@ const resourceApi = {
         const url = '/resource/delete-foldel-tmp'
         return axiosClient.get(url)
     },
+    uploadResource: (body) => {
+        const url = '/resource/upload'
+        return axiosClient.post(url, body, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+    },
 }
 
 export default resourceApi

@@ -138,6 +138,16 @@ public class ResourceController {
 
 	@GetMapping("/delete-foldel-tmp")
 	public void deleteFoldelTmp() throws Exception {
-		 googleDriveRepository.deleteFoldelTmp();
+		googleDriveRepository.deleteFoldelTmp();
+	}
+
+	@PostMapping(value = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = {
+			MediaType.APPLICATION_JSON_VALUE })
+	public void uploadResource(@RequestParam("file") MultipartFile[] file,
+			@RequestParam("courseName") String courseName, @RequestParam("type") String type) {
+
+		for (MultipartFile files : file) {
+			resourceService.uploadFile(files, courseName, type);
+		}
 	}
 }
