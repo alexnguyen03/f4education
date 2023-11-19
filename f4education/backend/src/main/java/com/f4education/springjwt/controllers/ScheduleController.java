@@ -15,10 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.payload.request.ScheduleRequest;
+import com.f4education.springjwt.payload.request.ScheduleTeacherDTO;
 import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.security.services.ScheduleServiceImpl;
-
-import jakarta.websocket.server.PathParam;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -41,4 +40,12 @@ public class ScheduleController {
         ScheduleResponse scheduleResponse = scheduleService.findAllScheduleByClassId(classId);
         return ResponseEntity.ok(scheduleResponse);
     }
+
+    @GetMapping("/teacher/{accountId}")
+    public ResponseEntity<?> findAllScheduleTeacherByID(@PathVariable("accountId") Integer accountId) {
+        List<ScheduleTeacherDTO> list = scheduleService.findAllScheduleTeacherByID(accountId);
+        return ResponseEntity.ok(list);
+    }
+
+
 }

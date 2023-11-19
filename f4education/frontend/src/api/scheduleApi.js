@@ -9,6 +9,10 @@ const scheduleApi = {
     getScheduleByClassId(classId) {
         const url = '/schedule/' + classId
         return axiosClient.get(url)
+    },
+    findAllScheduleTeacherByID(accountId) {
+        const url = '/schedule/teacher/' + accountId
+        return axiosClient.get(url)
     }
 }
 

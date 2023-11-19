@@ -16,6 +16,8 @@ import Cart from './views/client/visitor/Cart'
 import Checkout from './views/client/visitor/Checkout'
 import ClassDetail from './views/admin/ClassDetail'
 import Login from 'views/examples/Login'
+
+
 import CourseDetailClient from './views/client/visitor/CourseDetailClient'
 import CourseRegisterClient from './views/client/visitor/CourseRegisterClient'
 import InformationTeacher from './views/teacher/information'
@@ -34,6 +36,9 @@ import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
 import CertificatePDF from 'views/PDF/CertificatePDF'
 import LearningResult from 'views/client/student/LearningResult'
+
+import TeacherSchedule from 'views/teacher/TeacherSchedule'
+import TaskTeacher from 'views/teacher/TaskTeacher'
 
 export var routes = [
     {
@@ -238,6 +243,20 @@ export const routesTeacher = [
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
+        layout: '/teacher'
+    },
+    {
+        path: '/schedule',
+        name: 'Lịch dạy',
+        icon: 'ni ni-collection text-blue',
+        component: <TeacherSchedule />,
+        layout: '/teacher'
+    },
+    {
+        path: '/task',
+        name: 'Giao bài tập',
+        icon: 'ni ni-collection text-blue',
+        component: <TaskTeacher />,
         layout: '/teacher'
     },
     {
