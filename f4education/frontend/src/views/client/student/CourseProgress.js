@@ -22,7 +22,7 @@ import {
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { IconArrowBack, IconArrowRight, IconRefresh } from '@tabler/icons-react'
+import { IconArrowBack, IconArrowRight, IconRefresh, IconZoomQuestion } from '@tabler/icons-react'
 import {
     createSearchParams,
     Link,
@@ -102,7 +102,7 @@ const CourseProgress = () => {
     const fetchCourseProgress = async () => {
         try {
             const resp = await registerCoursecAPI.getAllCourseProgress(
-               'loinvpc04549'
+                'loinvpc04549'
             )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
@@ -550,6 +550,20 @@ const CourseProgress = () => {
                                         onClick={downloadRecourceHandlers.open}
                                     >
                                         Tải tài nguyên
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        color="indigo"
+                                        size="lg"
+                                        leftIcon={<IconZoomQuestion />}
+                                        mt={10}
+                                        onClick={() => {
+                                            handleShowQuestion(
+                                                selectedCourse.classes.classId
+                                            )
+                                        }}
+                                    >
+                                        Xem bài tập
                                     </Button>
                                 </Group>
                             </Stack>
