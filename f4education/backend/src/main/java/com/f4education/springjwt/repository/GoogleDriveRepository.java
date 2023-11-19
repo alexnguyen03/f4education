@@ -16,7 +16,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.security.services.SessionService;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -196,6 +195,27 @@ public class GoogleDriveRepository {
 	public void deleteFile(String fileId) throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		driveQuickstart.getInstance().files().delete(fileId).execute();
+	}
+
+	public String renameFolder(String folderName, String newFolderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+
+		String folderId = getFolderId(folderName);
+		if (folderId != null) {
+
+			File file = new File();
+			file.setName(newFolderName);
+
+			try {
+				File updatedFile = driveQuickstart.getInstance().files().update(folderId, file).execute();
+				return updatedFile.getId();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return null;
+		}
 	}
 
 	public byte[] downloadMultipleFiles(List<String> fileIds) {

@@ -624,13 +624,15 @@ const Home = () => {
                                     Xem khóa học
                                 </Button>
                             </Link>
-                            <Button
-                                className={classHeroText.control}
-                                size="lg"
-                                ml={rem(3)}
-                            >
-                                Đăng ký tài khoản
-                            </Button>
+                            <Link to={'/check-mail'}>
+                                <Button
+                                    className={classHeroText.control}
+                                    size="lg"
+                                    ml={rem(3)}
+                                >
+                                    Đăng ký tài khoản
+                                </Button>
+                            </Link>
                         </div>
                     </Box>
                 </Group>
