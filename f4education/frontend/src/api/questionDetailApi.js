@@ -1,8 +1,8 @@
 import axiosClient from './axiosClient'
 
 const questionDetailApi = {
-    getQuestionDetailsByStudentId: (studentId) => {
-        const url = `/question-detail/${studentId}`
+    getQuestionDetailsByClassId: (classId) => {
+        const url = `/question-detail/quizz/${classId}`
         return axiosClient.get(url)
     }
 }

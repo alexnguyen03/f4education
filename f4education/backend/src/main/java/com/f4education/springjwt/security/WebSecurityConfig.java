@@ -123,6 +123,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/resource/**",
                                         "/api/questions/**",
                                         "/api/question-detail/**",
+                                        "/api/task/**",
                                         "/api/quizz-result/**",
                                         "/api/answers/**",
                                         "/api/cart/**",

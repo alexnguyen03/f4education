@@ -94,6 +94,20 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        uploadFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Upload file thành công !',
+                ...defaultOptions
+            }
+        },
+        deleteFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Xóa file thành công !',
+                ...defaultOptions
+            }
+        },
         warningParam: (param) => {
             // loi chung thi dung ong nay
             return {

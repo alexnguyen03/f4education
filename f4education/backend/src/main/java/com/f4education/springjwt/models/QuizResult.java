@@ -31,7 +31,7 @@ public class QuizResult implements Serializable {
 
 	private Integer score;
 
-	private String duration;
+	private Integer duration;
 
 	@Column(name = "quizz_date")
 	private Date quizzDate;

@@ -30,9 +30,11 @@ import ClassInformation from './views/teacher/ClassInformation'
 import ClassInformationDetail from './views/teacher/ClassInformationDetail'
 import CourseProgress from './views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
+import SubmitHomework from 'views/client/student/SubmitHomework'
 import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
 import CertificatePDF from 'views/PDF/CertificatePDF'
+import DownloadTaskStudent from 'views/teacher/DownloadTaskStudent'
 import Points from './views/teacher/Points'
 import LearningResult from 'views/client/student/LearningResult'
 import ClassResult from 'views/teacher/ClassResult'
@@ -248,6 +250,11 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
+        path: '/download-task-student',
+        component: <DownloadTaskStudent />,
+        layout: '/teacher'
+    },
+    {
         path: '/class-infor/point/:classId',
         icon: 'ni ni-planet text-blue',
         component: <Points />,
@@ -282,6 +289,13 @@ export const routesStudent = [
         name: 'Thông tin bài kiểm tra',
         icon: 'ni ni-planet text-blue',
         component: <QuizzClient />,
+        layout: '/student'
+    },
+    {
+        path: '/task',
+        name: 'Nộp bài tập',
+        icon: 'ni ni-planet text-blue',
+        component: <SubmitHomework />,
         layout: '/student'
     },
     {

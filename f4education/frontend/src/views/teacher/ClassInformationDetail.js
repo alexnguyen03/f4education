@@ -4,6 +4,7 @@ import {
     Box,
     Button,
     Card,
+    Center,
     Flex,
     Grid,
     Group,
@@ -14,15 +15,19 @@ import {
     Skeleton,
     Stack,
     Text,
-    Title
+    Title,
+    useMantineTheme
 } from '@mantine/core'
 import { MaterialReactTable } from 'material-react-table'
+import { Dropzone } from '@mantine/dropzone'
+import { IconUpload, IconPhoto, IconX, IconEye } from '@tabler/icons-react'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { createSearchParams, useNavigate, useParams } from 'react-router-dom'
 
 // API
 import classApi from '../../api/classApi'
+import resourceApi from 'api/resourceApi'
 import attendanceApi from '../../api/attendanceApi'
 
 // scss
@@ -62,6 +67,26 @@ const ClassInformationDetail = () => {
     })
 
     const [activedExam, setActivedExam] = useState(false)
+    const [seletedStudent, setSletedStudent] = useState({
+        studentId: '',
+        fullname: '',
+        image: ''
+    })
+
+    const [opened, { open, close }] = useDisclosure(false)
+
+    const [openConfirm, setOpenConfirm] = useState(false)
+
+    const openModal = () => {
+        setOpenConfirm(true)
+    }
+
+    const closeModal = () => {
+        setOpenConfirm(false)
+    }
+
+    const theme = useMantineTheme()
+    const [selectedFile, setSelectedFile] = useState([null])
 
     // ************* fetch Area
     const fetchClass = async () => {
@@ -268,6 +293,37 @@ const ClassInformationDetail = () => {
         []
     )
 
+    const handleShowTask = (classId) => {
+        navigate({
+            pathname: '/teacher/download-task-student',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
+
+    const uploadResource = async (courseName) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        const formData = new FormData()
+        formData.append('courseName', courseName)
+        formData.append('type', 'TÀI NGUYÊN')
+        for (var i = 0; i < selectedFile.length; i++) {
+            formData.append('file', selectedFile[i])
+        }
+        console.log([...formData])
+        try {
+            const resp = await resourceApi.uploadResource(formData)
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.uploadFileSuccess())
+                closeModal()
+                close(true)
+            }
+        } catch (error) {
+            console.log('Upload thất bại', error)
+        }
+    }
+
     // Use Effect Area
     useEffect(() => {
         const fetchData = async () => {
@@ -465,6 +521,26 @@ const ClassInformationDetail = () => {
                                 <Button color="cyan" size="md" mb="md">
                                     Giao bài tập
                                 </Button>
+                                <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        handleShowTask(classInfor.classId)
+                                    }}
+                                >
+                                    Download bài tập
+                                </Button>
+                                <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        open()
+                                    }}
+                                >
+                                    Upload tài nguyên
+                                </Button>
                             </Stack>
                         </Card>
                     )}
@@ -559,6 +635,114 @@ const ClassInformationDetail = () => {
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
+            <Modal size="70%" opened={opened} onClose={close} centered>
+                <Center>
+                    <Title order={2} mb={30}>
+                        Upload tài nguyên
+                    </Title>
+                </Center>
+                <Dropzone
+                    onDrop={(files) => {
+                        const selectedFiles = Array.from(files)
+                        setSelectedFile(selectedFiles)
+                    }}
+                    maxSize={3 * 1024 ** 2}
+                    name="excelFile"
+                >
+                    <Group
+                        position="center"
+                        spacing="xl"
+                        style={{
+                            minHeight: rem(220),
+                            pointerEvents: 'none'
+                        }}
+                    >
+                        <Dropzone.Accept>
+                            <IconUpload
+                                size="3.2rem"
+                                stroke={1.5}
+                                color={
+                                    theme.colors[theme.primaryColor][
+                                        theme.colorScheme === 'dark' ? 4 : 6
+                                    ]
+                                }
+                            />
+                        </Dropzone.Accept>
+                        <Dropzone.Reject>
+                            <IconX
+                                size="3.2rem"
+                                stroke={1.5}
+                                color={
+                                    theme.colors.red[
+                                        theme.colorScheme === 'dark' ? 4 : 6
+                                    ]
+                                }
+                            />
+                        </Dropzone.Reject>
+                        <Dropzone.Idle>
+                            <IconPhoto size="3.2rem" stroke={1.5} />
+                        </Dropzone.Idle>
+
+                        <div>
+                            <Text size="xl" inline>
+                                Thả files excel vào đây hoặc click vào để chọn
+                                files
+                            </Text>
+                            <Text size="sm" color="dimmed" inline mt={7}>
+                                Thả mỗi lần một file, lưu ý dung lượng file phải
+                                dưới 5MB
+                            </Text>
+                        </div>
+                    </Group>
+                </Dropzone>
+                <Flex
+                    mt={30}
+                    mih={50}
+                    gap="md"
+                    justify="flex-end"
+                    align="center"
+                    direction="row"
+                    wrap="wrap"
+                >
+                    <Button
+                        color="default"
+                        outline
+                        data-dismiss="modal"
+                        type="button"
+                        onClick={() => {
+                            close(true)
+                        }}
+                    >
+                        Trở lại
+                    </Button>
+                    <Button color={'teal'} type="button" onClick={openModal}>
+                        Upload
+                    </Button>
+                </Flex>
+            </Modal>
+            <Modal opened={openConfirm} onClose={closeModal} title="Thông báo">
+                <Text size="lg">Bạn có chắc chắn muốn Upload ???</Text>
+                <Button
+                    onClick={() => {
+                        uploadResource(courseName)
+                        closeModal()
+                    }}
+                    className="float-right"
+                    mt={30}
+                >
+                    Upload
+                </Button>
+                <Button
+                    onClick={closeModal}
+                    color="red"
+                    mr={10}
+                    mb={20}
+                    mt={30}
+                    className="float-right"
+                >
+                    Hủy
+                </Button>
+            </Modal>
         </>
     )
 }
