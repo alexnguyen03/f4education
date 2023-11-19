@@ -18,8 +18,8 @@ const billApi = {
     //   const url = `/cart/${cartId}`;
     //   return axiosClient.put(url, body);
     // },
-    getAllByBillInformation: (studentId, courseId) => {
-        const url = `/bills/${studentId}/${courseId}`
+    getAllByBillInformation: (studentId) => {
+        const url = `/bills/bill-history/${studentId}`
         return axiosClient.get(url)
     }
 }
