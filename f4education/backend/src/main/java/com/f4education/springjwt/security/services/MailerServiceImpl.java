@@ -1,6 +1,7 @@
 package com.f4education.springjwt.security.services;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -86,45 +87,48 @@ public class MailerServiceImpl implements MailerService {
 
 	@Override
 	public void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
-			Date date) {
+			String isPassed, Date date) {
+		String link = "http://localhost:3000/student/classes";
 		body = ""
 				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
-				+ "    <div style=\"border-bottom:1px solid #eee\">\n"
+				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link// ! Linh website
 				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\n"
-				+ "    </div>\n" + "    <p style=\"font-size:1.1em\">Xin chào,</p>\n"
-				+ "    <p>Cảnh báo bạn đã vắng điểm danh vào ngày" + date + "</p>\n"
+				+ "    </div>\n" + " <p>Cảnh báo bạn đã vắng điểm danh vào ngày " + formatDate(date) + "</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
-				+ "    Bạn đã vắng" + absentCount + "/" + totalCount + "</h2>\n"
-				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
+				+ "    Bạn đã vắng " + absentCount + "/" + totalCount + " buổi học</h2>\n" + "<p style=\"color:red;font-size:1.2em;\">"
+				+ isPassed + "</p>" + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
-				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
+				+ "      <p>Team Bộ tứ siêu đẳng</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
 		subject = "Cảnh báo vắng điểm danh";
 		queue(new MailInfo(to, subject, body, date));
 	}
 
+	private String formatDate(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		String formattedDate = sdf.format(date);
+		return formattedDate;
+	}
+
 	@Scheduled(fixedDelay = 5000)
 	public void run() {
 		if (!list.isEmpty()) {
-			
-			System.out.println(list.size());
+
 			for (int i = 0; i < list.size(); i++) {
-				System.out.println();
 				MailInfo mail = list.get(i);
-				System.out.println(mail.toString());
 				if (mail.getDate() == null) {
 					list.remove(i);
 					sendMail(mail);
-					
+
 					System.out.println("Đã gửi mail");
 				} else {
 					Date date = new Date();
 					if (date.after(mail.getDate())) {
 						sendMail(mail);
 						list.remove(i);
-						
+
 						System.out.println("Đã gửi mail có ngày");
 					}
 				}

@@ -13,7 +13,7 @@ public interface AttendanceService {
 
 	List<AttendanceDTO> getAttendanceByStudentId(String studentId);
 
-	AttendanceDTO createAttendance(AttendanceDTO attendanceDTO, List<String> listStudentId);
+	AttendanceDTO createAttendance(AttendanceDTO attendanceDTO);
 
 	AttendanceDTO updateAttendance(Integer attendanceId, AttendanceDTO attendanceDTO);
 

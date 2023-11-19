@@ -54,11 +54,9 @@ public class AttendanceController {
 	@PostMapping
 	public ResponseEntity<?> createAttendance(@RequestBody List<AttendanceDTO> attendanceDTOList) {
 		List<AttendanceDTO> createdAttendance = new ArrayList<>();
-		List<String> studentAbsent = new ArrayList<>();
 		
 		for (AttendanceDTO attendenceDTO : attendanceDTOList) {
-			studentAbsent.add(attendenceDTO.getStudentId());
-			createdAttendance.add(attendanceService.createAttendance(attendenceDTO,studentAbsent));
+			createdAttendance.add(attendanceService.createAttendance(attendenceDTO));
 		}
 
 

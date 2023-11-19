@@ -13,4 +13,8 @@ import com.f4education.springjwt.models.Attendance;
 public interface AttendanceReposotory extends JpaRepository<Attendance, Integer> {
 	@Query("SELECT at FROM Attendance at WHERE at.student.studentId = :studentId")
 	List<Attendance> findAllAttendanceByStudentId(@Param("studentId") String studentId);
+
+	@Query("SELECT COUNT(at.attendanceId) FROM Attendance at WHERE at.student.studentId = :studentId AND at.classes.classId = :classId")
+	Integer countAttendanceByClassAndStudent(@Param("studentId") String studentId, @Param("classId") Integer classId);
+
 }

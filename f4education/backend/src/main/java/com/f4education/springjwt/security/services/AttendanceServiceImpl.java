@@ -1,6 +1,5 @@
 package com.f4education.springjwt.security.services;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -57,18 +56,26 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 
 	@Override
-	public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO, List<String> listStudentId) {
+	public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO) {
 		Attendance attendance = this.convertToEntity(attendanceDTO);
 
-//		String[] listMail = (String[]) listStudentId.toArray(new String[0]);    
-		String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+		Optional<Student> student = studentReposotory.findById(attendanceDTO.getStudentId());
+//		For production
+//		String[] listMail = { student.get().getUser().getEmail() };
 
-		System.out.println(listMail.toString());
+//		For testing
+		String[] listMail = { "hienttpc03323@fpt.edu.vn" };
 
 		attendance.setAttendanceDate(new Date());
 		Attendance newAttendance = attendanceReposotory.save(attendance);
 
-		mailer.queueAttendance(listMail, "", "", 3, 7, newAttendance.getAttendanceDate());
+//		Send Mail
+		Integer absentCount = attendanceReposotory.countAttendanceByClassAndStudent(attendanceDTO.getStudentId(),
+				attendanceDTO.getClassId());
+
+		String isPass = absentCount > 7 ? "Bạn đã rớt môn học" : "";
+
+		mailer.queueAttendance(listMail, "", "", absentCount, 7, isPass, newAttendance.getAttendanceDate());
 
 		return this.convertToResponseDTO(newAttendance);
 	}
