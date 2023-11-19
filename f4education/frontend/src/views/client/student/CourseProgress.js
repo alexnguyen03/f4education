@@ -17,7 +17,8 @@ import {
     Stack,
     Text,
     Title,
-    Tooltip
+    Tooltip,
+    Divider
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
@@ -41,6 +42,7 @@ import courseApi from '../../../api/courseApi'
 import registerCoursecAPI from '../../../api/registerCourseApi'
 import questionApi from 'api/questionApi'
 import certificateApi from '../../../api/certificateApi'
+import billApi from 'api/billApi'
 
 // Component
 import Schedule from './Schedule'
@@ -88,6 +90,7 @@ const CourseProgress = () => {
         endDate: '',
         registerCourseId: ''
     })
+
     const [numberOfCourseComplete, setNumberOfCourseComplete] = useState(0)
 
     const [newestCourse, setNewestCourse] = useState([])

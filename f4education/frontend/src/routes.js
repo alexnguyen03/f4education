@@ -37,6 +37,7 @@ import CertificatePDF from 'views/PDF/CertificatePDF'
 import DownloadTaskStudent from 'views/teacher/DownloadTaskStudent'
 import Points from './views/teacher/Points'
 import LearningResult from 'views/client/student/LearningResult'
+import PaymentHistory from 'views/client/student/PaymentHistory'
 import ClassResult from 'views/teacher/ClassResult'
 
 export var routes = [
@@ -310,6 +311,13 @@ export const routesStudent = [
         name: 'Kết quả học tập',
         icon: 'ni ni-planet text-primary',
         component: <LearningResult />,
+        layout: '/student'
+    },
+    {
+        path: '/payment-history',
+        name: 'Lịch sử thanh toán',
+        icon: 'ni ni-planet text-primary',
+        component: <PaymentHistory />,
         layout: '/student'
     }
 ]

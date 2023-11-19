@@ -1,6 +1,7 @@
 package com.f4education.springjwt.controllers;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.f4education.springjwt.payload.request.BillInformation;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
+import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.response.BillResponseDTO;
+import com.f4education.springjwt.security.services.BillInformationServiceImp;
 import com.f4education.springjwt.security.services.BillServiceImp;
 
 @CrossOrigin("*")
@@ -28,6 +32,8 @@ import com.f4education.springjwt.security.services.BillServiceImp;
 public class BillController {
 	@Autowired
 	BillServiceImp billService;
+	@Autowired
+	BillInformationServiceImp billInformationServiceImp;
 
 	@GetMapping
 	public ResponseEntity<?> findAll() {
@@ -86,5 +92,11 @@ public class BillController {
 
 			return ResponseEntity.ok(bill);
 		}
+	}
+	
+	@GetMapping("/{studentId}/{courseId}")
+	public ResponseEntity<?> getAllByBillInformation(@PathVariable("studentId") String studentId) {
+		List<BillInformation> billInformation = billInformationServiceImp.getAllByBillInformation(studentId);
+		return ResponseEntity.ok(billInformation);
 	}
 }
