@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -29,6 +30,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Autowired
 	private StudentRepository studentReposotory;
 
+	@Autowired
+	MailerServiceImpl mailer;
+
 	@Override
 	public List<AttendanceDTO> getAllAttendance() {
 		List<Attendance> antendance = attendanceReposotory.findAll();
@@ -53,11 +57,18 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 
 	@Override
-	public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO) {
+	public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO, List<String> listStudentId) {
 		Attendance attendance = this.convertToEntity(attendanceDTO);
-		
+
+//		String[] listMail = (String[]) listStudentId.toArray(new String[0]);    
+		String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+
+		System.out.println(listMail.toString());
+
 		attendance.setAttendanceDate(new Date());
 		Attendance newAttendance = attendanceReposotory.save(attendance);
+
+		mailer.queueAttendance(listMail, "", "", 3, 7, newAttendance.getAttendanceDate());
 
 		return this.convertToResponseDTO(newAttendance);
 	}
