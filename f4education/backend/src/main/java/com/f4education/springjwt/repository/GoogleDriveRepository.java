@@ -29,7 +29,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.security.services.SessionService;
-import com.google.api.client.http.FileContent;
 import com.google.api.client.http.InputStreamContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
@@ -143,6 +142,7 @@ public class GoogleDriveRepository {
 	}
 
 	// get id folder google drive
+	// ("TASK/classNam/taskName")
 	public String getFolderId(String folderName) throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		String parentId = null;

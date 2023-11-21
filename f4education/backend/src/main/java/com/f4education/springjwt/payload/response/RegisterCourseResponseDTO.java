@@ -16,8 +16,6 @@ public class RegisterCourseResponseDTO {
 
     private Date registrationDate;
 
-    private Integer numberSession;
-
     private String status;
 
     private String courseName;

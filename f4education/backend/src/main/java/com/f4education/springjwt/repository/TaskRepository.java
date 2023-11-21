@@ -11,4 +11,7 @@ import com.f4education.springjwt.models.Task;
 public interface TaskRepository extends JpaRepository<Task, Integer> {
 	@Query("SELECT t FROM Task t WHERE t.classes.classId = :classId")
 	List<Task> findByClassId(@Param("classId") Integer classId);
+
+	@Query("SELECT o FROM Task o where o.classes.classId = :classId")
+	List<Task> getAll(@Param("classId") Integer id);
 }

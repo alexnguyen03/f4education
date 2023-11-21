@@ -5,6 +5,8 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,10 +15,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.QuestionDetailService;
 import com.f4education.springjwt.interfaces.TaskService;
+import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Task;
 import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.TaskDTO;
 import com.f4education.springjwt.payload.request.TaskFileStudentDTO;
+import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.TaskRepository;
 import com.f4education.springjwt.ultils.ConvertByteToMB;
@@ -25,9 +29,19 @@ import com.google.api.services.drive.model.File;
 @Service
 public class TaskServiceImpl implements TaskService {
 	@Autowired
-	TaskRepository taskRepository;
-	@Autowired
-	GoogleDriveRepository googleDriveRepository;
+    private TaskRepository taskRepository;
+
+    @Autowired
+    GoogleDriveRepository googleDriveRepository;
+
+    @Autowired
+    ClassRepository classRepository;
+
+    @Autowired
+    ScheduleServiceImpl scheduleServiceImpl;
+
+    @Autowired
+    MailerServiceImpl mailer;
 
 	@Override
 	public List<TaskDTO> getAllTaskByClassId(Integer classId) {
@@ -73,4 +87,47 @@ public class TaskServiceImpl implements TaskService {
 		}
 		return taskFileStudentDTOs;
 	}
+
+    @Override
+    public List<Task> getAll(Integer id) {
+        return taskRepository.getAll(id);
+    }
+
+    @Override
+    public Task save(Task task) {
+        Classes classes = classRepository.findById(task.getClassesId()).get();
+        ZoneOffset timeOffset = scheduleServiceImpl.getTimeOffsetToServer();
+
+        OffsetDateTime starDate = task.getStartDate().withOffsetSameInstant(timeOffset);
+        OffsetDateTime endDate = task.getEndDate().withOffsetSameInstant(timeOffset);
+
+        task.setStartDate(starDate);
+        task.setEndDate(endDate);
+        task.setClasses(classes);
+
+        if (task.getTaskId() == null) {
+            String idFolder = null;
+            try {
+                String linkFoler = "Tasks/" + task.getClasses().getClassName() + "/" + task.getTitle();
+                idFolder = googleDriveRepository.getFolderId(linkFoler);
+                List<String> mails = null;
+                // mails.add(accountDTO.getEmail());
+
+                // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
+
+                String[] mail = mails.toArray(new String[0]);
+                mailer.queue(mail, "", "", null);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Task taskNew = taskRepository.findById(task.getTaskId()).get();
+            if (taskNew.getTitle().equals(task.getTitle())) {
+                // ! Tiến hành đổi tên folder cũ
+            }
+        }
+        // return null;
+        return taskRepository.save(task);
+    }
 }

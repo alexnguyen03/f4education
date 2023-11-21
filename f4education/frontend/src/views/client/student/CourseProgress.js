@@ -115,6 +115,8 @@ const CourseProgress = () => {
                     element.classes.classId
                 )
 
+                console.log(element)
+
                 const pointGreaterThanFive = await checkIfCourseProgressIsDone(
                     element.classes.classId,
                     element.registerCourseId
@@ -249,6 +251,8 @@ const CourseProgress = () => {
             startDate: course.startDate ? course.startDate : '',
             endDate: course.endDate ? course.endDate : '',
             registerCourseId: course.registerCourseId
+                ? course.registerCourseId
+                : ''
         })
 
         setShowingDetail(true)

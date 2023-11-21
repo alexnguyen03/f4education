@@ -35,11 +35,11 @@ public class Course implements Serializable {
 	@Column(name = "course_description")
 	private String courseDescription;
 
-	@Column(name = "number_session")
-	private Integer numberSession;
+//	@Column(name = "number_session")
+//	private Integer numberSession;
 
 	private String image;
-	
+
 	private Boolean status;
 
 	@JsonIgnore
@@ -81,20 +81,19 @@ public class Course implements Serializable {
 	List<CourseDetail> courseDetail;
 
 	public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
-			Integer numberSession, String image) {
+			String image) {
 		this.courseName = courseName;
 		this.coursePrice = coursePrice;
 		this.courseDuration = courseDuration;
 		this.courseDescription = courseDescription;
-		this.numberSession = numberSession;
 		this.image = image;
 	}
 
 	@Override
 	public String toString() {
 		return "Course [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
-				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-				+ numberSession + ", image=" + image + ", subject=" + subject + "]";
+				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", image=" + image
+				+ ", subject=" + subject + "]";
 	}
 
 }

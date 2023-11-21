@@ -18,6 +18,10 @@ const accountApi = {
     //   const url = `/teachers-history/${id}`;
     //   return axiosClient.get(url);
     // },
+    checkMail: (body) => {
+        const url = '/accounts/checkEmail'
+        return axiosClient.post(url, body)
+    },
     addAccount: (body) => {
         const url = '/accounts'
         return axiosClient.post(url, body, {

@@ -22,8 +22,6 @@ public class CourseResponse {
 
 	private String courseDescription;
 
-	private Integer numberSession;
-
 	private Subject subject;
 
 	private String image;

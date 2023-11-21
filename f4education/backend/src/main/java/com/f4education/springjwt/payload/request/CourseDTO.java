@@ -22,18 +22,17 @@ public class CourseDTO {
 
     private String courseDescription;
 
-    private Integer numberSession;
-
     private Subject subject;
 
     private String image;
     
     private Boolean status;
 
-    @Override
-    public String toString() {
-        return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
-                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-                + numberSession + "]";
-    }
+	@Override
+	public String toString() {
+		return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", subject="
+				+ subject + ", image=" + image + ", status=" + status + "]";
+	}
+
 }
