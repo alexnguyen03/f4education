@@ -56,6 +56,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 	}
 
 	@Override
+	public List<Object[]> getAllByClassId(Integer classId) {
+		return attendanceReposotory.getAllByClassId(classId);
+	}
+
+	@Override
 	public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO) {
 		Attendance attendance = this.convertToEntity(attendanceDTO);
 

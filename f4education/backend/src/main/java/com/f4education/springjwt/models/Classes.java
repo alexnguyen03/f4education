@@ -25,7 +25,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "Class")
 public class Classes implements Serializable {
-	@Id
+    @Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "class_id")
 	private Integer classId;
@@ -80,20 +80,18 @@ public class Classes implements Serializable {
 	@JsonIgnore
 	List<Attendance> attendances;
 
-	@ManyToOne
-	@JoinColumn(name = "admin_id")
-	@JsonIgnore
-	Admin admin;
+    @ManyToOne
+    @JoinColumn(name = "admin_id")
+    @JsonIgnore
+    Admin admin;
+    @ManyToOne
+    @JoinColumn(name = "teacher_id")
+    @JsonIgnore
+    Teacher teacher;
 
-	@ManyToOne
-	@JoinColumn(name = "teacher_id")
-	@JsonIgnore
-	Teacher teacher;
-
-	@Override
-	public String toString() {
-		return "Classes [classId=" + classId + ", className=" + className + ", startDate=" + startDate + ", endDate="
-				+ endDate + ", maximumQuantity=" + maximumQuantity + ", status=" + status + "]";
-	}
-
+    @Override
+    public String toString() {
+        return "Classes [classId=" + classId + ", className=" + className + ", startDate=" + startDate + ", endDate="
+                + endDate + ", maximumQuantity=" + maximumQuantity + ", status=" + status + "]";
+    }
 }

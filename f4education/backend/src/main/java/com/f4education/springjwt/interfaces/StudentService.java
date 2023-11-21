@@ -6,8 +6,10 @@ import com.f4education.springjwt.payload.request.TeacherDTO;
 
 public interface StudentService {
     public Student findByUserId(String userId);
-    
+
+    public Student findById(String studentId);
+
     StudentDTO getStudentDTOByID(String studentId);
-    
+
     StudentDTO updateStudent(StudentDTO studentDTO);
 }

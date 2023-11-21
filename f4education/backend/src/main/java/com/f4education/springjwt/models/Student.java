@@ -44,10 +44,6 @@ public class Student implements Serializable {
 	@Column(name = "image")
 	private String image;
 
-	// @JsonIgnore
-	// @OneToMany(mappedBy = "student")
-	// List<Attendance> attendances;
-
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
 	List<Bill> bills;
@@ -59,6 +55,10 @@ public class Student implements Serializable {
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
 	List<Point> points;
+
+	@JsonIgnore
+	@OneToMany(mappedBy = "student")
+	List<Attendance> attendences;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")

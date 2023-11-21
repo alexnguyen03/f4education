@@ -7,6 +7,8 @@ import java.util.List;
 
 @Service
 public interface AttendanceService {
+	List<Object[]> getAllByClassId(Integer classId);
+	
 	List<AttendanceDTO> getAllAttendance();
 
 	AttendanceDTO getAttendanceByAttendanceId(Integer attendanceId);

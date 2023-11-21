@@ -117,8 +117,8 @@ public class GoogleDriveRepository {
 						.setFields("id").execute();
 
 				// Đặt quyền truy cập cho tệp
-				driveQuickstart.getInstance().permissions()
-						.create(uploadFile.getId(), setPermission("anyone", "reader")).execute();
+				driveQuickstart.getInstance().permissions().create(uploadFile.getId(),
+						setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com")).execute();
 
 				return uploadFile.getId();
 			}
@@ -131,6 +131,7 @@ public class GoogleDriveRepository {
 	// get id folder google drive
 	// ("TASK/classNam/taskName")
 	public String getFolderId(String folderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
 		String parentId = null;
 		String[] folderNames = folderName.split("/");
 
@@ -157,7 +158,7 @@ public class GoogleDriveRepository {
 		}
 		folderId = driveInstance.files().create(fileMetadata).setFields("id").execute().getId();
 		// Set folder permission to allow others to view
-		Permission permission = setPermission("anyone", "reader");
+		Permission permission = setPermission("user", "reader").setEmailAddress("f4education.sp@gmail.com");
 		driveInstance.permissions().create(folderId, permission).execute();
 		return folderId;
 	}
@@ -218,6 +219,18 @@ public class GoogleDriveRepository {
 		}
 	}
 
+	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+
+		String folderId = getFolderId(folderName);
+		for (String email : emails) {
+			Permission permission = setPermission("user", "reader").setEmailAddress(email);
+
+			// Gọi API Drive API để cấp quyền truy cập
+			driveQuickstart.getInstance().permissions().create(folderId, permission).execute();
+		}
+	}
+
 	public byte[] downloadMultipleFiles(List<String> fileIds) {
 		DriveQuickstart driveService = new DriveQuickstart();
 		ByteArrayOutputStream zipOutputStream = new ByteArrayOutputStream();
@@ -254,4 +267,23 @@ public class GoogleDriveRepository {
 		}
 		return zipOutputStream.toByteArray();
 	}
+
+	/*
+	 * @param course name is a name of the folder in drive
+	 */
+	public void createFolderWithoutUploadFile(String folderIdCreated) {
+		// thực hiện tạo mới thư mục với tên là tên khóa học và 2 thu mục con là BÀI HỌC
+		// và TÀI NGUYÊN
+		try {
+			String subFolderLessonId = this.findOrCreateFolder(folderIdCreated, "BÀI HỌC",
+					driveQuickstart.getInstance());
+			String subFolderResourceId = this.findOrCreateFolder(folderIdCreated, "TÀI NGUYÊN",
+					driveQuickstart.getInstance());
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 }

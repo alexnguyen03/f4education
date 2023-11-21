@@ -18,14 +18,14 @@ public class QuestionController {
     QuestionService questionService;
 
     @GetMapping
-//	@PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> findAll() {
         List<QuestionDTO> question = questionService.getAllQuestion();
         return ResponseEntity.ok(question);
     }
 
     @GetMapping("/{questionId}")
-//	@PreAuthorize("hasRole('ADMIN')")
+    // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> findById(@PathVariable Integer questionId) {
         QuestionDTO question = questionService.findQuestionById(questionId);
         return ResponseEntity.ok(question);
@@ -39,8 +39,9 @@ public class QuestionController {
     }
 
     @PutMapping("/{id}")
-	@PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateQuestion(@PathVariable("questionId") Integer questionId, @RequestBody QuestionDTORequest questionDTO) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> updateQuestion(@PathVariable("questionId") Integer questionId,
+            @RequestBody QuestionDTORequest questionDTO) {
         QuestionDTO question = questionService.updateQuestion(questionId, questionDTO);
         return ResponseEntity.ok(question);
     }

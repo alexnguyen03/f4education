@@ -16,7 +16,7 @@ public class CourseHistoryDTO {
     private String adminName;
     private String courseName;
     private Float coursePrice;
-    private String courseDuration;
+    private Integer courseDuration;
     private String courseDescription;
     private Integer numberSession;
     private String image;

@@ -4,8 +4,8 @@ import { Badge, Col, Row } from 'reactstrap'
 // import logo from '../../assets/img/brand/f4.png'
 import logo from '../../assets/img/brand/F4EDUCATION.png'
 import cartEmptyimage from '../../assets/img/cart-empty.png'
-// reactstrap components
 
+// reactstrap components
 import {
     Autocomplete,
     Avatar,
@@ -16,14 +16,18 @@ import {
     Grid,
     Group,
     HoverCard,
+    List,
     Menu,
     rem,
+    ScrollArea,
     SimpleGrid,
     Text,
+    ThemeIcon,
     Title
 } from '@mantine/core'
 import {
     IconChevronDown,
+    IconChevronRight,
     IconLayoutDashboard,
     IconLogout2,
     IconSchoolBell,
@@ -37,6 +41,7 @@ import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 
 // API
 import courseApi from '../../api/courseApi'
+import subjectApi from '../../api/subjectApi'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -61,6 +66,8 @@ const ClientNavbar = () => {
     const [carts, setCarts] = useState([])
     const [totalPrice, setTotalPrice] = useState(0)
     const [listCourse, setListCourse] = useState([])
+    const [listSubject, setListSubject] = useState([])
+    const [courseByLevel, setCourseByLevel] = useState([])
 
     const fetchCart = async () => {
         try {
@@ -72,20 +79,35 @@ const ClientNavbar = () => {
         }
     }
 
-    // const fetchCourse = async () => {
-    //     try {
-    //         const resp = await courseApi.getAll()
+    const fetchCourse = async () => {
+        try {
+            const resp = await courseApi.getAll()
 
-    //         if (resp.status === 200 && resp.data.length > 0) {
-    //             setListCourse(resp.data)
-    //         }
-    //     } catch (error) {
-    //         console.log(error)
-    //     }
-    // }
+            if (resp.status === 200 && resp.data.length > 0) {
+                setListCourse(resp.data)
+            }
 
+            console.log(resp.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const fetchSubject = async () => {
+        try {
+            const resp = await subjectApi.getAllSubject()
+
+            if (resp.status === 200 && resp.data.length > 0) {
+                setListSubject(resp.data)
+            }
+            console.log(resp.data)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // get Total Price from list totalCartItem
     useEffect(() => {
-        // get Total Price from list totalCartItem
         let newTotalPrice = 0
         if (carts) {
             carts.forEach((item) => (newTotalPrice += item.course.coursePrice))
@@ -94,8 +116,11 @@ const ClientNavbar = () => {
     }, [carts])
 
     useEffect(() => {
-        fetchCart()
-    }, [])
+        const fetchData = async () => {
+            await Promise.all([fetchSubject(), fetchCourse()])
+        }
+        fetchData()
+    }, [user.username])
 
     useEffect(() => {
         fetchCart()
@@ -151,6 +176,14 @@ const ClientNavbar = () => {
         }
     })
 
+    const handleOnChangeLevelCategory = (subjectId) => {
+        const listCourseFilter = listCourse.filter(
+            (course) => course.subject.subjectId === subjectId
+        )
+        console.log(listCourseFilter)
+        setCourseByLevel(listCourseFilter)
+    }
+
     return (
         <nav
             className={`navbar navbar-expand-lg ${styles['navbar-animate']}`}
@@ -167,8 +200,8 @@ const ClientNavbar = () => {
                         alt="F4 Education Center"
                         style={{
                             objectFit: 'cover',
-                            width:'120px',
-                            height:'35px'
+                            width: '120px',
+                            height: '35px'
                         }}
                     />
                 </Link>
@@ -229,7 +262,6 @@ const ClientNavbar = () => {
 
                         <li className="nav-item">
                             <HoverCard
-                                width={'75vw'}
                                 position="bottom"
                                 radius="sm"
                                 shadow="md"
@@ -260,141 +292,131 @@ const ClientNavbar = () => {
                                     </Link>
                                 </HoverCard.Target>
 
-                                <HoverCard.Dropdown
-                                    style={{
-                                        overflow: 'hidden',
-                                        maxWidth: '1000px'
-                                    }}
-                                    mt="xl"
-                                >
-                                    <Group position="apart" px={rem('1.5rem')}>
+                                <HoverCard.Dropdown mt="xl">
+                                    {/* <Group position="apart" px={rem('1.5rem')}>
                                         <Text fw={500}>Khóa học</Text>
                                         <Link to="/course" fz="xs">
                                             Tất cả khóa học
                                         </Link>
                                     </Group>
 
-                                    <Divider my="sm" />
+                                    <Divider my="sm" /> */}
 
                                     <Grid gutter="xl" p={rem('1.5rem')}>
-                                        <Grid.Col
-                                            xl={4}
-                                            lg={4}
-                                            md={12}
-                                            sm={12}
-                                            style={{ height: '100%' }}
+                                        {/* Level 1 category */}
+                                        <ScrollArea
+                                            p={20}
+                                            h={500}
+                                            offsetScrollbars
                                         >
-                                            <div className="mb-auto">
-                                                <Title
-                                                    order={3}
-                                                    fw={700}
-                                                    color="dark"
-                                                >
-                                                    Các chủ đề khóa học phổ biến
-                                                </Title>
-                                                <Text color="dimmed">
-                                                    Khám phá các khóa học miễn
-                                                    phí hoặc trả phí về các chủ
-                                                    đề mà bạn quan tâm.
-                                                </Text>
-                                            </div>
-                                            <Link
-                                                to="/course"
-                                                className="w-100"
+                                            <List
+                                                spacing="xs"
+                                                size="sm"
+                                                center
+                                                icon={
+                                                    <ThemeIcon
+                                                        color="indigo"
+                                                        size={24}
+                                                        radius="xl"
+                                                    >
+                                                        <IconChevronRight size="1rem" />
+                                                    </ThemeIcon>
+                                                }
                                             >
-                                                <Button
-                                                    color="violet"
-                                                    w="100%"
-                                                    mt="xl"
-                                                >
-                                                    Khám phá khóa học
-                                                </Button>
-                                            </Link>
-                                        </Grid.Col>
-                                        {/* <Divider orientation="vertical" size="sm" /> */}
-                                        <Grid.Col xl={8} lg={8} md={12} sm={12}>
-                                            <SimpleGrid
-                                                cols={smallScreen ? 1 : 3}
-                                                spacing="xl"
-                                                verticalSpacing="sm"
-                                            >
-                                                <Flex
-                                                    justify={'center'}
-                                                    align={
-                                                        smallScreen
-                                                            ? 'center'
-                                                            : 'flex-start'
-                                                    }
-                                                    direction={'column'}
-                                                    gap={'xl'}
-                                                    ml="md"
-                                                >
-                                                    {category_1.map(
-                                                        (c, index) => (
-                                                            <Link
-                                                                to={`/course`}
-                                                                key={index}
+                                                {listSubject.map((subject) => (
+                                                    <HoverCard
+                                                        position="right-start"
+                                                        radius="sm"
+                                                        shadow="md"
+                                                        withinPortal
+                                                    >
+                                                        <HoverCard.Target>
+                                                            <List.Item
+                                                                key={
+                                                                    subject.subjectId
+                                                                }
+                                                                onMouseEnter={() =>
+                                                                    handleOnChangeLevelCategory(
+                                                                        subject.subjectId
+                                                                    )
+                                                                }
                                                             >
-                                                                <Text
-                                                                    color="dark"
-                                                                    fw={700}
-                                                                >
-                                                                    {c}
-                                                                </Text>
-                                                            </Link>
-                                                        )
-                                                    )}
-                                                </Flex>
-                                                <Flex
-                                                    justify={'center'}
-                                                    align={'center'}
-                                                    direction={'column'}
-                                                    gap={'xl'}
-                                                >
-                                                    {category_2.map(
-                                                        (c, index) => (
-                                                            <Link
-                                                                to={`/course`}
-                                                                key={index}
+                                                                {
+                                                                    subject.subjectName
+                                                                }
+                                                            </List.Item>
+                                                        </HoverCard.Target>
+                                                        {/* Level 2 category */}
+                                                        <HoverCard.Dropdown
+                                                            ml={57}
+                                                            mt={-30}
+                                                            p={20}
+                                                        >
+                                                            <List
+                                                                spacing="xs"
+                                                                size="sm"
+                                                                center
+                                                                icon={
+                                                                    <ThemeIcon
+                                                                        color="violet"
+                                                                        size={
+                                                                            24
+                                                                        }
+                                                                        radius="xl"
+                                                                    >
+                                                                        <IconChevronRight size="1rem" />
+                                                                    </ThemeIcon>
+                                                                }
+                                                                mah={500}
+                                                                styles={{
+                                                                    root: {
+                                                                        overflow:
+                                                                            'scroll'
+                                                                    }
+                                                                }}
                                                             >
-                                                                <Text
-                                                                    color="dark"
-                                                                    fw={700}
-                                                                >
-                                                                    {c}
-                                                                </Text>
-                                                            </Link>
-                                                        )
-                                                    )}
-                                                </Flex>
-                                                <Flex
-                                                    justify={'center'}
-                                                    align={
-                                                        smallScreen
-                                                            ? 'center'
-                                                            : 'flex-end'
-                                                    }
-                                                    direction={'column'}
-                                                    gap={'xl'}
-                                                >
-                                                    {category_3.map(
-                                                        (c, index) => (
-                                                            <Link
-                                                                to={`/course`}
-                                                                key={index}
-                                                            >
-                                                                <Text
-                                                                    color="dark"
-                                                                    fw={700}
-                                                                >
-                                                                    {c}
-                                                                </Text>
-                                                            </Link>
-                                                        )
-                                                    )}
-                                                </Flex>
-                                            </SimpleGrid>
-                                        </Grid.Col>
+                                                                {courseByLevel.length ===
+                                                                0 ? (
+                                                                    <>
+                                                                        <List.Item>
+                                                                            Môn
+                                                                            học
+                                                                            hiện
+                                                                            chưa
+                                                                            có
+                                                                            khóa
+                                                                            học.
+                                                                        </List.Item>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        {courseByLevel.map(
+                                                                            (
+                                                                                course
+                                                                            ) => (
+                                                                                <List.Item
+                                                                                    key={
+                                                                                        course.courseId
+                                                                                    }
+                                                                                >
+                                                                                    <Link
+                                                                                        to={`/course/${course.courseId}`}
+                                                                                    >
+                                                                                        {
+                                                                                            course.courseName
+                                                                                        }
+                                                                                    </Link>
+                                                                                </List.Item>
+                                                                            )
+                                                                        )}
+                                                                    </>
+                                                                )}
+                                                            </List>
+                                                        </HoverCard.Dropdown>
+                                                    </HoverCard>
+                                                ))}
+                                            </List>
+                                        </ScrollArea>
                                     </Grid>
                                 </HoverCard.Dropdown>
                             </HoverCard>

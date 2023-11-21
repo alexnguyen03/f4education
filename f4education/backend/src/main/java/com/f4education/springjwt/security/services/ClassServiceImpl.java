@@ -175,6 +175,11 @@ public class ClassServiceImpl implements ClassService {
 	}
 
 	@Override
+	public Classes saveOneClass(Classes classes) {
+		return classRepository.save(classes);
+	}
+
+	@Override
 	public List<LearningResultResponse> getAllClassLearningResult(String studentId) {
 		List<Classes> classes = classRepository.findClassByStudentId(studentId);
 		return classes.stream().map(this::convertToResponseResultOutCome).collect(Collectors.toList());

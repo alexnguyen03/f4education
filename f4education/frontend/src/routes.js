@@ -37,8 +37,9 @@ import StudentHome from './views/client/student/StudentHome'
 import CoursesDetail from 'views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
 import CertificatePDF from 'views/PDF/CertificatePDF'
+import Points from './views/teacher/Points'
 import LearningResult from 'views/client/student/LearningResult'
-
+import ClassResult from 'views/teacher/ClassResult'
 import TeacherSchedule from 'views/teacher/TeacherSchedule'
 import TaskTeacher from 'views/teacher/TaskTeacher'
 
@@ -276,7 +277,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/classes-infor',
+        path: '/class-infor',
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
@@ -304,8 +305,21 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/classes-infor/:classId',
+        path: '/class-infor/:classId',
         component: <ClassInformationDetail />,
+        layout: '/teacher'
+    },
+    {
+        path: '/class-infor/point/:classId',
+        icon: 'ni ni-planet text-blue',
+        component: <Points />,
+        layout: '/teacher'
+    },
+    {
+        path: '/class-result',
+        name: 'Kết quả lớp học',
+        icon: 'ni ni-planet text-blue',
+        component: <ClassResult />,
         layout: '/teacher'
     }
 ]

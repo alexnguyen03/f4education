@@ -72,11 +72,11 @@ const Sidebar = (props) => {
     const createLinks = (routes) => {
         return routes.map((prop, key) => {
             if (
-                prop.path != '/login' &&
-                prop.path != '/resourceDetail/:classId/:folderId' &&
-                prop.path != '/questionDetail/:classId' &&
-                prop.path != '/question-detail/:courseName' &&
-                prop.path != '/class-detail/:classIdParam'
+                prop.path !== '/login' &&
+                prop.path !== '/resourceDetail/:classId/:folderId' &&
+                prop.path !== '/questionDetail/:classId' &&
+                prop.path !== '/question-detail/:courseName' &&
+                prop.path !== '/class-detail/:classIdParam'
             ) {
                 return (
                     <NavItem key={key}>

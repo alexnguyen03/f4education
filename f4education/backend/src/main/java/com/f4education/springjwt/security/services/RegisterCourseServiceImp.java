@@ -1,5 +1,8 @@
 package com.f4education.springjwt.security.services;
 
+import java.util.ArrayList;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -11,24 +14,36 @@ import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.interfaces.PointService;
 import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.interfaces.TeacherService;
+import com.f4education.springjwt.models.ClassRoom;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Schedule;
+import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.models.Student;
+import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.request.ScheduleDTO;
+import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
 import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.ClassRoomRepository;
 import com.f4education.springjwt.repository.CourseRepository;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
 import com.f4education.springjwt.repository.ScheduleRepository;
 import com.f4education.springjwt.repository.SessionsRepository;
 import com.f4education.springjwt.repository.StudentRepository;
+import com.f4education.springjwt.repository.TeacherRepository;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
@@ -38,7 +53,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	private CourseRepository courseRepository;
 	@Autowired
 	private StudentRepository studentRepository;
-
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
 	@Autowired
 	private ClassRepository classRepository;
 
@@ -52,7 +68,18 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	SessionsRepository sessionsRepository;
 
 	@Autowired
+	TeacherService teacherService;
+
+	@Autowired
+	TeacherRepository teacherRepository;
+	@Autowired
 	ClassRoomRepository classRoomRepository;
+
+	@Autowired
+	PointService pointService;
+
+	@Autowired
+	ClassService classService;
 
 	@Override
 	public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
@@ -102,12 +129,12 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
 		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
-
+		
 		courseResponse.setCourse(registerCourse.getCourse());
 		courseResponse.setClasses(registerCourse.getClasses());
 		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
 		courseResponse.setRegisterCourseId(registerCourse.getRegisterCourseId());
-
+		
 		return courseResponse;
 	}
 
@@ -244,20 +271,63 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			RegisterCourseRequestDTO registerCourseRequestDTO) {
 		List<RegisterCourse> listRegisterCourse = registerCourseRepository
 				.findByCourseId(registerCourseRequestDTO.getCourseId());
-		List<Integer> listRegisterCourseId = registerCourseRequestDTO.getListRegisterCourseId();
-		List<RegisterCourse> filteredRegisterCourses = listRegisterCourse.stream()
-				.filter(registerCourse -> listRegisterCourseId.contains(registerCourse.getRegisterCourseId()))
-				.collect(Collectors.toList());
+		List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
+		List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
+		List<Point> listPoint = new ArrayList<Point>();
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
-		filteredRegisterCourses.forEach(registerCourse -> {
-			registerCourse.setClasses(foundClass);
-			registerCourse.setStudent(registerCourse.getStudent());
-			registerCourse.setCourse(registerCourse.getCourse());
-		});
+		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
+		foundClass.setTeacher(foundTeacher);
+		classService.saveOneClass(foundClass);
+		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
+		if (!listRegisterCourseIdToAdd.isEmpty()) {
 
-		return registerCourseRepository.saveAll(filteredRegisterCourses).stream().map(this::convertToResponseDTO)
+			filteredRegisterCoursesToAdd = listRegisterCourse.stream()
+					.filter(registerCourse -> listRegisterCourseIdToAdd.contains(registerCourse.getRegisterCourseId()))
+					.collect(Collectors.toList());
+			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
+				registerCourse.setClasses(foundClass);
+				Point point = new Point();
+				point.setClasses(foundClass);
+				point.setStudent(registerCourse.getStudent());
+				point.setAttendancePoint((double) 0);
+				point.setExercisePoint((double) 0);
+				point.setAveragePoint((double) 0);
+				point.setQuizzPoint((double) 0);
+				listPoint.add(point);
+			});
+			pointService.save(listPoint);
+			registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+		}
+		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
+		if (!listRegisterCourseIdToDelete.isEmpty()) {
+
+			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
+					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getRegisterCourseId()))
+					.collect(Collectors.toList());
+			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
+				registerCourse.setClasses(null);
+
+			});
+			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+		}
+
+		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
 
 	}
 
+	@Override
+	public Boolean getRegisterCourseHasClass(Integer classId) {
+		List<RegisterCourse> listRegisterCourses = new ArrayList<>();
+		listRegisterCourses = registerCourseRepository.getRegisterCourseHasClass(classId);
+		return !listRegisterCourses.isEmpty();// false thì sẽ thì lớp đã tồn tại throw new
+												// UnsupportedOperationException("Unimplemented method
+												// 'getRegisterCourseHasClass'");
+	}
+
+	// @Override
+	// public void grantPermissionsByEmails(String folderName, List<String> emails)
+	// throws Exception {
+	// googleDriveRepository.grantPermissionsByEmails(folderName, emails);
+	// }
 }

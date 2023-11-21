@@ -15,7 +15,7 @@ public class QuestionDTO {
 	private String subjectName;
 
 	private String courseName;
-	
+
 	private String courseImage;
 
 	private Date createDate;

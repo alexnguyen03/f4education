@@ -7,7 +7,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PointDTO implements Serializable {
+public class PointRequestDTO implements Serializable {
 	private Integer pointId;
 	private Float averagePoint;
 	private Float attendancePoint;

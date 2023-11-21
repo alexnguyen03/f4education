@@ -50,7 +50,7 @@ public class AttendanceController {
 		List<AttendanceDTO> attendances = attendanceService.getAttendanceByStudentId(studentId);
 		return ResponseEntity.ok(attendances);
 	}
-
+ 
 	@PostMapping
 	public ResponseEntity<?> createAttendance(@RequestBody List<AttendanceDTO> attendanceDTOList) {
 		List<AttendanceDTO> createdAttendance = new ArrayList<>();

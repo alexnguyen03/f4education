@@ -6,7 +6,6 @@ import com.f4education.springjwt.payload.response.CourseHistoryDTO;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,16 +24,16 @@ public class CourseHistoryServiceImpl implements CourseHistoryService {
 	}
 
 	private CourseHistoryDTO convertEntityToDTO(CourseHistory courseHistory) {
-		return new CourseHistoryDTO(
-				courseHistory.getCourseHistoryId(),
-				courseHistory.getCourse().getCourseId(),
-				courseHistory.getCourse().getSubject().getSubjectName(),
-				courseHistory.getCourse().getAdmin().getFullname(),
-				courseHistory.getCourseName(),
-				courseHistory.getCoursePrice(), courseHistory.getCourseDuration(), courseHistory.getCourseDescription(),
-				courseHistory.getNumberSession(), courseHistory.getImage(),
-				courseHistory.getAction(),
-				courseHistory.getModifyDate());
+		CourseHistoryDTO courseHistoryDTO = new CourseHistoryDTO();
+		courseHistoryDTO.setCourseName(courseHistory.getCourseName());
+		courseHistoryDTO.setCoursePrice(courseHistory.getCoursePrice());
+		courseHistoryDTO.setCourseDuration(courseHistory.getCourseDuration());
+		courseHistoryDTO.setCourseDescription(courseHistory.getCourseDescription());
+		courseHistoryDTO.setNumberSession(courseHistory.getNumberSession());
+		courseHistoryDTO.setImage(courseHistory.getImage());
+		courseHistoryDTO.setAction(courseHistory.getAction());
+		courseHistoryDTO.setModifyDate(courseHistory.getModifyDate());
+		return new CourseHistoryDTO();
 	}
 
 	@Override
@@ -44,5 +43,4 @@ public class CourseHistoryServiceImpl implements CourseHistoryService {
 				.map(this::convertEntityToDTO)
 				.collect(Collectors.toList());
 	}
-
 }

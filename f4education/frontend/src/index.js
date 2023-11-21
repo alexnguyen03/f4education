@@ -27,19 +27,15 @@ root.render(
                 path="/admin/*/:courseName/:folderId"
                 element={<AdminLayout />}
             />
-			<Route
-				path='/admin'
-				element={
-					<Navigate
-						to='/admin/index'
-						replace
-					/>
-				}
-			/>
-			<Route
-				path='/admin/*/:courseId'
-				element={<AdminLayout />}
-			/>
+            <Route
+                path="/admin/*/:courseName/:folderId"
+                element={<AdminLayout />}
+            />
+            <Route
+                path="/admin"
+                element={<Navigate to="/admin/index" replace />}
+            />
+            <Route path="/admin/*/:courseId" element={<AdminLayout />} />
 
             {/* Client Route */}
             <Route path="/*" element={<ClientLayout />} />
@@ -59,9 +55,10 @@ root.render(
             <Route path="/*/:classId" element={<Student />} />
 
             {/* Teacher Route */}
+            <Route path="*/point/:classId" element={<Teacher />} />
             <Route path="/teacher/*" element={<Teacher />} />
             <Route path="/*/classes-infor/:classId" element={<Teacher />} />
-           
+
             {/* PDF Route */}
             <Route path="/pdf/*" element={<PDFLayout />} />
         </Routes>

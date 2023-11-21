@@ -58,17 +58,15 @@ const LearningResult = () => {
                         classes.classId
                     )
 
-                    console.log(pointData)
-
-                    const newPointData = {
+                    const newClassesData = {
                         ...classes,
-                        averagePoint: pointData[0].averagePoint,
-                        attendancePoint: pointData[0].attendancePoint,
-                        exercisePoint: pointData[0].exercisePoint,
-                        quizzPoint: pointData[0].quizzPoint
+                        averagePoint: pointData.averagePoint,
+                        attendancePoint: pointData.attendancePoint,
+                        exercisePoint: pointData.exercisePoint,
+                        quizzPoint: pointData.quizzPoint
                     }
 
-                    resultClass.push(newPointData)
+                    resultClass.push(newClassesData)
                 }
 
                 console.log(resultClass)
@@ -87,7 +85,8 @@ const LearningResult = () => {
                 username,
                 parseInt(classId)
             )
-            return resp.data
+            console.log(resp.data[0])
+            return resp.data[0]
         } catch (error) {
             console.log(error)
         }
@@ -263,7 +262,8 @@ const LearningResult = () => {
                                                         striped
                                                     >
                                                         <caption>
-                                                            Kết quả học tập lớp{' '}{classes.className}
+                                                            Kết quả học tập lớp{' '}
+                                                            {classes.className}
                                                         </caption>
                                                         <thead>
                                                             {tableTheadContent}

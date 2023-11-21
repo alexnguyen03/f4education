@@ -34,7 +34,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @CrossOrigin("*")
 @RequestMapping("/api/courses")
-@RequiredArgsConstructor
 public class CoursesController {
 	@Autowired
 	CourseServiceImpl courseService;
@@ -102,15 +101,14 @@ public class CoursesController {
 	public ResponseEntity<?> updateCourse(@RequestPart("courseRequest") String courseRequestString,
 			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
+		// String newFile = "";
 		CourseRequest courseRequest = new CourseRequest();
-
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
 				File savedFile = xfileService.save(file.orElse(null), "/courses");
 				courseRequest.setImage(savedFile.getName());
 			}
-
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -157,5 +155,10 @@ public class CoursesController {
 	public ResponseEntity<?> findCourseById(@PathVariable("courseId") Integer courseId) {
 		CourseDTO course = courseService.findById(courseId);
 		return ResponseEntity.ok(course);
+	}
+
+	@GetMapping("/renameFolder")
+	public String renameFolder(String courseName, String newCoursename) throws Exception {
+		return courseService.renameFolder(courseName, newCoursename);
 	}
 }
