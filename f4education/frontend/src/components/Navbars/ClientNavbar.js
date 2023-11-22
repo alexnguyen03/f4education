@@ -168,8 +168,8 @@ const ClientNavbar = () => {
                         alt="F4 Education Center"
                         style={{
                             objectFit: 'cover',
-                            width:'120px',
-                            height:'35px'
+                            width: '120px',
+                            height: '35px'
                         }}
                     />
                 </Link>

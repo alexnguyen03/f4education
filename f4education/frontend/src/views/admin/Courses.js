@@ -52,6 +52,7 @@ import { formatDate } from '../../utils/formater'
 import { Link } from 'react-router-dom'
 import Notify from '../../utils/Notify'
 import { ToastContainer, toast } from 'react-toastify'
+import { LoadingOverlay } from '@mantine/core'
 const IMG_URL = '/courses/'
 const Courses = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -59,6 +60,7 @@ const Courses = () => {
 
     const [imgData, setImgData] = useState(null)
     const [showForm, setShowForm] = useState(false)
+    const [loadingValidate, setLoadingValidate] = useState(false)
     const [showHistoryTable, setShowHistoryTable] = useState(false)
     const [update, setUpdate] = useState(false)
     const [loadingCourses, setLoadingCourses] = useState(true)
@@ -183,7 +185,6 @@ const Courses = () => {
                 ...prevErr,
                 imgErr: 'Vui lòng chọn ảnh cho khóa học'
             }))
-            console.log('=================================')
             isValid = false
         } else {
             setMsgError((prevErr) => ({ ...prevErr, imgErr: '' }))
@@ -286,12 +287,14 @@ const Courses = () => {
                 size: 150
             },
             {
+                accessorKey: 'action',
+
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
 
-                    if (row.action === 'UPDATE') {
+                    if (row === 'UPDATE') {
                         return <Badge color="primary">Cập nhật</Badge>
-                    } else {
+                    } else if (row === 'CREATE') {
                         return <Badge color="success">Tạo mới </Badge>
                     }
                 },
@@ -344,9 +347,12 @@ const Courses = () => {
         try {
             setLoadingCoursesHistory(true)
             const resp = await courseApi.getAllCourseHistory()
+            console.log(
+                '🚀 ~ file: Courses.js:348 ~ getAllCourseHistory ~ resp:',
+                resp.data
+            )
             setCourseHistories(resp.data.reverse())
             setLoadingCoursesHistory(false)
-            console.log(courseHistories)
         } catch (error) {
             console.log(error)
         }
@@ -471,7 +477,9 @@ const Courses = () => {
         }
     }
     const addCourse = async (formData) => {
+        var id = null
         try {
+            setLoadingValidate(true)
             const respValidate = await courseApi.validateCourseName(
                 course.courseName
             )
@@ -481,15 +489,14 @@ const Courses = () => {
                 respValidate
             )
             if (!respValidate.data) {
-                const id = toast(Notify.msg.loading, Notify.options.loading())
-
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 const resp = await courseApi.addCourse(formData)
                 console.log(
                     '🚀 ~ file: Courses.js:468 ~ addCourse ~ resp:',
                     resp
                 )
                 if (resp.status === 200) {
-                    toast(id, Notify.options.createSuccess())
+                    toast.update(id, Notify.options.createSuccess())
                     setCourses([resp.data, ...courses])
                     handleResetForm()
                 }
@@ -500,10 +507,14 @@ const Courses = () => {
                         'Tên khóa học đã tồn tại. Vui lòng nhâp tên khác!'
                 }))
             }
+            setLoadingValidate(false)
 
             // getAllCourse()
         } catch (error) {
-            toast(Notify.options.createError())
+            toast.update(id, Notify.options.createError())
+
+            setLoadingValidate(false)
+
             console.log('failed to fetch data', error)
         }
     }
@@ -555,10 +566,8 @@ const Courses = () => {
         if (courses.length > 0) return
         getAllCourse()
         getAllSubject()
-        console.log(
-            '🚀 ~ file: Courses.js:361 ~ handleEditForm ~ course:',
-            course
-        )
+
+        getAllCourseHistory()
     }, []) // không có ngoặc vuông thì thực hiện gọi return trước call back// thực hiện 1 lần duy nhất
 
     useEffect(() => {
@@ -744,7 +753,12 @@ const Courses = () => {
                             <Form
                                 onSubmit={handleSubmitForm}
                                 encType="multipart/form-data"
+                                className="position-relative"
                             >
+                                <LoadingOverlay
+                                    visible={loadingValidate}
+                                    overlayBlur={2}
+                                />
                                 <div className="modal-header">
                                     <h3 className="mb-0">Thông tin khóa học</h3>
                                     <button
@@ -757,14 +771,15 @@ const Courses = () => {
                                         <span aria-hidden={true}>×</span>
                                     </button>
                                 </div>
-                                <div className="modal-body">
-                                    <div className="px-lg-2">
+                                <div className="modal-body ">
+                                    <div className="px-lg-2 ">
                                         <div
                                             className="previewProfilePic px-3 border d-flex justify-content-center"
                                             style={{
                                                 height: '200px',
                                                 overflow: 'hidden',
-                                                position: 'relative'
+                                                position: 'relative',
+                                                cursor: 'pointer'
                                             }}
                                             onClick={handleImageClick}
                                         >
@@ -789,7 +804,11 @@ const Courses = () => {
                                                 />
                                             )}
                                             <small
-                                                className="position-absolute text-danger text-center"
+                                                className={`${
+                                                    msgError.imgErr === ''
+                                                        ? 'text-danger'
+                                                        : ''
+                                                } position-absolute  text-center `}
                                                 style={{
                                                     top: '50%',
                                                     left: '50%',
@@ -800,6 +819,10 @@ const Courses = () => {
                                             >
                                                 {msgError.imgErr !== ''
                                                     ? msgError.imgErr
+                                                    : null}
+
+                                                {course.image === ''
+                                                    ? 'Nhấn chọn ảnh cho khóa học'
                                                     : null}
                                             </small>
                                         </div>
@@ -973,6 +996,7 @@ const Courses = () => {
                                         color={update ? 'primary' : 'success'}
                                         type="submit"
                                         className="px-5"
+                                        disabled={loadingValidate}
                                     >
                                         Lưu
                                     </Button>

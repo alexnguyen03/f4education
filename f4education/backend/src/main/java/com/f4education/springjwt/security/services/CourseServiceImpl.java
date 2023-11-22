@@ -352,7 +352,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public Boolean isCourseNameExist(String courseName) {
-		return courseRepository.isCourseNameExist(courseName) != null;
+		return !courseRepository.isCourseNameExist(courseName).isEmpty();
 	}
 
 }

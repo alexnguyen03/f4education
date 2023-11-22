@@ -47,20 +47,7 @@ export var routes = [
         component: <Index />,
         layout: '/admin'
     },
-    {
-        path: '/icons',
-        name: 'Icons',
-        icon: 'ni ni-planet text-blue',
-        component: <Icons />,
-        layout: '/admin'
-    },
-    {
-        path: '/register',
-        name: 'Register',
-        icon: 'ni ni-circle-08 text-pink',
-        component: <Register />,
-        layout: '/auth'
-    },
+
     {
         path: '/teachers',
         name: 'Giảng viên',
@@ -142,13 +129,7 @@ export var routes = [
         component: <QuestionDetail />,
         layout: '/admin'
     },
-    {
-        path: '/classsroom',
-        name: 'Phòng học',
-        icon: 'fa-solid fa-grip-vertical text-primary',
-        component: <ClasssRoom />,
-        layout: '/admin'
-    },
+
     {
         path: '/resources',
         name: 'Tài nguyên',
@@ -162,13 +143,7 @@ export var routes = [
         component: <Login />,
         layout: '/auth'
     },
-    {
-        path: '/questions',
-        name: 'Câu hỏi',
-        icon: 'ni ni-ui-04 text-primary',
-        component: <Questions />,
-        layout: '/admin'
-    },
+
     {
         path: '/question-detail/:questionId',
         component: <QuestionDetail />,

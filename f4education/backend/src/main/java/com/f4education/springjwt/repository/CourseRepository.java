@@ -19,7 +19,7 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findBySubjectNames(@Param("subjectNames") List<String> subjectNames);
 
 	@Query("SELECT c FROM Course c where c.courseName LIKE %:courseName%")
-	Course isCourseNameExist(@Param("courseName") String courseName);
+	List<Course> isCourseNameExist(@Param("courseName") String courseName);
 
 	@Query("SELECT k FROM Course k WHERE k.courseDuration >= :minThoiLuong AND k.courseDuration <= :maxThoiLuong")
 	List<Course> findByThoiLuongInRange(@Param("minThoiLuong") Integer minThoiLuong,

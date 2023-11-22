@@ -56,9 +56,20 @@ public class UserDetailsImpl implements UserDetails {
         })
         .collect(Collectors.toList());
     // String r = authorities.get(0).getAuthority(); // role
+    String fullName = "";
+    String imageName = "";
 
-    String fullName = "Tên demo nhé";
-    String imageName = "imageName.jpg";
+    if (authorities.get(0).toString().equalsIgnoreCase("ROLE_ADMIN")) {
+      fullName = user.getAdmins().get(0).getFullname();
+      imageName = user.getAdmins().get(0).getImage();
+    } else if (authorities.get(0).toString().equalsIgnoreCase("ROLE_TEACHER")) {
+      fullName = user.getTeachers().get(0).getFullname();
+      imageName = user.getTeachers().get(0).getImage();
+    } else {
+      fullName = user.getStudents().get(0).getFullname();
+      imageName = user.getStudents().get(0).getImage();
+
+    }
 
     // cho doi lai type admin_id roi them phan nay vao
     /*

@@ -193,7 +193,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		BeanUtils.copyProperties(registerCourse, registerCourseDTO);
 		registerCourseDTO.setRegisterCourseId(registerCourse.getRegisterCourseId());
 		registerCourseDTO.setStatus(registerCourse.getStatus());
-		registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 		registerCourseDTO.setRegistrationDate(registerCourse.getRegistrationDate());
 		registerCourseDTO.setCourseDuration(registerCourse.getCourseDuration());
 		registerCourseDTO.setCoursePrice(registerCourse.getCoursePrice());
@@ -204,7 +203,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		registerCourse.setClasses(registerCourse.getClasses());
 		registerCourseDTO.setStartDate(registerCourse.getStartDate());
 		registerCourseDTO.setStartDate(registerCourse.getEndDate());
-		registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 		registerCourseDTO.setCourseId(registerCourse.getCourse().getCourseId());
 		registerCourseDTO.setStudentId(registerCourse.getStudent().getStudentId());
 		if (registerCourse.getClasses() != null) {

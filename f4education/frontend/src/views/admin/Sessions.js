@@ -334,16 +334,16 @@ const Sessions = () => {
     }
     const handleShowAllHistory = () => {
         setShowHistoryTable((pre) => !pre)
-        if (sessionsHistories.length === 0) {
-            getAllSesssionHistory()
-        }
     }
 
     const getAllSesssionHistory = async () => {
         try {
             const resp = await sessionsApi.getAllSessionsHistory()
-            setSessionsHistories(resp)
-            console.log(resp)
+
+            if (resp.status === 200) {
+                setSessionsHistories(resp.data)
+                console.log(resp)
+            }
         } catch (error) {
             console.log(error)
         }
@@ -366,6 +366,7 @@ const Sessions = () => {
     }
     useEffect(() => {
         fetchSessions()
+        getAllSesssionHistory()
     }, [])
 
     return (
