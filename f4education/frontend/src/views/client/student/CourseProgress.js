@@ -17,11 +17,12 @@ import {
     Stack,
     Text,
     Title,
-    Tooltip
+    Tooltip,
+    Divider
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { IconArrowBack, IconArrowRight, IconRefresh } from '@tabler/icons-react'
+import { IconArrowBack, IconArrowRight, IconRefresh, IconZoomQuestion } from '@tabler/icons-react'
 import {
     createSearchParams,
     Link,
@@ -41,6 +42,7 @@ import courseApi from '../../../api/courseApi'
 import registerCoursecAPI from '../../../api/registerCourseApi'
 import questionApi from 'api/questionApi'
 import certificateApi from '../../../api/certificateApi'
+import billApi from 'api/billApi'
 
 // Component
 import Schedule from './Schedule'
@@ -88,6 +90,7 @@ const CourseProgress = () => {
         endDate: '',
         registerCourseId: ''
     })
+
     const [numberOfCourseComplete, setNumberOfCourseComplete] = useState(0)
 
     const [newestCourse, setNewestCourse] = useState([])
@@ -99,7 +102,7 @@ const CourseProgress = () => {
     const fetchCourseProgress = async () => {
         try {
             const resp = await registerCoursecAPI.getAllCourseProgress(
-                user.username
+                'loinvpc04549'
             )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
@@ -111,6 +114,8 @@ const CourseProgress = () => {
                 const totalProgress = await fetchCourseProgressByClassId(
                     element.classes.classId
                 )
+
+                console.log(element)
 
                 const pointGreaterThanFive = await checkIfCourseProgressIsDone(
                     element.classes.classId,
@@ -246,6 +251,8 @@ const CourseProgress = () => {
             startDate: course.startDate ? course.startDate : '',
             endDate: course.endDate ? course.endDate : '',
             registerCourseId: course.registerCourseId
+                ? course.registerCourseId
+                : ''
         })
 
         setShowingDetail(true)
@@ -257,6 +264,24 @@ const CourseProgress = () => {
         })
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
+    }
+
+    const handleShowTask = (classId) => {
+        navigate({
+            pathname: '/student/task',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
+
+    const handleShowQuestion = (classId) => {
+        navigate({
+            pathname: '/student/task',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
     }
 
     const formatDateWithDayOfWeek = (date) => {
@@ -529,6 +554,20 @@ const CourseProgress = () => {
                                         onClick={downloadRecourceHandlers.open}
                                     >
                                         Tải tài nguyên
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        color="indigo"
+                                        size="lg"
+                                        leftIcon={<IconZoomQuestion />}
+                                        mt={10}
+                                        onClick={() => {
+                                            handleShowQuestion(
+                                                selectedCourse.classes.classId
+                                            )
+                                        }}
+                                    >
+                                        Xem bài tập
                                     </Button>
                                 </Group>
                             </Stack>

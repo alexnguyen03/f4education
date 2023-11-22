@@ -128,11 +128,16 @@ public class CourseServiceImpl implements CoursesService {
 						e.printStackTrace();
 					}
 				}
+
+				System.out.println(objArray[5]);
+				System.out.println(objArray[6]);
+				System.out.println(objArray[7]);
+
 				courseData.setCoursePrice(floatValue);
 				courseData.setCourseDuration((Integer) objArray[3]);
 				courseData.setCourseDescription((String) objArray[4]);
 				courseData.setImage((String) objArray[5]);
-				Object subjectId = objArray[7];
+				Object subjectId = objArray[6];
 
 				Subject subject = null;
 				if (subjectId != null) {
@@ -148,7 +153,7 @@ public class CourseServiceImpl implements CoursesService {
 				List<RegisterCourse> rg = registerCourseRepository.findByCourseId((Integer) objArray[0]);
 				System.out.println(rg);
 				courseData.setRegisterCourses(rg);
-				courseData.setStatus((Boolean) objArray[9].toString().equals("1") ? true : false);
+				courseData.setStatus((Boolean) objArray[8].toString().equals("1") ? true : false);
 
 				courses.add(courseData);
 			}
@@ -236,8 +241,8 @@ public class CourseServiceImpl implements CoursesService {
 
 	private CourseDTO convertEntityToDTO(Course course) {
 		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
-				course.getCourseDuration(), course.getCourseDescription(),
-				course.getSubject(), course.getImage(), course.getStatus());
+				course.getCourseDuration(), course.getCourseDescription(), course.getSubject(), course.getImage(),
+				course.getStatus());
 	}
 
 	private CourseResponse convertToResponseDTO(Course course, Boolean isPurchase, Integer registerCourseId) {

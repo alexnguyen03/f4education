@@ -15,7 +15,7 @@ const pointApi = {
         return axiosClient.get(url + classId)
     },
     getPointByStudentAndClass: (studentId, classId) => {
-        const url = `/point/result?studentId=${studentId}&classId=${classId}`
+        const url = `/points/result?studentId=${studentId}&classId=${classId}`
         return axiosClient.get(url)
     }
 }

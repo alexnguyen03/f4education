@@ -12,4 +12,13 @@ import java.util.List;
 public interface QuestionDetailRepository extends JpaRepository<QuestionDetail, Integer> {
     @Query("SELECT qd FROM QuestionDetail qd WHERE qd.question.questionId = :questionId")
     List<QuestionDetail> findAllQuestionDetailByQuestionId(@Param("questionId") Integer questionId);
+    
+    @Query("SELECT qd FROM QuestionDetail qd " +
+	        "JOIN qd.question q " +
+	        "JOIN q.course c " +
+	        "JOIN c.registerCourses rc " +
+	        "JOIN q.examinations e " +
+	        "WHERE rc.course.courseId = q.course.courseId " +
+	        "AND rc.classes.classId = :classId")
+	public List<QuestionDetail> findQuestionDetailByStudentId(@Param("classId") Integer classId);
 }

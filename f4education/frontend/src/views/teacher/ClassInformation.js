@@ -3,7 +3,6 @@ import {
     Badge,
     Box,
     Button,
-    Center,
     Flex,
     Grid,
     Group,
@@ -31,9 +30,9 @@ import classApi from '../../api/classApi'
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
 
-const teacherId = 'nguyenhoainam121nTC'
-
 const ClassInformation = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // ********** Param Variable
     let navigate = useNavigate()
 
@@ -48,7 +47,7 @@ const ClassInformation = () => {
     const fetchClassByTeacher = async () => {
         try {
             setLoading(true)
-            const resp = await classApi.getAllClassByTeacherId(teacherId)
+            const resp = await classApi.getAllClassByTeacherId(user.username)
             if (resp.status === 200 && resp.data.length > 0) {
                 setListClasses(resp.data.reverse())
             }
@@ -69,7 +68,7 @@ const ClassInformation = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/class-info/' + classId)
+        navigate('/teacher/class-infor/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {
@@ -92,7 +91,7 @@ const ClassInformation = () => {
 
     // ************** Render UI
     const classInformationList = filteredClasses.map((c) => (
-        <Grid.Col xl={3} lg={4} md={4} sm={6} key={c.classes.classId}>
+        <Grid.Col xl={3} lg={3} md={4} sm={6} key={c.classes.classId}>
             {loading ? (
                 <>
                     <Skeleton
@@ -111,7 +110,7 @@ const ClassInformation = () => {
                     <Paper
                         withBorder
                         radius="md"
-                        p={0}
+                        p={6}
                         className={styles.card}
                         onClick={() =>
                             navigateToClassInformationDetail(c.classes.classId)
@@ -134,10 +133,9 @@ const ClassInformation = () => {
                                 />
                             </ThemeIcon>
                             <Tooltip label="Tổng số sinh viên" position="top">
-                                <Alert
-                                    title={c.numberStudent}
-                                    color="indigo"
-                                ></Alert>
+                                <Alert color="indigo">
+                                    {`Tổng số sinh viên: ${c.students.length}`}
+                                </Alert>
                             </Tooltip>
                         </Flex>
                         <Title order={3} fw={500} mt="md">
@@ -151,14 +149,29 @@ const ClassInformation = () => {
                             <strong>
                                 {moment(c.classes.startDate).format(
                                     'DD/mm/yyyy'
-                                )}{' '}
+                                ) === 'Invalid date'
+                                    ? 'Chưa có ngày khả dụng'
+                                    : moment(c.classes.startDate).format(
+                                          'DD/mm/yyyy'
+                                      )}{' '}
                                 -{' '}
-                                {moment(c.classes.endDate).format('DD/mm/yyyy')}
+                                {moment(c.classes.endDate).format(
+                                    'DD/mm/yyyy'
+                                ) === 'Invalid date'
+                                    ? 'Chưa có ngày khả dụng'
+                                    : moment(c.classes.endDate).format(
+                                          'DD/mm/yyyy'
+                                      )}
                             </strong>
                         </Text>
-                        <Flex justify="start" align="center" gap={5} mb={10}>
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            gap={5}
+                            mb={10}
+                        >
                             <Text size="lg" mt="sm" c="dimmed">
-                                Trạng thái:
+                                Trạng thái lớp:
                             </Text>
                             <Badge color="indigo" mt={12}>
                                 {c.classes.status}
@@ -229,7 +242,7 @@ const ClassInformation = () => {
                                                 id="search-input"
                                                 icon={<IconFilterSearch />}
                                                 size="md"
-                                                maw={270}
+                                                w={350}
                                                 placeholder="Tìm lớp học"
                                                 onChange={(e) =>
                                                     handleChangeSearchClass(e)

@@ -62,10 +62,17 @@ public class Classes implements Serializable {
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<EvaluationTeacher> evaluationTeacher;
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<Examination> examinations;
 
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
     List<Point> points;
+
+    @OneToMany(mappedBy = "classes")
+    @JsonIgnore
+    List<Attendance> attendances;
 
     @ManyToOne
     @JoinColumn(name = "admin_id")

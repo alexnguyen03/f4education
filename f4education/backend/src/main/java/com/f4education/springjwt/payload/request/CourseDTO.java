@@ -31,7 +31,8 @@ public class CourseDTO {
     @Override
     public String toString() {
         return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
-                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", numberSession="
-                + "]";
+                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", subject="
+                + subject + ", image=" + image + ", status=" + status + "]";
     }
+
 }

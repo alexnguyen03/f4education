@@ -2,21 +2,22 @@ package com.f4education.springjwt.models;
 
 import java.io.Serializable;
 import java.time.OffsetDateTime;
-import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 @Data
 @Entity
@@ -28,16 +29,20 @@ public class Schedule implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "schedule_id")
 	private Integer scheduleId;
+	
 	@Column(name = "study_date")
 	private OffsetDateTime studyDate;
+	
 	private String contents;
 	@Column(name = "is_practice")
+	
 	private Boolean isPractice;
 
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "admin_id")
 	Admin admin;
+	
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "class_id")
@@ -47,6 +52,7 @@ public class Schedule implements Serializable {
 	@ManyToOne
 	@JoinColumn(name = "classroom_id")
 	ClassRoom classRoom;
+	
 	@JsonIgnore
 	@ManyToOne
 	@JoinColumn(name = "session_id")

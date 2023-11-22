@@ -2,8 +2,6 @@ package com.f4education.springjwt.models;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -35,16 +33,17 @@ public class Attendance implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "class_id")
-	private Classes classes;
+	@JsonIgnore
+	Classes classes;
 
 	@ManyToOne
 	@JoinColumn(name = "student_id")
-	private Student student;
+	@JsonIgnore
+	Student student;
 
 	@Override
 	public String toString() {
-		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" + attendanceDate + ", endDate="
-				+ "]";
+		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" + attendanceDate + "]";
 	}
 
 }

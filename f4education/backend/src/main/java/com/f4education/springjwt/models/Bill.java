@@ -32,7 +32,7 @@ public class Bill {
     private Date createDate;
 
     @Column(name = "total_price")
-    private Double totalPrice;
+    private Float totalPrice;
 
     @Column(name = "status")
     private String status;

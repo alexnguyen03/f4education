@@ -1,8 +1,5 @@
 package com.f4education.springjwt.models;
 
-import java.util.List;
-import java.util.Set;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;

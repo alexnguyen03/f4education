@@ -1,6 +1,8 @@
 package com.f4education.springjwt.repository;
 
 import com.f4education.springjwt.models.Answer;
+import com.f4education.springjwt.models.QuestionDetail;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

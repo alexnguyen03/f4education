@@ -103,6 +103,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/evaluate/**",
                                         "/api/certificate/**",
                                         "/api/point/**",
+                                        "/api/attendance/**",
                                         "/img/**")
                                 .permitAll()
                                 .requestMatchers(
@@ -122,6 +123,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/resource/**",
                                         "/api/questions/**",
                                         "/api/question-detail/**",
+                                        "/api/task/**",
                                         "/api/quizz-result/**",
                                         "/api/answers/**",
                                         "/api/cart/**",
@@ -134,6 +136,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
                                         "/api/accounts/**",
+                                        "/api/task/**",
                                         "/api/schedule/**",
                                         "/api/evaluation/**",
                                         "/api/points/**",

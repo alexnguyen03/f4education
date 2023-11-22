@@ -18,7 +18,7 @@ public class QuizResultDTO {
 
 	private Integer score;
 
-	private String duration;
+	private Integer duration;
 	
 	private Date quizzDate;
 	

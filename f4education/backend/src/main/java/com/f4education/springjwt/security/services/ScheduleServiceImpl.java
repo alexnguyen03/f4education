@@ -19,6 +19,7 @@ import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.payload.request.ScheduleDTO;
 import com.f4education.springjwt.payload.request.ScheduleRequest;
+import com.f4education.springjwt.payload.request.ScheduleTeacherDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.repository.AdminRepository;
@@ -43,6 +44,11 @@ public class ScheduleServiceImpl implements ScheduleService {
     private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
     @Autowired
     SessionsRepository sessionsRepository;
+
+    @Override
+    public List<ScheduleTeacherDTO> findAllScheduleTeacherByID(Integer id) {
+        return scheduleRepository.findAllScheduleTeacherByID(id);
+    }
 
     @Override
     public List<Schedule> saveSchedule(ScheduleRequest scheduleRequest) {
@@ -146,12 +152,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleResponse;
     }
 
-    private ZoneOffset getTimeOffset() {
-        // Lấy múi giờ hiện tại của máy tính chạy Java
-
-        // Lấy múi giờ hiện tại của máy chủ SQL Server
-        // Thực hiện truy vấn hoặc lấy thông tin từ cơ sở dữ liệu để lấy múi giờ SQL
-        // Server
+    public ZoneOffset getTimeOffset() {
         ZoneOffset javaOffset = OffsetDateTime.now().getOffset();
         ZoneOffset sqlServerOffset = getSqlServerOffset(); // Hãy thay thế hàm này bằng cách lấy thông tin múi giờ từ
 
@@ -159,6 +160,18 @@ public class ScheduleServiceImpl implements ScheduleService {
         int hoursDifference = offsetDifference / 3600;
         // 3600: số giây trong 1h
         ZoneOffset timeOffset = sqlServerOffset.ofHours(hoursDifference);
+
+        return timeOffset;
+    }
+
+    public ZoneOffset getTimeOffsetToServer() {
+        ZoneOffset javaOffset = OffsetDateTime.now().getOffset();
+        ZoneOffset sqlServerOffset = getSqlServerOffset(); // Hãy thay thế hàm này bằng cách lấy thông tin múi giờ từ
+
+        int offsetDifference = javaOffset.getTotalSeconds() + sqlServerOffset.getTotalSeconds();// SQL Server
+        int hoursDifference = offsetDifference / 3600;
+        // 3600: số giây trong 1h
+        ZoneOffset timeOffset = sqlServerOffset.ofHours(hoursDifference + 7); // Lệch 7 múi giờ so với host
 
         return timeOffset;
     }
