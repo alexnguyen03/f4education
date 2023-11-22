@@ -131,8 +131,7 @@ public class CourseServiceImpl implements CoursesService {
 				courseData.setCoursePrice(floatValue);
 				courseData.setCourseDuration((Integer) objArray[3]);
 				courseData.setCourseDescription((String) objArray[4]);
-				courseData.setNumberSession((Integer) objArray[5]);
-				courseData.setImage((String) objArray[6]);
+				courseData.setImage((String) objArray[5]);
 				Object subjectId = objArray[7];
 
 				Subject subject = null;
@@ -237,7 +236,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	private CourseDTO convertEntityToDTO(Course course) {
 		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
-				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
+				course.getCourseDuration(), course.getCourseDescription(),
 				course.getSubject(), course.getImage(), course.getStatus());
 	}
 
@@ -350,4 +349,10 @@ public class CourseServiceImpl implements CoursesService {
 	public String renameFolder(String folderName, String newFolderName) throws Exception {
 		return googleDriveRepository.renameFolder(folderName, newFolderName);
 	}
+
+	@Override
+	public Boolean isCourseNameExist(String courseName) {
+		return courseRepository.isCourseNameExist(courseName) != null;
+	}
+
 }

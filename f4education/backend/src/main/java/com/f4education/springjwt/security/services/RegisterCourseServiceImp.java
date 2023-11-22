@@ -227,7 +227,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCoursePrice(course.getCoursePrice());
 			registerCourse.setImage(course.getImage());
 			registerCourse.setCourseDescription(course.getCourseDescription());
-			registerCourse.setNumberSession(course.getNumberSession());
 		}
 
 		if (student != null) {
@@ -248,7 +247,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCoursePrice(course.getCoursePrice());
 			registerCourse.setImage(course.getImage());
 			registerCourse.setCourseDescription(course.getCourseDescription());
-			registerCourse.setNumberSession(course.getNumberSession());
 		}
 		if (student != null) {
 			registerCourse.setStudent(student);

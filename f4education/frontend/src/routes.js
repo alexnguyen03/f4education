@@ -1,5 +1,5 @@
-import Index from 'views/Index.js'
-import Register from 'views/examples/Register.js'
+import Index from './views/Index.js'
+import Register from './views/examples/Register.js'
 import Subjects from './views/admin/Subjects'
 import Sessions from './views/admin/Sessions'
 import Courses from './views/admin/Courses.js'
@@ -15,7 +15,7 @@ import CourseClient from './views/client/visitor/CourseClient'
 import Cart from './views/client/visitor/Cart'
 import Checkout from './views/client/visitor/Checkout'
 import ClassDetail from './views/admin/ClassDetail'
-import Login from 'views/examples/Login'
+import Login from './views/examples/Login'
 import CourseDetailClient from './views/client/visitor/CourseDetailClient'
 import CourseRegisterClient from './views/client/visitor/CourseRegisterClient'
 import InformationTeacher from './views/teacher/information'
@@ -30,11 +30,14 @@ import ClassInformation from './views/teacher/ClassInformation'
 import ClassInformationDetail from './views/teacher/ClassInformationDetail'
 import CourseProgress from './views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
-import CoursesDetail from 'views/admin/CoursesDetail'
+import CoursesDetail from './views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
-import CertificatePDF from 'views/PDF/CertificatePDF'
+import CertificatePDF from './views/PDF/CertificatePDF'
 import Points from './views/teacher/Points'
-import LearningResult from 'views/client/student/LearningResult'
+import LearningResult from './views/client/student/LearningResult'
+import EvaluateTeacherCompleted from './views/client/student/EvaluateTeacherCompleted'
+import EvaluateTeacher from './views/client/student/EvaluateTeacher'
+import EvaluateTeacherViewByTeacher from './views/client/student/EvaluateTeacherViewByTeacher.js'
 
 export var routes = [
     {
@@ -276,6 +279,7 @@ export const routesStudent = [
         component: <QuizzClient />,
         layout: '/student'
     },
+
     {
         path: '/classes/recources/:classId',
         name: 'Thông tin bài kiểm tra',
@@ -297,5 +301,22 @@ export const routesPDF = [
         path: '/certificate/download',
         component: <CertificatePDF />,
         layout: '/pdf'
+    }
+]
+export const routesEvaluation = [
+    {
+        path: '/student/:classIdParam',
+        component: <EvaluateTeacher />,
+        layout: '/evaluation'
+    },
+    {
+        path: '/student/completed',
+        component: <EvaluateTeacherCompleted />,
+        layout: '/evaluation'
+    },
+    {
+        path: '/teacher',
+        component: <EvaluateTeacherViewByTeacher />,
+        layout: '/evaluation'
     }
 ]

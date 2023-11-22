@@ -23,6 +23,7 @@ import {
     Col,
     Container,
     Form,
+    FormFeedback,
     Input,
     Modal,
     Row
@@ -37,17 +38,21 @@ import { IconClock } from '@tabler/icons-react'
 import { IconEyeSearch } from '@tabler/icons-react'
 import { Event, Timeline } from 'react-timeline-scribble'
 import ReactLoading from 'react-loading'
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
 
 const Sessions = () => {
     // Main variable
     const [sessions, setSessions] = useState([])
     const [sessionsHistories, setSessionsHistories] = useState([])
-    const user = JSON.parse(localStorage.getItem('user') | '')
+    const user = JSON.parse(localStorage.getItem('user'))
     const [showHistoryTable, setShowHistoryTable] = useState(false)
     const [showHistoryInfo, setShowHistoryInfo] = useState(false)
+    const [loadingGetSessions, setLoadingGetSessions] = useState(false)
     const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true)
     const [listHistoryById, setListHistoryById] = useState([])
-    const [timeError, setTimeError] = useState('')
+    const [startTimeError, setStartTimeError] = useState('')
+    const [endTimeError, setEndTimeError] = useState('')
     const [msgError, setMsgError] = useState({})
 
     const [session, setSession] = useState({
@@ -60,14 +65,7 @@ const Sessions = () => {
         },
         endTime: '',
         sessionId: null,
-        sessionName: '',
-        startTime: ''
-    })
-    const [sessionRequest, setSessionRequest] = useState({
-        adminId: '',
-        endTime: '',
-        sessionId: -1,
-        sessionName: '',
+        sessionName: 0,
         startTime: ''
     })
 
@@ -80,8 +78,6 @@ const Sessions = () => {
 
     // Form action area
     const handleChangeInput = (e) => {
-        validate()
-
         setSession((preSession) => ({
             ...preSession,
             [e.target.name]: e.target.value
@@ -90,45 +86,24 @@ const Sessions = () => {
 
     const fetchSessions = async () => {
         try {
+            setLoadingGetSessions(true)
             const resp = await sessionsApi.getAllSessions()
-            setSessions(resp.data)
-            console.log(sessions)
+            if (resp.status === 200) {
+                setSessions(resp.data)
+                setLoadingGetSessions(false)
+            }
         } catch (error) {
+            setLoadingGetSessions(false)
             console.log(error)
         }
     }
     const validate = () => {
-        if (session.sessionName === '') {
-            setMsgError((pre) => ({
-                ...pre,
-                sessionNameError: 'Vui lòng nhập vào Tên ca học'
-            }))
-        } else {
-            setMsgError((pre) => ({ ...pre, sessionNameError: '' }))
-        }
         if (startRef.current.value === '') {
-            setMsgError((pre) => ({
-                ...pre,
-                startTimeError: 'Vui lòng nhập vào Giờ bắt đầu'
-            }))
+            setStartTimeError('Vui lòng nhập vào Giờ bắt đầu')
         } else {
-            setMsgError((pre) => ({ ...pre, startTimeError: '' }))
+            setStartTimeError('')
         }
-        if (endRef.current.value === '') {
-            setMsgError((pre) => ({
-                ...pre,
-                endTimeError: 'Vui lòng nhập vào Giờ kết thúc'
-            }))
-        } else {
-            setMsgError((pre) => ({ ...pre, endTimeError: '' }))
-        }
-        if (
-            session.sessionName != '' ||
-            startRef.current.value != '' ||
-            endRef.current.value != ''
-        )
-            return true
-        else return false
+        return startRef.current.value !== '' ? true : false
     }
     const columnSessions = useMemo(
         () => [
@@ -216,43 +191,80 @@ const Sessions = () => {
 
     const handleInputTimeOnChange = (e) => {
         validate()
-        if (startRef.current.value >= endRef.current.value) {
-            setTimeError('Giờ kết thúc phải sau giờ bắt đầu')
+
+        const newStartTime = startRef.current.value
+
+        // Tính toán giờ kết thúc
+        const startTime = moment(newStartTime, 'HH:mm') // Sử dụng thư viện moment để xử lý thời gian
+        const newEndTime = startTime.add(2, 'hours').format('HH:mm') // Thêm 2 giờ vào giờ bắt đầu để có giờ kết thúc
+
+        // Kiểm tra chồng chéo với danh sách thời gian đã có
+        const isOverlapping = sessions
+            .filter((item) => item.sessionId !== session.sessionId)
+            .some((item) => {
+                const existingStartTime = item.startTime
+                const existingEndTime = item.endTime
+
+                // Kiểm tra chồng chéo
+                return (
+                    (newStartTime >= existingStartTime &&
+                        newStartTime < existingEndTime) ||
+                    (newEndTime > existingStartTime &&
+                        newEndTime <= existingEndTime) ||
+                    (newStartTime <= existingStartTime &&
+                        newEndTime >= existingEndTime)
+                )
+            })
+
+        if (newStartTime >= newEndTime) {
+            setStartTimeError('Giờ kết thúc phải sau giờ bắt đầu')
+        } else if (isOverlapping) {
+            setStartTimeError('Thời gian trùng lặp với danh sách đã có')
         } else {
-            setTimeError('')
+            setStartTimeError('')
+            setSession((preSession) => ({
+                ...preSession,
+                startTime: newStartTime,
+                endTime: newEndTime
+            }))
         }
-
-        setSession((preSession) => ({
-            ...preSession,
-            startTime: startRef.current.value,
-            endTime: endRef.current.value
-        }))
-
-        console.log(
-            '🚀 ~ file: Sessions.js:145 ~ setSession ~ Session:',
-            session
-        )
     }
 
     const handleSubmitForm = (e) => {
         e.preventDefault()
-        validate()
-        if (!validate) {
+        if (!validate()) {
             return
         }
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        const { endTime, sessionId, sessionName, startTime } = { ...session }
+        console.log(user)
+        const sessionRequest = {
+            adminId: user.username,
+            endTime: endTime + ':00',
+            sessionId: sessionId,
+            sessionName: sessionName,
+            startTime: startTime + ':00'
+        }
+        console.log(
+            '🚀 ~ file: Sessions.js:281 ~ handleSubmitForm ~ sessionRequest:',
+            sessionRequest
+        )
         if (update) {
-            upateSessions()
+            upateSessions(sessionRequest, id)
         } else {
-            addSessions()
+            addSessions(sessionRequest, id)
         }
     }
 
     const handleShowAddForm = () => {
         setShowModal(true)
 
+        let sessionName = sessions.length + 1
         setUpdate(false)
         setSession((preSession) => ({
             ...preSession,
+            sessionName: sessionName,
             startTime: '',
             endTime: ''
         }))
@@ -260,8 +272,10 @@ const Sessions = () => {
 
     const handleResetForm = () => {
         setShowModal(false)
-        setTimeError('')
+        setStartTimeError('')
         setMsgError({})
+        setStartTimeError('')
+        setEndTimeError('')
 
         setSession({
             admin: {
@@ -278,19 +292,43 @@ const Sessions = () => {
         })
     }
 
-    const addSessions = async () => {
+    const addSessions = async (sessionRequest, id) => {
+        handleResetForm()
         try {
             const resp = await sessionsApi.createSessions(sessionRequest)
-            fetchSessions()
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.createSuccess())
+
+                setSessions([resp.data, ...sessions])
+            }
         } catch (error) {
+            toast.update(id, Notify.options.createError())
+
             console.log('failed to fetch data', error)
         }
     }
-    const upateSessions = async () => {
+    const upateSessions = async (sessionRequest, id) => {
         try {
+            handleResetForm()
+
             const resp = await sessionsApi.updateSessions(sessionRequest)
-            fetchSessions()
+            console.log(
+                '🚀 ~ file: Sessions.js:310 ~ upateSessions ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.updateSuccess())
+                setSessions(
+                    sessions.map((item) => {
+                        if (item.sessionId === session.sessionId) {
+                            return resp.data
+                        }
+                        return item
+                    })
+                )
+            }
         } catch (error) {
+            toast.update(id, Notify.options.updateError())
             console.log('failed to fetch data', error)
         }
     }
@@ -329,19 +367,10 @@ const Sessions = () => {
     useEffect(() => {
         fetchSessions()
     }, [])
-    useEffect(() => {
-        const { endTime, sessionId, sessionName, startTime } = { ...session }
-        setSessionRequest({
-            adminId: user.username,
-            endTime: endTime,
-            sessionId: sessionId,
-            sessionName: sessionName,
-            startTime: startTime
-        })
-    }, [session])
 
     return (
         <>
+            <ToastContainer />
             <SessionsHeader />
 
             <Container className="mt--7" fluid>
@@ -385,6 +414,7 @@ const Sessions = () => {
                                         }
                                     }
                                 }
+                                state={{ isLoading: loadingGetSessions }}
                                 columns={columnSessions}
                                 data={sessions}
                                 initialState={{
@@ -477,7 +507,7 @@ const Sessions = () => {
                 <Modal
                     className="modal-dialog-centered"
                     isOpen={showModal}
-                    toggle={showModal}
+                    // toggle={showModal}
                     backdrop={'static'}
                 >
                     <Form onSubmit={handleSubmitForm}>
@@ -523,35 +553,31 @@ const Sessions = () => {
                                     className="form-control-label"
                                     htmlFor="name"
                                 >
-                                    Tên ca học
+                                    Ca học
                                     <span className="text-danger mx-1">*</span>
                                 </label>
 
                                 <Input
-                                    className={''}
+                                    readOnly
                                     id="name"
-                                    // required={true}
+                                    type="number"
                                     onChange={handleChangeInput}
                                     name="sessionName"
                                     value={session.sessionName}
                                 />
 
                                 {msgError.sessionNameError && (
-                                    <span
-                                        className="text-danger "
-                                        style={{
-                                            transition: 'ease-in-out all 3s'
-                                        }}
-                                    >
+                                    <FormFeedback>
                                         {msgError.sessionNameError}
-                                    </span>
+                                    </FormFeedback>
                                 )}
                             </FormGroup>
 
                             <TimeInput
-                                withSeconds
+                                withSeconds={false}
                                 label="Giờ bắt đầu"
                                 ref={startRef}
+                                error={startTimeError}
                                 onChange={handleInputTimeOnChange}
                                 value={session.startTime}
                                 radius="md"
@@ -575,25 +601,26 @@ const Sessions = () => {
                             )}
 
                             <TimeInput
-                                withSeconds
+                                withSeconds={false}
+                                readOnly
                                 label="Giờ kết thúc"
                                 ref={endRef}
                                 radius="md"
-                                error={timeError}
+                                error={endTimeError}
                                 min={session.startTime}
                                 variant="default"
                                 name="endTime"
                                 onChange={handleInputTimeOnChange}
                                 value={session.endTime}
-                                rightSection={
-                                    <ActionIcon
-                                        onClick={() =>
-                                            endRef.current.showPicker()
-                                        }
-                                    >
-                                        <IconClock size="1rem" stroke={1.5} />
-                                    </ActionIcon>
-                                }
+                                // rightSection={
+                                //     <ActionIcon
+                                //         onClick={() =>
+                                //             endRef.current.showPicker()
+                                //         }
+                                //     >
+                                //         <IconClock size="1rem" stroke={1.5} />
+                                //     </ActionIcon>
+                                // }
                                 // maw={400}
                                 mx="auto"
                             />

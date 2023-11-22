@@ -18,8 +18,6 @@ public class CourseTop10Selling {
 
 	private String course_description;
 
-	private Integer number_session;
-
 	private String image;
 
 	private Integer subject_id;

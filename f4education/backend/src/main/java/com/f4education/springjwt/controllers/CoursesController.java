@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.response.CourseResponse;
@@ -36,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api/courses")
 public class CoursesController {
 	@Autowired
-	CourseServiceImpl courseService;
+	CoursesService courseService;
 
 	@Autowired
 	XFile xfileService;
@@ -160,5 +162,10 @@ public class CoursesController {
 	@GetMapping("/renameFolder")
 	public String renameFolder(String courseName, String newCoursename) throws Exception {
 		return courseService.renameFolder(courseName, newCoursename);
+	}
+
+	@GetMapping("/validate")
+	public Boolean validateCourseName(@RequestParam String courseName) {
+		return courseService.isCourseNameExist(courseName);
 	}
 }

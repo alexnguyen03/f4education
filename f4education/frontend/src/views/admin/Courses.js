@@ -37,7 +37,8 @@ import {
     CardGroup,
     ListGroupItem,
     ListGroup,
-    Badge
+    Badge,
+    FormFeedback
 } from 'reactstrap'
 import subjectApi from '../../api/subjectApi'
 import Select from 'react-select'
@@ -71,15 +72,14 @@ const Courses = () => {
         value: '0',
         label: ''
     })
-
+    const fileInputRef = useRef(null)
     const [options, setOptions] = useState([{ value: '0', label: '' }])
     const [msgError, setMsgError] = useState({})
     const [listHistoryById, setListHistoryById] = useState([])
     const [course, setCourse] = useState({
         courseId: 'null',
         courseName: '',
-        courseDuration: 0,
-        numberSession: 0,
+        courseDuration: 120,
         coursePrice: 6000000,
         courseDescription: '',
         image: '',
@@ -103,11 +103,13 @@ const Courses = () => {
     const handelOnChangeInput = (e) => {
         setCourse({
             ...course,
-            [e.target.name]: e.target.value,
-            courseDuration: course.numberSession * 2
+            [e.target.name]: e.target.value
         })
     }
-
+    const hasSpecialCharacters = (inputString) => {
+        const regex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
+        return regex.test(inputString)
+    }
     const validate = () => {
         const esxistCourseName = courses.some((item) => {
             return item.courseName === course.courseName
@@ -123,6 +125,12 @@ const Courses = () => {
             setMsgError((prevErr) => ({
                 ...prevErr,
                 courseNameErr: 'Vui lòng nhập Tên khóa học'
+            }))
+            isValid = false
+        } else if (hasSpecialCharacters(course.courseName)) {
+            setMsgError((prevErr) => ({
+                ...prevErr,
+                courseNameErr: 'Tên khóa học không được chứa ký tự đặc biêt!'
             }))
             isValid = false
         } else if (course.courseName.length < 10) {
@@ -175,18 +183,10 @@ const Courses = () => {
                 ...prevErr,
                 imgErr: 'Vui lòng chọn ảnh cho khóa học'
             }))
+            console.log('=================================')
             isValid = false
         } else {
             setMsgError((prevErr) => ({ ...prevErr, imgErr: '' }))
-        }
-        if (course.hourPerSession === '') {
-            setMsgError((prevErr) => ({
-                ...prevErr,
-                hourPerSessionErr: 'Vui lòng chọn số giờ cho ca học'
-            }))
-            isValid = false
-        } else {
-            setMsgError((prevErr) => ({ ...prevErr, hourPerSessionErr: '' }))
         }
 
         if (course.courseDescription === '') {
@@ -200,18 +200,36 @@ const Courses = () => {
         }
         return isValid
     }
+
+    const handleImageClick = () => {
+        fileInputRef.current.click()
+        console.log(
+            '🚀 ~ file: Courses.js:205 ~ handleImageClick ~ fileInputRef.current:',
+            fileInputRef.current
+        )
+    }
     const onChangePicture = (e) => {
-        setImage(null)
         if (e.target.files[0]) {
-            setImage(e.target.files[0])
+            const file = e.target.files[0]
+            setImage(file)
+
             const reader = new FileReader()
-            reader.addEventListener('load', () => {
+            reader.onload = () => {
                 setImgData(reader.result)
-            })
-            reader.readAsDataURL(e.target.files[0])
-            setCourse((preCourse) => ({
-                ...preCourse,
-                image: e.target.files[0].name
+            }
+            reader.readAsDataURL(file)
+
+            setCourse((prevCourse) => ({
+                ...prevCourse,
+                image: file.name
+            }))
+            setMsgError((prevErr) => ({ ...prevErr, imgErr: '' }))
+        } else {
+            setImage(null)
+            setImgData(null)
+            setCourse((prevCourse) => ({
+                ...prevCourse,
+                image: '' // Clear the image name
             }))
         }
     }
@@ -227,17 +245,7 @@ const Courses = () => {
                 header: 'Tên khóa học',
                 size: 150
             },
-            // {
-            //     accessorKey: 'courseDuration',
-            //     header: 'Thời lượng (h)',
-            //     size: 75
-            // },
 
-            {
-                accessorKey: 'numberSession',
-                header: 'Số ca',
-                size: 55
-            },
             {
                 accessorKey: 'coursePrice',
                 accessorFn: (row) => row,
@@ -370,20 +378,15 @@ const Courses = () => {
     }
 
     const handleResetForm = () => {
-        // console.log(
-        //     '🚀 ~ file: Courses.js:360 ~ handleResetForm ~ course:',
-        //     course
-        // )
         setMsgError({})
         setUpdate((pre) => !pre)
         setShowForm((pre) => !pre)
         setImgData(null)
         setCourse({
             courseName: '',
-            courseDuration: 0,
+            courseDuration: 120,
             coursePrice: 6000000,
             courseDescription: '',
-            numberSession: 0,
             image: '',
             subject: {
                 subjectId: 0,
@@ -418,7 +421,6 @@ const Courses = () => {
             coursePrice: course.coursePrice,
             courseDuration: course.courseDuration,
             courseDescription: course.courseDescription,
-            numberSession: parseInt(course.numberSession),
             image: course.image,
             subjectId: parseInt(selectedSubject.value),
             adminId: user.username
@@ -435,10 +437,10 @@ const Courses = () => {
         )
         formData.append('courseRequest', JSON.stringify(courseRequest))
         formData.append('file', image)
-        handleResetForm()
 
         if (update) {
             updateCourse(formData)
+            handleResetForm()
             console.log('updated')
         } else {
             addCourse(formData)
@@ -470,15 +472,35 @@ const Courses = () => {
     }
     const addCourse = async (formData) => {
         try {
-            const id = toast(Notify.msg.loading, Notify.options.loading())
+            const respValidate = await courseApi.validateCourseName(
+                course.courseName
+            )
 
-            const resp = await courseApi.addCourse(formData)
+            console.log(
+                '🚀 ~ file: Courses.js:469 ~ addCourse ~ respValidate:',
+                respValidate
+            )
+            if (!respValidate.data) {
+                const id = toast(Notify.msg.loading, Notify.options.loading())
 
-            console.log('🚀 ~ file: Courses.js:468 ~ addCourse ~ resp:', resp)
-            if (resp.status === 200) {
-                toast(id, Notify.options.createSuccess())
-                setCourses([resp.data, ...courses])
+                const resp = await courseApi.addCourse(formData)
+                console.log(
+                    '🚀 ~ file: Courses.js:468 ~ addCourse ~ resp:',
+                    resp
+                )
+                if (resp.status === 200) {
+                    toast(id, Notify.options.createSuccess())
+                    setCourses([resp.data, ...courses])
+                    handleResetForm()
+                }
+            } else {
+                setMsgError((prevErr) => ({
+                    ...prevErr,
+                    courseNameErr:
+                        'Tên khóa học đã tồn tại. Vui lòng nhâp tên khác!'
+                }))
             }
+
             // getAllCourse()
         } catch (error) {
             toast(Notify.options.createError())
@@ -526,12 +548,7 @@ const Courses = () => {
     useEffect(() => {
         setListHistoryById([...listHistoryById])
     }, [loadingHistoryInfo])
-    useEffect(() => {
-        setCourse({
-            ...course,
-            courseDuration: course.numberSession * 2
-        })
-    }, [course])
+
     useEffect(() => {}, [courses])
 
     useEffect(() => {
@@ -699,10 +716,7 @@ const Courses = () => {
                                         <Typography>
                                             Học phí: {row.original.coursePrice}
                                         </Typography>
-                                        <Typography>
-                                            Số học phần:
-                                            {row.original.numberSession}
-                                        </Typography>
+
                                         <Typography>
                                             Thời lượng:
                                             {row.original.courseDuration}
@@ -749,8 +763,10 @@ const Courses = () => {
                                             className="previewProfilePic px-3 border d-flex justify-content-center"
                                             style={{
                                                 height: '200px',
-                                                overflow: 'hidden'
+                                                overflow: 'hidden',
+                                                position: 'relative'
                                             }}
+                                            onClick={handleImageClick}
                                         >
                                             {imgData && (
                                                 <img
@@ -772,20 +788,29 @@ const Courses = () => {
                                                     }
                                                 />
                                             )}
-                                        </div>
-                                        <FormGroup>
-                                            <Label
-                                                htmlFor="exampleFile"
-                                                className="form-control-label"
+                                            <small
+                                                className="position-absolute text-danger text-center"
+                                                style={{
+                                                    top: '50%',
+                                                    left: '50%',
+                                                    transform:
+                                                        'translate(-50%, -50%)',
+                                                    textAlign: 'center'
+                                                }}
                                             >
-                                                Hình ảnh khóa học
-                                            </Label>
+                                                {msgError.imgErr !== ''
+                                                    ? msgError.imgErr
+                                                    : null}
+                                            </small>
+                                        </div>
+
+                                        <FormGroup className="d-none">
                                             <div className="custom-file">
                                                 <input
+                                                    ref={fileInputRef}
                                                     type="file"
                                                     name="imageFile"
                                                     accept="image/*"
-                                                    className="custom-file-input form-control-alternative"
                                                     id="customFile"
                                                     onChange={onChangePicture}
                                                     // multiple={true}
@@ -799,12 +824,8 @@ const Courses = () => {
                                                         : 'Chọn hình ảnh'}
                                                 </label>
                                             </div>
-                                            {msgError.imgErr && (
-                                                <p className="text-danger mt-1">
-                                                    {msgError.imgErr}
-                                                </p>
-                                            )}
                                         </FormGroup>
+
                                         <FormGroup>
                                             <label
                                                 className="form-control-label"
@@ -812,6 +833,7 @@ const Courses = () => {
                                             >
                                                 Tên môn học
                                             </label>
+
                                             <Select
                                                 options={options}
                                                 placeholder="Chọn môn học"
@@ -830,7 +852,11 @@ const Courses = () => {
                                                 Tên khóa học
                                             </label>
                                             <Input
-                                                className="form-control-alternative text-dark"
+                                                className={`${
+                                                    msgError.courseNameErr
+                                                        ? 'is-invalid'
+                                                        : 'form-control-alternative'
+                                                } text-dark`}
                                                 id="input-course-name"
                                                 placeholder="Tên khóa học"
                                                 type="text"
@@ -839,9 +865,9 @@ const Courses = () => {
                                                 value={course.courseName}
                                             />
                                             {msgError.courseNameErr && (
-                                                <p className="text-danger mt-1">
+                                                <FormFeedback>
                                                     {msgError.courseNameErr}
-                                                </p>
+                                                </FormFeedback>
                                             )}
                                         </FormGroup>
                                         <FormGroup>
@@ -852,7 +878,11 @@ const Courses = () => {
                                                 Mô tả khóa học
                                             </label>
                                             <Input
-                                                className="form-control-alternative"
+                                                className={`${
+                                                    msgError.courseDescriptionErr
+                                                        ? 'is-invalid'
+                                                        : 'form-control-alternative'
+                                                } text-dark`}
                                                 id="input-courseDescription"
                                                 name="courseDescription"
                                                 value={course.courseDescription}
@@ -862,34 +892,11 @@ const Courses = () => {
                                                 onChange={handelOnChangeInput}
                                             />
                                             {msgError.courseDescriptionErr && (
-                                                <p className="text-danger mt-1">
+                                                <FormFeedback>
                                                     {
                                                         msgError.courseDescriptionErr
                                                     }
-                                                </p>
-                                            )}
-                                        </FormGroup>
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-last-name"
-                                            >
-                                                Số ca học
-                                            </label>
-                                            <Input
-                                                className="form-control-alternative"
-                                                value={course.numberSession}
-                                                id="input-numberSession"
-                                                type="number"
-                                                name="numberSession"
-                                                placeholder="Số ca học"
-                                                onBlur={handelOnChangeInput}
-                                                onChange={handelOnChangeInput}
-                                            />
-                                            {msgError.coursePriceErr && (
-                                                <p className="text-danger mt-1">
-                                                    {msgError.coursePriceErr}
-                                                </p>
+                                                </FormFeedback>
                                             )}
                                         </FormGroup>
 
@@ -901,19 +908,26 @@ const Courses = () => {
                                                 Thời lượng (giờ)
                                             </label>
                                             <Input
-                                                className="form-control-alternative"
+                                                className={`${
+                                                    msgError.courseDurationErr
+                                                        ? 'is-invalid'
+                                                        : 'form-control-alternative'
+                                                } text-dark`}
                                                 id="input-courseDuration"
                                                 placeholder="Thời lượng"
                                                 type="number"
                                                 // readOnly
                                                 value={course.courseDuration}
                                                 name="courseDuration"
-                                                onChange={() => {}}
+                                                onChange={handelOnChangeInput}
+                                                onFocus={(e) => {
+                                                    e.target.select()
+                                                }}
                                             />
                                             {msgError.courseDurationErr && (
-                                                <p className="text-danger mt-1">
+                                                <FormFeedback>
                                                     {msgError.courseDurationErr}
-                                                </p>
+                                                </FormFeedback>
                                             )}
                                         </FormGroup>
                                         <FormGroup>
@@ -924,7 +938,11 @@ const Courses = () => {
                                                 Học phí (đồng)
                                             </label>
                                             <Input
-                                                className="form-control-alternative"
+                                                className={`${
+                                                    msgError.coursePriceErr
+                                                        ? 'is-invalid'
+                                                        : 'form-control-alternative'
+                                                } text-dark`}
                                                 value={course.coursePrice}
                                                 id="input-coursePrice"
                                                 type="number"
@@ -934,9 +952,9 @@ const Courses = () => {
                                                 onChange={handelOnChangeInput}
                                             />
                                             {msgError.coursePriceErr && (
-                                                <p className="text-danger mt-1">
+                                                <FormFeedback>
                                                     {msgError.coursePriceErr}
-                                                </p>
+                                                </FormFeedback>
                                             )}
                                         </FormGroup>
                                     </div>

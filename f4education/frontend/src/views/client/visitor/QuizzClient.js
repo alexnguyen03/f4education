@@ -182,233 +182,227 @@ function QuizzClient() {
     }, [])
 
     return (
-        <>
-            <Container fluid>
-                {/* BreadCums */}
-                <Breadcrumbs
-                    className="my-5 p-3"
-                    style={{ backgroundColor: '#ebebeb' }}
+        <Container fluid>
+            {/* BreadCums */}
+            <Breadcrumbs
+                className="my-5 p-3"
+                style={{ backgroundColor: '#ebebeb' }}
+            >
+                {itemsBreadcum}
+            </Breadcrumbs>
+            {showQuestion ? (
+                ''
+            ) : (
+                <div
+                    className="rounded shadow p-3"
+                    style={{
+                        width: 450
+                    }}
                 >
-                    {itemsBreadcum}
-                </Breadcrumbs>
-                {showQuestion ? (
-                    ''
-                ) : (
-                    <div
-                        className="rounded shadow p-3"
-                        style={{
-                            width: 450
+                    <h2 className="text-primary text-center pt-2">
+                        {questionDetail[0].courseId} -{' '}
+                        {questionDetail[0].courseName}
+                    </h2>
+                    <hr className="m-0" />
+                    <br />
+                    <span className="h3 ml-1">Mã số: {user.username}</span>
+                    <span className="float-right h3">
+                        Ngày thi: {moment(new Date()).format('DD/MM/yyyy')}
+                    </span>
+                    <br />
+                    <br />
+                    <span className="h3 ml-1">Họ tên: {user.fullName}</span>
+                    <span className="float-right h3">
+                        Lớp học: {questionDetail[0].className}
+                    </span>
+                    <Button
+                        className="my-4"
+                        fullWidth
+                        onClick={() => {
+                            startTimer()
                         }}
                     >
-                        <h2 className="text-primary text-center pt-2">
-                            {questionDetail[0].courseId} -{' '}
-                            {questionDetail[0].courseName}
-                        </h2>
-                        <hr className="m-0" />
-                        <br />
-                        <span className="h3 ml-1">Mã số: {user.username}</span>
-                        <span className="float-right h3">
-                            Ngày thi: {moment(new Date()).format('DD/MM/yyyy')}
-                        </span>
-                        <br />
-                        <br />
-                        <span className="h3 ml-1">Họ tên: {user.fullName}</span>
-                        <span className="float-right h3">
-                            Lớp học: {questionDetail[0].className}
-                        </span>
-                        <Button
-                            className="my-4"
-                            fullWidth
-                            onClick={() => {
-                                startTimer()
-                            }}
-                        >
-                            BẮT ĐẦU LÀM BÀI
-                        </Button>
-                    </div>
-                )}
-                {showQuestion && (
-                    <div className="container">
-                        <div className="row">
-                            <div className="col-lg-12 mx-auto rounded">
-                                <div class="d-flex justify-content-between">
-                                    <QuizIcon
-                                        className="rounded-circle p-3"
-                                        style={{
-                                            backgroundColor: 'white',
-                                            fontSize: 100,
-                                            color: '#34A633',
-                                            marginLeft: 100
-                                        }}
-                                    />
-                                    <div
-                                        style={{
-                                            width: 250,
-                                            margin: 'auto',
-                                            backgroundColor: 'white',
-                                            marginLeft: 200,
-                                            borderRadius: '10px'
-                                        }}
-                                    >
-                                        <p className="text-center text-success p-2">
-                                            <span className="display-4">
-                                                Thời gian còn lại
-                                            </span>
-                                            <br />
-                                            <span className="display-2">
-                                                {seconds > 10
-                                                    ? `0${minutes}`
-                                                    : minutes}
-                                            </span>
-                                            <span className="display-2">
-                                                :
-                                                {seconds < 10
-                                                    ? `0${seconds}`
-                                                    : seconds}
-                                            </span>
-                                        </p>
-                                    </div>
-                                    <QuestionMarkIcon
-                                        className="rounded-circle p-3"
-                                        style={{
-                                            backgroundColor: 'white',
-                                            fontSize: 100,
-                                            color: '#34A633',
-                                            marginRight: 100
-                                        }}
-                                    />
+                        BẮT ĐẦU LÀM BÀI
+                    </Button>
+                </div>
+            )}
+            {showQuestion && (
+                <div className="container">
+                    <div className="row">
+                        <div className="col-lg-12 mx-auto rounded">
+                            <div class="d-flex justify-content-between">
+                                <QuizIcon
+                                    className="rounded-circle p-3"
+                                    style={{
+                                        backgroundColor: 'white',
+                                        fontSize: 100,
+                                        color: '#34A633',
+                                        marginLeft: 100
+                                    }}
+                                />
+                                <div
+                                    style={{
+                                        width: 250,
+                                        margin: 'auto',
+                                        backgroundColor: 'white',
+                                        marginLeft: 200,
+                                        borderRadius: '10px'
+                                    }}
+                                >
+                                    <p className="text-center text-success p-2">
+                                        <span className="display-4">
+                                            Thời gian còn lại
+                                        </span>
+                                        <br />
+                                        <span className="display-2">
+                                            {seconds > 10
+                                                ? `0${minutes}`
+                                                : minutes}
+                                        </span>
+                                        <span className="display-2">
+                                            :
+                                            {seconds < 10
+                                                ? `0${seconds}`
+                                                : seconds}
+                                        </span>
+                                    </p>
                                 </div>
-                                <div className="container">
-                                    <div
-                                        className="row my-4"
-                                        style={{
-                                            minHeight: 300,
-                                            backgroundColor: '#ebebeb',
-                                            borderRadius: '10px',
-                                            marginLeft: 2,
-                                            marginRight: 2
-                                        }}
-                                    >
-                                        {questionDetail.map(
-                                            (question, indexQuestion) => (
-                                                <div
-                                                    className="col-lg-12"
-                                                    key={
-                                                        question.questionDetailId
-                                                    }
-                                                >
-                                                    <div class="d-flex bd-highlight">
-                                                        <div class="p-2 w-100">
-                                                            <h2 className="text-dark mt-3">
-                                                                Câu hỏi{' '}
-                                                                {indexQuestion +
-                                                                    1}
-                                                            </h2>
-                                                            <p className="h2 text-muted">
-                                                                {
-                                                                    question.questionTitle
-                                                                }
-                                                            </p>
-                                                        </div>
-                                                    </div>
-                                                    <div className="container mt-2 mb-3">
-                                                        <div className="row">
-                                                            {question.answer.map(
-                                                                (
-                                                                    answer,
-                                                                    indexAnswer
-                                                                ) => (
-                                                                    <div
-                                                                        className="col-md-6"
-                                                                        key={
-                                                                            indexAnswer
-                                                                        }
-                                                                    >
-                                                                        {question.answer.filter(
-                                                                            (
-                                                                                answer
-                                                                            ) =>
-                                                                                answer.isCorrect ===
-                                                                                true
-                                                                        )
-                                                                            .length ===
-                                                                        2 ? (
-                                                                            <Checkbox
-                                                                                id={
-                                                                                    answer.answerId
-                                                                                }
-                                                                                name={
-                                                                                    question.questionDetailId
-                                                                                }
-                                                                                value={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                label={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                onChange={() =>
-                                                                                    handleAnswerSelect(
-                                                                                        question.questionDetailId,
-                                                                                        answer.answerId,
-                                                                                        answer.isCorrect
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        ) : (
-                                                                            <Radio
-                                                                                id={
-                                                                                    answer.answerId
-                                                                                }
-                                                                                name={
-                                                                                    question.questionDetailId
-                                                                                }
-                                                                                value={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                label={
-                                                                                    answer.answerContent
-                                                                                }
-                                                                                onChange={() =>
-                                                                                    handleAnswerSelect(
-                                                                                        question.questionDetailId,
-                                                                                        answer.answerId,
-                                                                                        answer.isCorrect
-                                                                                    )
-                                                                                }
-                                                                            />
-                                                                        )}
-                                                                    </div>
-                                                                )
-                                                            )}
-                                                        </div>
+                                <QuestionMarkIcon
+                                    className="rounded-circle p-3"
+                                    style={{
+                                        backgroundColor: 'white',
+                                        fontSize: 100,
+                                        color: '#34A633',
+                                        marginRight: 100
+                                    }}
+                                />
+                            </div>
+                            <div className="container">
+                                <div
+                                    className="row my-4"
+                                    style={{
+                                        minHeight: 300,
+                                        backgroundColor: '#ebebeb',
+                                        borderRadius: '10px',
+                                        marginLeft: 2,
+                                        marginRight: 2
+                                    }}
+                                >
+                                    {questionDetail.map(
+                                        (question, indexQuestion) => (
+                                            <div
+                                                className="col-lg-12"
+                                                key={question.questionDetailId}
+                                            >
+                                                <div class="d-flex bd-highlight">
+                                                    <div class="p-2 w-100">
+                                                        <h2 className="text-dark mt-3">
+                                                            Câu hỏi{' '}
+                                                            {indexQuestion + 1}
+                                                        </h2>
+                                                        <p className="h2 text-muted">
+                                                            {
+                                                                question.questionTitle
+                                                            }
+                                                        </p>
                                                     </div>
                                                 </div>
-                                            )
-                                        )}
-                                    </div>
-                                    <Button
-                                        className="float-right mb-5"
-                                        variant="gradient"
-                                        gradient={{
-                                            from: 'blue',
-                                            to: 'violet',
-                                            deg: 90
-                                        }}
-                                        w={200}
-                                        size="md"
-                                        fw={'bold'}
-                                        fz={'lg'}
-                                        onClick={handleFinish}
-                                    >
-                                        Nộp bài
-                                    </Button>
+                                                <div className="container mt-2 mb-3">
+                                                    <div className="row">
+                                                        {question.answer.map(
+                                                            (
+                                                                answer,
+                                                                indexAnswer
+                                                            ) => (
+                                                                <div
+                                                                    className="col-md-6"
+                                                                    key={
+                                                                        indexAnswer
+                                                                    }
+                                                                >
+                                                                    {question.answer.filter(
+                                                                        (
+                                                                            answer
+                                                                        ) =>
+                                                                            answer.isCorrect ===
+                                                                            true
+                                                                    ).length ===
+                                                                    2 ? (
+                                                                        <Checkbox
+                                                                            id={
+                                                                                answer.answerId
+                                                                            }
+                                                                            name={
+                                                                                question.questionDetailId
+                                                                            }
+                                                                            value={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            label={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            onChange={() =>
+                                                                                handleAnswerSelect(
+                                                                                    question.questionDetailId,
+                                                                                    answer.answerId,
+                                                                                    answer.isCorrect
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    ) : (
+                                                                        <Radio
+                                                                            id={
+                                                                                answer.answerId
+                                                                            }
+                                                                            name={
+                                                                                question.questionDetailId
+                                                                            }
+                                                                            value={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            label={
+                                                                                answer.answerContent
+                                                                            }
+                                                                            onChange={() =>
+                                                                                handleAnswerSelect(
+                                                                                    question.questionDetailId,
+                                                                                    answer.answerId,
+                                                                                    answer.isCorrect
+                                                                                )
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                </div>
+                                                            )
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )
+                                    )}
                                 </div>
+                                <Button
+                                    className="float-right mb-5"
+                                    variant="gradient"
+                                    gradient={{
+                                        from: 'blue',
+                                        to: 'violet',
+                                        deg: 90
+                                    }}
+                                    w={200}
+                                    size="md"
+                                    fw={'bold'}
+                                    fz={'lg'}
+                                    onClick={handleFinish}
+                                >
+                                    Nộp bài
+                                </Button>
                             </div>
                         </div>
                     </div>
-                )}
-            </Container>
-        </>
+                </div>
+            )}
+        </Container>
     )
 }
 

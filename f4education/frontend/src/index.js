@@ -6,13 +6,13 @@ import 'assets/plugins/nucleo/css/nucleo.css'
 import '@fortawesome/fontawesome-free/css/all.min.css'
 import 'assets/scss/argon-dashboard-react.scss'
 
-import AdminLayout from './layouts/Admin.js'
-import AuthLayout from './layouts/Auth.js'
-import ClientLayout from './layouts/Client.js'
+import AdminLayout from '././layouts/Admin'
+import AuthLayout from '././layouts/Auth'
+import ClientLayout from '././layouts/Client'
 import Teacher from './layouts/Teacher'
 import Student from './layouts/Student'
-import Provider from 'Provider'
-import PDFLayout from 'layouts/PDF.js'
+import PDFLayout from './layouts/PDF'
+import Evaluation from './layouts/Evaluation'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
@@ -61,6 +61,9 @@ root.render(
 
             {/* PDF Route */}
             <Route path="/pdf/*" element={<PDFLayout />} />
+            {/* Evaluation Route */}
+            <Route path="/evaluation/*" element={<Evaluation />} />
+            <Route path="/*/student/:classId/*" element={<Evaluation />} />
         </Routes>
     </BrowserRouter>
 )

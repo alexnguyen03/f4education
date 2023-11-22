@@ -1,9 +1,8 @@
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { useEffect, useRef } from 'react'
-import { routesPDF } from 'routes.js'
-import { Container } from '@mantine/core'
+import { routesEvaluation } from 'routes.js'
 
-const PDFLayout = (props) => {
+const Evaluation = (props) => {
     const mainContent = useRef(null)
     const location = useLocation()
 
@@ -13,9 +12,9 @@ const PDFLayout = (props) => {
         mainContent.current.scrollTop = 0
     }, [location])
 
-    const getRoutes = (routesClient) => {
-        return routesClient.map((prop, key) => {
-            if (prop.layout === '/pdf') {
+    const getRoutes = (routesEvaluation) => {
+        return routesEvaluation.map((prop, key) => {
+            if (prop.layout === '/evaluation') {
                 return (
                     <Route
                         path={prop.path}
@@ -39,12 +38,15 @@ const PDFLayout = (props) => {
             {/* Page content */}
             <div style={{ minHeight: '100vh' }}>
                 <Routes>
-                    {getRoutes(routesPDF)}
-                    <Route path="/pdf" element={<Navigate to="/" replace />} />
+                    {getRoutes(routesEvaluation)}
+                    <Route
+                        path="/evaluation"
+                        element={<Navigate to="/" replace />}
+                    />
                 </Routes>
             </div>
         </div>
     )
 }
 
-export default PDFLayout
+export default Evaluation
