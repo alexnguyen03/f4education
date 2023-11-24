@@ -152,6 +152,12 @@ public class ScheduleServiceImpl implements ScheduleService {
         return scheduleResponse;
     }
 
+    @Override
+    public Schedule findScheduleByClassAndStudyDate(Integer classId,Date studyDate){
+        Schedule schedule = scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId, studyDate);
+        return schedule;
+    }
+
     public ZoneOffset getTimeOffset() {
         ZoneOffset javaOffset = OffsetDateTime.now().getOffset();
         ZoneOffset sqlServerOffset = getSqlServerOffset(); // Hãy thay thế hàm này bằng cách lấy thông tin múi giờ từ

@@ -24,4 +24,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
 	@Query("SELECT new com.f4education.springjwt.payload.request.ScheduleTeacherDTO(sc) FROM Schedule sc WHERE sc.classes.teacher.user.id = :accountId ORDER BY sc.studyDate ASC")
 	public List<ScheduleTeacherDTO> findAllScheduleTeacherByID(Integer accountId);
 
+	@Query("SELECT sc FROM Schedule sc WHERE sc.classes.classId = :classId AND sc.studyDate = :studyDate")
+	public Schedule findAllScheduleByClassIdAndStudyDate(@Param("classId") Integer classId, @Param("studyDate") Date studyDate);
+
 }

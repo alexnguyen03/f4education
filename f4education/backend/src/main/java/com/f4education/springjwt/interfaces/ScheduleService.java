@@ -1,5 +1,6 @@
 package com.f4education.springjwt.interfaces;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
@@ -16,4 +17,6 @@ public interface ScheduleService {
     ScheduleResponse findAllScheduleByClassId(Integer classId);
 
     List<ScheduleTeacherDTO> findAllScheduleTeacherByID(Integer id);
+
+    Schedule findScheduleByClassAndStudyDate(Integer classId, Date studyDate);
 }

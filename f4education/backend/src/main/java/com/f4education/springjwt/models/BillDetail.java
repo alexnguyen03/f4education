@@ -19,31 +19,30 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "BillDetail")
 public class BillDetail {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bill_detail_id")
-    private Integer billDetailId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "bill_detail_id")
+	private Integer billDetailId;
 
-    private Double price;
+//    private Double price;
 
-    @Column(name = "total_price")
-    private Double totalPrice;
+	@Column(name = "total_price")
+	private Double totalPrice;
 
-    private String note;
+	private String note;
 
-    @ManyToOne
-    @JoinColumn(name = "course_id")
-    @JsonIgnore
-    Course course;
+	@ManyToOne
+	@JoinColumn(name = "course_id")
+	@JsonIgnore
+	Course course;
 
-    @ManyToOne
-    @JoinColumn(name = "bill_id")
-    @JsonIgnore
-    Bill bill;
+	@ManyToOne
+	@JoinColumn(name = "bill_id")
+	@JsonIgnore
+	Bill bill;
 
-    @Override
-    public String toString() {
-        return "DetailInvoice [detailInvoiceId=" + billDetailId + ", price=" + price + ", totalPrice=" + totalPrice
-                + ", note=" + note + "]";
-    }
+	@Override
+	public String toString() {
+		return "DetailInvoice [detailInvoiceId=" + billDetailId + ", totalPrice=" + totalPrice + ", note=" + note + "]";
+	}
 }

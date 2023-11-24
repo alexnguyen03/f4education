@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.interfaces.CoursesService;
+import com.f4education.springjwt.models.BillDetail;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.CourseHistory;
 import com.f4education.springjwt.models.Evaluate;
@@ -103,6 +104,8 @@ public class CourseServiceImpl implements CoursesService {
 		List<Object[]> list = courseRepository.findTop10CoursesWithBillDetails(true);
 
 		List<Course> courses = new ArrayList<>();
+		List<Double> totalListRenueve = new ArrayList<>();
+		List<Date> listCreateDate = new ArrayList<>();
 
 		for (Object[] objArray : list) {
 			if (objArray.length >= 1) {
@@ -114,7 +117,19 @@ public class CourseServiceImpl implements CoursesService {
 				courseData.setResources(null);
 				courseData.setQuizResults(null);
 
-				courseData.setCourseId((Integer) objArray[0]);
+				Integer courseId = (Integer) objArray[0];
+				courseData.setCourseId(courseId);
+
+//				Get BillDetailID
+				Course billDetailCourse = courseRepository.findById(courseId).get();
+				List<BillDetail> listBillDetail = billDetailCourse.getBillDetail();
+
+				for (BillDetail bd : listBillDetail) {
+					if (bd.getCourse().getCourseId().equals(courseId)) {
+						listCreateDate.add(bd.getBill().getCreateDate());
+					}
+				}
+
 				courseData.setCourseName((String) objArray[1]);
 				Object value = objArray[2];
 				Float floatValue = null;
@@ -128,11 +143,7 @@ public class CourseServiceImpl implements CoursesService {
 						e.printStackTrace();
 					}
 				}
-				
-				System.out.println(objArray[5]);
-				System.out.println(objArray[6]);
-				System.out.println(objArray[7]);
-				
+
 				courseData.setCoursePrice(floatValue);
 				courseData.setCourseDuration((Integer) objArray[3]);
 				courseData.setCourseDescription((String) objArray[4]);
@@ -151,18 +162,22 @@ public class CourseServiceImpl implements CoursesService {
 				courseData.setSubject(subject);
 
 				List<RegisterCourse> rg = registerCourseRepository.findByCourseId((Integer) objArray[0]);
-				System.out.println(rg);
 				courseData.setRegisterCourses(rg);
 				courseData.setStatus((Boolean) objArray[8].toString().equals("1") ? true : false);
+
+//				Total sales
+				totalListRenueve.add((Double) objArray[10]);
 
 				courses.add(courseData);
 			}
 		}
+
 		List<CourseResponse> courseResponses = new ArrayList<>();
 
-		for (Course course : courses) {
-			Boolean isPurchase = false;
+		for (int i = 0; i < courses.size(); i++) {
+			Course course = courses.get(i);
 
+			Boolean isPurchase = false;
 			for (RegisterCourse rg : course.getRegisterCourses()) {
 				if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
 					isPurchase = true;
@@ -170,14 +185,15 @@ public class CourseServiceImpl implements CoursesService {
 				}
 			}
 
+			Double renueve = totalListRenueve.get(i);
+			Date createDate = listCreateDate.get(i);
+
 			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
+			courseResponse.setTotalRenueve(renueve);
+			courseResponse.setCreateDate(createDate);
+
 			courseResponses.add(courseResponse);
 		}
-
-		// for (Course course : courses) {
-		// CourseResponse courseResponse = convertToResponseDTO(course, false, null);
-		// courseResponses.add(courseResponse);
-		// }
 
 		return courseResponses;
 	}

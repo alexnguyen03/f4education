@@ -12,12 +12,13 @@ import {
     Burger,
     Button,
     Grid,
+    Group,
     HoverCard,
-    List,
     Menu,
     rem,
     ScrollArea,
-    ThemeIcon
+    Stack,
+    Text
 } from '@mantine/core'
 import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks'
 import {
@@ -39,10 +40,6 @@ import subjectApi from '../../api/subjectApi'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
-const category_1 = ['Java', 'C#', 'PHP', 'JavaScript']
-const category_2 = ['NextJS', 'ReactJS', 'AngularJS', 'NodeJS']
-const category_3 = ['SQL Server', 'MySQL', 'Xampp']
-
 const ClientNavbar = () => {
     const user = JSON.parse(localStorage.getItem('user'))
     const listCart = JSON.parse(localStorage.getItem('userCart')) || []
@@ -62,6 +59,8 @@ const ClientNavbar = () => {
     const [listCourse, setListCourse] = useState([])
     const [listSubject, setListSubject] = useState([])
     const [courseByLevel, setCourseByLevel] = useState([])
+    const [optionSearch, setOptionSearch] = useState([])
+    const [searchValue, setSearchValue] = useState()
 
     const fetchCart = async () => {
         try {
@@ -78,10 +77,11 @@ const ClientNavbar = () => {
             const resp = await courseApi.getAll()
 
             if (resp.status === 200 && resp.data.length > 0) {
+                // const uniqueValues = [
+                //     ...new Set(resp.data.map((item) => item.courseName))
+                // ]
                 setListCourse(resp.data)
             }
-
-            console.log(resp.data)
         } catch (error) {
             console.log(error)
         }
@@ -92,9 +92,11 @@ const ClientNavbar = () => {
             const resp = await subjectApi.getAllSubject()
 
             if (resp.status === 200 && resp.data.length > 0) {
+                // const uniqueValues = [
+                //     ...new Set(resp.data.map((item) => item.subjectName))
+                // ]
                 setListSubject(resp.data)
             }
-            console.log(resp.data)
         } catch (error) {
             console.log(error)
         }
@@ -114,7 +116,7 @@ const ClientNavbar = () => {
             await Promise.all([fetchSubject(), fetchCourse()])
         }
         fetchData()
-    }, [user.username])
+    }, [user !== null ? user.username : ''])
 
     useEffect(() => {
         fetchCart()
@@ -174,8 +176,25 @@ const ClientNavbar = () => {
         const listCourseFilter = listCourse.filter(
             (course) => course.subject.subjectId === subjectId
         )
-        console.log(listCourseFilter)
         setCourseByLevel(listCourseFilter)
+    }
+
+    const handleOnChangeSearch = (value) => {
+        console.log(value)
+        if (value === undefined) {
+            return
+        }
+
+        const currentCourse = listCourse.find(
+            (course) => course.courseName.toLowerCase() === value.toLowerCase()
+        )
+        console.log(currentCourse)
+
+        if (currentCourse === undefined) {
+            return
+        } else {
+            navigate(`/course/${currentCourse.courseId}`)
+        }
     }
 
     return (
@@ -287,45 +306,20 @@ const ClientNavbar = () => {
                                 </HoverCard.Target>
 
                                 <HoverCard.Dropdown mt="xl">
-                                    {/* <Group position="apart" px={rem('1.5rem')}>
-                                        <Text fw={500}>Khóa học</Text>
-                                        <Link to="/course" fz="xs">
-                                            Tất cả khóa học
-                                        </Link>
-                                    </Group>
-
-                                    <Divider my="sm" /> */}
-
-                                    <Grid gutter="xl" p={rem('1.5rem')}>
-                                        {/* Level 1 category */}
-                                        <ScrollArea
-                                            p={20}
-                                            h={500}
-                                            offsetScrollbars
-                                        >
-                                            <List
-                                                spacing="xs"
-                                                size="sm"
-                                                center
-                                                icon={
-                                                    <ThemeIcon
-                                                        color="indigo"
-                                                        size={24}
-                                                        radius="xl"
-                                                    >
-                                                        <IconChevronRight size="1rem" />
-                                                    </ThemeIcon>
-                                                }
-                                            >
+                                    <ScrollArea p={20} h={500} offsetScrollbars>
+                                        <Grid gutter="xl" p={rem('1.5rem')}>
+                                            <Stack display="block">
                                                 {listSubject.map((subject) => (
                                                     <HoverCard
                                                         position="right-start"
                                                         radius="sm"
                                                         shadow="md"
                                                         withinPortal
+                                                        maw={450}
                                                     >
                                                         <HoverCard.Target>
-                                                            <List.Item
+                                                            <Group
+                                                                position="apart"
                                                                 key={
                                                                     subject.subjectId
                                                                 }
@@ -334,84 +328,93 @@ const ClientNavbar = () => {
                                                                         subject.subjectId
                                                                     )
                                                                 }
+                                                                mb={10}
                                                             >
-                                                                {
-                                                                    subject.subjectName
-                                                                }
-                                                            </List.Item>
+                                                                <Text
+                                                                    color="dark"
+                                                                    size="lg"
+                                                                >
+                                                                    {
+                                                                        subject.subjectName
+                                                                    }
+                                                                </Text>
+                                                                <IconChevronRight />
+                                                            </Group>
                                                         </HoverCard.Target>
                                                         {/* Level 2 category */}
                                                         <HoverCard.Dropdown
-                                                            ml={57}
-                                                            mt={-30}
+                                                            ml={54}
+                                                            mt={-45}
                                                             p={20}
+                                                            maw={450}
                                                         >
-                                                            <List
-                                                                spacing="xs"
-                                                                size="sm"
-                                                                center
-                                                                icon={
-                                                                    <ThemeIcon
-                                                                        color="violet"
-                                                                        size={
-                                                                            24
-                                                                        }
-                                                                        radius="xl"
-                                                                    >
-                                                                        <IconChevronRight size="1rem" />
-                                                                    </ThemeIcon>
-                                                                }
-                                                                mah={500}
-                                                                styles={{
-                                                                    root: {
-                                                                        overflow:
-                                                                            'scroll'
-                                                                    }
-                                                                }}
+                                                            <Text
+                                                                color="dimmed"
+                                                                fw={700}
+                                                                mb={20}
+                                                                size="lg"
                                                             >
-                                                                {courseByLevel.length ===
-                                                                0 ? (
-                                                                    <>
-                                                                        <List.Item>
-                                                                            Môn
-                                                                            học
-                                                                            hiện
-                                                                            chưa
-                                                                            có
-                                                                            khóa
-                                                                            học.
-                                                                        </List.Item>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
+                                                                Những khóa học
+                                                                phổ biến
+                                                            </Text>
+                                                            {courseByLevel.length ===
+                                                            0 ? (
+                                                                <>
+                                                                    <Text
+                                                                        color="dimmed"
+                                                                        size="lg"
+                                                                    >
+                                                                        Môn học
+                                                                        hiện
+                                                                        chưa có
+                                                                        khóa
+                                                                        học.
+                                                                    </Text>
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <ScrollArea
+                                                                        p={20}
+                                                                        h={500}
+                                                                        offsetScrollbars
+                                                                    >
                                                                         {courseByLevel.map(
                                                                             (
                                                                                 course
                                                                             ) => (
-                                                                                <List.Item
+                                                                                <Text
                                                                                     key={
                                                                                         course.courseId
+                                                                                    }
+                                                                                    size="lg"
+                                                                                    mb={
+                                                                                        10
                                                                                     }
                                                                                 >
                                                                                     <Link
                                                                                         to={`/course/${course.courseId}`}
+                                                                                        style={{
+                                                                                            color: '#000',
+                                                                                            fontSize:
+                                                                                                '1.25rem'
+                                                                                        }}
                                                                                     >
                                                                                         {
                                                                                             course.courseName
                                                                                         }
                                                                                     </Link>
-                                                                                </List.Item>
+                                                                                </Text>
                                                                             )
                                                                         )}
-                                                                    </>
-                                                                )}
-                                                            </List>
+                                                                    </ScrollArea>
+                                                                </>
+                                                            )}
                                                         </HoverCard.Dropdown>
                                                     </HoverCard>
                                                 ))}
-                                            </List>
-                                        </ScrollArea>
-                                    </Grid>
+                                            </Stack>
+                                        </Grid>
+                                    </ScrollArea>
                                 </HoverCard.Dropdown>
                             </HoverCard>
                         </li>
@@ -443,12 +446,14 @@ const ClientNavbar = () => {
                         justify-content-sm-center text-center text-dark ml-auto"
                     >
                         <Autocomplete
-                            placeholder="Tìm khóa học.."
+                            placeholder="Tìm khóa học..."
                             className="mt-1"
                             ref={ref}
                             style={{ width: rem(300) }}
                             icon={<IconSearch />}
                             data={listCourse.map((c) => c.courseName)}
+                            // value={searchValue}
+                            onChange={(e) => handleOnChangeSearch(e)}
                         />
                         {user !== null ? (
                             <>

@@ -277,7 +277,7 @@ const Checkout = () => {
         }
     }
 
-    const handleCreateBillAndBillDetail = async (updateCartRequest) => {
+    const handleCreateBillAndBillDetail = (updateCartRequest) => {
         try {
             const billRequest = {
                 totalPrice: updateCartRequest[0].totalPrice,
@@ -289,7 +289,7 @@ const Checkout = () => {
             // console.log(totalPrice)
             console.log('Bill: ' + JSON.stringify(billRequest))
 
-            await billApi.createBill(billRequest)
+            billApi.createBill(billRequest)
         } catch (error) {
             console.log('Bill: ' + error)
         }
@@ -306,7 +306,7 @@ const Checkout = () => {
         try {
             // console.log('BillDetail: ' + JSON.stringify(billDetailRequest))
 
-            await billApi.createBillDetail(billDetailRequest)
+            billApi.createBillDetail(billDetailRequest)
         } catch (error) {
             console.log('BillDetail: ' + error)
         }

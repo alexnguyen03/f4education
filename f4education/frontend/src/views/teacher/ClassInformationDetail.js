@@ -29,6 +29,7 @@ import { createSearchParams, useNavigate, useParams } from 'react-router-dom'
 import classApi from '../../api/classApi'
 import resourceApi from 'api/resourceApi'
 import attendanceApi from '../../api/attendanceApi'
+import scheduleApi from '../../api/scheduleApi'
 
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
@@ -60,6 +61,7 @@ const ClassInformationDetail = () => {
 
     // ************* Action variable
     const [loading, setLoading] = useState(false)
+    const [classStudyToday, setClassStudyToday] = useState(false)
 
     const [examOpened, handlers] = useDisclosure(false, {
         onOpen: () => console.log('Opened'),
@@ -118,6 +120,24 @@ const ClassInformationDetail = () => {
 
                 setStudents(newData)
                 setCourseName(resp.data[0].courseName[0])
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const checkIfClassStudyToDay = async () => {
+        const today = moment(new Date()).format('DD-MM-yyyy')
+        try {
+            const resp = await scheduleApi.findAllScheduleByClassAndStudyDate(
+                data.classId,
+                today
+            )
+
+            console.log(resp.data)
+
+            if (resp.status === 200 && resp.data.length > 0) {
+                setClassStudyToday(true)
             }
         } catch (error) {
             console.log(error)
@@ -331,7 +351,8 @@ const ClassInformationDetail = () => {
             await Promise.all([
                 fetchClass(),
                 fetchClassByTeacher(),
-                checkActivedExam()
+                checkActivedExam(),
+                checkIfClassStudyToDay()
             ])
             setLoading(false)
         }
@@ -562,16 +583,34 @@ const ClassInformationDetail = () => {
                             <>
                                 <Flex justify="space-between" align="center">
                                     <Group position="left">
-                                        <Button
-                                            color="violet"
-                                            size="md"
-                                            mb="lg"
-                                            onClick={() =>
-                                                handleSaveAttendance()
-                                            }
-                                        >
-                                            Lưu điểm danh
-                                        </Button>
+                                        {classStudyToday ? (
+                                            <>
+                                                <Button
+                                                    color="violet"
+                                                    size="md"
+                                                    mb="lg"
+                                                    onClick={() =>
+                                                        handleSaveAttendance()
+                                                    }
+                                                >
+                                                    Lưu điểm danh
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    color="violet"
+                                                    size="md"
+                                                    mb="lg"
+                                                    onClick={() =>
+                                                        handleSaveAttendance()
+                                                    }
+                                                    disabled
+                                                >
+                                                    Lưu điểm danh
+                                                </Button>
+                                            </>
+                                        )}
                                     </Group>
 
                                     <Text color="dark" fz="lg" fw={500}>
