@@ -17,4 +17,8 @@ public interface EvaluationTeacherRepository extends JpaRepository<EvaluationTea
 
     @Query(value = "SELECT  ed.title,   COUNT(value), ed.value   FROM Class c JOIN EvaluationTeacher et ON c.class_id = et.class_id JOIN EvaluationTeacherDetail ed ON et.evaluation_id = ed.evaluation_teacher_id where  c.teacher_id =:teacherId GROUP BY  ed.title, ed.value ORDER BY ed.title ASC", nativeQuery = true)
     public List<Object[]> getAllEvaluationsByTeacherId(@Param("teacherId") String teacherId);
+
+    @Query(value = "SELECT  ed.title,tc.fullname, c.class_id,   COUNT(ed.value) AS 'vote', ed.value   FROM Class c JOIN EvaluationTeacher et ON c.class_id = et.class_id  JOIN EvaluationTeacherDetail ed ON et.evaluation_id = ed.evaluation_teacher_id JOIN Teacher tc ON tc.teacher_id = c.teacher_id  GROUP BY  ed.title, ed.value  ,tc.fullname, c.class_id ORDER BY ed.title ASC", nativeQuery = true)
+    public List<Object[]> getAllReportEvaluationTeacher();
+
 }
