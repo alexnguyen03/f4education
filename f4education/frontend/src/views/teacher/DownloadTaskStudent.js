@@ -44,7 +44,7 @@ const DownloadTaskStudent = () => {
     const [searchParams, setSearchParams] = useSearchParams()
 
     const redirectTo = () => {
-        return navigate('/teacher/classes-infor/' + searchParams.get('classId'))
+        return navigate('/teacher/classes-info/' + searchParams.get('classId'))
     }
 
     const [tasks, setTasks] = useState([

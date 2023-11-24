@@ -179,7 +179,7 @@ const TeacherSchedule = () => {
     )
 
     const redirectTo = (classId) => {
-        return navigate('/teacher/classes-infor/' + classId)
+        return navigate('/teacher/classes-info/' + classId)
     }
 
     useEffect(() => {
@@ -223,7 +223,7 @@ const TeacherSchedule = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/classes-infor/' + classId)
+        navigate('/teacher/classes-info/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {

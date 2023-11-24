@@ -258,7 +258,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-infor',
+        path: '/class-info',
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
@@ -286,7 +286,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-infor/:classId',
+        path: '/class-info/:classId',
         component: <ClassInformationDetail />,
         layout: '/teacher'
     },
@@ -296,7 +296,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-infor/point/:classId',
+        path: '/class-info/point/:classId',
         icon: 'ni ni-planet text-blue',
         component: <Points />,
         layout: '/teacher'

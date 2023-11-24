@@ -48,6 +48,10 @@ const ClassInformation = () => {
         try {
             setLoading(true)
             const resp = await classApi.getAllClassByTeacherId(user.username)
+            console.log(
+                '🚀 ~ file: ClassInformation.js:51 ~ fetchClassByTeacher ~ resp:',
+                resp
+            )
             if (resp.status === 200 && resp.data.length > 0) {
                 setListClasses(resp.data.reverse())
             }
@@ -68,7 +72,7 @@ const ClassInformation = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/class-infor/' + classId)
+        navigate('/teacher/class-info/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {
