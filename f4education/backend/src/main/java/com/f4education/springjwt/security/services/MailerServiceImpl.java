@@ -67,7 +67,7 @@ public class MailerServiceImpl implements MailerService {
 
 	@Override
 	public void queue(String[] to, String subject, String body, Date date) {
-		String link = "http://localhost:3000/client-register/" + to;
+		String link = "http://localhost:3000/client-register/" + to[0];
 		body = ""
 				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
@@ -128,7 +128,6 @@ public class MailerServiceImpl implements MailerService {
 					if (date.after(mail.getDate())) {
 						sendMail(mail);
 						list.remove(i);
-
 						System.out.println("Đã gửi mail có ngày");
 					}
 				}

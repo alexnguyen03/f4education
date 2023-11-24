@@ -80,6 +80,10 @@ const TeacherSchedule = () => {
             const resp = await scheduleApi.findAllScheduleTeacherByID(user.id)
             if (resp.status === 200 && resp.data.length > 0) {
                 let data = resp.data
+                console.log(
+                    '🚀 ~ file: TeacherSchedule.js:83 ~ fetchClassByTeacher ~ data:',
+                    data
+                )
                 setSchedules(data)
                 let dataFilter = await filler(data, datepicker)
                 setSchedulesFillter([...dataFilter])

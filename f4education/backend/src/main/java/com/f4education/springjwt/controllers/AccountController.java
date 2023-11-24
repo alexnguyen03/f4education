@@ -1,6 +1,7 @@
 package com.f4education.springjwt.controllers;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,10 +99,10 @@ public class AccountController {
                     .badRequest()
                     .body(new MessageResponse("1"));
         }
-        List<String> mails = null;
-        mails.add(accountDTO.getEmail());
+        // List<String> mails = new ArrayList<>();
+        // mails.add(accountDTO.getEmail());
 
-        String[] mail = mails.toArray(new String[0]);
+        String[] mail = { accountDTO.getEmail().toString() };
         mailer.queue(mail, "", "", null);
         return ResponseEntity.ok().body(new MessageResponse("2"));
     }
