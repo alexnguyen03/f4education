@@ -193,7 +193,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		BeanUtils.copyProperties(registerCourse, registerCourseDTO);
 		registerCourseDTO.setRegisterCourseId(registerCourse.getRegisterCourseId());
 		registerCourseDTO.setStatus(registerCourse.getStatus());
-		registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
+		// registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 		registerCourseDTO.setRegistrationDate(registerCourse.getRegistrationDate());
 		registerCourseDTO.setCourseDuration(registerCourse.getCourseDuration());
 		registerCourseDTO.setCoursePrice(registerCourse.getCoursePrice());
@@ -204,7 +204,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		registerCourse.setClasses(registerCourse.getClasses());
 		registerCourseDTO.setStartDate(registerCourse.getStartDate());
 		registerCourseDTO.setStartDate(registerCourse.getEndDate());
-		registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
+		// registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 		registerCourseDTO.setCourseId(registerCourse.getCourse().getCourseId());
 		registerCourseDTO.setStudentId(registerCourse.getStudent().getStudentId());
 		if (registerCourse.getClasses() != null) {
@@ -227,7 +227,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCoursePrice(course.getCoursePrice());
 			registerCourse.setImage(course.getImage());
 			registerCourse.setCourseDescription(course.getCourseDescription());
-			registerCourse.setNumberSession(course.getNumberSession());
+			// registerCourse.setNumberSession(course.getNumberSession());
 		}
 
 		if (student != null) {
@@ -248,7 +248,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCoursePrice(course.getCoursePrice());
 			registerCourse.setImage(course.getImage());
 			registerCourse.setCourseDescription(course.getCourseDescription());
-			registerCourse.setNumberSession(course.getNumberSession());
+			// registerCourse.setNumberSession(course.getNumberSession());
 		}
 		if (student != null) {
 			registerCourse.setStudent(student);

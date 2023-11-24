@@ -131,7 +131,7 @@ public class CourseServiceImpl implements CoursesService {
 				courseData.setCoursePrice(floatValue);
 				courseData.setCourseDuration((Integer) objArray[3]);
 				courseData.setCourseDescription((String) objArray[4]);
-				courseData.setNumberSession((Integer) objArray[5]);
+				// courseData.setNumberSession((Integer) objArray[5]);
 				courseData.setImage((String) objArray[6]);
 				Object subjectId = objArray[7];
 
@@ -237,8 +237,10 @@ public class CourseServiceImpl implements CoursesService {
 
 	private CourseDTO convertEntityToDTO(Course course) {
 		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
-				course.getCourseDuration(), course.getCourseDescription(), course.getNumberSession(),
-				course.getSubject(), course.getImage(), course.getStatus());
+				course.getCourseDuration(), course.getCourseDescription(), 
+				// course.getNumberSession(),
+
+				null, course.getSubject(), course.getImage(), course.getStatus());
 	}
 
 	private CourseResponse convertToResponseDTO(Course course, Boolean isPurchase, Integer registerCourseId) {

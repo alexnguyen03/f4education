@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.f4education.springjwt.models.RegisterCourse;
+import com.f4education.springjwt.payload.request.ProgressDTO;
 
 @Repository
 public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, Integer> {
@@ -25,6 +26,9 @@ public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, 
 
 	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.classes.classId = :classId")
 	List<RegisterCourse> getRegisterCourseHasClass(@Param("classId") Integer classId);
+
+	@Query("SELECT new com.f4education.springjwt.payload.request.ProgressDTO(rc) FROM RegisterCourse rc WHERE rc.classes.classId = :classId")
+	List<ProgressDTO> getAllProgress(@Param("classId") Integer classId);
 
 	//
 	// @Query("SELECT new com.f4education.springjwt.models.ClassesByTeacher(rc,c,t)
