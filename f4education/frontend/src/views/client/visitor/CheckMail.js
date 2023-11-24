@@ -180,6 +180,46 @@ const CheckMail = () => {
         })
     }, [student])
 
+    // ! Update OTP start
+    // const storedStartTime = localStorage.getItem('countdown_start_time')
+    // const storedSeconds = localStorage.getItem('countdown_seconds')
+
+    // const [startTime, setStartTime] = useState(
+    //     storedStartTime || Date.now().toString()
+    // )
+    // const [seconds, setSeconds] = useState(
+    //     storedSeconds ? parseInt(storedSeconds) : 60
+    // )
+
+    // useEffect(() => {
+    //     localStorage.setItem('countdown_start_time', startTime)
+    //     localStorage.setItem('countdown_seconds', seconds.toString())
+    // }, [startTime, seconds])
+
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setSeconds((prevSeconds) => {
+    //             if (prevSeconds === 0) {
+    //                 setStartTime(Date.now().toString()) // Reset start time when countdown reaches 0
+    //                 return 60
+    //             }
+    //             return prevSeconds - 1
+    //         })
+    //     }, 1000)
+
+    //     return () => clearInterval(timer)
+    // }, [])
+
+    // const formatTime = (time) => (time < 10 ? `0${time}` : time)
+
+    // const handleReset = () => {
+    //     setStartTime(Date.now().toString())
+    //     setSeconds(60)
+    // }
+
+    // const minutes = Math.floor(seconds / 60)
+    // const remainingSeconds = seconds % 60
+
     return (
         <>
             <ToastContainer />
@@ -197,6 +237,16 @@ const CheckMail = () => {
                         <div className="modal-body">
                             <div className="px-lg-2">
                                 <FormGroup>
+                                    {/* Update OTP --------------------------------------------------------------------------- */}
+                                    {/* <div>
+                                        <p>
+                                            Countdown: {formatTime(minutes)}:
+                                            {formatTime(remainingSeconds)}
+                                        </p>
+                                        <button onClick={handleReset}>
+                                            Reset
+                                        </button>
+                                    </div> */}
                                     <label
                                         className="form-control-label"
                                         htmlFor="input-email"
