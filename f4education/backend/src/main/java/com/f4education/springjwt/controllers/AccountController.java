@@ -60,6 +60,7 @@ public class AccountController {
         return accountService.getAllAccountsDTO();
     }
 
+    // ! Lấy tất cả tài khoản dựa vào role
     @GetMapping("/{role}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getByRole(@PathVariable("role") Integer role) {
@@ -67,14 +68,16 @@ public class AccountController {
         return ResponseEntity.ok(list);
     }
 
+    // ! Cập nhật tài khoản
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateSubject(@RequestPart("request") String teacherRequestString,
+    public ResponseEntity<?> updateAccount(@RequestPart("request") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
         AccountDTO accountDTO = changeImg(teacherRequestString, file, false);
         return ResponseEntity.ok(accountService.updateAccount(accountDTO));
     }
 
+    // ! Tạo tài khoản
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createAccount(@RequestPart("request") String teacherRequestString,
@@ -91,6 +94,7 @@ public class AccountController {
         return ResponseEntity.ok(accountService.createAccount(accountDTO));
     }
 
+    // ! Kiểm tra mail có tồn tại hay chưa
     @PostMapping(value = "/checkEmail")
     public ResponseEntity<?> checkMail(@RequestBody AccountDTO accountDTO) {
         Boolean checkEmailExit = accountService.existsByEmail(accountDTO.getEmail().trim());
@@ -99,10 +103,7 @@ public class AccountController {
                     .badRequest()
                     .body(new MessageResponse("1"));
         }
-        // List<String> mails = new ArrayList<>();
-        // mails.add(accountDTO.getEmail());
-
-        String[] mail = { accountDTO.getEmail().toString() };
+        String mail = accountDTO.getEmail().toString();
         mailer.queue(mail, "", "", null);
         return ResponseEntity.ok().body(new MessageResponse("2"));
     }

@@ -67,7 +67,27 @@ public class MailerServiceImpl implements MailerService {
 
 	@Override
 	public void queue(String[] to, String subject, String body, Date date) {
-		String link = "http://localhost:3000/client-register/" + to[0];
+		String link = "http://localhost:3000/client-register/" + to;
+		body = ""
+				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
+				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
+				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link // ! Linh website
+				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">LOVE CAKE</a>\n"
+				+ "    </div>\n" + "    <p style=\"font-size:1.1em\">Xin chào,</p>\n"
+				+ "    <p>Cảm ơn bạn đã tin tưởng lựa chọn cửa hàng của chúng tôi</p>\n"
+				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">Chào mừng bạn đã đến với thế giới bánh ngọt</h2>\n"
+				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />LOVE CAKE</p>\n"
+				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
+				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
+				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
+				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
+		subject = "Thư chào mừng";
+		queue(new MailInfo(to, subject, body, date));
+	}
+
+	@Override
+	public void queue(String to, String subject, String body, Date date) {
+		String link = "http://localhost:3000/client-register/" + to;
 		body = ""
 				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
@@ -96,7 +116,8 @@ public class MailerServiceImpl implements MailerService {
 				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\n"
 				+ "    </div>\n" + " <p>Cảnh báo bạn đã vắng điểm danh vào ngày " + formatDate(date) + "</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
-				+ "    Bạn đã vắng " + absentCount + "/" + totalCount + " buổi học</h2>\n" + "<p style=\"color:red;font-size:1.2em;\">"
+				+ "    Bạn đã vắng " + absentCount + "/" + totalCount + " buổi học</h2>\n"
+				+ "<p style=\"color:red;font-size:1.2em;\">"
 				+ isPassed + "</p>" + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
