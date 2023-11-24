@@ -1,23 +1,19 @@
 package com.f4education.springjwt.security.services;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.f4education.springjwt.interfaces.QuestionDetailService;
 import com.f4education.springjwt.interfaces.TaskService;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Task;
-import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
 import com.f4education.springjwt.payload.request.TaskDTO;
 import com.f4education.springjwt.payload.request.TaskFileStudentDTO;
 import com.f4education.springjwt.repository.ClassRepository;
