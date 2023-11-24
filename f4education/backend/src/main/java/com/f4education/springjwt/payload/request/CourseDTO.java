@@ -28,6 +28,8 @@ public class CourseDTO {
 
     private Boolean status;
 
+    
+
     @Override
     public String toString() {
         return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
