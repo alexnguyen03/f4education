@@ -23,21 +23,22 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class TaskController {
 
-    @Autowired(required = true)
-    private TaskService taskService;
+	@Autowired(required = true)
+	private TaskService taskService;
 
-    @GetMapping("/{id}")
-    // @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> getAll(@PathVariable("id") Integer id) {
-        List<Task> tasks = taskService.getAll(id);
-        return ResponseEntity.ok(tasks);
-    }
+	@GetMapping("/{id}")
+	// @PreAuthorize("hasRole('TEACHER')")
+	public ResponseEntity<?> getAll(@PathVariable("id") Integer id) {
+		List<Task> tasks = taskService.getAll(id);
+		int a = 0;
+		return ResponseEntity.ok(tasks);
+	}
 
-    @PostMapping
-    // @PreAuthorize("hasRole('TEACHER')")
-    public ResponseEntity<?> save(@RequestBody Task task) {
-        
-        Task taskSave = taskService.save(task);
-        return ResponseEntity.ok(null);
-    }
+	@PostMapping
+	// @PreAuthorize("hasRole('TEACHER')")
+	public ResponseEntity<?> save(@RequestBody Task task) {
+
+		Task taskSave = taskService.save(task);
+		return ResponseEntity.ok(null);
+	}
 }
