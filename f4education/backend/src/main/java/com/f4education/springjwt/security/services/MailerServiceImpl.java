@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -63,6 +64,7 @@ public class MailerServiceImpl implements MailerService {
 	@Override
 	public void queue(MailInfo mail) {
 		list.add(mail);
+		System.out.println();
 	}
 
 	@Override
@@ -87,7 +89,8 @@ public class MailerServiceImpl implements MailerService {
 
 	@Override
 	public void queue(String to, String subject, String body, Date date) {
-		String link = "http://localhost:3000/client-register/" + to;
+		String encodedEmail = Base64.getEncoder().encodeToString(to.getBytes());
+		String link = "http://localhost:3000/client-register/" + encodedEmail;
 		body = ""
 				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
@@ -142,7 +145,6 @@ public class MailerServiceImpl implements MailerService {
 				if (mail.getDate() == null) {
 					list.remove(i);
 					sendMail(mail);
-
 					System.out.println("Đã gửi mail");
 				} else {
 					Date date = new Date();

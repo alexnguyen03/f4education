@@ -40,6 +40,7 @@ const Register = () => {
     const [errors, setErrors] = useState({})
     const toastId = React.useRef(null)
     const { email } = useParams()
+    const emailDaMaHoa = atob(email)
 
     // notification loading
     const notifi_loading = (mess) => {
@@ -108,7 +109,7 @@ const Register = () => {
         id: 0,
         username: '',
         password: '',
-        email: email,
+        email: emailDaMaHoa,
         roles: 1,
         status: true,
         student: {
