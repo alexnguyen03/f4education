@@ -179,6 +179,10 @@ const ClassInformationDetail = () => {
 
         try {
             const resp = await questionApi.checkActivedExam(classId)
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:182 ~ checkActivedExam ~ resp:',
+                resp
+            )
 
             if (resp.status === 200 && resp.data) {
                 setActivedExam(true)
@@ -194,7 +198,7 @@ const ClassInformationDetail = () => {
     }
 
     const redirectTo = () => {
-        return navigate('/teacher/classes-infor')
+        return navigate('/teacher/class-infor')
     }
 
     // ********* Action Area
@@ -518,10 +522,7 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
-                                    disabled={
-                                        activedExam ||
-                                        classInfor.status === 'Đang diễn ra'
-                                    }
+                                    disabled={activedExam}
                                 >
                                     Tạo quiz
                                 </Button>
