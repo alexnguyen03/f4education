@@ -131,8 +131,6 @@ const TaskTeacher = () => {
                     data
                 )
                 setTasks(data)
-                // let dataFilter = await filler(data, datepicker)
-                // setSchedulesFillter([...dataFilter])
             }
             setLoading(false)
         } catch (error) {
@@ -274,6 +272,8 @@ const TaskTeacher = () => {
             const resp = await taskTeacherApi.addTask(taskRequest)
             if (resp.status === 200) {
                 toast.update(id, Notify.options.createSuccess())
+                getTasks()
+                resetForm()
             }
         } catch (error) {
             toast.update(id, Notify.options.updateError())
