@@ -19,7 +19,7 @@ import {useState} from 'react';
 // node.js library that concatenates classes (strings)
 import classnames from 'classnames';
 // javascipt plugin for creating charts
-import Chart from 'chart.js';
+import { Chart } from 'chart.js';
 // react plugin used to create charts
 import {Line, Bar} from 'react-chartjs-2';
 // reactstrap components
@@ -29,6 +29,7 @@ import {Button, Card, CardHeader, CardBody, NavItem, NavLink, Nav, Progress, Tab
 import {chartOptions, parseOptions, chartExample1, chartExample2} from 'variables/charts.js';
 
 import Header from 'components/Headers/Header.js';
+import StudentCountChart from './admin/StudentCountChart';
 
 const Index = (props) => {
 	const [activeNav, setActiveNav] = useState(1);
@@ -316,6 +317,7 @@ const Index = (props) => {
 							</Table>
 						</Card>
 					</Col>
+					<StudentCountChart />
 				</Row>
 			</Container>
 		</>

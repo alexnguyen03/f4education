@@ -1,0 +1,28 @@
+package com.f4education.springjwt.controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.f4education.springjwt.interfaces.CoursesService;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
+
+@RestController
+@CrossOrigin("*")
+@RequestMapping("/api/report")
+public class ReportCoursesController {
+	@Autowired
+	CoursesService courseService;
+
+	@GetMapping("/course/student-count")
+	public ResponseEntity<?> getCoursesWithStudentCount() {
+		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount();
+		return ResponseEntity.ok(list);
+	}
+}

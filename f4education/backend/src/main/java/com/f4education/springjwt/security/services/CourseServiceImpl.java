@@ -20,6 +20,7 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 import com.f4education.springjwt.payload.request.ThoiLuongRange;
 import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.repository.AdminRepository;
@@ -360,4 +361,10 @@ public class CourseServiceImpl implements CoursesService {
 		return !courseRepository.isCourseNameExist(courseName).isEmpty();
 	}
 
+	@Override
+	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
+		List<ReportCourseCountStudentDTO> list = courseRepository.getCoursesWithStudentCount();
+		System.out.println(list);
+		return list;
+	}
 }
