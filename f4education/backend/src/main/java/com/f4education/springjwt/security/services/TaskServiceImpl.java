@@ -3,6 +3,7 @@ package com.f4education.springjwt.security.services;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,13 +47,15 @@ public class TaskServiceImpl implements TaskService {
         return tasks.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    private TaskDTO convertToDto(Task task) {
-        TaskDTO taskDTO = new TaskDTO();
-        BeanUtils.copyProperties(task, taskDTO);
-        taskDTO.setClassName(task.getClasses().getClassName());
-        taskDTO.setTeacherName(task.getClasses().getTeacher().getFullname());
-        return taskDTO;
-    }
+	private TaskDTO convertToDto(Task task) {
+		TaskDTO taskDTO = new TaskDTO();
+		BeanUtils.copyProperties(task, taskDTO);
+		taskDTO.setStartDate(Date.from(task.getStartDate().toInstant()));
+		taskDTO.setEndDate(Date.from(task.getEndDate().toInstant()));
+		taskDTO.setClassName(task.getClasses().getClassName());
+		taskDTO.setTeacherName(task.getClasses().getTeacher().getFullname());
+		return taskDTO;
+	}
 
     @Override
     public void submitTaskFile(MultipartFile file, String className, String taskName, String studentName) {
