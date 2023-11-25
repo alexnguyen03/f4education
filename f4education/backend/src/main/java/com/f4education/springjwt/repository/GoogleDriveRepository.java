@@ -9,16 +9,13 @@ import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -307,6 +304,25 @@ public class GoogleDriveRepository {
 		}
 	}
 
+	public String renameFolderById(String folderId, String newFolderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		if (folderId != null) {
+
+			File file = new File();
+			file.setName(newFolderName);
+
+			try {
+				File updatedFile = driveQuickstart.getInstance().files().update(folderId, file).execute();
+				return updatedFile.getId();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
+
 	public void grantPermissionsByEmails(String folderName, List<String> emails) throws Exception {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 
@@ -367,7 +383,7 @@ public class GoogleDriveRepository {
 		// tính
 		downloadFolder(taskNameFolderId, targetFolderPath);
 
-//		// Nén thư mục đích thành một tệp tin ZIP
+		// // Nén thư mục đích thành một tệp tin ZIP
 		String zipFilePath = "/tmp/" + taskName + ".zip";
 		zipFolder(targetFolderPath, zipFilePath);
 
