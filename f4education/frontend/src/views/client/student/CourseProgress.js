@@ -22,7 +22,12 @@ import {
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { IconArrowBack, IconArrowRight, IconRefresh, IconZoomQuestion } from '@tabler/icons-react'
+import {
+    IconArrowBack,
+    IconArrowRight,
+    IconRefresh,
+    IconZoomQuestion
+} from '@tabler/icons-react'
 import {
     createSearchParams,
     Link,
@@ -40,7 +45,7 @@ import styles from '../../../assets/scss/custom-module-scss/client-custom/course
 // API
 import courseApi from '../../../api/courseApi'
 import registerCoursecAPI from '../../../api/registerCourseApi'
-import questionApi from 'api/questionApi'
+import questionApi from '../../../api/questionApi'
 import certificateApi from '../../../api/certificateApi'
 import billApi from 'api/billApi'
 
@@ -102,7 +107,7 @@ const CourseProgress = () => {
     const fetchCourseProgress = async () => {
         try {
             const resp = await registerCoursecAPI.getAllCourseProgress(
-                'loinvpc04549'
+                user.username
             )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
@@ -275,7 +280,7 @@ const CourseProgress = () => {
         })
     }
 
-    const handleShowQuestion = (classId) => {
+    const handleShowQuestionByClassId = (classId) => {
         navigate({
             pathname: '/student/task',
             search: `?${createSearchParams({
@@ -315,7 +320,14 @@ const CourseProgress = () => {
         }
         setLoadingCheckExam(false)
     }
-
+    const handleShowQuestion = (classId) => {
+        navigate({
+            pathname: '/student/quizz',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
     const handleCreateCertificate = async () => {
         try {
             const resp = await certificateApi.createCertificate(certificate)
@@ -402,8 +414,8 @@ const CourseProgress = () => {
             setLoading(true)
             await Promise.all([
                 fetchCourseProgress(),
-                fetchNewestCourse(),
-                checkActivedExamByTodayAndClassId()
+                fetchNewestCourse()
+                // checkActivedExamByTodayAndClassId()
             ])
             setLoading(false)
         }
@@ -746,6 +758,12 @@ const CourseProgress = () => {
                                             color="teal"
                                             loading={loadingCheckExam}
                                             disabled={!enableExam}
+                                            onClick={() =>
+                                                handleShowQuestionByClassId(
+                                                    selectedCourse.classes
+                                                        .classId
+                                                )
+                                            }
                                         >
                                             Làm kiểm tra
                                         </Button>
