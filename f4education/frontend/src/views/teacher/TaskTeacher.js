@@ -189,7 +189,7 @@ const TaskTeacher = () => {
     )
 
     const redirectTo = (classId) => {
-        return navigate('/teacher/classes-infor/' + classId)
+        return navigate('/teacher/classes-info/' + classId)
     }
 
     const filler = async (list, value) => {
@@ -225,7 +225,7 @@ const TaskTeacher = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/classes-infor/' + classId)
+        navigate('/teacher/classes-info/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {

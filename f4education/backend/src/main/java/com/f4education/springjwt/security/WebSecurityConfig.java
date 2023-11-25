@@ -138,8 +138,10 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/accounts/**",
                                         "/api/task/**",
                                         "/api/schedule/**",
+                                        "/api/evaluation/**",
                                         "/api/points/**",
-                                        "/api/exam/**")
+                                        "/api/exam/**",
+                                        "/api/progress/**")
                                 .permitAll().anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());

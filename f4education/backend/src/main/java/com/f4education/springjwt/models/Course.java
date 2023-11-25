@@ -35,8 +35,8 @@ public class Course implements Serializable {
 	@Column(name = "course_description")
 	private String courseDescription;
 
-//	@Column(name = "number_session")
-//	private Integer numberSession;
+	// @Column(name = "number_session")
+	// private Integer numberSession;
 
 	private String image;
 
@@ -86,6 +86,7 @@ public class Course implements Serializable {
 		this.coursePrice = coursePrice;
 		this.courseDuration = courseDuration;
 		this.courseDescription = courseDescription;
+		// this.numberSession = numberSession;
 		this.image = image;
 	}
 

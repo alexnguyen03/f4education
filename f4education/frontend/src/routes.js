@@ -1,5 +1,5 @@
-import Index from 'views/Index.js'
-import Register from 'views/examples/Register.js'
+import Index from './views/Index.js'
+import Register from './views/examples/Register.js'
 import ClientRegister from 'views/client/visitor/Register.js'
 import Subjects from 'views/admin/Subjects'
 import Sessions from 'views/admin/Sessions'
@@ -18,7 +18,7 @@ import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
 import CheckMail from 'views/client/visitor/CheckMail'
 import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
-import Login from 'views/examples/Login'
+import Login from './views/examples/Login'
 
 import CourseDetailClient from './views/client/visitor/CourseDetailClient'
 import CourseRegisterClient from './views/client/visitor/CourseRegisterClient'
@@ -35,12 +35,15 @@ import ClassInformationDetail from './views/teacher/ClassInformationDetail'
 import CourseProgress from './views/client/student/CourseProgress'
 import StudentHome from './views/client/student/StudentHome'
 import SubmitHomework from 'views/client/student/SubmitHomework'
-import CoursesDetail from 'views/admin/CoursesDetail'
+import CoursesDetail from './views/admin/CoursesDetail'
 import DownloadRecource from './views/client/student/DownloadRecource'
-import CertificatePDF from 'views/PDF/CertificatePDF'
+import CertificatePDF from './views/PDF/CertificatePDF'
 import DownloadTaskStudent from 'views/teacher/DownloadTaskStudent'
 import Points from './views/teacher/Points'
-import LearningResult from 'views/client/student/LearningResult'
+import LearningResult from './views/client/student/LearningResult'
+import EvaluateTeacherCompleted from './views/client/student/EvaluateTeacherCompleted'
+import EvaluateTeacher from './views/client/student/EvaluateTeacher'
+import EvaluateTeacherViewByTeacher from './views/client/student/EvaluateTeacherViewByTeacher.js'
 import PaymentHistory from 'views/client/student/PaymentHistory'
 import ClassResult from 'views/teacher/ClassResult'
 import TeacherSchedule from 'views/teacher/TeacherSchedule'
@@ -54,20 +57,7 @@ export var routes = [
         component: <Index />,
         layout: '/admin'
     },
-    {
-        path: '/icons',
-        name: 'Icons',
-        icon: 'ni ni-planet text-blue',
-        component: <Icons />,
-        layout: '/admin'
-    },
-    {
-        path: '/register',
-        name: 'Register',
-        icon: 'ni ni-circle-08 text-pink',
-        component: <Register />,
-        layout: '/auth'
-    },
+
     {
         path: '/teachers',
         name: 'Giảng viên',
@@ -149,13 +139,7 @@ export var routes = [
         component: <QuestionDetail />,
         layout: '/admin'
     },
-    {
-        path: '/classsroom',
-        name: 'Phòng học',
-        icon: 'fa-solid fa-grip-vertical text-primary',
-        component: <ClasssRoom />,
-        layout: '/admin'
-    },
+
     {
         path: '/resources',
         name: 'Tài nguyên',
@@ -169,13 +153,7 @@ export var routes = [
         component: <Login />,
         layout: '/auth'
     },
-    {
-        path: '/questions',
-        name: 'Câu hỏi',
-        icon: 'ni ni-ui-04 text-primary',
-        component: <Questions />,
-        layout: '/admin'
-    },
+
     {
         path: '/question-detail/:questionId',
         component: <QuestionDetail />,
@@ -280,7 +258,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-infor',
+        path: '/class-info',
         name: 'Danh sách lớp học',
         icon: 'ni ni-collection text-blue',
         component: <ClassInformation />,
@@ -308,7 +286,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-infor/:classId',
+        path: '/class-info/:classId',
         component: <ClassInformationDetail />,
         layout: '/teacher'
     },
@@ -318,7 +296,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-infor/point/:classId',
+        path: '/class-info/point/:classId',
         icon: 'ni ni-planet text-blue',
         component: <Points />,
         layout: '/teacher'
@@ -389,5 +367,22 @@ export const routesPDF = [
         path: '/certificate/download',
         component: <CertificatePDF />,
         layout: '/pdf'
+    }
+]
+export const routesEvaluation = [
+    {
+        path: '/student/:classIdParam',
+        component: <EvaluateTeacher />,
+        layout: '/evaluation'
+    },
+    {
+        path: '/student/completed',
+        component: <EvaluateTeacherCompleted />,
+        layout: '/evaluation'
+    },
+    {
+        path: '/teacher',
+        component: <EvaluateTeacherViewByTeacher />,
+        layout: '/evaluation'
     }
 ]

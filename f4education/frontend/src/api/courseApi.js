@@ -20,6 +20,10 @@ const courseApi = {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
     },
+    validateCourseName: (courseName) => {
+        const url = `/courses/validate?courseName=${courseName}`
+        return axiosClient.get(url)
+    },
     updateCourse: (body) => {
         const url = '/courses'
         return axiosClient.put(url, body, {

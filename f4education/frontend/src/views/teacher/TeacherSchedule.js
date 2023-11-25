@@ -80,6 +80,10 @@ const TeacherSchedule = () => {
             const resp = await scheduleApi.findAllScheduleTeacherByID(user.id)
             if (resp.status === 200 && resp.data.length > 0) {
                 let data = resp.data
+                console.log(
+                    '🚀 ~ file: TeacherSchedule.js:83 ~ fetchClassByTeacher ~ data:',
+                    data
+                )
                 setSchedules(data)
                 let dataFilter = await filler(data, datepicker)
                 setSchedulesFillter([...dataFilter])
@@ -175,7 +179,7 @@ const TeacherSchedule = () => {
     )
 
     const redirectTo = (classId) => {
-        return navigate('/teacher/classes-infor/' + classId)
+        return navigate('/teacher/classes-info/' + classId)
     }
 
     useEffect(() => {
@@ -219,7 +223,7 @@ const TeacherSchedule = () => {
     }
 
     const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/classes-infor/' + classId)
+        navigate('/teacher/classes-info/' + classId)
     }
 
     const filteredClasses = listClasses.filter((item) => {

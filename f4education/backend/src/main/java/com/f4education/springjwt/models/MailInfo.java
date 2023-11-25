@@ -31,6 +31,15 @@ public class MailInfo {
         this.date = date;
     }
 
+    public MailInfo(String to, String subject, String body, Date date) {
+        this.from = "FPT Polytechnic <poly@fpt.edu.vn>";
+        String[] mail = { to };
+        this.to = mail;
+        this.subject = subject;
+        this.body = body;
+        this.date = date;
+    }
+
     public MailInfo(String[] to, String subject, String body) {
         this.from = "FPT Polytechnic <poly@fpt.edu.vn>";
         this.to = to;

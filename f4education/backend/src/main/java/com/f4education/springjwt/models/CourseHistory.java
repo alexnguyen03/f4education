@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
+import java.io.Serializable;
 import java.util.Date;
 
 @Data
@@ -14,7 +16,7 @@ import java.util.Date;
 @NoArgsConstructor
 @Table(name = "coursehistory")
 @Builder
-public class CourseHistory {
+public class CourseHistory implements Serializable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "course_history_id")
@@ -27,8 +29,7 @@ public class CourseHistory {
 	private Integer courseDuration;
 	@Column(name = "course_description")
 	private String courseDescription;
-	@Column(name = "number_session")
-	private Integer numberSession;
+
 	private String image;
 	private String action;
 	@Column(name = "modify_date")

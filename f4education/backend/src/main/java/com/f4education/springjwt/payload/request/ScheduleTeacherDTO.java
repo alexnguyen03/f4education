@@ -29,7 +29,7 @@ public class ScheduleTeacherDTO {
         this.isPractice = schedule.getIsPractice();
         try {
             this.classId = schedule.getClasses().getClassId();
-            this.classRoomName = schedule.getClasses().getClassName();
+            this.classRoomName = schedule.getClassRoom().getClassroomName();
         } catch (Exception e) {
             this.classId = null;
             this.classRoomName = null;

@@ -25,14 +25,16 @@ public class CourseDTO {
     private Subject subject;
 
     private String image;
-    
+
     private Boolean status;
 
-	@Override
-	public String toString() {
-		return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
-				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", subject="
-				+ subject + ", image=" + image + ", status=" + status + "]";
-	}
+    
+
+    @Override
+    public String toString() {
+        return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+                + ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", subject="
+                + subject + ", image=" + image + ", status=" + status + "]";
+    }
 
 }

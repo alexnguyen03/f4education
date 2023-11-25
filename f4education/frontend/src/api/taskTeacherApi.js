@@ -2,7 +2,7 @@ import axiosClient from './axiosClient'
 
 const taskTeacherApi = {
     getAllTask: (id) => {
-        const url = '/task/' + id
+        const url = '/task/class/' + id
         return axiosClient.get(url)
     },
     addTask: (body) => {

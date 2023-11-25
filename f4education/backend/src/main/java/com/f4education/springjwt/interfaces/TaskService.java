@@ -15,5 +15,6 @@ public interface TaskService {
 	List<TaskFileStudentDTO> getAllFilesInFolderTaskStudent(String className, String taskName, String studentName) throws Exception;
 
 	List<Task> getAll(Integer id);
+	
 	Task save(Task task);
 }

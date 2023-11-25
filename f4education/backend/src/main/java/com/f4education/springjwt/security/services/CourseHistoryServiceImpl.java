@@ -25,15 +25,20 @@ public class CourseHistoryServiceImpl implements CourseHistoryService {
 
 	private CourseHistoryDTO convertEntityToDTO(CourseHistory courseHistory) {
 		CourseHistoryDTO courseHistoryDTO = new CourseHistoryDTO();
+
+		courseHistoryDTO.setCourseHistoryId(courseHistory.getCourseHistoryId());
+		;
 		courseHistoryDTO.setCourseName(courseHistory.getCourseName());
 		courseHistoryDTO.setCoursePrice(courseHistory.getCoursePrice());
 		courseHistoryDTO.setCourseDuration(courseHistory.getCourseDuration());
 		courseHistoryDTO.setCourseDescription(courseHistory.getCourseDescription());
-		courseHistoryDTO.setNumberSession(courseHistory.getNumberSession());
 		courseHistoryDTO.setImage(courseHistory.getImage());
+		courseHistoryDTO.setCourseId(courseHistory.getCourse().getCourseId());
+		courseHistoryDTO.setAdminName(courseHistory.getCourse().getAdmin().getFullname());
 		courseHistoryDTO.setAction(courseHistory.getAction());
 		courseHistoryDTO.setModifyDate(courseHistory.getModifyDate());
-		return new CourseHistoryDTO();
+		courseHistoryDTO.setSubjectName(courseHistory.getCourse().getSubject().getSubjectName());
+		return courseHistoryDTO;
 	}
 
 	@Override

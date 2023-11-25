@@ -144,6 +144,10 @@ public class CourseServiceImpl implements CoursesService {
 					}
 				}
 
+				System.out.println(objArray[5]);
+				System.out.println(objArray[6]);
+				System.out.println(objArray[7]);
+
 				courseData.setCoursePrice(floatValue);
 				courseData.setCourseDuration((Integer) objArray[3]);
 				courseData.setCourseDescription((String) objArray[4]);
@@ -370,4 +374,10 @@ public class CourseServiceImpl implements CoursesService {
 	public String renameFolder(String folderName, String newFolderName) throws Exception {
 		return googleDriveRepository.renameFolder(folderName, newFolderName);
 	}
+
+	@Override
+	public Boolean isCourseNameExist(String courseName) {
+		return !courseRepository.isCourseNameExist(courseName).isEmpty();
+	}
+
 }

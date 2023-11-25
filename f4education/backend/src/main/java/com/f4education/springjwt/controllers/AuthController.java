@@ -2,11 +2,8 @@ package com.f4education.springjwt.controllers;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -37,13 +34,11 @@ import com.f4education.springjwt.payload.response.MessageResponse;
 import com.f4education.springjwt.payload.response.TokenRefreshResponse;
 import com.f4education.springjwt.repository.RoleRepository;
 import com.f4education.springjwt.repository.UserRepository;
-import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
 import com.f4education.springjwt.security.jwt.JwtUtils;
-import com.f4education.springjwt.security.jwt.exception.TokenRefreshException;
 import com.f4education.springjwt.security.services.RefreshTokenServiceImpl;
 import com.f4education.springjwt.security.services.UserDetailsImpl;
 
-import io.jsonwebtoken.JwtException;
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

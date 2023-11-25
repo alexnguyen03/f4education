@@ -31,24 +31,19 @@ const PDFLayout = (props) => {
     }
 
     return (
-        <>
-            <div
-                className="main-content"
-                style={{ backgroundColor: '#fff' }}
-                ref={mainContent}
-            >
-                {/* Page content */}
-                <div style={{ minHeight: '100vh' }}>
-                    <Routes>
-                        {getRoutes(routesPDF)}
-                        <Route
-                            path="/pdf"
-                            element={<Navigate to="/" replace />}
-                        />
-                    </Routes>
-                </div>
+        <div
+            className="main-content"
+            style={{ backgroundColor: '#fff' }}
+            ref={mainContent}
+        >
+            {/* Page content */}
+            <div style={{ minHeight: '100vh' }}>
+                <Routes>
+                    {getRoutes(routesPDF)}
+                    <Route path="/pdf" element={<Navigate to="/" replace />} />
+                </Routes>
             </div>
-        </>
+        </div>
     )
 }
 

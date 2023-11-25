@@ -119,6 +119,14 @@ const Login = () => {
                     navigate('/teacher')
                 } else navigate('/')
             }
+            if (response.status === 404 && response.status) {
+                setMsgError({
+                    ...msgError,
+                    allErr: 'Tài khoản chưa đăng ký. Vui lòng đăng ký tài khoản để thực hiện tính năng này.'
+                })
+            } else {
+                setMsgError({ ...msgError, allErr: '' })
+            }
         } catch (error) {
             setLoading(false)
             console.log('🚀 ~ file: Login.js:49 ~ handleLogin ~ error:', error)
@@ -134,7 +142,12 @@ const Login = () => {
         }
         setLoading(false)
     }
-    const responseGoogleError = (resp) => {}
+    const responseGoogleError = (resp) => {
+        console.log(
+            '🚀 ~ file: Login.js:140 ~ responseGoogleError ~ resp:',
+            resp
+        )
+    }
     const storeUserInfo = (data) => {
         console.log('🚀 ~ file: Login.js:137 ~ storeUserInfo ~ data:', data)
         localStorage.setItem('user', JSON.stringify(data))
@@ -193,7 +206,7 @@ const Login = () => {
                                 <small>Đăng nhập bằng</small>
                             </div>
                             <div className="btn-wrapper text-center">
-                                <Button
+                                {/* <Button
                                     className="btn-neutral btn-icon"
                                     color="default"
                                     href="#pablo"
@@ -211,7 +224,7 @@ const Login = () => {
                                     <span className="btn-inner--text">
                                         Github
                                     </span>
-                                </Button>
+                                </Button> */}
 
                                 <GoogleLogin
                                     clientId="477164526232-padd6dn43ofdo07ie2uad6avblrp9n9r.apps.googleusercontent.com"

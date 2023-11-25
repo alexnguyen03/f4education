@@ -94,7 +94,23 @@ const ClassInformationDetail = () => {
     const fetchClass = async () => {
         try {
             const resp = await classApi.getByClassId(data.classId)
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:95 ~ fetchClass ~ resp:',
+                resp
+            )
 
+            const newData = resp.data.students.map((data) => {
+                return {
+                    ...data,
+                    isPresent: true
+                }
+            })
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:106 ~ newData ~ newData:',
+                newData
+            )
+
+            setStudents(newData)
             if (resp.status === 200 && resp.data != null) {
                 setClassInfor(resp.data)
             } else {
@@ -108,17 +124,21 @@ const ClassInformationDetail = () => {
     const fetchClassByTeacher = async () => {
         try {
             const resp = await classApi.getAllClassByTeacherId(teacherId)
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:109 ~ fetchClassByTeacher ~ resp:',
+                resp
+            )
             if (resp.status === 200 && resp.data.length > 0) {
                 const studentRespData = resp.data[0].students
 
-                const newData = studentRespData.map((data) => {
-                    return {
-                        ...data,
-                        isPresent: true
-                    }
-                })
+                // const newData = studentRespData.map((data) => {
+                //     return {
+                //         ...data,
+                //         isPresent: true
+                //     }
+                // })
 
-                setStudents(newData)
+                // setStudents(newData)
                 setCourseName(resp.data[0].courseName[0])
             }
         } catch (error) {
