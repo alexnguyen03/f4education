@@ -271,16 +271,7 @@ const CourseProgress = () => {
         document.scrollingElement.scrollTop = 0
     }
 
-    const handleShowTask = (classId) => {
-        navigate({
-            pathname: '/student/task',
-            search: `?${createSearchParams({
-                classId: classId
-            })}`
-        })
-    }
-
-    const handleShowQuestionByClassId = (classId) => {
+    const handleShowTaskByClassId = (classId) => {
         navigate({
             pathname: '/student/task',
             search: `?${createSearchParams({
@@ -574,7 +565,7 @@ const CourseProgress = () => {
                                         leftIcon={<IconZoomQuestion />}
                                         mt={10}
                                         onClick={() => {
-                                            handleShowQuestion(
+                                            handleShowTaskByClassId(
                                                 selectedCourse.classes.classId
                                             )
                                         }}
@@ -759,7 +750,7 @@ const CourseProgress = () => {
                                             loading={loadingCheckExam}
                                             disabled={!enableExam}
                                             onClick={() =>
-                                                handleShowQuestionByClassId(
+                                                handleShowQuestion(
                                                     selectedCourse.classes
                                                         .classId
                                                 )
