@@ -51,6 +51,7 @@ import {
 import Header from 'components/Headers/Header.js'
 import evaluateApi from '../api/evaluateApi'
 import { Box, Group, Paper, Space, Title } from '@mantine/core'
+import ReportEvaluationTeacher from './admin/ReportEvaluationTeacher'
 
 const Index = (props) => {
     const [activeNav, setActiveNav] = useState(1)
@@ -68,107 +69,6 @@ const Index = (props) => {
     }
     //! Evauluation Teacher
 
-    const [dataArray, setDataArray] = useState([
-        {
-            title: 'Giảng viên có khuyến khích sáng tạo và tư duy độc lập từ học viên',
-            totalVote: 0,
-            options: [
-                {
-                    value: 0,
-                    totalVoteItem: 0,
-                    label: 'Không có, không bao giờ nhắc đến'
-                },
-                {
-                    value: 1,
-                    totalVoteItem: 0,
-                    label: 'Có, rất khuyết khích'
-                }
-            ]
-        },
-        {
-            title: 'Nội dung và phương pháp giảng dạy',
-            totalVote: 0,
-            options: [
-                {
-                    value: 0,
-                    totalVoteItem: 0,
-                    label: 'Rất không tốt'
-                },
-                {
-                    value: 1,
-                    totalVoteItem: 0,
-                    label: 'Không tốt'
-                },
-                {
-                    value: 2,
-                    totalVoteItem: 0,
-                    label: 'Bình thường'
-                },
-                {
-                    value: 3,
-                    totalVoteItem: 0,
-                    label: 'Tốt'
-                },
-                {
-                    value: 4,
-                    totalVoteItem: 0,
-                    label: 'Xuất sắc'
-                }
-            ]
-        },
-        {
-            title: 'Sự công bằng của giảng viên trong kiểm tra đánh giá quá trình và đánh giá kết quả học tập',
-            totalVote: 0,
-            options: [
-                {
-                    value: 0,
-                    totalVoteItem: 0,
-                    label: 'Rất không công bằng'
-                },
-                {
-                    value: 1,
-                    totalVoteItem: 0,
-                    label: 'Đôi lúc còn thiên vị'
-                },
-                {
-                    value: 2,
-                    totalVoteItem: 0,
-                    label: 'Bình thường'
-                },
-                {
-                    value: 3,
-                    totalVoteItem: 0,
-                    label: 'Rất công bằng'
-                }
-            ]
-        },
-        {
-            title: 'Thời gian giảng dạy của giảng viên',
-            totalVote: 0,
-            options: [
-                {
-                    value: 0,
-                    totalVoteItem: 0,
-                    label: ' Rất hay trễ giờ'
-                },
-                {
-                    value: 1,
-                    totalVoteItem: 0,
-                    label: 'Nhiều lần trễ giờ'
-                },
-                {
-                    value: 2,
-                    totalVoteItem: 0,
-                    label: 'Trễ giờ 1 vài lần'
-                },
-                {
-                    value: 3,
-                    totalVoteItem: 0,
-                    label: 'Luôn đi đúng giờ'
-                }
-            ]
-        }
-    ])
     const optionsInEvaluationTeacherChart = {
         scales: {
             y: {
@@ -223,223 +123,6 @@ const Index = (props) => {
         return `rgb(${r}, ${g}, ${b})` // Trả về chuỗi mã màu RGB
     }
 
-    const getAllReportEvaluationTeacher = async () => {
-        try {
-            const resp = await evaluateApi.getAllReportEvaluationTeacher()
-            console.log(
-                '🚀 ~ file: Index.js:70 ~ getAllReportEvaluationTeacher ~ resp:',
-                resp
-            )
-
-            const updatedData = resp.data.map((item1) => {
-                console.log(
-                    '🚀 ~ file: Index.js:235 ~ updatedData ~ item1:',
-                    item1
-                )
-                const foundItem = dataArray.find(
-                    (item2) => item2.title === item1.title
-                )
-                console.log(
-                    '🚀 ~ file: EvaluateTeacherViewByTeacher.js:142 ~ updatedData ~ foundItem:',
-                    foundItem
-                )
-
-                if (foundItem) {
-                    const updatedOptions = foundItem.options.map((option) => {
-                        if (option.value === item1.voteValue) {
-                            console.log(
-                                '🚀 ~ file: Index.js:247 ~ updatedOptions ~ item1.voteCount:',
-                                item1.voteCount
-                            )
-                            return {
-                                ...option,
-                                totalVoteItem: item1.voteCount
-                            }
-                        }
-                        console.log(
-                            '🚀 ~ file: Index.js:257 ~ updatedOptions ~ option:',
-                            option
-                        )
-                        return option
-                    })
-
-                    return {
-                        ...foundItem,
-                        totalVote: foundItem.totalVote + item1.voteCount,
-                        options: updatedOptions
-                    }
-                }
-                return item1
-            })
-            const groupedByTitle = updatedData.reduce((acc, obj) => {
-                const key = obj.title
-                if (!acc[key]) {
-                    acc[key] = {
-                        title: obj.title,
-                        totalVote: 0,
-                        options: []
-                    }
-                }
-
-                acc[key].totalVote += obj.totalVote
-
-                obj.options.forEach((opt) => {
-                    const existingOption = acc[key].options.find(
-                        (o) => o.value === opt.value
-                    )
-                    if (existingOption) {
-                        existingOption.totalVoteItem += opt.totalVoteItem
-                    } else {
-                        acc[key].options.push({
-                            value: opt.value,
-                            totalVoteItem: opt.totalVoteItem,
-                            label: opt.label
-                        })
-                    }
-                })
-
-                return acc
-            }, {})
-
-            const result = Object.values(groupedByTitle)
-
-            console.log(result)
-
-            setDataArray(result)
-        } catch (error) {
-            console.log(
-                '🚀 ~ file: Index.js:70 ~ getAllReportEvaluationTeacher ~ error:',
-                error
-            )
-        }
-    }
-    const renderEvaluationTeacher = () => {
-        return dataArray.map((item, index) => {
-            console.log(
-                '🚀 ~ file: Index.js:307 ~ returndataArray.map ~ item:',
-                item
-            )
-            console.log(
-                '🚀 ~ file: Index.js:307 ~ returndataArray.map ~ item:',
-                item.options
-            )
-            const labels = item.options.map((item) => item.label)
-            const datas = item.options.map((item) => item.totalVoteItem)
-            console.log(
-                '🚀 ~ file: Index.js:317 ~ returndataArray.map ~ datas:',
-                datas
-            )
-            console.log(
-                '🚀 ~ file: Index.js:316 ~ returndataArray.map ~ labels:',
-                labels
-            )
-            const dataInChart = {
-                labels: labels,
-                datasets: [
-                    {
-                        label: `Số lượt đánh giá`,
-                        data: datas,
-                        backgroundColor: generateRandomColor(), // Màu sắc của cột
-                        // borderColor: 'rgba(255, 99, 132, 1)', // Màu sắc viền cột
-                        borderWidth: 1
-                    }
-                ]
-            }
-            return (
-                // <Bar data={dataInChart} />
-                <p>kjdflakdj</p>
-                // <Paper shadow="lg" p="md" mb={'lg'} key={index}>
-                //     <Box>
-                //         <Title order={3}> {item.title}</Title>
-                //     </Box>
-                //     <Group grow position="center">
-                //         {item.options.map((subItem, subIndex) => {
-                //             var color = 'red'
-
-                //             switch (subItem.value) {
-                //                 case 1:
-                //                     color = 'yellow'
-                //                     break
-                //                 case 2:
-                //                     color = 'gray'
-                //                     break
-                //                 case 3:
-                //                     color = 'cyan'
-                //                     break
-                //                 case 4:
-                //                     color = 'green'
-                //                     break
-
-                //                 default:
-                //                     color = 'red'
-                //                     break
-                //             }
-                //             return (
-                //                 <>
-                //                     <p>{subItem.totalVoteItem}</p>
-                //                     {/* <Alert
-                //                 key={index}
-                //                 icon={<IconAlertCircle size="1rem" />}
-                //                 title={subItem.label}
-                //                 color={color}
-                //             >
-                //                 <Group>
-                //                     <Title order={4}>
-                //                         {subItem.totalVoteItem} Đánh giá - Chiếm{' '}
-                //                         {subItem.totalVoteItem *
-                //                             (100 / item.totalVote).toFixed(
-                //                                 2
-                //                             )}{' '}
-                //                         %
-                //                     </Title>
-                //                 </Group>
-                //             </Alert> */}
-                //                 </>
-                //             )
-                //         })}
-                //     </Group>
-                // </Paper>
-            )
-        })
-    }
-    // const renderEvaluationTeacherChart = () => {
-    //     // Tạo biểu đồ cho mỗi nhóm dữ liệu 'title'
-    //     const charts = Object.keys(groupedData).map((title, index) => {
-    //         const dataForChart = groupedData[title]
-
-    //         // Tạo 'data' cho biểu đồ từ dữ liệu của từng nhóm 'title'
-    //         const data = {
-    //             labelxs: dataForChart.map((item) => `Class ${item.classId}`),
-    //             datasets: [
-    //                 {
-    //                     label: `${title} - Chart ${index + 1}`,
-    //                     data: dataForChart.map((item) => item.voteValue),
-    //                     backgroundColor: 'rgba(255, 99, 132, 0.2)', // Màu sắc của cột
-    //                     borderColor: 'rgba(255, 99, 132, 1)', // Màu sắc viền cột
-    //                     borderWidth: 1
-    //                 }
-    //             ]
-    //         }
-
-    //         // Options cho biểu đồ (có thể tùy chỉnh)
-    //         const options = {
-    //             scales: {
-    //                 y: {
-    //                     beginAtZero: true
-    //                 }
-    //             }
-    //         }
-
-    //         return (
-    //             <div key={index}>
-    //                 <h2>{title}</h2>
-    //                 <Bar data={data} options={options} />
-    //             </div>
-    //         )
-    //     })
-
-    //     return <div>{charts}</div>
-    // }
     const groupByClassId = (data) => {
         return data.reduce((acc, currentValue) => {
             const { teacherName } = currentValue
@@ -464,7 +147,7 @@ const Index = (props) => {
     }
 
     useEffect(() => {
-        getAllReportEvaluationTeacher()
+        // getAllReportEvaluationTeacher()
     }, [])
 
     return (
@@ -544,16 +227,7 @@ const Index = (props) => {
                             <CardBody>
                                 <TabContent activeTab={'tabs' + tabs}>
                                     <TabPane tabId="tabs1">
-                                        {' '}
-                                        {/* <Bar
-                                            data={
-                                                dataInEvaluationTeacherChartByTime
-                                            }
-                                            options={
-                                                optionsInEvaluationTeacherChart
-                                            }
-                                        /> */}
-                                        {renderEvaluationTeacher()}
+                                        <ReportEvaluationTeacher />
                                     </TabPane>
                                     <TabPane tabId="tabs2">
                                         <p className="description">

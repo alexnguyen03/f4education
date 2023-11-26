@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReportEvaluationTeacher {
     private String title;
-    private String teacherName;
+    private String teacherId;
     private Integer classId;
     private Integer voteCount;
     private Integer voteValue;
