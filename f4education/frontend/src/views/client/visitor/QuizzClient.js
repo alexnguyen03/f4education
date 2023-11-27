@@ -22,30 +22,65 @@ const user = JSON.parse(localStorage.getItem('user'))
 
 function QuizzClient() {
     const [searchParams, setSearchParams] = useSearchParams()
-    const [time, setTime] = useState(10 * 60)
-    const [elapsedTime, setElapsedTime] = useState(0)
-    const [isFinished, setIsFinished] = useState(true)
-    const useReverseTimer = () => {
-        useEffect(() => {
-            let intervalId
+    // const [time, setTime] = useState(10 * 60)
+    // const [elapsedTime, setElapsedTime] = useState(0)
+    // const [isFinished, setIsFinished] = useState(true)
+    // const useReverseTimer = () => {
+    //     useEffect(() => {
+    //         let intervalId
 
-            if (time > 0 && !isFinished) {
-                intervalId = setInterval(() => {
-                    setTime((prevTime) => prevTime - 1)
-                    setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
-                }, 1000)
-            }
+    //         if (time > 0 && !isFinished) {
+    //             intervalId = setInterval(() => {
+    //                 setTime((prevTime) => prevTime - 1)
+    //                 setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
+    //             }, 1000)
+    //         }
 
-            return () => {
-                clearInterval(intervalId)
-            }
-        }, [time, isFinished])
+    //         return () => {
+    //             clearInterval(intervalId)
+    //         }
+    //     }, [time, isFinished])
 
-        return time
-    }
-    const timeRemaining = useReverseTimer()
-    const minutes = Math.floor(timeRemaining / 60)
-    const seconds = timeRemaining % 60
+    //     return time
+    // }
+    // const timeRemaining = useReverseTimer()
+    // const minutes = Math.floor(timeRemaining / 60)
+    // const seconds = timeRemaining % 60
+
+    const initialTime = 10 * 60 // 10 phút
+    const [time, setTime] = useState(initialTime)
+    const [initialized, setInitialized] = useState(false)
+
+    useEffect(() => {
+        const storedTime = localStorage.getItem('quizTime')
+
+        if (storedTime && !initialized) {
+            setTime(parseInt(storedTime, 10))
+            setInitialized(true)
+        }
+
+        const handleBeforeUnload = () => {
+            localStorage.setItem('quizTime', time.toString())
+        }
+
+        const intervalId = setInterval(() => {
+            setTime((prevTime) => {
+                const newTime = prevTime - 1
+                if (newTime <= 0) {
+                    clearInterval(intervalId)
+                    return 0
+                }
+                return newTime
+            })
+        }, 1000)
+
+        window.addEventListener('beforeunload', handleBeforeUnload)
+
+        return () => {
+            clearInterval(intervalId)
+            window.removeEventListener('beforeunload', handleBeforeUnload)
+        }
+    }, [time, initialized])
 
     const itemsBreadcum = [
         { title: 'Trang chủ', href: '/' },
@@ -154,25 +189,14 @@ function QuizzClient() {
     }
 
     const [showQuestion, setShowQuestion] = useState(false)
-
-    const [quizzResultRequest, setQuizResultRequest] = useState({
-        quizzId: 0,
-        score: 0,
-        duration: 0,
-        quizzDate: '',
-        courseId: 0,
-        classId: 0,
-        studentId: ''
-    })
-
     const startTimer = () => {
         setShowQuestion(true)
-        setIsFinished(false)
-        setElapsedTime(0)
+        // setIsFinished(false)
+        // setElapsedTime(0)
     }
 
     const handleFinish = () => {
-        setIsFinished(true)
+        // setIsFinished(true)
         // const minutes = Math.floor(elapsedTime / 60)
         // const seconds = elapsedTime % 60
         // let formattedTime = ''
@@ -183,8 +207,6 @@ function QuizzClient() {
         //         seconds < 10 ? '0' : ''
         //     }${seconds} giây`
         // }
-
-        console.log(elapsedTime)
 
         console.log(selectedAnswers)
 
@@ -236,7 +258,7 @@ function QuizzClient() {
 
         console.log(`Tổng điểm số radio: ${totalScoreRadio}`)
         console.log(`Tổng điểm số checkbox: ${totalScoreCheckbox}`)
-        addQuizzResult(elapsedTime, totalScoreCheckbox + totalScoreRadio)
+        addQuizzResult(2, totalScoreCheckbox + totalScoreRadio)
     }
 
     const findAnswer = (questionDetailId, answerId) => {
@@ -325,7 +347,7 @@ function QuizzClient() {
                                             Thời gian còn lại
                                         </span>
                                         <br />
-                                        <span className="display-2">
+                                        {/* <span className="display-2">
                                             {seconds > 10
                                                 ? `0${minutes}`
                                                 : minutes}
@@ -335,6 +357,17 @@ function QuizzClient() {
                                             {seconds < 10
                                                 ? `0${seconds}`
                                                 : seconds}
+                                        </span> */}
+                                        <span className="display-2">
+                                            {Math.floor(time / 60)
+                                                .toString()
+                                                .padStart(2, '0')}
+                                        </span>
+                                        <span className="display-2">
+                                            :
+                                            {(time % 60)
+                                                .toString()
+                                                .padStart(2, '0')}
                                         </span>
                                     </p>
                                 </div>
@@ -538,3 +571,52 @@ function QuizzClient() {
 }
 
 export default QuizzClient
+
+// const QuizzClient = () => {
+//     const initialTime = 10 * 60 // 10 phút
+//     const [time, setTime] = useState(initialTime)
+//     const [initialized, setInitialized] = useState(false)
+
+//     useEffect(() => {
+//         const storedTime = localStorage.getItem('quizTime')
+
+//         if (storedTime && !initialized) {
+//             setTime(parseInt(storedTime, 10))
+//             setInitialized(true)
+//         }
+
+//         const handleBeforeUnload = () => {
+//             localStorage.setItem('quizTime', time.toString())
+//         }
+
+//         const intervalId = setInterval(() => {
+//             setTime((prevTime) => {
+//                 const newTime = prevTime - 1
+//                 if (newTime <= 0) {
+//                     clearInterval(intervalId)
+//                     return 0
+//                 }
+//                 return newTime
+//             })
+//         }, 1000)
+
+//         window.addEventListener('beforeunload', handleBeforeUnload)
+
+//         return () => {
+//             clearInterval(intervalId)
+//             window.removeEventListener('beforeunload', handleBeforeUnload)
+//         }
+//     }, [time, initialized])
+
+//     return (
+//         <div>
+//             <h1>
+//                 Thời gian còn lại: {Math.floor(time / 60).toString().padStart(2, '0')}:
+//                 {(time % 60).toString().padStart(2, '0')}
+//             </h1>
+
+//         </div>
+//     )
+// }
+
+// export default QuizzClient
