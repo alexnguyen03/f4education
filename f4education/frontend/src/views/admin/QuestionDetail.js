@@ -92,13 +92,19 @@ const QuestionDetail = () => {
     const [currentPage, setCurrentPage] = useState(1)
     const itemsPerPage = 10
 
-    const filteredQuestion = questions.filter((item) => {
-        const questionTitle = item.questionTitle
+    let filteredQuestion
 
-        const lowerSearchTerm = searchTerm.toLowerCase()
+    if (questions.length > 0) {
+        filteredQuestion = questions.filter((item) => {
+            const questionTitle = item.questionTitle
 
-        return questionTitle.toLowerCase().includes(lowerSearchTerm)
-    })
+            const lowerSearchTerm = searchTerm.toLowerCase()
+
+            return questionTitle.toLowerCase().includes(lowerSearchTerm)
+        })
+    } else {
+        console.log('question lenght < 0')
+    }
 
     const handleChangeSearchQuestions = (e) => {
         setSearchTerm(e.target.value)

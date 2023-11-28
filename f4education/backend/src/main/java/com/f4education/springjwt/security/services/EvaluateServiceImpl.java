@@ -34,6 +34,12 @@ public class EvaluateServiceImpl implements EvaluateService {
 		List<Evaluate> evaluateLst = evaluateRepository.findAll();
 		return evaluateLst.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
 	}
+	
+	@Override
+	public List<EvaluateResponse> getTop10Evaluate() {
+		List<Evaluate> evaluateLst = evaluateRepository.findTop10LatestEvaluate();
+		return evaluateLst.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
+	}
 
 	@Override
 	public List<EvaluateResponse> getAllEvaluateByCourseId(Integer courseId) {

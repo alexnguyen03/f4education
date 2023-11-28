@@ -83,6 +83,7 @@
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.31",
     "nouislider": "15.4.0",
+    "qrcode": "^1.5.3",
     "query-string": "^8.1.0",
     "react": ">=16.0.0",
     "react-big-calendar": "^1.8.5",

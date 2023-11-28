@@ -59,9 +59,9 @@ const ClientNavbar = () => {
     const [listCourse, setListCourse] = useState([])
     const [listSubject, setListSubject] = useState([])
     const [courseByLevel, setCourseByLevel] = useState([])
-    const [optionSearch, setOptionSearch] = useState([])
-    const [searchValue, setSearchValue] = useState()
+    const [parentCategory, setParentCategory] = useState([])
 
+    // Fetch area
     const fetchCart = async () => {
         try {
             const userCart = JSON.parse(localStorage.getItem('userCart')) || []
@@ -92,14 +92,38 @@ const ClientNavbar = () => {
             const resp = await subjectApi.getAllSubject()
 
             if (resp.status === 200 && resp.data.length > 0) {
-                // const uniqueValues = [
-                //     ...new Set(resp.data.map((item) => item.subjectName))
-                // ]
                 setListSubject(resp.data)
+
+                // Shuffle the array randomly
+                const shuffledSubjects = shuffleArray([...resp.data])
+
+                // Calculate the indices to split the array into three parts
+                const totalSubjects = shuffledSubjects.length
+                const firstThird = Math.floor(totalSubjects / 3)
+                const secondThird = firstThird * 2
+
+                // Separate the array into three child arrays
+                const frontend = shuffledSubjects.slice(0, firstThird)
+                const backend = shuffledSubjects.slice(firstThird, secondThird)
+                const orther = shuffledSubjects.slice(secondThird)
+
+                // Store the three arrays in a variable
+                const resultArrays = { frontend, backend, orther }
+
+                setParentCategory(resultArrays)
             }
+            console.log(resp.data)
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[array[i], array[j]] = [array[j], array[i]]
+        }
+        return array
     }
 
     // get Total Price from list totalCartItem
@@ -126,11 +150,13 @@ const ClientNavbar = () => {
     const handleItemClick = (index) => {
         const newActiveItems = [...activeItems]
         newActiveItems[index] = true
+
         for (let i = 0; i < newActiveItems.length; i++) {
             if (i !== index) {
                 newActiveItems[i] = false
             }
         }
+        console.log(newActiveItems)
         setActiveItems(newActiveItems)
     }
 
@@ -426,13 +452,13 @@ const ClientNavbar = () => {
                                         to={'/cart'}
                                         className={`
                 ${
-                    activeItems[1]
+                    activeItems[3]
                         ? 'nav-link custom-nav-link active'
                         : 'nav-link custom-nav-link'
                 }
                 ${styles['custom-nav-link']}
                 `}
-                                        onClick={() => handleItemClick(1)}
+                                        onClick={() => handleItemClick(3)}
                                     >
                                         Giỏ hàng
                                     </Link>

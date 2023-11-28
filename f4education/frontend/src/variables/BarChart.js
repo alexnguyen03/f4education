@@ -16,19 +16,33 @@ const BarChart = ({ data }) => {
                 type: 'bar',
                 data: {
                     labels: sortedData.map((course) => course.courseName),
+                    axis: 'y',
                     datasets: [
                         {
-                            label: 'Thống kê doanh thu khóa học',
+                            label: 'Tổng doanh thu Khóa học',
                             data: sortedData.map(
                                 (course) => course.totalRenueve
                             )
                         }
                     ]
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Thống kê doanh thu khóa học',
+                            color: '#fff'
+                        }
+                    },
+                    layout: {
+                        autoPadding: true
+                    }
                 }
             })
 
             // format currency
-            myChart.options.scales.y.ticks.callback = (value) =>
+            myChart.options.scales.x.ticks.callback = (value) =>
                 formatCurrency(value)
 
             return () => {
@@ -41,7 +55,7 @@ const BarChart = ({ data }) => {
 
     return (
         <div className="w-100 h-100">
-            <canvas id="revenueChart"></canvas>
+            <canvas id="revenueChart" className="w-100 h-100" />
         </div>
     )
 }

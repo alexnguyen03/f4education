@@ -41,6 +41,13 @@ public class EvaluateController {
 		return ResponseEntity.ok(list);
 	}
 
+	@GetMapping("/newest-evaluete")
+	// @PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getTop10Evaluate() {
+		List<EvaluateResponse> list = evaluateService.getTop10Evaluate();
+		return ResponseEntity.ok(list);
+	}
+
 	@GetMapping("/{evaluateId}")
 	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> getEvaluateById(@PathVariable Integer evaluateId) {

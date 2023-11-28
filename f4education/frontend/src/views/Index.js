@@ -55,12 +55,13 @@ import courseAPI from '../api/courseApi'
 import { LoadingOverlay } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import moment from 'moment/moment'
+import { DateInput } from '@mantine/dates'
 
 const Index = () => {
     const user = JSON.parse(localStorage.getItem('user'))
 
     // Main Variable
-    // Revenue
+    // Revenue Start
     const [totalRevenue, setTotalRevenue] = useState(0)
     const [reportRevenue, setReportRevenue] = useState([])
 
@@ -71,6 +72,9 @@ const Index = () => {
     // Filter
     const [filteredRevenueData, setFilteredRevenueData] =
         useState(reportRevenue)
+    const [startDate, setStartDate] = useState(null)
+    const [endDate, setEndDate] = useState(null)
+    // Revenue End
 
     // Fetch Area
     const fetchRevenue = async () => {
@@ -114,6 +118,18 @@ const Index = () => {
         setTotalRevenue(totalRevenue)
     }, [reportRevenue])
 
+    useEffect(() => {
+        setFilteredRevenueData(
+            reportRevenue.filter((course) => {
+                const courseDate = new Date(course.createDate)
+                return (
+                    (!startDate || courseDate >= startDate) &&
+                    (!endDate || courseDate <= endDate)
+                )
+            })
+        )
+    }, [startDate, endDate, reportRevenue])
+
     // Templates Variable
     const [activeNav, setActiveNav] = useState(1)
 
@@ -146,94 +162,120 @@ const Index = () => {
                 <Row>
                     <Col className="mb-5 mb-xl-0" xl="8">
                         {loading ? (
-                            <>
-                                <LoadingOverlay
-                                    visible={visible}
-                                    overlayOpacity={1}
-                                    overlayBlur={2}
-                                    overlayColor="#191c4d"
-                                />
-                            </>
+                            <LoadingOverlay
+                                visible={visible}
+                                overlayOpacity={1}
+                                overlayBlur={2}
+                                overlayColor="#191c4d"
+                            />
                         ) : (
-                            <>
-                                <Card className="bg-gradient-default shadow">
-                                    <CardHeader className="bg-transparent">
-                                        <Row className="align-items-center">
-                                            <div className="col">
-                                                <h6 className="text-uppercase text-light ls-1 mb-1">
-                                                    Tổng quan
-                                                </h6>
-                                                <h2 className="text-white mb-0">
-                                                    Top 10 khóa học theo doanh
-                                                    thu
-                                                </h2>
-                                            </div>
-                                            <div className="col">
-                                                <Nav
-                                                    className="justify-content-end"
-                                                    pills
-                                                >
-                                                    <NavItem>
-                                                        <NavLink
-                                                            className={classnames(
-                                                                'py-2 px-3',
-                                                                {
-                                                                    active:
-                                                                        activeNav ===
-                                                                        1
-                                                                }
-                                                            )}
-                                                            href="#pablo"
-                                                            onClick={(e) =>
-                                                                toggleNavs(e, 1)
-                                                            }
-                                                        >
-                                                            <span className="d-none d-md-block">
-                                                                Theo tháng
-                                                            </span>
-                                                            <span className="d-md-none">
-                                                                M
-                                                            </span>
-                                                        </NavLink>
-                                                    </NavItem>
-                                                    <NavItem>
-                                                        <NavLink
-                                                            className={classnames(
-                                                                'py-2 px-3',
-                                                                {
-                                                                    active:
-                                                                        activeNav ===
-                                                                        2
-                                                                }
-                                                            )}
-                                                            data-toggle="tab"
-                                                            href="#pablo"
-                                                            onClick={(e) =>
-                                                                toggleNavs(e, 2)
-                                                            }
-                                                        >
-                                                            <span className="d-none d-md-block">
-                                                                Theo tuần
-                                                            </span>
-                                                            <span className="d-md-none">
-                                                                W
-                                                            </span>
-                                                        </NavLink>
-                                                    </NavItem>
-                                                </Nav>
-                                            </div>
-                                        </Row>
-                                    </CardHeader>
-                                    <CardBody>
-                                        {/* Chart */}
-                                        <div className="chart">
-                                            <BarChart
-                                                data={filteredRevenueData}
-                                            />
+                            <Card className="bg-gradient-default shadow">
+                                <CardHeader className="bg-transparent">
+                                    <Row className="align-items-center">
+                                        <div className="col">
+                                            <h6 className="text-uppercase text-light ls-1 mb-1">
+                                                Tổng quan
+                                            </h6>
+                                            <h2 className="text-white mb-0">
+                                                Top 10 khóa học theo doanh thu
+                                            </h2>
                                         </div>
-                                    </CardBody>
-                                </Card>
-                            </>
+                                        <div className="col">
+                                            <Nav
+                                                className="justify-content-end"
+                                                pills
+                                            >
+                                                <NavItem>
+                                                    <NavLink
+                                                        className={classnames(
+                                                            'py-2 px-3',
+                                                            {
+                                                                active:
+                                                                    activeNav ===
+                                                                    1
+                                                            }
+                                                        )}
+                                                        href="#pablo"
+                                                        onClick={(e) =>
+                                                            toggleNavs(e, 1)
+                                                        }
+                                                    >
+                                                        <span className="d-none d-md-block">
+                                                            Theo tháng hiện tại
+                                                        </span>
+                                                        <span className="d-md-none">
+                                                            M
+                                                        </span>
+                                                    </NavLink>
+                                                </NavItem>
+                                                <NavItem>
+                                                    <NavLink
+                                                        className={classnames(
+                                                            'py-2 px-3',
+                                                            {
+                                                                active:
+                                                                    activeNav ===
+                                                                    2
+                                                            }
+                                                        )}
+                                                        data-toggle="tab"
+                                                        href="#pablo"
+                                                        onClick={(e) =>
+                                                            toggleNavs(e, 2)
+                                                        }
+                                                    >
+                                                        <span className="d-none d-md-block">
+                                                            Theo tuần hiện tại
+                                                        </span>
+                                                        <span className="d-md-none">
+                                                            W
+                                                        </span>
+                                                    </NavLink>
+                                                </NavItem>
+                                            </Nav>
+                                        </div>
+                                    </Row>
+                                    <div className="row mt-3">
+                                        <div className="col">
+                                            <div className="d-flex justify-content-end align-items-center">
+                                                <h5 className="text-uppercase text-light mr-4 mt-2 ls-1 mb-2">
+                                                    Bộ lọc theo ngày tháng:
+                                                </h5>
+                                                <div className="d-flex justify-content-start">
+                                                    <DateInput
+                                                        placeholder="Ngày bắt đầu"
+                                                        variant="filled"
+                                                        mr={10}
+                                                        clearable
+                                                        w={320}
+                                                        value={startDate}
+                                                        onChange={(value) =>
+                                                            setStartDate(value)
+                                                        }
+                                                    />
+
+                                                    <DateInput
+                                                        placeholder="Ngày kết thúc"
+                                                        variant="filled"
+                                                        clearable
+                                                        w={320}
+                                                        value={endDate}
+                                                        onChange={(value) =>
+                                                            setEndDate(value)
+                                                        }
+                                                    />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </CardHeader>
+                                <CardBody>
+                                    {/* Chart */}
+                                    <div className="chart">
+                                        <BarChart data={filteredRevenueData} />
+                                    </div>
+                                </CardBody>
+                            </Card>
                         )}
                     </Col>
                     <Col xl="4">
