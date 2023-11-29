@@ -4,8 +4,7 @@ import {
     Breadcrumbs,
     Anchor,
     Text,
-    Pagination,
-    Container
+    Pagination
 } from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import FilterListIcon from '@mui/icons-material/FilterList'
@@ -14,6 +13,10 @@ import StarIcon from '@mui/icons-material/Star'
 import { Link } from 'react-router-dom'
 import { Search as SearchIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
+import MicIcon from '@mui/icons-material/Mic'
+import SpeechRecognition, {
+    useSpeechRecognition
+} from 'react-speech-recognition'
 
 import courseApi from 'api/courseApi'
 import subjectApi from 'api/subjectApi'
@@ -33,6 +36,11 @@ function CourseClient() {
     const [searchTerm, setSearchTerm] = useState('')
     const [isLoading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
+    const { transcript, resetTranscript } = useSpeechRecognition()
+
+    const handleSearch = () => {
+        setSearchTerm(transcript)
+    }
 
     // Tính toán chỉ mục sản phẩm đầu tiên và cuối cùng trên trang hiện tại
     const indexOfLastProduct = currentPage * PRODUCTS_PER_PAGE
@@ -233,6 +241,10 @@ function CourseClient() {
         }
     }, [selectedValuePrice])
 
+    useEffect(() => {
+        setSearchTerm(transcript)
+    }, [transcript])
+
     return (
         <>
             {/* <Container> */}
@@ -298,22 +310,17 @@ function CourseClient() {
                     </div>
                 )}
                 <div
-                    className="p-1 mt-3"
+                    className="p-2 mt-3"
                     style={{
-                        marginLeft: 350,
+                        marginLeft: 800,
                         width: '350px',
-                        height: 50,
+                        height: 58,
                         border: '1px solid #282a354d',
-                        borderRadius: '25px',
+                        borderRadius: '40px',
                         background: '#fff'
                     }}
                 >
                     <div class="input-group">
-                        <div class="input-group-prepend">
-                            <IconButton>
-                                <SearchIcon />
-                            </IconButton>
-                        </div>
                         <input
                             style={{ border: 'none', marginRight: 10 }}
                             class="form-control"
@@ -321,23 +328,43 @@ function CourseClient() {
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
+                        <div class="input-group-prepend">
+                            <IconButton>
+                                <SearchIcon />
+                            </IconButton>
+                        </div>
                     </div>
                 </div>
-                <div class="ml-auto p-2 mt-3">
-                    <span class="text-dark font-weight-bold">
+                <button
+                    onClick={SpeechRecognition.startListening}
+                    style={{
+                        border: 'none',
+                        borderRadius: '50%',
+                        marginLeft: 20,
+                        width: 70,
+                        height: 70,
+                        marginTop: 10
+                    }}
+                >
+                    <IconButton>
+                        <MicIcon style={{ fontSize: 35, color: 'black' }} />
+                    </IconButton>
+                </button>
+                <div class="ml-auto p-2 mt-4">
+                    <span class="text-dark font-weight-bold h2">
                         {currentCourses.length} kết quả
                     </span>
                 </div>
             </div>
             <div className="d-flex">
-                <div className="pl-0 col-4">
+                <div className="pl-0 col-3">
                     <div className="col-lg-12 pl-0 pt-2 pr-2 pb-2">
                         <div className="border-top border-bottom pt-3">
                             <div
                                 onClick={toggleAccordionRating}
                                 className="my-2"
                             >
-                                <h3 className="mb-4">
+                                <h1 className="mb-3 text-dark">
                                     Xếp hạng
                                     {expandedRating ? (
                                         <ExpandLess
@@ -348,10 +375,10 @@ function CourseClient() {
                                             style={{ float: 'right' }}
                                         />
                                     )}
-                                </h3>
+                                </h1>
                             </div>
                             {expandedRating && (
-                                <div>
+                                <div className="text-dark h3 ml-3">
                                     <div className="form-check">
                                         <input
                                             className="form-check-input"
@@ -381,7 +408,10 @@ function CourseClient() {
                                                 color="warning"
                                             />
                                             <StarIcon
-                                                style={{ marginBottom: 5 }}
+                                                style={{
+                                                    marginBottom: 5,
+                                                    marginRight: 10
+                                                }}
                                                 fontSize="inherit"
                                                 color="warning"
                                             />
@@ -414,7 +444,10 @@ function CourseClient() {
                                                 color="warning"
                                             />
                                             <StarIcon
-                                                style={{ marginBottom: 5 }}
+                                                style={{
+                                                    marginBottom: 5,
+                                                    marginRight: 10
+                                                }}
                                                 fontSize="inherit"
                                                 color="warning"
                                             />
@@ -444,7 +477,10 @@ function CourseClient() {
                                                 color="warning"
                                             />
                                             <StarIcon
-                                                style={{ marginBottom: 5 }}
+                                                style={{
+                                                    marginBottom: 5,
+                                                    marginRight: 10
+                                                }}
                                                 fontSize="inherit"
                                                 color="warning"
                                             />
@@ -461,12 +497,12 @@ function CourseClient() {
                         </div>
                     </div>
                     <div className="col-lg-12 pl-0 pt-2 pr-2 pb-2">
-                        <div className="border-bottom pt-3">
+                        <div className="border-bottom pt-2">
                             <div
                                 onClick={toggleAccordionTopic}
                                 className="my-2"
                             >
-                                <h3 className="mb-4">
+                                <h1 className="mb-3 text-dark">
                                     Chủ đề
                                     {expandedTopic ? (
                                         <ExpandLess
@@ -477,10 +513,10 @@ function CourseClient() {
                                             style={{ float: 'right' }}
                                         />
                                     )}
-                                </h3>
+                                </h1>
                             </div>
                             {expandedTopic && (
-                                <div>
+                                <div className="text-dark h3 ml-3">
                                     {subjects.map((subject) => (
                                         <div
                                             className="form-check mb-3"
@@ -519,7 +555,7 @@ function CourseClient() {
                                 onClick={toggleAccordionDuration}
                                 className="my-2"
                             >
-                                <h3 className="mb-4">
+                                <h1 className="mb-3 text-dark">
                                     Thời lượng
                                     {expandedDuration ? (
                                         <ExpandLess
@@ -530,10 +566,10 @@ function CourseClient() {
                                             style={{ float: 'right' }}
                                         />
                                     )}
-                                </h3>
+                                </h1>
                             </div>
                             {expandedDuration && (
-                                <div>
+                                <div className="text-dark h3 ml-3">
                                     <div className="form-check mb-3">
                                         <input
                                             className="form-check-input"
@@ -599,7 +635,7 @@ function CourseClient() {
                         </div>
                     </div>
                 </div>
-                <div className="p-2 col-8">
+                <div className="p-2 col-9">
                     {isLoading ? (
                         <Loader
                             color="rgba(46, 46, 46, 1)"
@@ -632,27 +668,22 @@ function CourseClient() {
                                 </div>
                                 <div className="col-lg-7 mb-3">
                                     <Link to={`/course/${course.courseId}`}>
-                                        <Text lineClamp={1}>
-                                            <h3
+                                        <Text lineClamp={1} size="xl">
+                                            <h1
                                                 className="font-weight-700 text-dark"
                                                 style={{
-                                                    lineHeight: '0.6'
+                                                    lineHeight: '0.8'
                                                 }}
                                             >
                                                 {course.courseName}
-                                            </h3>
+                                            </h1>
                                         </Text>
                                     </Link>
                                     <Text lineClamp={1}>
-                                        <span className="text-dark small">
+                                        <span className="text-dark">
                                             {course.courseDescription}
                                         </span>
                                     </Text>
-                                    <span class="text-dark small">
-                                        <b>Chủ đề:</b>{' '}
-                                        {course.subject.subjectName}
-                                    </span>
-                                    <br />
                                     <b>4.0</b>
                                     <span className="ml-2">
                                         <StarIcon
@@ -687,6 +718,7 @@ function CourseClient() {
                                     <br />
                                     <Badge
                                         className="p-0"
+                                        mb={5}
                                         size="md"
                                         color="pink"
                                         variant="light"
@@ -694,6 +726,11 @@ function CourseClient() {
                                         Thời lượng: {course.courseDuration}{' '}
                                         (giờ)
                                     </Badge>
+                                    <br />
+                                    <span class="text-dark">
+                                        <b>Chủ đề:</b>{' '}
+                                        {course.subject.subjectName}
+                                    </span>
                                     <button
                                         type="button"
                                         class="btn"
@@ -714,16 +751,17 @@ function CourseClient() {
                                 </div>
                                 <div
                                     className="col-lg-2 mb-3 p-0"
-                                    style={{ lineHeight: '0.6' }}
+                                    style={{ lineHeight: '0.8' }}
                                 >
                                     <div
                                         class="d-flex align-items-start flex-column mt-1"
                                         style={{ height: 140 }}
                                     >
                                         <div class="mb-auto w-100">
-                                            <b className="float-right text-dark">
-                                                {course.coursePrice}
-                                                <u>đ</u>
+                                            <b className="float-right">
+                                                <h2 className="text-dark">
+                                                    {course.coursePrice} VND
+                                                </h2>
                                             </b>
                                         </div>
                                         <button
@@ -734,7 +772,7 @@ function CourseClient() {
                                                 color: 'white',
                                                 fontWeight: 'bold',
                                                 borderRadius: 0,
-                                                marginTop: 40
+                                                marginTop: 74
                                             }}
                                             onClick={() =>
                                                 handleRegistration(course)
@@ -756,7 +794,6 @@ function CourseClient() {
                     />
                 </div>
             </div>
-            {/* </Container>{' '} */}
         </>
     )
 }
