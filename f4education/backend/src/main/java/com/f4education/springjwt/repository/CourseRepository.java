@@ -49,9 +49,10 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName = :subjectName")
 	List<Course> getCourseBySubjectName(@Param("subjectName") String subjectName);
 
-	@Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO(c.courseName, COUNT(rc.student.studentId)) " +
-	        "FROM Course c JOIN RegisterCourse rc ON c.courseId = rc.course.courseId " +
-//	        "WHERE rc.status = 'Đã đăng ký' " +
-	        "GROUP BY rc.course.courseId, c.courseName")
-	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount();
+	 @Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO(c.courseName, COUNT(rc.student.studentId)) " +
+	            "FROM Course c " +
+	            "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId " +
+	            "WHERE LOWER(rc.status) = LOWER(:status) " +
+	            "GROUP BY c.courseId, c.courseName")
+	 List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(@Param("status") String status);
 }

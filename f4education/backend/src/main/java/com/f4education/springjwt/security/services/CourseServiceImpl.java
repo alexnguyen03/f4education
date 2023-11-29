@@ -363,7 +363,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
-		List<ReportCourseCountStudentDTO> list = courseRepository.getCoursesWithStudentCount();
+		List<ReportCourseCountStudentDTO> list = courseRepository.getCoursesWithStudentCount("Đã đăng ký");
 		System.out.println(list);
 		return list;
 	}
