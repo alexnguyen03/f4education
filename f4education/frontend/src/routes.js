@@ -36,6 +36,7 @@ import CertificatePDF from 'views/PDF/CertificatePDF'
 import Points from './views/teacher/Points'
 import LearningResult from 'views/client/student/LearningResult'
 import ClassResult from 'views/teacher/ClassResult'
+import ClassProgress from 'views/teacher/ClassProgress'
 
 export var routes = [
     {
@@ -258,6 +259,13 @@ export const routesTeacher = [
         name: 'Kết quả lớp học',
         icon: 'ni ni-planet text-blue',
         component: <ClassResult />,
+        layout: '/teacher'
+    },
+    {
+        path: '/class-progress',
+        name: 'Tiến độ lớp học',
+        icon: 'ni ni-planet text-blue',
+        component: <ClassProgress />,
         layout: '/teacher'
     }
 ]

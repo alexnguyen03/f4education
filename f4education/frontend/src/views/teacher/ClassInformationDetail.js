@@ -64,7 +64,7 @@ const ClassInformationDetail = () => {
     const [activedExam, setActivedExam] = useState(false)
 
     // ************* fetch Area
-    const fetchClass = async () => {
+    const fetchClass = async () => {    
         try {
             const resp = await classApi.getByClassId(data.classId)
 
