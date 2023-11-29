@@ -1,20 +1,3 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
 import { useEffect, React, useRef, useState } from 'react'
 import { useLocation, Route, Routes, Navigate } from 'react-router-dom'
 // reactstrap components
@@ -33,6 +16,7 @@ const Admin = (props) => {
     const mainContent = useRef(null)
     const location = useLocation()
     const [adminName, setAdminName] = useState('')
+    const [adminImg, setAdminImg] = useState('')
     useEffect(() => {
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
@@ -72,6 +56,7 @@ const Admin = (props) => {
         const user = JSON.parse(localStorage.getItem('user'))
         if (user) {
             setAdminName(user.fullName)
+            setAdminImg(user.imageName)
         }
     }
     useEffect(() => {
@@ -80,20 +65,14 @@ const Admin = (props) => {
 
     return (
         <>
-            <Sidebar
-                {...props}
-                routes={routes}
-                logo={{
-                    innerLink: '/admin/index',
-                    imgSrc: require('../assets/img/brand/argon-react.png'),
-                    imgAlt: '...'
-                }}
-            />
+            <Sidebar {...props} routes={routes} />
             <div className="main-content" ref={mainContent}>
                 <AdminNavbar
                     {...props}
-                    brandText={getBrandText(props?.location?.pathname)}
+                    brandText={'F4EDUCATION '}
+                    // brandText={getBrandText(props?.location?.pathname)}
                     adminName={adminName}
+                    adminImg={adminImg}
                 />
                 <Routes>
                     {getRoutes(routes)}

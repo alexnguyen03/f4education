@@ -1,5 +1,9 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -13,6 +17,7 @@ import com.f4education.springjwt.interfaces.QuestionDetailService;
 import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.Question;
 import com.f4education.springjwt.models.QuestionDetail;
+import com.f4education.springjwt.payload.request.QuestionDetailClientDTO;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 import com.f4education.springjwt.repository.AnswerReposotory;
 import com.f4education.springjwt.repository.QuestionDetailRepository;
@@ -30,6 +35,30 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 	AnswerReposotory answerReposotory;
 
 	@Override
+	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId) {
+		List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(classId);
+		System.out.println(questionDetail);
+		// Xáo trộn các phần tử trong danh sách
+	    Collections.shuffle(questionDetail);
+	    
+	    // Lấy 20 phần tử đầu tiên
+	    List<QuestionDetail> randomQuestions = questionDetail.subList(0, Math.min(questionDetail.size(), 20));
+	    System.out.println(randomQuestions);
+	    
+		return randomQuestions.stream().map(this::convertToDto).collect(Collectors.toList());
+	}
+
+	private QuestionDetailClientDTO convertToDto(QuestionDetail questionDetail) {
+		QuestionDetailClientDTO questionDetailClientDTO = new QuestionDetailClientDTO();
+		BeanUtils.copyProperties(questionDetail, questionDetailClientDTO);
+		questionDetailClientDTO.setAnswer(questionDetail.getAnswers());
+		questionDetailClientDTO.setCourseId(questionDetail.getQuestion().getCourse().getCourseId());
+		questionDetailClientDTO.setClassId(
+				questionDetail.getQuestion().getCourse().getRegisterCourses().get(0).getClasses().getClassId());
+		return questionDetailClientDTO;
+	}
+
+	@Override
 	public List<QuestionDetailDTO> findAll() {
 		List<QuestionDetail> questionDetail = questionDetailReposotory.findAll();
 		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
@@ -37,8 +66,9 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
 	@Override
 	public List<QuestionDetailDTO> getAllQuestionDetailByQuestionId(Integer questionId) {
-		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
-		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
+//		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
+//		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
+		return null;
 	}
 
 	@Override

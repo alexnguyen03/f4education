@@ -54,10 +54,11 @@ public class AttendanceController {
 	@PostMapping
 	public ResponseEntity<?> createAttendance(@RequestBody List<AttendanceDTO> attendanceDTOList) {
 		List<AttendanceDTO> createdAttendance = new ArrayList<>();
-
+		
 		for (AttendanceDTO attendenceDTO : attendanceDTOList) {
 			createdAttendance.add(attendanceService.createAttendance(attendenceDTO));
 		}
+
 
 		return ResponseEntity.ok(createdAttendance);
 	}

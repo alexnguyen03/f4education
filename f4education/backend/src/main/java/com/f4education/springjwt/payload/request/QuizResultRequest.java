@@ -19,7 +19,7 @@ public class QuizResultRequest {
 	private Integer score;
 	
 	@JsonProperty("duration")
-	private String duration;
+	private Integer duration;
 	
 	@JsonProperty("quizzDate")
 	private Date quizzDate;

@@ -532,7 +532,6 @@ function Schedules() {
                             zIndex={1000}
                             color="rgba(46, 46, 46, 1)"
                             size={50}
-                            overlayProps={{ radius: 'sm', blur: 2 }}
                         />
                         <CardHeader className="text-center border-0 pt-8 pt-md-4 pb-0 pb-md-4">
                             <h3>DANH SÁCH LỚP HỌC </h3>

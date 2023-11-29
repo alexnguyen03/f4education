@@ -1,6 +1,7 @@
 package com.f4education.springjwt.controllers;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,12 +27,14 @@ import com.f4education.springjwt.models.Teacher;
 
 import com.f4education.springjwt.payload.request.AccountDTO;
 import com.f4education.springjwt.payload.response.MessageResponse;
+import com.f4education.springjwt.security.services.MailerServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @CrossOrigin("*")
 @RestController
@@ -48,12 +51,16 @@ public class AccountController {
     @Autowired
     PasswordEncoder encoder;
 
+    @Autowired
+    MailerServiceImpl mailer;
+
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public List<AccountDTO> getAllAccountsDTO() {
         return accountService.getAllAccountsDTO();
     }
 
+    // ! Lấy tất cả tài khoản dựa vào role
     @GetMapping("/{role}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> getByRole(@PathVariable("role") Integer role) {
@@ -61,14 +68,16 @@ public class AccountController {
         return ResponseEntity.ok(list);
     }
 
+    // ! Cập nhật tài khoản
     @PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> updateSubject(@RequestPart("request") String teacherRequestString,
+    public ResponseEntity<?> updateAccount(@RequestPart("request") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
         AccountDTO accountDTO = changeImg(teacherRequestString, file, false);
         return ResponseEntity.ok(accountService.updateAccount(accountDTO));
     }
 
+    // ! Tạo tài khoản
     @PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createAccount(@RequestPart("request") String teacherRequestString,
@@ -81,9 +90,22 @@ public class AccountController {
                     .badRequest()
                     .body(new MessageResponse("1"));
         }
+        // return ResponseEntity.ok(null);
         return ResponseEntity.ok(accountService.createAccount(accountDTO));
+    }
 
-        // return accountService.updateAccount(accountDTO);
+    // ! Kiểm tra mail có tồn tại hay chưa
+    @PostMapping(value = "/checkEmail")
+    public ResponseEntity<?> checkMail(@RequestBody AccountDTO accountDTO) {
+        Boolean checkEmailExit = accountService.existsByEmail(accountDTO.getEmail().trim());
+        if (checkEmailExit) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("1"));
+        }
+        String mail = accountDTO.getEmail().toString();
+        mailer.queue(mail, "", "", null);
+        return ResponseEntity.ok().body(new MessageResponse("2"));
     }
 
     // ! Chuyển đổi json sang DTO và set img vào DTO nếu có file có tồn tại
@@ -94,7 +116,12 @@ public class AccountController {
             accountDTO = mapper.readValue(teacherRequestString,
                     AccountDTO.class);
             File savedFile = null;
-            String id = accountDTO.getEmail().substring(0, accountDTO.getEmail().indexOf("@"));
+            String id = null;
+            try {
+                id = accountDTO.getEmail().substring(0, accountDTO.getEmail().indexOf("@"));
+            } catch (Exception e) {
+
+            }
             accountDTO.setUsername(id);
             if (create) {
                 accountDTO.setPassword(encoder.encode(accountDTO.getPassword()));

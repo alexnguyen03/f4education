@@ -1,5 +1,7 @@
 package com.f4education.springjwt.payload.response;
 
+import java.util.Date;
+
 import com.f4education.springjwt.models.Subject;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +24,6 @@ public class CourseResponse {
 
 	private String courseDescription;
 
-	private Integer numberSession;
-
 	private Subject subject;
 
 	private String image;
@@ -37,4 +37,8 @@ public class CourseResponse {
 	private Integer reviewNumber;
 	
 	private Integer totalStudent;
+	
+	private Double totalRenueve;
+	
+	private Date createDate;
 }

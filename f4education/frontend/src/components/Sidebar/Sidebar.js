@@ -1,25 +1,8 @@
-/*!
-
-=========================================================
-* Argon Dashboard React - v1.2.3
-=========================================================
-
-* Product Page: https://www.creative-tim.com/product/argon-dashboard-react
-* Copyright 2023 Creative Tim (https://www.creative-tim.com)
-* Licensed under MIT (https://github.com/creativetimofficial/argon-dashboard-react/blob/master/LICENSE.md)
-
-* Coded by Creative Tim
-
-=========================================================
-
-* The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-
-*/
-/*eslint-disable*/
 import { useState } from 'react'
 import { NavLink as NavLinkRRD, Link } from 'react-router-dom'
 // nodejs library to set properties for components
 import { PropTypes } from 'prop-types'
+import mainLogo from '../../assets/img/brand/F4EDUCATION.png'
 
 // reactstrap components
 import {
@@ -76,7 +59,10 @@ const Sidebar = (props) => {
                 prop.path !== '/resourceDetail/:classId/:folderId' &&
                 prop.path !== '/questionDetail/:classId' &&
                 prop.path !== '/question-detail/:courseName' &&
-                prop.path !== '/class-detail/:classIdParam'
+                prop.path !== '/class-detail/:classIdParam' &&
+                prop.path !== '/courses-detail/:courseId' &&
+                prop.path !== '/resourceDetail/:courseName/:folderId' &&
+                prop.path !== '/question-detail/:questionId'
             ) {
                 return (
                     <NavItem key={key}>
@@ -94,19 +80,8 @@ const Sidebar = (props) => {
         })
     }
 
-    const { bgColor, routes, logo } = props
+    const { bgColor, routes } = props
     let navbarBrandProps
-    if (logo && logo.innerLink) {
-        navbarBrandProps = {
-            to: logo.innerLink,
-            tag: Link
-        }
-    } else if (logo && logo.outterLink) {
-        navbarBrandProps = {
-            href: logo.outterLink,
-            target: '_blank'
-        }
-    }
 
     return (
         <Navbar
@@ -124,15 +99,14 @@ const Sidebar = (props) => {
                     <span className="navbar-toggler-icon" />
                 </button>
                 {/* Brand */}
-                {logo ? (
-                    <NavbarBrand className="pt-0" {...navbarBrandProps}>
-                        <img
-                            alt={logo.imgAlt}
-                            className="navbar-brand-img"
-                            src={logo.imgSrc}
-                        />
-                    </NavbarBrand>
-                ) : null}
+
+                <NavbarBrand className="pt-0">
+                    <img
+                        alt={'.......'}
+                        className="navbar-brand-img"
+                        src={mainLogo}
+                    />
+                </NavbarBrand>
                 {/* User */}
                 <Nav className="align-items-center d-md-none">
                     <UncontrolledDropdown nav>
@@ -199,39 +173,7 @@ const Sidebar = (props) => {
                 {/* Collapse */}
                 <Collapse navbar isOpen={collapseOpen}>
                     {/* Collapse header */}
-                    <div className="navbar-collapse-header d-md-none">
-                        <Row>
-                            {logo ? (
-                                <Col className="collapse-brand" xs="6">
-                                    {logo.innerLink ? (
-                                        <Link to={logo.innerLink}>
-                                            <img
-                                                alt={logo.imgAlt}
-                                                src={logo.imgSrc}
-                                            />
-                                        </Link>
-                                    ) : (
-                                        <a href={logo.outterLink}>
-                                            <img
-                                                alt={logo.imgAlt}
-                                                src={logo.imgSrc}
-                                            />
-                                        </a>
-                                    )}
-                                </Col>
-                            ) : null}
-                            <Col className="collapse-close" xs="6">
-                                <button
-                                    className="navbar-toggler"
-                                    type="button"
-                                    onClick={toggleCollapse}
-                                >
-                                    <span />
-                                    <span />
-                                </button>
-                            </Col>
-                        </Row>
-                    </div>
+                    <div className="navbar-collapse-header d-md-none"></div>
                     {/* Form */}
                     <Form className="mt-4 mb-3 d-md-none">
                         <InputGroup className="input-group-rounded input-group-merge">
@@ -262,19 +204,7 @@ Sidebar.defaultProps = {
 
 Sidebar.propTypes = {
     // links that will be displayed inside the component
-    routes: PropTypes.arrayOf(PropTypes.object),
-    logo: PropTypes.shape({
-        // innerLink is for links that will direct the user within the app
-        // it will be rendered as <Link to="...">...</Link> tag
-        innerLink: PropTypes.string,
-        // outterLink is for links that will direct the user outside the app
-        // it will be rendered as simple <a href="...">...</a> tag
-        outterLink: PropTypes.string,
-        // the image src of the logo
-        imgSrc: PropTypes.string.isRequired,
-        // the alt for the img
-        imgAlt: PropTypes.string.isRequired
-    })
+    routes: PropTypes.arrayOf(PropTypes.object)
 }
 
 export default Sidebar

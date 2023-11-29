@@ -8,6 +8,8 @@ import com.f4education.springjwt.payload.response.EvaluateResponse;
 public interface EvaluateService {
 	List<EvaluateResponse> getAllEvaluate();
 
+	List<EvaluateResponse> getTop10Evaluate();
+
 	List<EvaluateResponse> getAllEvaluateByCourseId(Integer courseId);
 
 	EvaluateResponse getEvaluateById(Integer evaluateId);

@@ -51,9 +51,8 @@ public class AccountServiceImpl implements AccountService {
         // }
         // ! Role == 3 có vai trò là admin
         if (accountDTO.getRoles() == 3) {
-
             if (create) {
-                Role role = roleRepository.findById((Integer) 3).get();
+                Role role = roleRepository.findById(3).get();
                 Account_role account_role = new Account_role(role, userSaved);
                 account_roleRepository.save(account_role);
                 Admin admin = accountDTO.getAdmin();
@@ -71,7 +70,7 @@ public class AccountServiceImpl implements AccountService {
             // ! Role == 2 có vai trò là giảng viên
             if (accountDTO.getRoles() == 2) {
                 if (create) {
-                    Role role = roleRepository.findById((Integer) 2).get();
+                    Role role = roleRepository.findById(2).get();
                     Account_role account_role = new Account_role(role, userSaved);
                     account_roleRepository.save(account_role);
                     Teacher teacher = accountDTO.getTeacher();
@@ -87,7 +86,7 @@ public class AccountServiceImpl implements AccountService {
 
             } else { // ! Role còn lại mặc định là student
                 if (create) {
-                    Role role = roleRepository.findById((Integer) 1).get();
+                    Role role = roleRepository.findById(1).get();
                     Account_role account_role = new Account_role(role, userSaved);
                     account_roleRepository.save(account_role);
                     Student student = accountDTO.getStudent();

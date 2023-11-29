@@ -1,5 +1,6 @@
 package com.f4education.springjwt.controllers;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +12,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.payload.request.ScheduleRequest;
+import com.f4education.springjwt.payload.request.ScheduleTeacherDTO;
 import com.f4education.springjwt.payload.response.ScheduleResponse;
 import com.f4education.springjwt.security.services.ScheduleServiceImpl;
-
-import jakarta.websocket.server.PathParam;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -41,4 +42,17 @@ public class ScheduleController {
         ScheduleResponse scheduleResponse = scheduleService.findAllScheduleByClassId(classId);
         return ResponseEntity.ok(scheduleResponse);
     }
+
+    @GetMapping("/teacher/{accountId}")
+    public ResponseEntity<?> findAllScheduleTeacherByID(@PathVariable("accountId") Integer accountId) {
+        List<ScheduleTeacherDTO> list = scheduleService.findAllScheduleTeacherByID(accountId);
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/classes")
+    public ResponseEntity<?> getAllScheduleByClassId(@RequestParam("classId") Integer classId, @RequestParam("studyDate") Date studyDate) {
+        Schedule scheduleResponse = scheduleService.findScheduleByClassAndStudyDate(classId, studyDate);
+        return ResponseEntity.ok(scheduleResponse);
+    }
+
 }

@@ -21,15 +21,20 @@ import {
 } from '@mantine/core'
 import { useEffect, useState } from 'react'
 
-import { IconArrowBack, IconArrowRight, IconRefresh } from '@tabler/icons-react'
+import { useDisclosure } from '@mantine/hooks'
+import {
+    IconArrowBack,
+    IconArrowRight,
+    IconDatabasePlus,
+    IconRefresh,
+    IconZoomQuestion
+} from '@tabler/icons-react'
 import {
     createSearchParams,
     Link,
     useNavigate,
     useSearchParams
 } from 'react-router-dom'
-import { IconDatabasePlus } from '@tabler/icons-react'
-import { useDisclosure } from '@mantine/hooks'
 
 import moment from 'moment'
 
@@ -37,17 +42,17 @@ import moment from 'moment'
 import styles from '../../../assets/scss/custom-module-scss/client-custom/course-progress/CourseProgress.module.scss'
 
 // API
-import courseApi from '../../../api/courseApi'
-import registerCoursecAPI from '../../../api/registerCourseApi'
 import questionApi from 'api/questionApi'
 import certificateApi from '../../../api/certificateApi'
+import courseApi from '../../../api/courseApi'
+import registerCoursecAPI from '../../../api/registerCourseApi'
 
 // Component
-import Schedule from './Schedule'
 import DownloadRecource from './DownloadRecource'
+import Schedule from './Schedule'
 
 // Notification
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import Notify from '../../../utils/Notify'
 
 // IMAGE PATH
@@ -88,6 +93,7 @@ const CourseProgress = () => {
         endDate: '',
         registerCourseId: ''
     })
+
     const [numberOfCourseComplete, setNumberOfCourseComplete] = useState(0)
 
     const [newestCourse, setNewestCourse] = useState([])
@@ -111,6 +117,8 @@ const CourseProgress = () => {
                 const totalProgress = await fetchCourseProgressByClassId(
                     element.classes.classId
                 )
+
+                console.log(element)
 
                 const pointGreaterThanFive = await checkIfCourseProgressIsDone(
                     element.classes.classId,
@@ -246,6 +254,8 @@ const CourseProgress = () => {
             startDate: course.startDate ? course.startDate : '',
             endDate: course.endDate ? course.endDate : '',
             registerCourseId: course.registerCourseId
+                ? course.registerCourseId
+                : ''
         })
 
         setShowingDetail(true)
@@ -257,6 +267,24 @@ const CourseProgress = () => {
         })
         document.documentElement.scrollTop = 0
         document.scrollingElement.scrollTop = 0
+    }
+
+    const handleShowTask = (classId) => {
+        navigate({
+            pathname: '/student/task',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
+
+    const handleShowQuestion = (classId) => {
+        navigate({
+            pathname: '/student/task',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
     }
 
     const formatDateWithDayOfWeek = (date) => {
@@ -345,7 +373,6 @@ const CourseProgress = () => {
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
-                        registerCourseId: selectedCourse.registerCourseId,
                         studentId: user.username ? user.username : '',
                         certificateId: resp.data.certificateId
                     })}`
@@ -530,6 +557,20 @@ const CourseProgress = () => {
                                     >
                                         Tải tài nguyên
                                     </Button>
+                                    <Button
+                                        variant="outline"
+                                        color="indigo"
+                                        size="lg"
+                                        leftIcon={<IconZoomQuestion />}
+                                        mt={10}
+                                        onClick={() => {
+                                            handleShowQuestion(
+                                                selectedCourse.classes.classId
+                                            )
+                                        }}
+                                    >
+                                        Xem bài tập
+                                    </Button>
                                 </Group>
                             </Stack>
                         ) : (
@@ -596,10 +637,10 @@ const CourseProgress = () => {
                                                         radius={8}
                                                         p={15}
                                                         maw={'100%'}
-                                                        fz={'lg'}
+                                                        fz="lg"
                                                         size="lg"
                                                     >
-                                                        Khóa học mới nhất"
+                                                        Khóa học mới nhất "
                                                         {courseProgresses.length >
                                                         0
                                                             ? courseProgresses[0]
@@ -726,10 +767,10 @@ const CourseProgress = () => {
                     ) : (
                         <Box className={styles['floating-result']}>
                             <Stack align={'center'} p={rem('1rem')}>
-                                <Title order={5} color="dark" fw={700}>
+                                <Title order={5} fz="xl" color="dark" fw={700}>
                                     Làm tốt lắm!
                                 </Title>
-                                <Text fz="md" c="dimmed">
+                                <Text fz="lg" c="dimmed">
                                     Tổng quan
                                 </Text>
                                 <Box>
@@ -786,7 +827,7 @@ const CourseProgress = () => {
                                                     fz="lg"
                                                     mt={rem('-0.7rem')}
                                                 >
-                                                    Khóa đã đăng ký
+                                                    Khóa học đã đăng ký
                                                 </Text>
                                             </Stack>
                                         </Box>
@@ -806,7 +847,7 @@ const CourseProgress = () => {
                                                     fz="lg"
                                                     mt={rem('-0.7rem')}
                                                 >
-                                                    Khóa hoàn thành
+                                                    Khóa học hoàn thành
                                                 </Text>
                                             </Stack>
                                         </Box>
@@ -819,14 +860,15 @@ const CourseProgress = () => {
                                                     fz="lg"
                                                     fw={700}
                                                 >
-                                                    {courseProgresses.length}
+                                                    {courseProgresses.length -
+                                                        numberOfCourseComplete}
                                                 </Text>
                                                 <Text
                                                     color="dimmed"
                                                     fz="lg"
                                                     mt={rem('-0.7rem')}
                                                 >
-                                                    Khóa đang học
+                                                    Khóa học đang học
                                                 </Text>
                                             </Stack>
                                         </Box>
@@ -847,6 +889,7 @@ const CourseProgress = () => {
                                 variant="filled"
                                 color="indigo"
                                 mt="xl"
+                                ml="lg"
                                 onClick={() =>
                                     handleCheckIfCertificateIsCreated(
                                         selectedCourse.registerCourseId
@@ -865,7 +908,7 @@ const CourseProgress = () => {
                 <Box mt={rem('8rem')}>
                     <Group position="left" mb={'lg'}>
                         <Title order={2} color="dark" fw={700}>
-                            Trong tiến trình học
+                            Các khóa học đang theo học
                         </Title>
                     </Group>
                     {loading ? (
@@ -996,8 +1039,8 @@ const CourseProgress = () => {
                                                                                         fz="md"
                                                                                         mt="md"
                                                                                     >
-                                                                                        HƯỚNG
-                                                                                        DẪN
+                                                                                        KHÓA
+                                                                                        HỌC
                                                                                     </Text>
                                                                                     <Badge
                                                                                         color="violet"
@@ -1367,13 +1410,13 @@ const CourseProgress = () => {
                                             <Group position="left" mt="md">
                                                 <Text color="dimmed">
                                                     {course.rating === 'NaN'
-                                                        ? 5
+                                                        ? 0
                                                         : course.rating}
                                                 </Text>
                                                 <Rating
                                                     value={
                                                         course.rating === 'NaN'
-                                                            ? 5
+                                                            ? 0
                                                             : course.rating
                                                     }
                                                     fractions={2}

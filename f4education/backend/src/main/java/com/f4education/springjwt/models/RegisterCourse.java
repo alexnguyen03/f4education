@@ -50,9 +50,6 @@ public class RegisterCourse implements Serializable {
     @Column(name = "registration_date")
     private Date registrationDate;
 
-    // @Column(name = "number_session")
-    // private Integer numberSession;
-
     private String status;
 
     private String image;

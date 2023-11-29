@@ -84,7 +84,6 @@ public class BillDetailServiceImp implements BillDetailService {
 
 		billDetail.setTotalPrice(billDetailRequestDTO.getTotalPrice());
 		billDetail.setCourse(course);
-		billDetail.setPrice(Double.valueOf(course.getCoursePrice()));
 
 		return billDetail;
 	}

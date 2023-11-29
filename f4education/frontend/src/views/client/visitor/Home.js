@@ -1,6 +1,7 @@
 import { Carousel } from '@mantine/carousel'
 import {
     Affix,
+    Avatar,
     Box,
     Button,
     Card,
@@ -14,6 +15,7 @@ import {
     rem,
     SimpleGrid,
     Skeleton,
+    Stack,
     Text,
     ThemeIcon,
     Title,
@@ -26,7 +28,10 @@ import {
     IconArrowUp,
     IconCalendarTime,
     IconCertificate,
-    IconCoin
+    IconCloudNetwork,
+    IconCoin,
+    IconSubtask,
+    IconUserCheck
 } from '@tabler/icons-react'
 import PropTypes from 'prop-types'
 import { useEffect, useState } from 'react'
@@ -37,12 +42,13 @@ import classes from '../../../assets/scss/custom-module-scss/client-custom/home/
 import classHeroText from '../../../assets/scss/custom-module-scss/client-custom/home/HeroText.module.scss'
 
 // API
-import courseApi from '../../../api/courseApi'
 import { Link, useNavigate } from 'react-router-dom'
+import courseApi from '../../../api/courseApi'
+import evaluateApi from '../../../api/evaluateApi'
 
-import { ToastContainer, toast } from 'react-toastify'
-import Notify from '../../../utils/Notify'
+import { toast, ToastContainer } from 'react-toastify'
 import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
+import Notify from '../../../utils/Notify'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -88,7 +94,7 @@ const mockdata = [
         icon: IconCertificate,
         title: 'Những khóa học chất lượng',
         description:
-            'Tim của Slakoth chỉ đập một lần một phút. Dù có chuyện gì xảy ra đi nữa, việc đi loanh quanh bất động là bằng lòng.'
+            'Chúng tôi cung cấp những khóa học chất lượng trên từng giây học tập, bạn có thể trở thành lập trình viên chỉ sau 6 tháng '
     },
     {
         icon: IconCoin,
@@ -105,6 +111,7 @@ const Home = () => {
     // Main Variable
     const [newestCourse, setNewestCourse] = useState([])
     const [bestSellingCourse, setBestSellingCourse] = useState([])
+    const [listEvaluate, SetListEvaluate] = useState([])
     const [loading, setLoading] = useState(false)
     const [scroll, scrollTo] = useWindowScroll()
 
@@ -143,6 +150,49 @@ const Home = () => {
             setLoading(false)
         } catch (error) {
             console.log(error)
+        }
+    }
+
+    const fetchEvaluate = async () => {
+        try {
+            const resp = await evaluateApi.getNewestEvaluate()
+
+            if (resp.status === 200 && resp.data.length > 0) {
+                SetListEvaluate(resp.data)
+                console.log(resp.data)
+            } else {
+                console.log('cannot get data best selling')
+            }
+            setLoading(false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const formatTimeAgo = (reviewDate) => {
+        const currentDate = new Date()
+        const targetDate = new Date(reviewDate)
+
+        const timeDifference = currentDate - targetDate
+        const seconds = Math.floor(timeDifference / 1000)
+        const minutes = Math.floor(seconds / 60)
+        const hours = Math.floor(minutes / 60)
+        const days = Math.floor(hours / 24)
+        const months = Math.floor(days / 30)
+        const years = Math.floor(months / 12)
+
+        if (years > 0) {
+            return years === 1 ? '1 năm trước' : `${years} năm trước`
+        } else if (months > 0) {
+            return months === 1 ? '1 tháng trước' : `${months} tháng trước`
+        } else if (days > 0) {
+            return days === 1 ? '1 ngày trước' : `${days} ngày trước`
+        } else if (hours > 0) {
+            return hours === 1 ? '1 giờ trước' : `${hours} giờ trước`
+        } else if (minutes > 0) {
+            return minutes === 1 ? '1 phút trước' : `${minutes} phút trước`
+        } else {
+            return 'vừa mới'
         }
     }
 
@@ -226,10 +276,10 @@ const Home = () => {
     }
 
     // learnext course Carousel
-    const LearnNextSlides = newestCourse.map((learn, index) => (
-        <Carousel.Slide key={index}>
-            {!loading ? (
-                <>
+    const LearnNextSlides = newestCourse.map(
+        (learn, index) =>
+            !learn.isPurchase && (
+                <Carousel.Slide key={index}>
                     <Card className={`${cartStyle['card-hover-overlay']}`}>
                         <Card.Section>
                             <Image
@@ -250,14 +300,14 @@ const Home = () => {
                                 <Flex justify="flex-start" gap="sm">
                                     <Text>
                                         {learn.rating === 'NaN'
-                                            ? 5
+                                            ? 0
                                             : learn.rating}
                                     </Text>
                                     <Group position="center">
                                         <Rating
                                             value={
                                                 learn.rating === 'NaN'
-                                                    ? 5
+                                                    ? 0
                                                     : learn.rating
                                             }
                                             fractions={2}
@@ -335,138 +385,155 @@ const Home = () => {
                             </Box>
                         </Link>
                     </Card>
-                </>
-            ) : (
-                <>
-                    <Skeleton height={200} radius="sm" mb="sm" />
-                    <Skeleton height={8} radius="xl" />
-                    <Skeleton height={8} radius="xl" />
-                    <Skeleton height={8} radius="xl" />
-                </>
-            )}
-        </Carousel.Slide>
-    ))
+                </Carousel.Slide>
+            )
+    )
 
     // learnext course Carousel
     const bestSellingslides = bestSellingCourse.map((learn, index) => (
         <Carousel.Slide key={index}>
-            {/* Target Hover */}
-            {!loading ? (
-                <>
-                    <Card className={`${cartStyle['card-hover-overlay']}`}>
-                        <Card.Section>
-                            <Image
-                                src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
-                                fit="cover"
-                                width={'100%'}
-                                height={200}
-                                radius="sm"
-                                withPlaceholder
-                            />
-                        </Card.Section>
+            <Card className={`${cartStyle['card-hover-overlay']}`}>
+                <Card.Section>
+                    <Image
+                        src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                        fit="cover"
+                        width={'100%'}
+                        height={200}
+                        radius="sm"
+                        withPlaceholder
+                    />
+                </Card.Section>
 
-                        <Box>
-                            <Text fw={500} lineClamp={1} fs="lg">
-                                {learn.courseName}
+                <Box>
+                    <Text fw={500} lineClamp={1} fs="lg">
+                        {learn.courseName}
+                    </Text>
+                    <Box>
+                        <Flex justify="flex-start" gap="sm">
+                            <Text>
+                                {learn.rating === 'NaN' ? 0 : learn.rating}
                             </Text>
-                            <Box>
-                                <Flex justify="flex-start" gap="sm">
-                                    <Text>
-                                        {learn.rating === 'NaN'
-                                            ? 5
-                                            : learn.rating}
-                                    </Text>
-                                    <Group position="center">
-                                        <Rating
-                                            value={
-                                                learn.rating === 'NaN'
-                                                    ? 5
-                                                    : learn.rating
-                                            }
-                                            fractions={2}
-                                            readOnly
-                                        />
-                                    </Group>
-                                    <Text c="dimmed">
-                                        ({learn.reviewNumber})
-                                    </Text>
-                                </Flex>
-                            </Box>
-                            <Box>
-                                <Text fw={500}>
-                                    {learn.coursePrice.toLocaleString('it-IT', {
-                                        style: 'currency',
-                                        currency: 'VND'
-                                    })}
-                                </Text>
-                            </Box>
-                        </Box>
+                            <Group position="center">
+                                <Rating
+                                    value={
+                                        learn.rating === 'NaN'
+                                            ? 0
+                                            : learn.rating
+                                    }
+                                    fractions={2}
+                                    readOnly
+                                />
+                            </Group>
+                            <Text c="dimmed">({learn.reviewNumber})</Text>
+                        </Flex>
+                    </Box>
+                    <Box>
+                        <Text fw={500}>
+                            {learn.coursePrice.toLocaleString('it-IT', {
+                                style: 'currency',
+                                currency: 'VND'
+                            })}
+                        </Text>
+                    </Box>
+                </Box>
 
-                        {/* Overlay đây nha */}
-                        <Link to={`/course/${learn.courseId}`}>
-                            <Box className={cartStyle.overlay}>
-                                {learn.isPurchase ? (
-                                    <>
-                                        <Button
-                                            color="violet"
-                                            fullWidth
-                                            onClick={(e) =>
-                                                navigateToStudent(e)
+                {/* Overlay đây nha */}
+                <Link to={`/course/${learn.courseId}`}>
+                    <Box className={cartStyle.overlay}>
+                        {learn.isPurchase ? (
+                            <>
+                                <Button
+                                    color="violet"
+                                    fullWidth
+                                    onClick={(e) => navigateToStudent(e)}
+                                    style={{ zIndex: 1000 }}
+                                >
+                                    <Text color="#fff" size="md">
+                                        Đã đăng ký khóa học
+                                    </Text>
+                                </Button>
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    color="violet"
+                                    fullWidth
+                                    onClick={(e) => handleAddCart(learn, e)}
+                                >
+                                    <Text color="#fff" size="md">
+                                        Thêm vào giỏ hàng
+                                    </Text>
+                                </Button>
+                                <Button
+                                    bg={'transparent'}
+                                    fullWidth
+                                    styles={{
+                                        root: {
+                                            outline: '1px solid #fff',
+                                            '&:hover': {
+                                                background: 'transparent'
                                             }
-                                            style={{ zIndex: 1000 }}
-                                        >
-                                            <Text color="#fff" size="md">
-                                                Đã đăng ký khóa học
-                                            </Text>
-                                        </Button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <Button
-                                            color="violet"
-                                            fullWidth
-                                            onClick={(e) =>
-                                                handleAddCart(learn, e)
-                                            }
-                                        >
-                                            <Text color="#fff" size="md">
-                                                Thêm vào giỏ hàng
-                                            </Text>
-                                        </Button>
-                                        <Button
-                                            bg={'transparent'}
-                                            fullWidth
-                                            styles={{
-                                                root: {
-                                                    outline: '1px solid #fff',
-                                                    '&:hover': {
-                                                        background:
-                                                            'transparent'
-                                                    }
-                                                }
-                                            }}
-                                            onClick={(e) =>
-                                                handleCheckOutNow(learn, e)
-                                            }
-                                        >
-                                            <Text color="#fff" size="md">
-                                                ĐĂNG KÝ NGAY
-                                            </Text>
-                                        </Button>
-                                    </>
-                                )}
-                            </Box>
-                        </Link>
-                    </Card>
-                </>
-            ) : (
-                <>
-                    <Skeleton height={200} radius="sm" mb="sm" />
-                    <Skeleton height={8} radius="xl" />
-                    <Skeleton height={8} radius="xl" />
-                    <Skeleton height={8} radius="xl" />
-                </>
-            )}
+                                        }
+                                    }}
+                                    onClick={(e) => handleCheckOutNow(learn, e)}
+                                >
+                                    <Text color="#fff" size="md">
+                                        ĐĂNG KÝ NGAY
+                                    </Text>
+                                </Button>
+                            </>
+                        )}
+                    </Box>
+                </Link>
+            </Card>
+        </Carousel.Slide>
+    ))
+
+    // evaluate
+    const evaluateSlides = listEvaluate.map((evaluate, index) => (
+        <Carousel.Slide key={index}>
+            <Card shadow="xl" h={185}>
+                <Stack>
+                    <Group>
+                        <Avatar
+                            src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
+                            alt={evaluate.studentName}
+                            radius="xl"
+                        />
+                        <Stack spacing="xs">
+                            <Text
+                                size="xs"
+                                m={0}
+                                p={0}
+                                c="dimmed"
+                                lineClamp={1}
+                            >
+                                Đã đánh giá {formatTimeAgo(evaluate.reviewDate)}
+                            </Text>
+                            <Text
+                                size="md"
+                                color="dark"
+                                fw={500}
+                                m={0}
+                                p={0}
+                                lineClamp={1}
+                            >
+                                {evaluate.studentName}
+                            </Text>
+                            <Group m={0} p={0}>
+                                <Rating
+                                    fractions={2}
+                                    value={evaluate.rating}
+                                    readOnly
+                                />
+                            </Group>
+                        </Stack>
+                    </Group>
+                    <Text size="md" color="dark" lineClamp={2} mah={80}>
+                        {evaluate.content}
+                    </Text>
+                </Stack>
+            </Card>
         </Carousel.Slide>
     ))
 
@@ -534,18 +601,9 @@ const Home = () => {
 
     // UseEffect AREA
     useEffect(() => {
-        // const fetchData = async () => {
-        //     setLoading(true)
-        //     await Promise.all([
-        //         fetchNewestCourse(),
-        //         fetchTopBestSellingCourse()
-        //     ])
-        //     setLoading(false)
-        // }
-
-        // fetchData()
         fetchNewestCourse()
         fetchTopBestSellingCourse()
+        fetchEvaluate()
     }, [])
 
     return (
@@ -554,11 +612,7 @@ const Home = () => {
 
             <Container size="xl">
                 {/* Hero section */}
-                <Group
-                    className={classHeroText.wrapper}
-                    size={1400}
-                    mb={rem('5rem')}
-                >
+                <Group className={classHeroText.wrapper} size={1400}>
                     <Dots
                         className={classHeroText.dots}
                         style={{ left: 0, top: 0 }}
@@ -614,7 +668,7 @@ const Home = () => {
                         </Title>
                         <br />
                         <div className={classHeroText.controls}>
-                            <Link to="/course">
+                            <Link to="/courses">
                                 <Button
                                     className={classHeroText.control}
                                     size="lg"
@@ -624,23 +678,21 @@ const Home = () => {
                                     Xem khóa học
                                 </Button>
                             </Link>
-                            <Button
-                                className={classHeroText.control}
-                                size="lg"
-                                ml={rem(3)}
-                            >
-                                Đăng ký tài khoản
-                            </Button>
+                            <Link to={'/check-mail'}>
+                                <Button
+                                    className={classHeroText.control}
+                                    size="lg"
+                                    ml={rem(3)}
+                                >
+                                    Đăng ký tài khoản
+                                </Button>
+                            </Link>
                         </div>
                     </Box>
                 </Group>
 
                 {/* Feature section */}
-                <Group
-                    position="apart"
-                    my={rem('8rem')}
-                    className={classes.wrapper}
-                >
+                <Group position="apart" className={classes.wrapper}>
                     <Title
                         className={classes.title}
                         align="center"
@@ -679,96 +731,160 @@ const Home = () => {
                 </Group>
 
                 {/* what learn nexxt */}
-                <Box mt={rem('5rem')}>
+                <Box mt={rem('1rem')}>
                     <Title order={1} mt="lg" fw={700} color="dark">
-                        Tiếp theo học gì
+                        Những khóa học mới nhất
                     </Title>
                     <Text size={'xl'} c="dimmed" maw={600} mb="md">
                         Chúng tôi có những khóa học mới nhất và chất lượng nhất
                     </Text>
                     <Box>
-                        <Carousel
-                            slideSize="20%"
-                            height="400px"
-                            slideGap="lg"
-                            controlsOffset="xs"
-                            align="start"
-                            dragFree
-                            loop
-                            controlSize={35}
-                            slidesToScroll={breakpoints ? 3 : 1}
-                            styles={{
-                                control: {
-                                    background: '#212121',
-                                    color: '#fff',
-                                    fontSize: rem(35),
-                                    '&[data-inactive]': {
-                                        opacity: 0,
-                                        cursor: 'default'
-                                    },
-                                    ref: getStylesRef('controls'),
-                                    transition: 'opacity 150ms ease',
-                                    opacity: 0
-                                },
-                                root: {
-                                    '&:hover': {
-                                        [`& .${getStylesRef('controls')}`]: {
-                                            opacity: 1
+                        {loading ? (
+                            <>
+                                <Skeleton
+                                    width="100%"
+                                    height={200}
+                                    radius="sm"
+                                    mb="md"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    mb="sm"
+                                    radius="sm"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    mb="sm"
+                                    radius="sm"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    radius="sm"
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Carousel
+                                    slideSize="20%"
+                                    height="300px"
+                                    slideGap="lg"
+                                    controlsOffset="xs"
+                                    align="start"
+                                    dragFree
+                                    loop
+                                    controlSize={35}
+                                    slidesToScroll={breakpoints ? 3 : 1}
+                                    styles={{
+                                        control: {
+                                            background: '#212121',
+                                            color: '#fff',
+                                            fontSize: rem(35),
+                                            '&[data-inactive]': {
+                                                opacity: 0,
+                                                cursor: 'default'
+                                            },
+                                            ref: getStylesRef('controls'),
+                                            transition: 'opacity 150ms ease',
+                                            opacity: 0
+                                        },
+                                        root: {
+                                            '&:hover': {
+                                                [`& .${getStylesRef(
+                                                    'controls'
+                                                )}`]: {
+                                                    opacity: 1
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                            }}
-                        >
-                            {LearnNextSlides}
-                        </Carousel>
+                                    }}
+                                >
+                                    {LearnNextSlides}
+                                </Carousel>
+                            </>
+                        )}
                     </Box>
                 </Box>
 
                 {/* Top sell course*/}
                 <Box>
-                    <Title order={1} mt="lg" fw={700} color="dark">
+                    <Title order={1} mt="lg" mb="md" fw={700} color="dark">
                         Những khóa học bán chạy nhất
                     </Title>
                     <Box>
-                        <Carousel
-                            slideSize="20%"
-                            height="400px"
-                            slideGap="lg"
-                            controlsOffset="xs"
-                            align="start"
-                            dragFree
-                            loop
-                            controlSize={35}
-                            slidesToScroll={breakpoints ? 3 : 1}
-                            styles={{
-                                control: {
-                                    background: '#212121',
-                                    color: '#fff',
-                                    fontSize: rem(35),
-                                    '&[data-inactive]': {
-                                        opacity: 0,
-                                        cursor: 'default'
-                                    },
-                                    ref: getStylesRef('controls'),
-                                    transition: 'opacity 150ms ease',
-                                    opacity: 0
-                                },
-                                root: {
-                                    '&:hover': {
-                                        [`& .${getStylesRef('controls')}`]: {
-                                            opacity: 1
+                        {loading ? (
+                            <>
+                                <Skeleton
+                                    width="100%"
+                                    height={200}
+                                    radius="sm"
+                                    mb="md"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    mb="sm"
+                                    radius="sm"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    mb="sm"
+                                    radius="sm"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    radius="sm"
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Carousel
+                                    slideSize="20%"
+                                    height="300px"
+                                    slideGap="lg"
+                                    controlsOffset="xs"
+                                    align="start"
+                                    dragFree
+                                    loop
+                                    controlSize={35}
+                                    slidesToScroll={breakpoints ? 3 : 1}
+                                    styles={{
+                                        control: {
+                                            background: '#212121',
+                                            color: '#fff',
+                                            fontSize: rem(35),
+                                            '&[data-inactive]': {
+                                                opacity: 0,
+                                                cursor: 'default'
+                                            },
+                                            ref: getStylesRef('controls'),
+                                            transition: 'opacity 150ms ease',
+                                            opacity: 0
+                                        },
+                                        root: {
+                                            '&:hover': {
+                                                [`& .${getStylesRef(
+                                                    'controls'
+                                                )}`]: {
+                                                    opacity: 1
+                                                }
+                                            }
                                         }
-                                    }
-                                }
-                            }}
-                        >
-                            {bestSellingslides}
-                        </Carousel>
+                                    }}
+                                >
+                                    {bestSellingslides}
+                                </Carousel>
+                            </>
+                        )}
                     </Box>
                 </Box>
 
                 {/* Topic recomment*/}
-                <Box my={rem('5rem')}>
+                <Box my={rem('2.5rem')}>
                     <Title order={1} mt="lg" fw={700} color="dark" mb="lg">
                         Những chủ đề gợi ý cho bạn
                     </Title>
@@ -801,17 +917,18 @@ const Home = () => {
             </Container>
 
             {/* Other section */}
-            <Box my={rem('5rem')} bg="#10162f" p={rem('2rem')}>
+            <Box bg="#10162f" p={rem('2rem')}>
                 <Container>
                     <Grid grow>
-                        <Grid.Col xl={6} lg={6} md={12} sm={12}>
+                        <Grid.Col xl={6} lg={6} md={12} sm={12} py="auto">
                             <Box>
                                 <Title
                                     order={1}
                                     color="#fff"
                                     fw={700}
-                                    mx={'auto'}
-                                    align={'center'}
+                                    mx="auto"
+                                    mt="md"
+                                    align="center"
                                     maw={300}
                                 >
                                     Gia nhập với chúng tôi ngay.
@@ -833,6 +950,10 @@ const Home = () => {
                                     <Text color="#fff" fw={700}>
                                         Học viên
                                     </Text>
+                                    <IconUserCheck
+                                        size={rem('2rem')}
+                                        color="#fff"
+                                    />
                                 </Flex>
                                 <Flex
                                     gap="md"
@@ -847,6 +968,10 @@ const Home = () => {
                                     <Text color="#fff" fw={700}>
                                         Quốc gia
                                     </Text>
+                                    <IconCloudNetwork
+                                        size={rem('2rem')}
+                                        color="#fff"
+                                    />
                                 </Flex>
                                 <Flex
                                     gap="md"
@@ -861,6 +986,10 @@ const Home = () => {
                                     <Text color="#fff" fw={700}>
                                         Khóa học
                                     </Text>
+                                    <IconSubtask
+                                        size={rem('2rem')}
+                                        color="#fff"
+                                    />
                                 </Flex>
                             </Group>
                         </Grid.Col>
@@ -869,7 +998,7 @@ const Home = () => {
             </Box>
 
             {/* Sub Footer section */}
-            <Box my={rem('5rem')} p={rem('2rem')}>
+            <Box mt={rem('2rem')} p={rem('2rem')}>
                 <Flex direction={'column'} justify="center" align={'center'}>
                     <Title order={1} color="dark" mx={'auto'}>
                         Bắt đầu và nâng cao kỹ năng của bạn
@@ -886,12 +1015,10 @@ const Home = () => {
                     </Text>
                     <Link to="/auth/login">
                         <Button
-                            variant="outline"
-                            color="dark"
+                            variant="filled"
+                            color="violet"
                             size="lg"
                             uppercase
-                            // component={'a'}
-                            // href="/auth/login"
                         >
                             Đăng ký ngay
                         </Button>
@@ -899,8 +1026,71 @@ const Home = () => {
                 </Flex>
             </Box>
 
+            {/* Evaluate */}
+            <Container size="xl">
+                <Box mt={rem('2rem')}>
+                    <Title order={1} mt="lg" mb="md" fw={700} color="dark">
+                        Học viên nghĩ gì về khóa học
+                    </Title>
+                    <Box>
+                        {loading ? (
+                            <>
+                                <Skeleton
+                                    width="100%"
+                                    height={200}
+                                    radius="sm"
+                                    mb="md"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    mb="sm"
+                                    radius="sm"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    mb="sm"
+                                    radius="sm"
+                                />
+                                <Skeleton
+                                    width="100%"
+                                    height={10}
+                                    radius="sm"
+                                />
+                            </>
+                        ) : (
+                            <>
+                                <Carousel
+                                    slideSize="25%"
+                                    height="250px"
+                                    slideGap="lg"
+                                    controlsOffset="xs"
+                                    align="start"
+                                    dragFree
+                                    loop
+                                    controlSize={40}
+                                    slidesToScroll={breakpoints ? 3 : 1}
+                                    styles={{
+                                        control: {
+                                            background: '#212121',
+                                            color: '#fff',
+                                            fontSize: rem(35),
+                                            ref: getStylesRef('controls'),
+                                            transition: 'opacity 150ms ease'
+                                        }
+                                    }}
+                                >
+                                    {evaluateSlides}
+                                </Carousel>
+                            </>
+                        )}
+                    </Box>
+                </Box>
+            </Container>
+
             {/* Contact section */}
-            <Box my={rem('5rem')} p={rem('2rem')}>
+            <Box py={rem('2rem')}>
                 <Flex direction={'column'} justify="center" align={'center'}>
                     <Text
                         color="dimmed"

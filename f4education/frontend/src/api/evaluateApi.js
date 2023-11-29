@@ -5,6 +5,10 @@ const evaluateApi = {
         const url = '/evaluate'
         return axiosClient.get(url)
     },
+    getNewestEvaluate: () => {
+        const url = `/evaluate/newest-evaluete`
+        return axiosClient.get(url)
+    },
     getAllByCourseId: (courseId) => {
         const url = `/evaluate/course/${courseId}`
         return axiosClient.get(url)
@@ -20,6 +24,16 @@ const evaluateApi = {
     deleteEvaluate: (evaluateId) => {
         const url = `/evaluate/${evaluateId}`
         return axiosClient.delete(url)
+    },
+    saveEvaluationTeacher: (data) => {
+        //ham nay tao danh gia giao vien
+        const url = `/evaluation/student`
+        return axiosClient.post(url, data)
+    },
+    getEvaluationTeacherId: (teacherId) => {
+        //ham nay tao danh gia giao vien
+        const url = `/evaluation/teacher/${teacherId}`
+        return axiosClient.get(url)
     }
 }
 

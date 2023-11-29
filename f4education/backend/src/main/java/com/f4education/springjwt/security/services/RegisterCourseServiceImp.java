@@ -129,9 +129,12 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
 		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
+		
 		courseResponse.setCourse(registerCourse.getCourse());
 		courseResponse.setClasses(registerCourse.getClasses());
 		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
+		courseResponse.setRegisterCourseId(registerCourse.getRegisterCourseId());
+		
 		return courseResponse;
 	}
 
@@ -193,7 +196,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		BeanUtils.copyProperties(registerCourse, registerCourseDTO);
 		registerCourseDTO.setRegisterCourseId(registerCourse.getRegisterCourseId());
 		registerCourseDTO.setStatus(registerCourse.getStatus());
-		// registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 		registerCourseDTO.setRegistrationDate(registerCourse.getRegistrationDate());
 		registerCourseDTO.setCourseDuration(registerCourse.getCourseDuration());
 		registerCourseDTO.setCoursePrice(registerCourse.getCoursePrice());
@@ -204,7 +206,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		registerCourse.setClasses(registerCourse.getClasses());
 		registerCourseDTO.setStartDate(registerCourse.getStartDate());
 		registerCourseDTO.setStartDate(registerCourse.getEndDate());
-		// registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
 		registerCourseDTO.setCourseId(registerCourse.getCourse().getCourseId());
 		registerCourseDTO.setStudentId(registerCourse.getStudent().getStudentId());
 		if (registerCourse.getClasses() != null) {
@@ -227,7 +228,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCoursePrice(course.getCoursePrice());
 			registerCourse.setImage(course.getImage());
 			registerCourse.setCourseDescription(course.getCourseDescription());
-			// registerCourse.setNumberSession(course.getNumberSession());
 		}
 
 		if (student != null) {
@@ -248,7 +248,6 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourse.setCoursePrice(course.getCoursePrice());
 			registerCourse.setImage(course.getImage());
 			registerCourse.setCourseDescription(course.getCourseDescription());
-			// registerCourse.setNumberSession(course.getNumberSession());
 		}
 		if (student != null) {
 			registerCourse.setStudent(student);
@@ -257,14 +256,10 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName() {
-		return registerCourseRepository.findAll()
-				.stream()
+		return registerCourseRepository.findAll().stream()
 				.collect(Collectors.toMap(registration -> registration.getCourse().getCourseId(),
 						registration -> registration, (a, b) -> a))
-				.values()
-				.stream()
-				.map(this::convertToResponseDTO)
-				.collect(Collectors.toList());
+				.values().stream().map(this::convertToResponseDTO).collect(Collectors.toList());
 	}
 
 	@Override
@@ -282,8 +277,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
 		if (!listRegisterCourseIdToAdd.isEmpty()) {
 
-			filteredRegisterCoursesToAdd = listRegisterCourse
-					.stream()
+			filteredRegisterCoursesToAdd = listRegisterCourse.stream()
 					.filter(registerCourse -> listRegisterCourseIdToAdd.contains(registerCourse.getRegisterCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
@@ -303,10 +297,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
 
-			filteredRegisterCoursesToDelete = listRegisterCourse
-					.stream()
-					.filter(registerCourse -> listRegisterCourseIdToDelete
-							.contains(registerCourse.getRegisterCourseId()))
+			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
+					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getRegisterCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
 				registerCourse.setClasses(null);
@@ -315,9 +307,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
 		}
 
-		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd)
-				.stream()
-				.map(this::convertToResponseDTO)
+		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
 
 	}

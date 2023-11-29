@@ -11,11 +11,13 @@ public interface CoursesService {
 
 	List<CourseResponse> findNewestCourse(String studentId);
 
-	CourseResponse findCourseByCourseId(Integer courseId,String studentId);
+	CourseResponse findCourseByCourseId(Integer courseId, String studentId);
 
 	List<CourseResponse> findTop10SoldCourse(String studentId);
 
 	CourseDTO findById(Integer id);
+
+	Boolean isCourseNameExist(String courseName);
 
 	CourseDTO saveCourse(CourseRequest courseRequest);
 
@@ -28,6 +30,7 @@ public interface CoursesService {
 	List<CourseDTO> findAllCourseDTOByStudentId(String studentId);
 
 	List<CourseDTO> getCourseBySubjectName(String subjectName);
-	
+
 	String renameFolder(String folderName, String newFolderName) throws Exception;
+
 }

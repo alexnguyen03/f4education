@@ -18,7 +18,6 @@ public class CourseHistoryDTO {
     private Float coursePrice;
     private Integer courseDuration;
     private String courseDescription;
-    private Integer numberSession;
     private String image;
     private String action;
     private Date modifyDate;

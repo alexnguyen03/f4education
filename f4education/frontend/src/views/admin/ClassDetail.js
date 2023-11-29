@@ -299,7 +299,15 @@ const ClassDetail = () => {
                 '🚀 ~ file: ClassDetail.js:267 ~ getClassByClassId ~ resp:',
                 resp
             )
-
+            const { teacher } = resp.data
+            console.log(
+                '🚀 ~ file: ClassDetail.js:303 ~ getClassByClassId ~ teacher:',
+                teacher
+            )
+            setSelectedTeacher({
+                fullname: teacher.fullname,
+                teacherId: teacher.teacherId
+            })
             setClassDetail(resp.data)
             setLoadingGetClassDetail(false)
         } catch (error) {

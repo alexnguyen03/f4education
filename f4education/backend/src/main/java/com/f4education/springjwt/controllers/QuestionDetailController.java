@@ -32,6 +32,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.AnswerService;
 import com.f4education.springjwt.interfaces.QuestionDetailService;
+import com.f4education.springjwt.payload.request.QuestionDetailClientDTO;
 import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
@@ -44,6 +45,13 @@ public class QuestionDetailController {
 
 	@Autowired
 	AnswerService answerService;
+
+	@GetMapping("/quizz/{classId}")
+//	@PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getQuestionDetailsByStudentId(@PathVariable("classId") Integer classId) {
+		List<QuestionDetailClientDTO> questionDetailDTO = questionDetailService.getQuestionDetailsByStudentId(classId);
+		return ResponseEntity.ok(questionDetailDTO);
+	}
 
 	@GetMapping
 	// @PreAuthorize("hasRole('ADMIN')")

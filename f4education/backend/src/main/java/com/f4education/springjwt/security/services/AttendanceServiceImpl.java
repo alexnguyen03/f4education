@@ -29,6 +29,9 @@ public class AttendanceServiceImpl implements AttendanceService {
 	@Autowired
 	private StudentRepository studentReposotory;
 
+	@Autowired
+	MailerServiceImpl mailer;
+
 	@Override
 	public List<AttendanceDTO> getAllAttendance() {
 		List<Attendance> antendance = attendanceReposotory.findAll();
@@ -61,8 +64,23 @@ public class AttendanceServiceImpl implements AttendanceService {
 	public AttendanceDTO createAttendance(AttendanceDTO attendanceDTO) {
 		Attendance attendance = this.convertToEntity(attendanceDTO);
 
+		Optional<Student> student = studentReposotory.findById(attendanceDTO.getStudentId());
+//		For production
+//		String[] listMail = { student.get().getUser().getEmail() };
+
+//		For testing
+		String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+
 		attendance.setAttendanceDate(new Date());
 		Attendance newAttendance = attendanceReposotory.save(attendance);
+
+//		Send Mail
+		Integer absentCount = attendanceReposotory.countAttendanceByClassAndStudent(attendanceDTO.getStudentId(),
+				attendanceDTO.getClassId());
+
+		String isPass = absentCount > 7 ? "Bạn đã rớt môn học" : "";
+
+		mailer.queueAttendance(listMail, "", "", absentCount, 7, isPass, newAttendance.getAttendanceDate());
 
 		return this.convertToResponseDTO(newAttendance);
 	}

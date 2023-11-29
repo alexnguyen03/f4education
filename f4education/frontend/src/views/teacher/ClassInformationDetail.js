@@ -4,6 +4,7 @@ import {
     Box,
     Button,
     Card,
+    Center,
     Flex,
     Grid,
     Group,
@@ -14,16 +15,21 @@ import {
     Skeleton,
     Stack,
     Text,
-    Title
+    Title,
+    useMantineTheme
 } from '@mantine/core'
 import { MaterialReactTable } from 'material-react-table'
+import { Dropzone } from '@mantine/dropzone'
+import { IconUpload, IconPhoto, IconX, IconEye } from '@tabler/icons-react'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { createSearchParams, useNavigate, useParams } from 'react-router-dom'
 
 // API
 import classApi from '../../api/classApi'
+import resourceApi from 'api/resourceApi'
 import attendanceApi from '../../api/attendanceApi'
+import scheduleApi from '../../api/scheduleApi'
 
 // scss
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
@@ -55,6 +61,7 @@ const ClassInformationDetail = () => {
 
     // ************* Action variable
     const [loading, setLoading] = useState(false)
+    const [classStudyToday, setClassStudyToday] = useState(false)
 
     const [examOpened, handlers] = useDisclosure(false, {
         onOpen: () => console.log('Opened'),
@@ -62,12 +69,48 @@ const ClassInformationDetail = () => {
     })
 
     const [activedExam, setActivedExam] = useState(false)
+    const [seletedStudent, setSletedStudent] = useState({
+        studentId: '',
+        fullname: '',
+        image: ''
+    })
+
+    const [opened, { open, close }] = useDisclosure(false)
+
+    const [openConfirm, setOpenConfirm] = useState(false)
+
+    const openModal = () => {
+        setOpenConfirm(true)
+    }
+
+    const closeModal = () => {
+        setOpenConfirm(false)
+    }
+
+    const theme = useMantineTheme()
+    const [selectedFile, setSelectedFile] = useState([null])
 
     // ************* fetch Area
     const fetchClass = async () => {    
         try {
             const resp = await classApi.getByClassId(data.classId)
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:95 ~ fetchClass ~ resp:',
+                resp
+            )
 
+            const newData = resp.data.students.map((data) => {
+                return {
+                    ...data,
+                    isPresent: true
+                }
+            })
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:106 ~ newData ~ newData:',
+                newData
+            )
+
+            setStudents(newData)
             if (resp.status === 200 && resp.data != null) {
                 setClassInfor(resp.data)
             } else {
@@ -81,18 +124,40 @@ const ClassInformationDetail = () => {
     const fetchClassByTeacher = async () => {
         try {
             const resp = await classApi.getAllClassByTeacherId(teacherId)
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:109 ~ fetchClassByTeacher ~ resp:',
+                resp
+            )
             if (resp.status === 200 && resp.data.length > 0) {
                 const studentRespData = resp.data[0].students
 
-                const newData = studentRespData.map((data) => {
-                    return {
-                        ...data,
-                        isPresent: true
-                    }
-                })
+                // const newData = studentRespData.map((data) => {
+                //     return {
+                //         ...data,
+                //         isPresent: true
+                //     }
+                // })
 
-                setStudents(newData)
+                // setStudents(newData)
                 setCourseName(resp.data[0].courseName[0])
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const checkIfClassStudyToDay = async () => {
+        const today = moment(new Date()).format('DD-MM-yyyy')
+        try {
+            const resp = await scheduleApi.findAllScheduleByClassAndStudyDate(
+                data.classId,
+                today
+            )
+
+            console.log(resp.data)
+
+            if (resp.status === 200 && resp.data.length > 0) {
+                setClassStudyToday(true)
             }
         } catch (error) {
             console.log(error)
@@ -268,6 +333,37 @@ const ClassInformationDetail = () => {
         []
     )
 
+    const handleShowTask = (classId) => {
+        navigate({
+            pathname: '/teacher/download-task-student',
+            search: `?${createSearchParams({
+                classId: classId
+            })}`
+        })
+    }
+
+    const uploadResource = async (courseName) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        const formData = new FormData()
+        formData.append('courseName', courseName)
+        formData.append('type', 'TÀI NGUYÊN')
+        for (var i = 0; i < selectedFile.length; i++) {
+            formData.append('file', selectedFile[i])
+        }
+        console.log([...formData])
+        try {
+            const resp = await resourceApi.uploadResource(formData)
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.uploadFileSuccess())
+                closeModal()
+                close(true)
+            }
+        } catch (error) {
+            console.log('Upload thất bại', error)
+        }
+    }
+
     // Use Effect Area
     useEffect(() => {
         const fetchData = async () => {
@@ -275,7 +371,8 @@ const ClassInformationDetail = () => {
             await Promise.all([
                 fetchClass(),
                 fetchClassByTeacher(),
-                checkActivedExam()
+                checkActivedExam(),
+                checkIfClassStudyToDay()
             ])
             setLoading(false)
         }
@@ -465,6 +562,26 @@ const ClassInformationDetail = () => {
                                 <Button color="cyan" size="md" mb="md">
                                     Giao bài tập
                                 </Button>
+                                <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        handleShowTask(classInfor.classId)
+                                    }}
+                                >
+                                    Download bài tập
+                                </Button>
+                                <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        open()
+                                    }}
+                                >
+                                    Upload tài nguyên
+                                </Button>
                             </Stack>
                         </Card>
                     )}
@@ -486,16 +603,34 @@ const ClassInformationDetail = () => {
                             <>
                                 <Flex justify="space-between" align="center">
                                     <Group position="left">
-                                        <Button
-                                            color="violet"
-                                            size="md"
-                                            mb="lg"
-                                            onClick={() =>
-                                                handleSaveAttendance()
-                                            }
-                                        >
-                                            Lưu điểm danh
-                                        </Button>
+                                        {classStudyToday ? (
+                                            <>
+                                                <Button
+                                                    color="violet"
+                                                    size="md"
+                                                    mb="lg"
+                                                    onClick={() =>
+                                                        handleSaveAttendance()
+                                                    }
+                                                >
+                                                    Lưu điểm danh
+                                                </Button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    color="violet"
+                                                    size="md"
+                                                    mb="lg"
+                                                    onClick={() =>
+                                                        handleSaveAttendance()
+                                                    }
+                                                    disabled
+                                                >
+                                                    Lưu điểm danh
+                                                </Button>
+                                            </>
+                                        )}
                                     </Group>
 
                                     <Text color="dark" fz="lg" fw={500}>
@@ -559,6 +694,114 @@ const ClassInformationDetail = () => {
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
+            <Modal size="70%" opened={opened} onClose={close} centered>
+                <Center>
+                    <Title order={2} mb={30}>
+                        Upload tài nguyên
+                    </Title>
+                </Center>
+                <Dropzone
+                    onDrop={(files) => {
+                        const selectedFiles = Array.from(files)
+                        setSelectedFile(selectedFiles)
+                    }}
+                    maxSize={3 * 1024 ** 2}
+                    name="excelFile"
+                >
+                    <Group
+                        position="center"
+                        spacing="xl"
+                        style={{
+                            minHeight: rem(220),
+                            pointerEvents: 'none'
+                        }}
+                    >
+                        <Dropzone.Accept>
+                            <IconUpload
+                                size="3.2rem"
+                                stroke={1.5}
+                                color={
+                                    theme.colors[theme.primaryColor][
+                                        theme.colorScheme === 'dark' ? 4 : 6
+                                    ]
+                                }
+                            />
+                        </Dropzone.Accept>
+                        <Dropzone.Reject>
+                            <IconX
+                                size="3.2rem"
+                                stroke={1.5}
+                                color={
+                                    theme.colors.red[
+                                        theme.colorScheme === 'dark' ? 4 : 6
+                                    ]
+                                }
+                            />
+                        </Dropzone.Reject>
+                        <Dropzone.Idle>
+                            <IconPhoto size="3.2rem" stroke={1.5} />
+                        </Dropzone.Idle>
+
+                        <div>
+                            <Text size="xl" inline>
+                                Thả files excel vào đây hoặc click vào để chọn
+                                files
+                            </Text>
+                            <Text size="sm" color="dimmed" inline mt={7}>
+                                Thả mỗi lần một file, lưu ý dung lượng file phải
+                                dưới 5MB
+                            </Text>
+                        </div>
+                    </Group>
+                </Dropzone>
+                <Flex
+                    mt={30}
+                    mih={50}
+                    gap="md"
+                    justify="flex-end"
+                    align="center"
+                    direction="row"
+                    wrap="wrap"
+                >
+                    <Button
+                        color="default"
+                        outline
+                        data-dismiss="modal"
+                        type="button"
+                        onClick={() => {
+                            close(true)
+                        }}
+                    >
+                        Trở lại
+                    </Button>
+                    <Button color={'teal'} type="button" onClick={openModal}>
+                        Upload
+                    </Button>
+                </Flex>
+            </Modal>
+            <Modal opened={openConfirm} onClose={closeModal} title="Thông báo">
+                <Text size="lg">Bạn có chắc chắn muốn Upload ???</Text>
+                <Button
+                    onClick={() => {
+                        uploadResource(courseName)
+                        closeModal()
+                    }}
+                    className="float-right"
+                    mt={30}
+                >
+                    Upload
+                </Button>
+                <Button
+                    onClick={closeModal}
+                    color="red"
+                    mr={10}
+                    mb={20}
+                    mt={30}
+                    className="float-right"
+                >
+                    Hủy
+                </Button>
+            </Modal>
         </>
     )
 }

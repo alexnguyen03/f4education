@@ -1,12 +1,17 @@
 package com.f4education.springjwt.controllers;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,7 +44,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 @RestController
 @RequestMapping("/api/resource")
 public class ResourceController {
-
 	@Autowired
 	ResourceService resourceService;
 
@@ -122,6 +126,28 @@ public class ResourceController {
 			return new ResponseEntity<>(zipFile, headers, HttpStatus.OK);
 		} catch (Exception e) {
 			return new ResponseEntity<>("Failed to download files", HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@GetMapping("/download-multiple-student/{className}/{taskName}")
+	public ResponseEntity<?> downloadMultipleFilesStudent(@PathVariable String className, @PathVariable String taskName)
+			throws Exception {
+		ResponseEntity<FileSystemResource> response = googleDriveRepository.downloadTaskFolder(className, taskName);
+		return ResponseEntity.ok(response.getBody());
+	}
+
+	@GetMapping("/delete-foldel-tmp")
+	public void deleteFoldelTmp() throws Exception {
+		googleDriveRepository.deleteFoldelTmp();
+	}
+
+	@PostMapping(value = "/upload", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = {
+			MediaType.APPLICATION_JSON_VALUE })
+	public void uploadResource(@RequestParam("file") MultipartFile[] file,
+			@RequestParam("courseName") String courseName, @RequestParam("type") String type) {
+
+		for (MultipartFile files : file) {
+			resourceService.uploadFile(files, courseName, type);
 		}
 	}
 }

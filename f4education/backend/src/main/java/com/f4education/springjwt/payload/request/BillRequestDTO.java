@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillRequestDTO {
-    private Double totalPrice;
+    private Float totalPrice;
 
     private Integer checkoutMethodId;
 
