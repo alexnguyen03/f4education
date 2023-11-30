@@ -26,6 +26,13 @@ const courseDetailApi = {
         return axiosClient.post(url, file, {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
+    },
+    downloadExcel: () => {
+        const url = `/courses-detail/download-excel`
+        return axiosClient.get(url, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            responseType: 'arraybuffer'
+        })
     }
 }
 

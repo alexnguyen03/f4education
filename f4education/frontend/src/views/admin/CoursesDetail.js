@@ -22,18 +22,22 @@ import { Link, useParams } from 'react-router-dom'
 import { Group, rem, Text, useMantineTheme } from '@mantine/core'
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import {
+    IconBookDownload,
     IconBookUpload,
     IconPhoto,
     IconUpload,
     IconX
 } from '@tabler/icons-react'
 import CoursesHeader from 'components/Headers/CoursesHeader'
-import { useState } from 'react'
+
+import { useEffect, useMemo, useState } from 'react'
+import moment from 'moment/moment'
 
 // API
-import moment from 'moment/moment'
-import { useEffect, useMemo } from 'react'
 import courseDetailApi from '../../api/courseDetailApi'
+import courseApi from '../../api/courseApi'
+
+// Utils
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
@@ -45,6 +49,7 @@ const CoursesDetail = () => {
     // MAIN VARIABLE
     const [selectedFile, setSelectedFile] = useState(null)
     const [courseDetail, setCourseDetail] = useState([])
+    const [currentCourse, setCurrentCourse] = useState({})
 
     // ACTION VARIABLE
     const [showModal, setShowModal] = useState(false)
@@ -71,6 +76,22 @@ const CoursesDetail = () => {
 
             if (resp.status === 200) {
                 setCourseDetail(resp.data)
+                setShowModal(false)
+                setLoading(false)
+                console.log('Fetch successfully')
+            }
+        } catch (error) {
+            console.error('Failed to upload file.', error)
+        }
+    }
+
+    const fetchCurrentCourse = async () => {
+        setLoading(true)
+        try {
+            const resp = await courseApi.getCourseByCourseId(params.courseId)
+
+            if (resp.status === 200) {
+                setCurrentCourse(resp.data)
                 setShowModal(false)
                 setLoading(false)
                 console.log('Fetch successfully')
@@ -256,6 +277,31 @@ const CoursesDetail = () => {
         []
     )
 
+    // Dowload excel file
+    const handleDownloadExcel = async () => {
+        try {
+            const response = await courseDetailApi.downloadExcel()
+
+            // Convert the response data to a Blob
+            const blob = new Blob([response.data], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            })
+
+            console.log(blob)
+
+            // Create a download link and trigger the download
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'example.xlsx'
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+        } catch (error) {
+            console.error('Error downloading Excel file:', error)
+        }
+    }
+
     // ADD NEW COURSEDETAIL
     // *************** CREATE NEW QUESTION - ANSWER - START
     const [createCourseDetail, setCreateCourseDetail] = useState([
@@ -343,7 +389,7 @@ const CoursesDetail = () => {
                                     className="form-control-label"
                                     htmlFor="id"
                                 >
-                                    Tiêu đề bài học
+                                    Nội dung bài học
                                 </label>
                                 <Input
                                     className="form-control-alternative"
@@ -370,6 +416,7 @@ const CoursesDetail = () => {
     // USE EFECT AREA
     useEffect(() => {
         fetchCourseDetail()
+        fetchCurrentCourse()
     }, [])
 
     return (
@@ -388,9 +435,10 @@ const CoursesDetail = () => {
                             to="/admin/courses"
                             className="text-muted text-underline mb-3"
                         >
-                            khóa học / chi tiết khóa học
+                            khóa học / chi tiết khóa học 
                         </Link>
-                        <h3 className="mb-0">BẢNG CHI TIẾT KHÓA HỌC</h3>
+                        <h3 className="mb-0 text-uppercase">BẢNG CHI TIẾT KHÓA HỌC -{' '}
+                            {currentCourse.courseName}</h3>
                     </CardHeader>
 
                     <CardBody>
@@ -436,7 +484,6 @@ const CoursesDetail = () => {
                                     </Button>
                                     <Button
                                         color="primary"
-                                        outline
                                         variant="contained"
                                         onClick={() => {
                                             setShowModal(true)
@@ -444,6 +491,16 @@ const CoursesDetail = () => {
                                         }}
                                     >
                                         <IconBookUpload /> Upload excel
+                                    </Button>
+                                    <Button
+                                        color="primary"
+                                        outline
+                                        variant="contained"
+                                        onClick={() => {
+                                            handleDownloadExcel()
+                                        }}
+                                    >
+                                        <IconBookDownload /> Tải về file excel mẫu
                                     </Button>
                                 </Box>
                             )}

@@ -74,7 +74,7 @@ public class Course implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "course")
-	List<BillDetail> billDetail;
+	List<Bill> bill;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "course")

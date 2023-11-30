@@ -64,6 +64,7 @@ const Questions = () => {
             if (resp.status === 200 && resp.data.length > 0) {
                 setQuestions(resp.data)
                 setQuestionLoading(false)
+                console.log(resp.data)
             }
             console.log('restarted application')
         } catch (error) {
@@ -95,27 +96,31 @@ const Questions = () => {
 
     // + API_AREA > CRUD
     const handleStoreQuestions = async () => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
         if (validateForm()) {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
             try {
                 setQuestionLoading(true)
                 const resp = await questionApi.createQuestion(question)
                 if (resp.status === 200 && resp.data.length > 0) {
                     toast.update(id, Notify.options.createSuccess())
-                } else {
-                    toast.update(id, Notify.options.createError())
                 }
+            } catch (error) {
+                toast.update(id, Notify.options.createError())
+                console.log(error)
+            } finally {
                 setQuestionLoading(false)
-
                 setShowModal(false)
                 fetchQuestions()
-            } catch (error) {
-                console.log(error)
+                handleClearForm()
             }
         } else {
             console.log('error in validate')
         }
+    }
+
+    const handleClearForm = () => {
+        setSelectedCourseId(null)
+        setSelectedSubjectId(null)
     }
 
     // *************** Validation area
@@ -125,7 +130,6 @@ const Questions = () => {
                 ...preErr,
                 subjectNameError: 'Vui lòng chọn môn học'
             }))
-            return false
         } else {
             setMsgForm((preErr) => ({ ...preErr, subjectNameError: '' }))
         }
@@ -135,7 +139,6 @@ const Questions = () => {
                 ...preErr,
                 courseNameErr: 'Vui lòng chọn khóa học'
             }))
-            return false
         } else {
             setMsgForm((preErr) => ({ ...preErr, courseNameErr: '' }))
         }
@@ -148,9 +151,7 @@ const Questions = () => {
 
     // *************** React Data table area
     function renderCellWithLink(row) {
-        // console.log(row);
         const questionId = row.questionId
-        // const id = row.questionId
         return (
             <span>
                 <Link to={`/admin/question-detail/${questionId}`}>
@@ -208,16 +209,24 @@ const Questions = () => {
         question.subjectId = value
     }
 
-    const filteredCourse = courses.filter((item) => {
-        const subjectId = item.subject.subjectId
+    const filteredCourse = courses
+        .filter((item) => {
+            const subjectId = item.subject.subjectId
 
-        if (selectedSubjectId === null) {
-            return false
-        }
-        const selectedSubjectIdValue = parseInt(selectedSubjectId) || null
+            if (selectedSubjectId === null) {
+                return false
+            }
+            const selectedSubjectIdValue = parseInt(selectedSubjectId) || null
 
-        return subjectId.toString().includes(selectedSubjectIdValue.toString())
-    })
+            return subjectId
+                .toString()
+                .includes(selectedSubjectIdValue.toString())
+        })
+        .filter((course) => {
+            return !questions.some(
+                (question) => question.courseName === course.courseName
+            )
+        })
 
     const courseSelectValues = filteredCourse.map((item) => ({
         value: item.courseId,
@@ -334,11 +343,17 @@ const Questions = () => {
                             className="close"
                             data-dismiss="modal"
                             type="button"
-                            onClick={() => setShowModal(false)}
+                            onClick={() => {
+                                setShowModal(false)
+                                handleClearForm()
+                            }}
                         >
                             <span
                                 aria-hidden={true}
-                                onClick={() => setIsUpdate(false)}
+                                onClick={() => {
+                                    setIsUpdate(false)
+                                    handleClearForm()
+                                }}
                             >
                                 ×
                             </span>
@@ -412,6 +427,7 @@ const Questions = () => {
                             onClick={() => {
                                 setShowModal(false)
                                 setIsUpdate(false)
+                                handleClearForm()
                             }}
                         >
                             Trở lại

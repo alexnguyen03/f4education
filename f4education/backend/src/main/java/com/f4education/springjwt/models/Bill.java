@@ -23,45 +23,42 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "Bill")
 public class Bill {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "bill_id")
-    private Integer billId;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "bill_id")
+	private Integer billId;
 
-    @Column(name = "create_date")
-    private Date createDate;
+	@Column(name = "create_date")
+	private Date createDate;
 
-    @Column(name = "total_price")
-    private Float totalPrice;
+	@Column(name = "total_price")
+	private Float totalPrice;
 
-    @Column(name = "status")
-    private String status;
+	@Column(name = "status")
+	private String status;
 
-    @Column(name = "note")
-    private String note;
+	@Column(name = "note")
+	private String note;
 
-    @OneToMany(mappedBy = "bill")
-    @JsonIgnore
-    List<BillDetail> detailBills;
+	@ManyToOne
+	@JoinColumn(name = "course_id")
+	@JsonIgnore
+	Course course;
 
-	// @ManyToOne
-	// @JoinColumn(name = "admin_id")
-	// Admin admin;
+	@ManyToOne
+	@JoinColumn(name = "student_id")
+	@JsonIgnore
+	Student student;
 
-    @ManyToOne
-    @JoinColumn(name = "student_id")
-    @JsonIgnore
-    Student student;
+	@ManyToOne
+	@JoinColumn(name = "payment_method_id")
+	@JsonIgnore
+	PaymentMethod paymentMethod;
 
-    @ManyToOne
-    @JoinColumn(name = "payment_method_id")
-    @JsonIgnore
-    PaymentMethod paymentMethod;
-
-    @Override
-    public String toString() {
-        return "Bill [billId=" + billId + ", createDate=" + createDate + ", totalPrice=" + totalPrice + ", status="
-                + status + ", note=" + note + "]";
-    }
+	@Override
+	public String toString() {
+		return "Bill [billId=" + billId + ", createDate=" + createDate + ", totalPrice=" + totalPrice + ", status="
+				+ status + ", note=" + note + "]";
+	}
 
 }

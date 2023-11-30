@@ -30,7 +30,8 @@ public class BillInformationServiceImp implements BillInformationService {
 
 	@Override
 	public List<BillInformation> getAllByBillInformation(String studentId) {
-		List<BillInformation> billInformation = billRepository.getAllByBillInformation(studentId);
-		return billInformation;
+//		List<BillInformation> billInformation = billRepository.getAllByBillInformation(studentId);
+//		return billInformation;
+		return null;
 	}
 }

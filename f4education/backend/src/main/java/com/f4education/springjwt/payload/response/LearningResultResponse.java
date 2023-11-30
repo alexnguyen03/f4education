@@ -19,4 +19,5 @@ public class LearningResultResponse {
 	private String teacherName;
 	private Integer maximumQuantity;
 	private Integer courseDuration;
+	private String courseName;
 }

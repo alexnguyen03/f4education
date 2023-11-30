@@ -27,4 +27,8 @@ public class EvaluateResponse {
 	private Date reviewDate;
 
 	private RegisterCourse registerCourse;
+	
+	private String courseName;
+	
+	private Integer courseId;
 }

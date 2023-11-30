@@ -6,6 +6,7 @@ import {
     Button,
     Card,
     Container,
+    Divider,
     Flex,
     getStylesRef,
     Grid,
@@ -492,48 +493,62 @@ const Home = () => {
     // evaluate
     const evaluateSlides = listEvaluate.map((evaluate, index) => (
         <Carousel.Slide key={index}>
-            <Card shadow="xl" h={185}>
-                <Stack>
-                    <Group>
-                        <Avatar
-                            src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
-                            alt={evaluate.studentName}
-                            radius="xl"
-                        />
-                        <Stack spacing="xs">
+            <Link to={`/course/${evaluate.courseId}`}>
+                <Card withBorder shadow="xl" h={250}>
+                    <Stack>
+                        <Group position="left">
                             <Text
-                                size="xs"
-                                m={0}
-                                p={0}
-                                c="dimmed"
-                                lineClamp={1}
-                            >
-                                Đã đánh giá {formatTimeAgo(evaluate.reviewDate)}
-                            </Text>
-                            <Text
-                                size="md"
                                 color="dark"
+                                lineClamp={2}
+                                size="md"
                                 fw={500}
-                                m={0}
-                                p={0}
-                                lineClamp={1}
                             >
-                                {evaluate.studentName}
+                                <span className="text-primary">Khóa học:</span>{' '}
+                                {evaluate.courseName}
                             </Text>
-                            <Group m={0} p={0}>
-                                <Rating
-                                    fractions={2}
-                                    value={evaluate.rating}
-                                    readOnly
-                                />
-                            </Group>
-                        </Stack>
-                    </Group>
-                    <Text size="md" color="dark" lineClamp={2} mah={80}>
-                        {evaluate.content}
-                    </Text>
-                </Stack>
-            </Card>
+                        </Group>
+                        <Group>
+                            <Avatar
+                                src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
+                                alt={evaluate.studentName}
+                                radius="xl"
+                            />
+                            <Stack spacing="xs">
+                                <Text
+                                    size="xs"
+                                    m={0}
+                                    p={0}
+                                    c="dimmed"
+                                    lineClamp={1}
+                                >
+                                    Đã đánh giá{' '}
+                                    {formatTimeAgo(evaluate.reviewDate)}
+                                </Text>
+                                <Text
+                                    size="md"
+                                    color="dark"
+                                    fw={500}
+                                    m={0}
+                                    p={0}
+                                    lineClamp={1}
+                                >
+                                    {evaluate.studentName}
+                                </Text>
+                                <Group m={0} p={0}>
+                                    <Rating
+                                        fractions={2}
+                                        value={evaluate.rating}
+                                        readOnly
+                                    />
+                                </Group>
+                            </Stack>
+                        </Group>
+                        <Text size="md" color="dark" lineClamp={2} mah={80}>
+                            {evaluate.content}
+                        </Text>
+                    </Stack>
+                </Card>
+            </Link>
         </Carousel.Slide>
     ))
 
@@ -544,23 +559,23 @@ const Home = () => {
                 <Card.Section>
                     <Flex direction="column" wrap="wrap">
                         <Button
-                            variant="outline"
-                            color="dark"
+                            variant="filled"
+                            color="violet"
                             radius="xs"
                             size="md"
                             mb="lg"
                             w={170}
                         >
-                            <Text color="dark">{learn.title}</Text>
+                            <Text color="#fff">{learn.title}</Text>
                         </Button>
                         <Button
-                            variant="outline"
-                            color="dark"
+                            variant="gradient"
+                            color="violet"
                             radius="xs"
                             size="md"
                             w={170}
                         >
-                            <Text color="dark">{learn.titleSecond}</Text>
+                            <Text color="#fff">{learn.titleSecond}</Text>
                         </Button>
                     </Flex>
                 </Card.Section>
@@ -884,7 +899,7 @@ const Home = () => {
                 </Box>
 
                 {/* Topic recomment*/}
-                <Box my={rem('2.5rem')}>
+                <Box my={rem('5rem')}>
                     <Title order={1} mt="lg" fw={700} color="dark" mb="lg">
                         Những chủ đề gợi ý cho bạn
                     </Title>

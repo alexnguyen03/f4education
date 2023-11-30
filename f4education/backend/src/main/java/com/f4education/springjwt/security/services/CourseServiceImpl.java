@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.interfaces.CoursesService;
-import com.f4education.springjwt.models.BillDetail;
+import com.f4education.springjwt.models.Bill;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.CourseHistory;
 import com.f4education.springjwt.models.Evaluate;
@@ -24,6 +24,7 @@ import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.request.ThoiLuongRange;
 import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.repository.AdminRepository;
+import com.f4education.springjwt.repository.BillRepository;
 import com.f4education.springjwt.repository.CourseHistoryRepository;
 import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.GoogleDriveRepository;
@@ -43,11 +44,15 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Autowired
 	CourseHistoryRepository courseHistoryRepository;
+
 	@Autowired
 	GoogleDriveRepository googleDriveRepository;
 
 	@Autowired
 	RegisterCourseRepository registerCourseRepository;
+
+	@Autowired
+	BillRepository billRepository;
 
 	@Override
 	public List<CourseDTO> findAllCourseDTO() {
@@ -111,7 +116,7 @@ public class CourseServiceImpl implements CoursesService {
 			if (objArray.length >= 1) {
 				Course courseData = new Course();
 				courseData.setAdmin(null);
-				courseData.setBillDetail(null);
+//				courseData.setBillDetail(null);
 				courseData.setCourseHistories(null);
 				courseData.setQuestions(null);
 				courseData.setResources(null);
@@ -120,15 +125,9 @@ public class CourseServiceImpl implements CoursesService {
 				Integer courseId = (Integer) objArray[0];
 				courseData.setCourseId(courseId);
 
-//				Get BillDetailID
-				Course billDetailCourse = courseRepository.findById(courseId).get();
-				List<BillDetail> listBillDetail = billDetailCourse.getBillDetail();
-
-				for (BillDetail bd : listBillDetail) {
-					if (bd.getCourse().getCourseId().equals(courseId)) {
-						listCreateDate.add(bd.getBill().getCreateDate());
-					}
-				}
+//				Get createDate
+				Bill bill = billRepository.findById((Integer) objArray[10]).get();
+				listCreateDate.add(bill.getCreateDate());
 
 				courseData.setCourseName((String) objArray[1]);
 				Object value = objArray[2];
@@ -170,7 +169,7 @@ public class CourseServiceImpl implements CoursesService {
 				courseData.setStatus((Boolean) objArray[8].toString().equals("1") ? true : false);
 
 //				Total sales
-				totalListRenueve.add((Double) objArray[10]);
+				totalListRenueve.add((Double) objArray[12]);
 
 				courses.add(courseData);
 			}

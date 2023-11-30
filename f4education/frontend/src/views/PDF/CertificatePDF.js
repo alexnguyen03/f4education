@@ -322,7 +322,7 @@ const CertificatePDF = () => {
                                 width: 100,
                                 height: 100,
                                 position: 'absolute',
-                                bottom: 38,
+                                bottom: 35,
                                 right: 240
                             }}
                             src={qrCodeImage}

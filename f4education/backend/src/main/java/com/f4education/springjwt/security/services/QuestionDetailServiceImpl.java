@@ -66,9 +66,8 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 
 	@Override
 	public List<QuestionDetailDTO> getAllQuestionDetailByQuestionId(Integer questionId) {
-//		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
-//		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
-		return null;
+		List<QuestionDetail> questionDetail = questionDetailReposotory.findAllQuestionDetailByQuestionId(questionId);
+		return questionDetail.stream().map(this::convertToQuestionDetailResponse).collect(Collectors.toList());
 	}
 
 	@Override
