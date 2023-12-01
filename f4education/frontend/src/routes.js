@@ -48,6 +48,7 @@ import PaymentHistory from 'views/client/student/PaymentHistory'
 import ClassResult from 'views/teacher/ClassResult'
 import TeacherSchedule from 'views/teacher/TeacherSchedule'
 import TaskTeacher from 'views/teacher/TaskTeacher'
+import Attendance from 'views/client/student/Attendance.js'
 
 export var routes = [
     {
@@ -358,6 +359,13 @@ export const routesStudent = [
         name: 'Lịch sử thanh toán',
         icon: 'ni ni-planet text-primary',
         component: <PaymentHistory />,
+        layout: '/student'
+    },
+    {
+        path: '/attendance-review',
+        name: 'Điểm danh',
+        icon: 'ni ni-planet text-primary',
+        component: <Attendance />,
         layout: '/student'
     }
 ]

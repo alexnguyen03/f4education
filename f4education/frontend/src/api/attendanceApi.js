@@ -9,6 +9,14 @@ const attendanceApi = {
         const url = `/attendance/${attendanceId}`
         return axiosClient.get(url)
     },
+    getAttendanceByStudentId: (student) => {
+        const url = `/attendance/student/${student}`
+        return axiosClient.get(url)
+    },
+    getAttendanceByStudentAndClass: (studentId, classId) => {
+        const url = `/attendance/student-review?studentId=${studentId}&classId=${classId}`
+        return axiosClient.get(url)
+    },
     createAttendance: (body) => {
         const url = '/attendance'
         return axiosClient.post(url, body)

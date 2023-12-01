@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.interfaces.AttendanceService;
 import com.f4education.springjwt.models.Attendance;
 import com.f4education.springjwt.payload.request.AttendanceDTO;
+import com.f4education.springjwt.payload.response.AttendanceStudentReviewResponse;
 import com.f4education.springjwt.repository.AttendanceReposotory;
 
 @CrossOrigin("*")
@@ -50,15 +52,22 @@ public class AttendanceController {
 		List<AttendanceDTO> attendances = attendanceService.getAttendanceByStudentId(studentId);
 		return ResponseEntity.ok(attendances);
 	}
- 
+
+	@GetMapping("/student-review")
+	public ResponseEntity<?> getAttendanceForStudentReview(@RequestParam("studentId") String studentId,
+			@RequestParam("classId") Integer classId) {
+		List<AttendanceStudentReviewResponse> attendances = attendanceService.getAttendanceForStudentReview(studentId,
+				classId);
+		return ResponseEntity.ok(attendances);
+	}
+
 	@PostMapping
 	public ResponseEntity<?> createAttendance(@RequestBody List<AttendanceDTO> attendanceDTOList) {
 		List<AttendanceDTO> createdAttendance = new ArrayList<>();
-		
+
 		for (AttendanceDTO attendenceDTO : attendanceDTOList) {
 			createdAttendance.add(attendanceService.createAttendance(attendenceDTO));
 		}
-
 
 		return ResponseEntity.ok(createdAttendance);
 	}
