@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Teacher;
 
 import com.f4education.springjwt.payload.request.AccountDTO;
+import com.f4education.springjwt.payload.request.OTP;
 import com.f4education.springjwt.payload.response.MessageResponse;
 import com.f4education.springjwt.security.services.MailerServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
@@ -53,6 +55,28 @@ public class AccountController {
 
     @Autowired
     MailerServiceImpl mailer;
+
+    private List<OTP> list = new ArrayList<OTP>();
+
+    private static int randomOTP() {
+        Random random = new Random();
+        return random.nextInt(9000) + 1000;
+    }
+
+    private OTP checkOTP(OTP otp) {
+        for (int i = 0; i < list.size(); i++) {
+            OTP otp2 = list.get(i);
+            long timeDifference = Math.abs((otp.getDate().getTime() - otp2.getDate().getTime()) / 1000);
+            if (timeDifference > 60) {
+                list.remove(i);
+            } else {
+                if (otp2.getEmail().equals(otp.getEmail())) {
+                    return otp2;
+                }
+            }
+        }
+        return null;
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -106,6 +130,21 @@ public class AccountController {
         String mail = accountDTO.getEmail().toString();
         mailer.queue(mail, "", "", null);
         return ResponseEntity.ok().body(new MessageResponse("2"));
+    }
+
+    @PostMapping(value = "/checkEmailForPassWord")
+    public ResponseEntity<?> checkMailForPassWord(@RequestBody AccountDTO accountDTO) {
+        // Boolean checkEmailExit =
+        // accountService.existsByEmail(accountDTO.getEmail().trim());
+        // if (checkEmailExit) {
+        // return ResponseEntity
+        // .badRequest()
+        // .body(new MessageResponse("1"));
+        // }
+        // String mail = accountDTO.getEmail().toString();
+        // mailer.queue(mail, "", "", null);
+        // return ResponseEntity.ok().body(new MessageResponse("2"));
+        return null;
     }
 
     // ! Chuyển đổi json sang DTO và set img vào DTO nếu có file có tồn tại

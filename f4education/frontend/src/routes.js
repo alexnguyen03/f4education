@@ -16,6 +16,7 @@ import CourseClient from '../../../f4education/frontend/src/views/client/visitor
 import TeacherResources from 'views/teacher/TeacherResources'
 import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
 import CheckMail from 'views/client/visitor/CheckMail'
+import ForgotPassword from 'views/client/visitor/ForgotPassword'
 import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
 import Login from './views/examples/Login'
@@ -227,6 +228,13 @@ export var routesClient = [
         name: 'Thông tin email',
         icon: 'ni ni-planet text-blue',
         component: <CheckMail />,
+        layout: '/client'
+    },
+    {
+        path: '/forgot-password',
+        name: 'Thông tin email',
+        icon: 'ni ni-planet text-blue',
+        component: <ForgotPassword />,
         layout: '/client'
     },
     {
