@@ -160,7 +160,7 @@ const Index = () => {
             {/* Page content */}
             <Container className="mt--7" fluid>
                 <Row>
-                    <Col className="mb-5 mb-xl-0" xl="8">
+                    <Col className="mb-5 mb-xl-0">
                         {loading ? (
                             <LoadingOverlay
                                 visible={visible}
@@ -169,16 +169,16 @@ const Index = () => {
                                 overlayColor="#191c4d"
                             />
                         ) : (
-                            <Card className="bg-gradient-default shadow">
-                                <CardHeader className="bg-transparent">
+                            <Card className="shadow">
+                                <CardHeader>
                                     <Row className="align-items-center">
                                         <div className="col">
-                                            <h6 className="text-uppercase text-light ls-1 mb-1">
+                                            <h4 className="text-uppercase text-dark ls-1 mb-1">
                                                 Tổng quan
-                                            </h6>
-                                            <h2 className="text-white mb-0">
+                                            </h4>
+                                            <h1 className="text-dark mb-0">
                                                 Top 10 khóa học theo doanh thu
-                                            </h2>
+                                            </h1>
                                         </div>
                                         <div className="col">
                                             <Nav
@@ -200,7 +200,7 @@ const Index = () => {
                                                             toggleNavs(e, 1)
                                                         }
                                                     >
-                                                        <span className="d-none d-md-block">
+                                                        <span className="d-none d-md-block fw-500">
                                                             Theo tháng hiện tại
                                                         </span>
                                                         <span className="d-md-none">
@@ -224,7 +224,7 @@ const Index = () => {
                                                             toggleNavs(e, 2)
                                                         }
                                                     >
-                                                        <span className="d-none d-md-block">
+                                                        <span className="d-none d-md-block fw-500">
                                                             Theo tuần hiện tại
                                                         </span>
                                                         <span className="d-md-none">
@@ -238,7 +238,7 @@ const Index = () => {
                                     <div className="row mt-3">
                                         <div className="col">
                                             <div className="d-flex justify-content-end align-items-center">
-                                                <h5 className="text-uppercase text-light mr-4 mt-2 ls-1 mb-2">
+                                                <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
                                                     Bộ lọc theo ngày tháng:
                                                 </h5>
                                                 <div className="d-flex justify-content-start">
@@ -271,30 +271,10 @@ const Index = () => {
                                 </CardHeader>
                                 <CardBody>
                                     {/* Chart */}
-                                    <div className="chart">
-                                        <BarChart data={filteredRevenueData} />
-                                    </div>
+                                    <BarChart data={filteredRevenueData} />
                                 </CardBody>
                             </Card>
                         )}
-                    </Col>
-                    <Col xl="4">
-                        <Card className="shadow">
-                            <CardHeader className="bg-transparent">
-                                <Row className="align-items-center">
-                                    <div className="col">
-                                        <h6 className="text-uppercase text-muted ls-1 mb-1">
-                                            Performance
-                                        </h6>
-                                        <h2 className="mb-0">Total orders</h2>
-                                    </div>
-                                </Row>
-                            </CardHeader>
-                            <CardBody>
-                                {/* Chart */}
-                                <div className="chart"></div>
-                            </CardBody>
-                        </Card>
                     </Col>
                 </Row>
                 <Row className="mt-5">

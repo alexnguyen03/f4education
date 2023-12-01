@@ -20,9 +20,6 @@ import classAPI from '../../../api/classApi'
 import moment from 'moment/moment'
 import { IconBook } from '@tabler/icons-react'
 
-// Util
-import { formatDate } from '../../../utils/formater'
-
 const Attendance = () => {
     const user = JSON.parse(localStorage.getItem('user'))
 
@@ -143,6 +140,13 @@ const Attendance = () => {
         }
     }
 
+    const formatDate = (date) => {
+        const formattedDate = moment(date)
+            .locale('vi')
+            .format('dddd, DD/MM/yyyy')
+        return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
+    }
+
     // Materriable table
     const attendanceColumn = useMemo(
         () => [
@@ -163,7 +167,7 @@ const Attendance = () => {
                     if (row === true) {
                         return <Badge color="indigo">Thực hành</Badge>
                     } else {
-                        return <Badge color="lime">Lý thuyết</Badge>
+                        return <Badge color="violet">Lý thuyết</Badge>
                     }
                 },
                 header: 'Mô tả',
@@ -181,7 +185,7 @@ const Attendance = () => {
                                 {today.isBefore(
                                     moment(cell.row.original.studyDate)
                                 ) ? (
-                                    <Badge color="orange">Tương lai</Badge>
+                                    <Badge color="gray">Tương lai</Badge>
                                 ) : (
                                     <Badge color="indigo">Có mặt</Badge>
                                 )}

@@ -32,7 +32,7 @@ const BarChart = ({ data }) => {
                         title: {
                             display: true,
                             text: 'Thống kê doanh thu khóa học',
-                            color: '#fff'
+                            color: '#000'
                         }
                     },
                     layout: {
@@ -53,11 +53,7 @@ const BarChart = ({ data }) => {
         }
     }, [data])
 
-    return (
-        <div className="w-100 h-100">
-            <canvas id="revenueChart" className="w-100 h-100" />
-        </div>
-    )
+    return <canvas id="revenueChart" className="w-100 h-100" />
 }
 
 export default BarChart
