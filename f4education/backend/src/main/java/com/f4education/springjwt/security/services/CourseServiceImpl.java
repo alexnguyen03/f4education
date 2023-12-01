@@ -1,5 +1,6 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -363,18 +364,45 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
-		List<ReportCourseCountStudentDTO> list = courseRepository.getCoursesWithStudentCount("Đã đăng ký");
-		System.out.println(list);
+	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) {
+		// List<ReportCourseCountStudentDTO> list =
+		// courseRepository.getCoursesWithStudentCount("Đã đăng ký");
+		List<ReportCourseCountStudentDTO> list = new ArrayList<ReportCourseCountStudentDTO>();
 		List<Course> listCourse = courseRepository.findAll();
 		for (Course c : listCourse) {
-			if(!c.getRegisterCourses().isEmpty()) {
-				for (RegisterCourse r : c.getRegisterCourses()) {
-					
+			Long studentCount = 0l;
+			if (startDate == null && endDate == null) { // ! lấy hết
+				studentCount = (long) c.getRegisterCourses().size();
+			} else {
+				if (!c.getRegisterCourses().isEmpty()) {
+					for (RegisterCourse r : c.getRegisterCourses()) {// ! lọc qua những phiếu đăng ký
+						Date date = r.getRegistrationDate();
+						if (endDate == null) { // ! check từ ngày bắt đầu trở về sau
+							if (date.after(startDate)) {
+								studentCount++;
+							} else {
+								if (startDate == null) { // ! check từ ngày kết thúc trở về trước
+									if (date.before(endDate)) {
+										studentCount++;
+									}
+								} else {
+									if (check(date, startDate, endDate)) {
+										studentCount++;
+									}
+								}
+							}
+						}
+					}
 				}
 			}
+
+			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
 		}
 		return list;
+	}
+
+	private static boolean check(Date date, Date startDate, Date endDate) {
+		return !date.before(startDate) && !date.after(endDate);
 	}
 
 	@Override

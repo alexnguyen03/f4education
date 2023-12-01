@@ -25,10 +25,10 @@ public class ReportCoursesController {
 
 	@GetMapping("/course/student-count")
 	public ResponseEntity<?> getCoursesWithStudentCount() {
-		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount();
+		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount(null, null);
 		return ResponseEntity.ok(list);
 	}
-	
+
 	@GetMapping("/course/student-count-certificate")
 	public ResponseEntity<?> getCoursesWithStudentCountCertificate() {
 		List<ReportCourseCountStudentCertificateDTO> list = courseService.getCoursesWithStudentCountCertificate();

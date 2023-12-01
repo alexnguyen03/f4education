@@ -1,5 +1,6 @@
 package com.f4education.springjwt.interfaces;
 
+import java.util.Date;
 import java.util.List;
 
 import com.f4education.springjwt.payload.request.CourseDTO;
@@ -35,7 +36,7 @@ public interface CoursesService {
 
 	String renameFolder(String folderName, String newFolderName) throws Exception;
 
-	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount();
-	
+	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate);
+
 	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
 }
