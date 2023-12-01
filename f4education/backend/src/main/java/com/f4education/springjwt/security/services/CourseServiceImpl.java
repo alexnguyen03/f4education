@@ -366,6 +366,14 @@ public class CourseServiceImpl implements CoursesService {
 	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
 		List<ReportCourseCountStudentDTO> list = courseRepository.getCoursesWithStudentCount("Đã đăng ký");
 		System.out.println(list);
+		List<Course> listCourse = courseRepository.findAll();
+		for (Course c : listCourse) {
+			if(!c.getRegisterCourses().isEmpty()) {
+				for (RegisterCourse r : c.getRegisterCourses()) {
+					
+				}
+			}
+		}
 		return list;
 	}
 

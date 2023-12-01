@@ -16,7 +16,9 @@ const StudentCountChart = () => {
                 return {
                     courseName: course.courseName,
                     studentCount: course.studentCount,
-                    certificateCount: matchingCertificateCourse.certificateCount,
+                    certificateCount:
+                        matchingCertificateCourse.certificateCount,
+                    registrationDate: course.registrationDate
                 }
             }
 
@@ -38,8 +40,28 @@ const StudentCountChart = () => {
                     respStudentCount.data,
                     respStudentCountCertificate.data
                 )
-                setData(combinedData)
-                console.log(combinedData);
+                console.log(combinedData)
+
+                const resultMap = {}
+
+                for (const item of combinedData) {
+                    const courseName = item.courseName
+                    const studentCount = item.studentCount
+                    const registrationDate = item.registrationDate
+
+                    if (!resultMap.hasOwnProperty(courseName)) {
+                        resultMap[courseName] = {
+                            courseName: courseName,
+                            studentCount: studentCount,
+                            registrationDates: []
+                        }
+                    }
+
+                    resultMap[courseName].registrationDates.push(
+                        registrationDate
+                    )
+                }
+                console.log(resultMap)
             }
         } catch (error) {
             console.error('Lấy dữ liệu thất bại', error)
@@ -66,7 +88,6 @@ const StudentCountChart = () => {
                             data: sortedData.map(
                                 (course) => course.studentCount
                             ),
-                            barThickness: 25,
                             backgroundColor: '#00CCCC'
                         },
                         {
@@ -74,7 +95,6 @@ const StudentCountChart = () => {
                             data: sortedData.map(
                                 (course) => course.certificateCount
                             ),
-                            barThickness: 25,
                             backgroundColor: 'lime'
                         }
                     ]
