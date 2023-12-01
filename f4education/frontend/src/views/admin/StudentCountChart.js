@@ -6,11 +6,40 @@ import reportApi from 'api/reportApi'
 const StudentCountChart = () => {
     const [data, setData] = useState([])
 
+    const mergeData = (studentCountData, studentCountCertificateData) => {
+        return studentCountData.map((course) => {
+            const matchingCertificateCourse = studentCountCertificateData.find(
+                (certCourse) => certCourse.courseName === course.courseName
+            )
+
+            if (matchingCertificateCourse) {
+                return {
+                    courseName: course.courseName,
+                    studentCount: course.studentCount,
+                    certificateCount: matchingCertificateCourse.certificateCount,
+                }
+            }
+
+            return course
+        })
+    }
+
     const fetchData = async () => {
         try {
-            const resp = await reportApi.getCoursesWithStudentCount()
-            if (resp.status === 200) {
-                setData(resp.data)
+            const respStudentCount =
+                await reportApi.getCoursesWithStudentCount()
+            const respStudentCountCertificate =
+                await reportApi.getCoursesWithStudentCountCertificate()
+            if (
+                respStudentCount.status === 200 &&
+                respStudentCountCertificate.status === 200
+            ) {
+                const combinedData = mergeData(
+                    respStudentCount.data,
+                    respStudentCountCertificate.data
+                )
+                setData(combinedData)
+                console.log(combinedData);
             }
         } catch (error) {
             console.error('Lấy dữ liệu thất bại', error)
@@ -22,9 +51,7 @@ const StudentCountChart = () => {
     }, [])
 
     useEffect(() => {
-        const sortedData = data.sort(
-            (a, b) => b.totalRenueve - a.totalRenueve
-        )
+        const sortedData = data.sort((a, b) => b.totalRenueve - a.totalRenueve)
 
         const revenueChart = document.getElementById('revenueChart')
 
@@ -33,13 +60,22 @@ const StudentCountChart = () => {
                 type: 'bar',
                 data: {
                     labels: sortedData.map((course) => course.courseName),
-                    axis: 'y',
                     datasets: [
                         {
                             label: 'Tổng số học viên đã đăng ký Khóa học',
                             data: sortedData.map(
                                 (course) => course.studentCount
-                            )
+                            ),
+                            barThickness: 25,
+                            backgroundColor: '#00CCCC'
+                        },
+                        {
+                            label: 'Tổng số học viên đã nhận chứng chỉ',
+                            data: sortedData.map(
+                                (course) => course.certificateCount
+                            ),
+                            barThickness: 25,
+                            backgroundColor: 'lime'
                         }
                     ]
                 },
@@ -48,8 +84,8 @@ const StudentCountChart = () => {
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Thống kê doanh thu khóa học',
-                            color: '#fff'
+                            text: 'Thống kê khóa học',
+                            color: 'black'
                         }
                     },
                     layout: {

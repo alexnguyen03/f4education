@@ -5,6 +5,10 @@ const reportApi = {
         const url = '/report/course/student-count'
         return axiosClient.get(url)
     },
+    getCoursesWithStudentCountCertificate: () => {
+        const url = '/report/course/student-count-certificate'
+        return axiosClient.get(url)
+    },
 }
 
 export default reportApi

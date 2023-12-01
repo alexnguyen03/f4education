@@ -1,5 +1,6 @@
 package com.f4education.springjwt.controllers;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.interfaces.CoursesService;
+import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
 import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 
 @RestController
@@ -23,6 +26,12 @@ public class ReportCoursesController {
 	@GetMapping("/course/student-count")
 	public ResponseEntity<?> getCoursesWithStudentCount() {
 		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount();
+		return ResponseEntity.ok(list);
+	}
+	
+	@GetMapping("/course/student-count-certificate")
+	public ResponseEntity<?> getCoursesWithStudentCountCertificate() {
+		List<ReportCourseCountStudentCertificateDTO> list = courseService.getCoursesWithStudentCountCertificate();
 		return ResponseEntity.ok(list);
 	}
 }

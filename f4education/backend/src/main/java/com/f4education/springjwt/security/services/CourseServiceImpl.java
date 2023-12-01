@@ -20,6 +20,7 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
 import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 import com.f4education.springjwt.payload.request.ThoiLuongRange;
 import com.f4education.springjwt.payload.response.CourseResponse;
@@ -364,6 +365,13 @@ public class CourseServiceImpl implements CoursesService {
 	@Override
 	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
 		List<ReportCourseCountStudentDTO> list = courseRepository.getCoursesWithStudentCount("Đã đăng ký");
+		System.out.println(list);
+		return list;
+	}
+
+	@Override
+	public List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate() {
+		List<ReportCourseCountStudentCertificateDTO> list = courseRepository.getCoursesWithStudentCountCertificate();
 		System.out.println(list);
 		return list;
 	}

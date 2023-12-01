@@ -14,6 +14,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
 import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
@@ -55,4 +56,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	            "WHERE LOWER(rc.status) = LOWER(:status) " +
 	            "GROUP BY c.courseId, c.courseName")
 	 List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(@Param("status") String status);
+	 
+	 @Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO(c.courseName, COUNT(p.student.studentId)) " +
+	            "FROM Course c " +
+	            "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId " +
+	            "JOIN Classes cl ON cl.classId = rc.classes.classId " +
+	            "JOIN Point p ON p.classes.classId = cl.classId " +
+	            "WHERE p.averagePoint >= 5.0 " +
+	            "GROUP BY c.courseId, c.courseName")
+	 List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
 }
