@@ -47,31 +47,69 @@ function QuizzClient() {
     // const minutes = Math.floor(timeRemaining / 60)
     // const seconds = timeRemaining % 60
 
-    const initialTime = 10 * 60 // 10 phút
-    const [time, setTime] = useState(initialTime)
-    const [initialized, setInitialized] = useState(false)
+    // const initialTime = 10 * 60
+    // const [time, setTime] = useState(initialTime)
+    // const [initialized, setInitialized] = useState(false)
+
+    // useEffect(() => {
+    //     const storedTime = localStorage.getItem('quizTime')
+
+    //     if (storedTime && !initialized) {
+    //         setTime(parseInt(storedTime, 10))
+    //         setInitialized(true)
+    //     }
+
+    //     const handleBeforeUnload = () => {
+    //         localStorage.setItem('quizTime', time.toString())
+    //     }
+
+    //     const intervalId = setInterval(() => {
+    //         setTime((prevTime) => {
+    //             const newTime = prevTime - 1
+    //             if (newTime <= 0) {
+    //                 clearInterval(intervalId)
+    //                 return 0
+    //             }
+    //             return newTime
+    //         })
+    //     }, 1000)
+
+    //     window.addEventListener('beforeunload', handleBeforeUnload)
+
+    //     return () => {
+    //         clearInterval(intervalId)
+    //         window.removeEventListener('beforeunload', handleBeforeUnload)
+    //     }
+    // }, [time, initialized])
+
+    const [time, setTime] = useState(10 * 60)
+    const [elapsedTime, setElapsedTime] = useState(0)
+    const [isFinished, setIsFinished] = useState(false)
+
+    const handleBeforeUnload = () => {
+        localStorage.setItem('quizTime', JSON.stringify(time))
+        localStorage.setItem('elapsedTime', JSON.stringify(elapsedTime))
+        localStorage.setItem('isFinished', JSON.stringify(isFinished))
+    }
 
     useEffect(() => {
-        const storedTime = localStorage.getItem('quizTime')
+        const storedTime = JSON.parse(localStorage.getItem('quizTime')) || time
+        const storedElapsedTime =
+            JSON.parse(localStorage.getItem('elapsedTime')) || 0
+        const storedIsFinished =
+            JSON.parse(localStorage.getItem('isFinished')) || false
 
-        if (storedTime && !initialized) {
-            setTime(parseInt(storedTime, 10))
-            setInitialized(true)
-        }
-
-        const handleBeforeUnload = () => {
-            localStorage.setItem('quizTime', time.toString())
-        }
+        setTime(storedTime)
+        setElapsedTime(storedElapsedTime)
+        setIsFinished(storedIsFinished)
 
         const intervalId = setInterval(() => {
-            setTime((prevTime) => {
-                const newTime = prevTime - 1
-                if (newTime <= 0) {
-                    clearInterval(intervalId)
-                    return 0
-                }
-                return newTime
-            })
+            if (time > 0 && !isFinished) {
+                setTime((prevTime) => prevTime - 1)
+                setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
+            } else {
+                clearInterval(intervalId)
+            }
         }, 1000)
 
         window.addEventListener('beforeunload', handleBeforeUnload)
@@ -80,7 +118,7 @@ function QuizzClient() {
             clearInterval(intervalId)
             window.removeEventListener('beforeunload', handleBeforeUnload)
         }
-    }, [time, initialized])
+    }, [time, isFinished])
 
     const itemsBreadcum = [
         { title: 'Trang chủ', href: '/' },
@@ -571,52 +609,3 @@ function QuizzClient() {
 }
 
 export default QuizzClient
-
-// const QuizzClient = () => {
-//     const initialTime = 10 * 60 // 10 phút
-//     const [time, setTime] = useState(initialTime)
-//     const [initialized, setInitialized] = useState(false)
-
-//     useEffect(() => {
-//         const storedTime = localStorage.getItem('quizTime')
-
-//         if (storedTime && !initialized) {
-//             setTime(parseInt(storedTime, 10))
-//             setInitialized(true)
-//         }
-
-//         const handleBeforeUnload = () => {
-//             localStorage.setItem('quizTime', time.toString())
-//         }
-
-//         const intervalId = setInterval(() => {
-//             setTime((prevTime) => {
-//                 const newTime = prevTime - 1
-//                 if (newTime <= 0) {
-//                     clearInterval(intervalId)
-//                     return 0
-//                 }
-//                 return newTime
-//             })
-//         }, 1000)
-
-//         window.addEventListener('beforeunload', handleBeforeUnload)
-
-//         return () => {
-//             clearInterval(intervalId)
-//             window.removeEventListener('beforeunload', handleBeforeUnload)
-//         }
-//     }, [time, initialized])
-
-//     return (
-//         <div>
-//             <h1>
-//                 Thời gian còn lại: {Math.floor(time / 60).toString().padStart(2, '0')}:
-//                 {(time % 60).toString().padStart(2, '0')}
-//             </h1>
-
-//         </div>
-//     )
-// }
-
-// export default QuizzClient
