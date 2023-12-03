@@ -1,12 +1,18 @@
 package com.f4education.springjwt.controllers;
 
+import java.text.ParseException;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -23,9 +29,13 @@ public class ReportCoursesController {
 	@Autowired
 	CoursesService courseService;
 
-	@GetMapping("/course/student-count")
-	public ResponseEntity<?> getCoursesWithStudentCount() {
-		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount(null, null);
+	@GetMapping("/course/student-count/{startDate}/{endDate}")
+	public ResponseEntity<?> getCoursesWithStudentCount(
+			@PathVariable Date startDate,
+			@PathVariable Date endDate) throws ParseException {
+		System.out.println(startDate);
+		System.out.println(endDate);
+		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount(startDate, endDate);
 		return ResponseEntity.ok(list);
 	}
 

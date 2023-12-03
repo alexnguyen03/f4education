@@ -18,7 +18,6 @@ const StudentCountChart = () => {
                     studentCount: course.studentCount,
                     certificateCount:
                         matchingCertificateCourse.certificateCount,
-                    registrationDate: course.registrationDate
                 }
             }
 
@@ -41,27 +40,7 @@ const StudentCountChart = () => {
                     respStudentCountCertificate.data
                 )
                 console.log(combinedData)
-
-                const resultMap = {}
-
-                for (const item of combinedData) {
-                    const courseName = item.courseName
-                    const studentCount = item.studentCount
-                    const registrationDate = item.registrationDate
-
-                    if (!resultMap.hasOwnProperty(courseName)) {
-                        resultMap[courseName] = {
-                            courseName: courseName,
-                            studentCount: studentCount,
-                            registrationDates: []
-                        }
-                    }
-
-                    resultMap[courseName].registrationDates.push(
-                        registrationDate
-                    )
-                }
-                console.log(resultMap)
+                setData(combinedData)
             }
         } catch (error) {
             console.error('Lấy dữ liệu thất bại', error)

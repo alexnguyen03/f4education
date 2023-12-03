@@ -1,5 +1,6 @@
 package com.f4education.springjwt.interfaces;
 
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 
@@ -36,7 +37,7 @@ public interface CoursesService {
 
 	String renameFolder(String folderName, String newFolderName) throws Exception;
 
-	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate);
+	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate)throws ParseException;
 
 	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
 }

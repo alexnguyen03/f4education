@@ -27,6 +27,6 @@ public class ReportCourseCountStudentCertificateDTO {
 
 	@Override
 	public String toString() {
-		return "ReportCourseCountStudentDTO [courseName=" + courseName + ", certificateCount=" + certificateCount + "]";
+		return "ReportCourseCountStudentCertificateDTO [courseName=" + courseName + ", certificateCount=" + certificateCount + "]";
 	}
 }

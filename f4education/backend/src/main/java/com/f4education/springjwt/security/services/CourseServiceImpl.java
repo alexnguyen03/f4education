@@ -1,6 +1,9 @@
 package com.f4education.springjwt.security.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -363,46 +366,84 @@ public class CourseServiceImpl implements CoursesService {
 		return !courseRepository.isCourseNameExist(courseName).isEmpty();
 	}
 
+//	@Override
+//	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) {
+//		List<ReportCourseCountStudentDTO> list = new ArrayList<ReportCourseCountStudentDTO>();
+//		List<Course> listCourse = courseRepository.getAll("Đã đăng ký");
+//		for (Course c : listCourse) {
+//			Long studentCount = 0l;
+//			if (startDate == null && endDate == null) { // ! lấy hết
+//				studentCount = (long) c.getRegisterCourses().size();
+//			} else {
+//				if (!c.getRegisterCourses().isEmpty()) {
+//					for (RegisterCourse r : c.getRegisterCourses()) {// ! lọc qua những phiếu đăng ký
+//						Date date = r.getRegistrationDate();
+//						if (endDate == null) { // ! check từ ngày bắt đầu trở về sau
+//							if (date.after(startDate)) {
+//								studentCount++;
+//							} else {
+//								if (startDate == null) { // ! check từ ngày kết thúc trở về trước
+//									if (date.before(endDate)) {
+//										studentCount++;
+//									}
+//								} else {
+//									if (check(date, startDate, endDate)) {
+//										studentCount++;
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//
+//			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+//		}
+//		System.out.println(list);
+//		return list;
+//	}
+
 	@Override
-	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) {
-		// List<ReportCourseCountStudentDTO> list =
-		// courseRepository.getCoursesWithStudentCount("Đã đăng ký");
-		List<ReportCourseCountStudentDTO> list = new ArrayList<ReportCourseCountStudentDTO>();
-		List<Course> listCourse = courseRepository.findAll();
+	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) throws ParseException {
+		List<ReportCourseCountStudentDTO> list = new ArrayList<>();
+		List<Course> listCourse = courseRepository.getAll();
+
 		for (Course c : listCourse) {
-			Long studentCount = 0l;
-			if (startDate == null && endDate == null) { // ! lấy hết
-				studentCount = (long) c.getRegisterCourses().size();
-			} else {
-				if (!c.getRegisterCourses().isEmpty()) {
-					for (RegisterCourse r : c.getRegisterCourses()) {// ! lọc qua những phiếu đăng ký
-						Date date = r.getRegistrationDate();
-						if (endDate == null) { // ! check từ ngày bắt đầu trở về sau
-							if (date.after(startDate)) {
-								studentCount++;
-							} else {
-								if (startDate == null) { // ! check từ ngày kết thúc trở về trước
-									if (date.before(endDate)) {
-										studentCount++;
-									}
-								} else {
-									if (check(date, startDate, endDate)) {
-										studentCount++;
-									}
-								}
-							}
-						}
-					}
+			Long studentCount = 0L;
+
+			if (!c.getRegisterCourses().isEmpty()) {
+				for (RegisterCourse r : c.getRegisterCourses()) {
+					Date date = r.getRegistrationDate();
+
+					// Check the status and filter by registration date range
+					if (r.getStatus().equalsIgnoreCase("Đã đăng ký") && !isWithinDateRange(date, startDate, endDate)) {
+						System.out.println(isWithinDateRange(date, startDate, endDate));
+						studentCount++;
+					} 					
 				}
 			}
 
+			// Add the course and student count to the result list
 			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
 		}
+		System.out.println(list);
 		return list;
 	}
 
-	private static boolean check(Date date, Date startDate, Date endDate) {
-		return !date.before(startDate) && !date.after(endDate);
+	private boolean isWithinDateRange(Date date, Date startDate, Date endDate) throws ParseException {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		String dateString = dateFormat.format(date);
+        String startDateString = dateFormat.format(startDate);
+        String endDateString = dateFormat.format(endDate);
+
+        Date formattedDate = dateFormat.parse(dateString);
+        Date formattedStartDate = dateFormat.parse(startDateString);
+        Date formattedEndDate = dateFormat.parse(endDateString);
+        
+		System.out.println(formattedDate);
+		System.out.println(formattedStartDate);
+		System.out.println(formattedEndDate);
+	    return formattedDate != null && formattedDate.before(formattedStartDate) && formattedDate.after(formattedEndDate);
 	}
 
 	@Override

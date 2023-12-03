@@ -6,7 +6,6 @@ import java.util.List;
 public class ReportCourseCountStudentDTO {
 	private String courseName;
 	private Long studentCount;
-	// private Date registrationDate;
 
 	public String getCourseName() {
 		return courseName;
@@ -24,13 +23,10 @@ public class ReportCourseCountStudentDTO {
 		this.studentCount = studentCount;
 	}
 
-	public ReportCourseCountStudentDTO(String courseName, Long studentCount, Date registrationDate) {
+	public ReportCourseCountStudentDTO(String courseName, Long studentCount) {
 		super();
 		this.courseName = courseName;
 		this.studentCount = studentCount;
-	}
-
-	public ReportCourseCountStudentDTO(String courseName2, Long studentCount2) {
 	}
 
 	@Override
