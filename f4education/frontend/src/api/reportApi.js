@@ -2,8 +2,8 @@ import axiosClient from './axiosClient'
 import moment from 'moment'
 
 const reportApi = {
-    getCoursesWithStudentCount: (startDate, endDate) => {
-        const url = `/report/course/student-count/${startDate}/${endDate}`;
+    getCoursesWithStudentCount: () => {
+        const url = '/report/course/student-count'
         return axiosClient.get(url)
     },
     getCoursesWithStudentCountCertificate: () => {

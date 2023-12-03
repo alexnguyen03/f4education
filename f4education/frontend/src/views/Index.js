@@ -44,6 +44,28 @@ const Index = () => {
 
     const [data, setData] = useState([])
 
+    // Thêm state mới để lưu trữ dữ liệu gốc không thay đổi
+    const [originalData, setOriginalData] = useState([])
+
+    // Hàm lọc dữ liệu theo ngày bắt đầu và kết thúc
+    const filterDataByDateRange = (start, end) => {
+        if (!start && !end) {
+            // Nếu không có ngày bắt đầu và kết thúc, trả về dữ liệu gốc
+            return originalData
+        }
+
+        return originalData.filter((course) => {
+            const registrationDates = course.registrationDates.map(
+                (date) => new Date(date)
+            )
+
+            // Kiểm tra xem có ít nhất một ngày trong khoảng không
+            return registrationDates.some(
+                (date) => (!start || date >= start) && (!end || date <= end)
+            )
+        })
+    }
+
     const mergeData = (studentCountData, studentCountCertificateData) => {
         return studentCountData.map((course) => {
             const matchingCertificateCourse = studentCountCertificateData.find(
@@ -54,7 +76,9 @@ const Index = () => {
                 return {
                     courseName: course.courseName,
                     studentCount: course.studentCount,
-                    certificateCount: matchingCertificateCourse.certificateCount
+                    certificateCount:
+                        matchingCertificateCourse.certificateCount,
+                    registrationDates: course.registrationDates
                 }
             }
 
@@ -64,10 +88,8 @@ const Index = () => {
 
     const fetchData = async () => {
         try {
-            const respStudentCount = await reportApi.getCoursesWithStudentCount(
-                startDate,
-                endDate
-            )
+            const respStudentCount =
+                await reportApi.getCoursesWithStudentCount()
             const respStudentCountCertificate =
                 await reportApi.getCoursesWithStudentCountCertificate()
             if (
@@ -79,6 +101,8 @@ const Index = () => {
                     respStudentCountCertificate.data
                 )
                 console.log(combinedData)
+                // Lưu trữ dữ liệu gốc và cập nhật dữ liệu hiển thị
+                setOriginalData(combinedData)
                 setData(combinedData)
             }
         } catch (error) {
@@ -88,10 +112,17 @@ const Index = () => {
 
     useEffect(() => {
         fetchData()
-    }, [startDate, endDate])
+    }, [])
 
     useEffect(() => {
-        const sortedData = data.sort((a, b) => b.totalRenueve - a.totalRenueve)
+        // Lọc dữ liệu dựa trên ngày bắt đầu và kết thúc
+        const filteredData = filterDataByDateRange(startDate, endDate)
+        console.log(filteredData)
+
+        // Chắc chắn rằng sortedData không null hoặc undefined
+        const sortedData = filteredData
+            ? filteredData.sort((a, b) => b.totalRenueve - a.totalRenueve)
+            : []
 
         const revenueChart = document.getElementById('revenueChart')
 
@@ -138,7 +169,7 @@ const Index = () => {
         } else {
             console.error("Element with id 'revenueChart' not found")
         }
-    }, [data])
+    }, [data, startDate, endDate])
 
     return (
         <>
@@ -147,29 +178,32 @@ const Index = () => {
             <Container className="mt--7" fluid>
                 <Row className="mt-5">
                     <Col className="mt-5">
-                        <div className="d-flex justify-content-start mt-5">
-                            <DateInput
-                                placeholder="Ngày bắt đầu"
-                                variant="filled"
-                                mr={10}
-                                clearable
-                                w={320}
-                                value={startDate}
-                                onChange={(value) => setStartDate(value)}
-                            />
+                        <div className="d-flex justify-content-end align-items-center my-5">
+                            <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
+                                Bộ lọc theo ngày tháng năm:
+                            </h5>
+                            <div className="d-flex justify-content-start">
+                                <DateInput
+                                    placeholder="Ngày bắt đầu"
+                                    variant="filled"
+                                    mr={10}
+                                    clearable
+                                    w={320}
+                                    value={startDate}
+                                    onChange={(value) => setStartDate(value)}
+                                />
 
-                            <DateInput
-                                placeholder="Ngày kết thúc"
-                                variant="filled"
-                                clearable
-                                w={320}
-                                value={endDate}
-                                onChange={(value) => setEndDate(value)}
-                            />
+                                <DateInput
+                                    placeholder="Ngày kết thúc"
+                                    variant="filled"
+                                    clearable
+                                    w={320}
+                                    value={endDate}
+                                    onChange={(value) => setEndDate(value)}
+                                />
+                            </div>
                         </div>
-                        <div className="w-100 h-100">
-                            <canvas id="revenueChart" className="w-100 h-100" />
-                        </div>
+                        <canvas id="revenueChart" className="w-100 h-100" />
                     </Col>
                 </Row>
             </Container>

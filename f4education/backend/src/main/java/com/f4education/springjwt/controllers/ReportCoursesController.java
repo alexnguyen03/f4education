@@ -29,13 +29,9 @@ public class ReportCoursesController {
 	@Autowired
 	CoursesService courseService;
 
-	@GetMapping("/course/student-count/{startDate}/{endDate}")
-	public ResponseEntity<?> getCoursesWithStudentCount(
-			@PathVariable Date startDate,
-			@PathVariable Date endDate) throws ParseException {
-		System.out.println(startDate);
-		System.out.println(endDate);
-		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount(startDate, endDate);
+	@GetMapping("/course/student-count")
+	public ResponseEntity<?> getCoursesWithStudentCount() {
+		List<ReportCourseCountStudentDTO> list = courseService.getCoursesWithStudentCount();
 		return ResponseEntity.ok(list);
 	}
 

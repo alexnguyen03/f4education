@@ -6,6 +6,13 @@ import java.util.List;
 public class ReportCourseCountStudentDTO {
 	private String courseName;
 	private Long studentCount;
+	private List<Date> registrationDates;
+
+	public ReportCourseCountStudentDTO(String courseName, Long studentCount, List<Date> registrationDates) {
+		this.courseName = courseName;
+		this.studentCount = studentCount;
+		this.registrationDates = registrationDates;
+	}
 
 	public String getCourseName() {
 		return courseName;
@@ -23,14 +30,17 @@ public class ReportCourseCountStudentDTO {
 		this.studentCount = studentCount;
 	}
 
-	public ReportCourseCountStudentDTO(String courseName, Long studentCount) {
-		super();
-		this.courseName = courseName;
-		this.studentCount = studentCount;
+	public List<Date> getRegistrationDates() {
+		return registrationDates;
+	}
+
+	public void setRegistrationDates(List<Date> registrationDates) {
+		this.registrationDates = registrationDates;
 	}
 
 	@Override
 	public String toString() {
-		return "ReportCourseCountStudentDTO [courseName=" + courseName + ", studentCount=" + studentCount + "]";
+		return "ReportCourseCountStudentDTO [courseName=" + courseName + ", studentCount=" + studentCount
+				+ ", registrationDates=" + registrationDates + "]";
 	}
 }

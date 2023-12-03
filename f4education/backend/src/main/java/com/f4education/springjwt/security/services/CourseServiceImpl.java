@@ -403,47 +403,60 @@ public class CourseServiceImpl implements CoursesService {
 //		return list;
 //	}
 
+//	@Override
+//	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) throws ParseException {
+//		List<ReportCourseCountStudentDTO> list = new ArrayList<>();
+//		List<Course> listCourse = courseRepository.getAll();
+//
+//		for (Course c : listCourse) {
+//			Long studentCount = 0L;
+//
+//			if (!c.getRegisterCourses().isEmpty()) {
+//				for (RegisterCourse r : c.getRegisterCourses()) {
+//					Date date = r.getRegistrationDate();
+//
+//					// Check the status and filter by registration date range
+//					if (r.getStatus().equalsIgnoreCase("Đã đăng ký") && !isWithinDateRange(date, startDate, endDate)) {
+//						System.out.println(isWithinDateRange(date, startDate, endDate));
+//						studentCount++;
+//					} 					
+//				}
+//			}
+//
+//			// Add the course and student count to the result list
+//			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+//		}
+//		System.out.println(list);
+//		return list;
+//	}
+
 	@Override
-	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) throws ParseException {
+	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
 		List<ReportCourseCountStudentDTO> list = new ArrayList<>();
 		List<Course> listCourse = courseRepository.getAll();
 
 		for (Course c : listCourse) {
 			Long studentCount = 0L;
+			List<Date> registrationDates = new ArrayList<>();
 
 			if (!c.getRegisterCourses().isEmpty()) {
 				for (RegisterCourse r : c.getRegisterCourses()) {
 					Date date = r.getRegistrationDate();
 
 					// Check the status and filter by registration date range
-					if (r.getStatus().equalsIgnoreCase("Đã đăng ký") && !isWithinDateRange(date, startDate, endDate)) {
-						System.out.println(isWithinDateRange(date, startDate, endDate));
+					if (r.getStatus().equalsIgnoreCase("Đã đăng ký")) {
 						studentCount++;
-					} 					
+						registrationDates.add(date);
+					}
 				}
 			}
 
-			// Add the course and student count to the result list
-			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+			// Add the course, student count, and registration dates to the result list
+			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount, registrationDates));
 		}
+
 		System.out.println(list);
 		return list;
-	}
-
-	private boolean isWithinDateRange(Date date, Date startDate, Date endDate) throws ParseException {
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-		String dateString = dateFormat.format(date);
-        String startDateString = dateFormat.format(startDate);
-        String endDateString = dateFormat.format(endDate);
-
-        Date formattedDate = dateFormat.parse(dateString);
-        Date formattedStartDate = dateFormat.parse(startDateString);
-        Date formattedEndDate = dateFormat.parse(endDateString);
-        
-		System.out.println(formattedDate);
-		System.out.println(formattedStartDate);
-		System.out.println(formattedEndDate);
-	    return formattedDate != null && formattedDate.before(formattedStartDate) && formattedDate.after(formattedEndDate);
 	}
 
 	@Override

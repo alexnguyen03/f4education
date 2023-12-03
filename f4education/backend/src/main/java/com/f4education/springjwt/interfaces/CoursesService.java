@@ -37,7 +37,7 @@ public interface CoursesService {
 
 	String renameFolder(String folderName, String newFolderName) throws Exception;
 
-	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate)throws ParseException;
+	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount();
 
 	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
 }
