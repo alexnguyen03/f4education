@@ -82,43 +82,76 @@ function QuizzClient() {
     //     }
     // }, [time, initialized])
 
-    const [time, setTime] = useState(10 * 60)
-    const [elapsedTime, setElapsedTime] = useState(0)
-    const [isFinished, setIsFinished] = useState(false)
+    // const [time, setTime] = useState(10 * 60)
+    // const [elapsedTime, setElapsedTime] = useState(0)
+    // const [isFinished, setIsFinished] = useState(false)
 
-    const handleBeforeUnload = () => {
-        localStorage.setItem('quizTime', JSON.stringify(time))
-        localStorage.setItem('elapsedTime', JSON.stringify(elapsedTime))
-        localStorage.setItem('isFinished', JSON.stringify(isFinished))
-    }
+    // const handleBeforeUnload = () => {
+    //     localStorage.setItem('quizTime', JSON.stringify(time))
+    //     localStorage.setItem('elapsedTime', JSON.stringify(elapsedTime))
+    //     localStorage.setItem('isFinished', JSON.stringify(isFinished))
+    // }
+
+    // useEffect(() => {
+    //     const storedTime = JSON.parse(localStorage.getItem('quizTime')) || time
+    //     const storedElapsedTime =
+    //         JSON.parse(localStorage.getItem('elapsedTime')) || 0
+    //     const storedIsFinished =
+    //         JSON.parse(localStorage.getItem('isFinished')) || false
+
+    //     setTime(storedTime)
+    //     setElapsedTime(storedElapsedTime)
+    //     setIsFinished(storedIsFinished)
+
+    //     const intervalId = setInterval(() => {
+    //         if (time > 0 && !isFinished) {
+    //             setTime((prevTime) => prevTime - 1)
+    //             setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
+    //         } else {
+    //             clearInterval(intervalId)
+    //         }
+    //     }, 1000)
+
+    //     window.addEventListener('beforeunload', handleBeforeUnload)
+
+    //     return () => {
+    //         clearInterval(intervalId)
+    //         window.removeEventListener('beforeunload', handleBeforeUnload)
+    //     }
+    // }, [time, isFinished])
+    const storedStartTime = localStorage.getItem('countdown_start_time')
+    const storedSeconds = localStorage.getItem('countdown_seconds')
+
+    const [startTime, setStartTime] = useState(
+        storedStartTime || Date.now().toString()
+    )
+
+    const [seconds, setSeconds] = useState(
+        storedSeconds ? parseInt(storedSeconds) : 600
+    )
 
     useEffect(() => {
-        const storedTime = JSON.parse(localStorage.getItem('quizTime')) || time
-        const storedElapsedTime =
-            JSON.parse(localStorage.getItem('elapsedTime')) || 0
-        const storedIsFinished =
-            JSON.parse(localStorage.getItem('isFinished')) || false
+        localStorage.setItem('countdown_start_time', startTime)
+        localStorage.setItem('countdown_seconds', seconds.toString())
+    }, [startTime, seconds])
 
-        setTime(storedTime)
-        setElapsedTime(storedElapsedTime)
-        setIsFinished(storedIsFinished)
-
-        const intervalId = setInterval(() => {
-            if (time > 0 && !isFinished) {
-                setTime((prevTime) => prevTime - 1)
-                setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
-            } else {
-                clearInterval(intervalId)
-            }
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setSeconds((prevSeconds) => {
+                if (prevSeconds <= 0) {
+                    return 0
+                }
+                return prevSeconds - 1
+            })
         }, 1000)
 
-        window.addEventListener('beforeunload', handleBeforeUnload)
+        return () => clearInterval(timer)
+    }, [])
 
-        return () => {
-            clearInterval(intervalId)
-            window.removeEventListener('beforeunload', handleBeforeUnload)
-        }
-    }, [time, isFinished])
+    const formatTime = (time) => (time < 10 ? `0${time}` : time)
+
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
 
     const itemsBreadcum = [
         { title: 'Trang chủ', href: '/' },
@@ -396,7 +429,7 @@ function QuizzClient() {
                                                 ? `0${seconds}`
                                                 : seconds}
                                         </span> */}
-                                        <span className="display-2">
+                                        {/* <span className="display-2">
                                             {Math.floor(time / 60)
                                                 .toString()
                                                 .padStart(2, '0')}
@@ -406,6 +439,12 @@ function QuizzClient() {
                                             {(time % 60)
                                                 .toString()
                                                 .padStart(2, '0')}
+                                        </span> */}
+                                        <span className="display-2">
+                                            {formatTime(minutes)}
+                                        </span>
+                                        <span className="display-2">
+                                            : {formatTime(remainingSeconds)}
                                         </span>
                                     </p>
                                 </div>
