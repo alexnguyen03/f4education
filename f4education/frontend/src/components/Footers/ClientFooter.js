@@ -171,10 +171,10 @@ const ClientFooter = () => {
 
                     {/* Bottom Item */}
                     <div className="d-flex justify-content-between mt-4">
-                        <span className="font-weight-700">
-                            <img src={logo} alt="" width={40} heihg={40} />
+                        <span className="text-white font-weight-700">
+                            &copy; F4 Education.
                         </span>
-                        <span className="font-weight-700 text-white">
+                        <span className="font-weight-700 text-white float-right">
                             @2023, Inc
                         </span>
                     </div>

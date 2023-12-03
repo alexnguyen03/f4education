@@ -204,6 +204,7 @@ public class ClassServiceImpl implements ClassService {
 		for (RegisterCourse rg : registerCourses) {
 			if (rg.getClasses().getClassId().equals(classes.getClassId())) {
 				classResponse.setCourseDuration(rg.getCourseDuration());
+				classResponse.setCourseName(rg.getCourse().getCourseName());
 			}
 		}
 

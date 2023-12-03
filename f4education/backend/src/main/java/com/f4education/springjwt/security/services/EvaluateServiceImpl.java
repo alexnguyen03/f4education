@@ -36,6 +36,12 @@ public class EvaluateServiceImpl implements EvaluateService {
 	}
 
 	@Override
+	public List<EvaluateResponse> getTop10Evaluate() {
+		List<Evaluate> evaluateLst = evaluateRepository.findTop10LatestEvaluate();
+		return evaluateLst.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
+	}
+
+	@Override
 	public List<EvaluateResponse> getAllEvaluateByCourseId(Integer courseId) {
 		List<Evaluate> evaluateLst = evaluateRepository.findAllEvaluateByCourseId(courseId);
 		return evaluateLst.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
@@ -146,6 +152,8 @@ public class EvaluateServiceImpl implements EvaluateService {
 		evaluateResponse.setRegisterCourse(evaluate.getRegisterCourse());
 		evaluateResponse.setEvaluateId(evaluate.getEvaluateId());
 		evaluateResponse.setReviewDate(evaluate.getReviewDate());
+		evaluateResponse.setCourseName(evaluate.getRegisterCourse().getCourse().getCourseName());
+		evaluateResponse.setCourseId(evaluate.getRegisterCourse().getCourse().getCourseId());
 
 		return evaluateResponse;
 	}

@@ -38,6 +38,7 @@ import Notify from '../../utils/Notify'
 // API
 import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import {
+    IconBookDownload,
     IconBookUpload,
     IconPhoto,
     IconUpload,
@@ -90,32 +91,40 @@ const QuestionDetail = () => {
 
     // *************** PAGINATION AND SEARCH START
     const [currentPage, setCurrentPage] = useState(1)
+    const [firstIndex, setFirstIndex] = useState(0)
+    const [lastIndex, setLastIndex] = useState(0)
+    const [currentItems, setCurrentItems] = useState([])
+    const [totalPages, setTotalPage] = useState(0)
+    const [filteredQuestion, setFilteredQuestion] = useState([])
     const itemsPerPage = 10
 
-    const filteredQuestion = questions.filter((item) => {
-        const questionTitle = item.questionTitle
+    useEffect(() => {
+        const filteredQuestions = questions.filter((item) => {
+            const questionTitle = item.questionTitle.toLowerCase()
+            const lowerSearchTerm = searchTerm.toLowerCase()
+            return questionTitle.includes(lowerSearchTerm)
+        })
 
-        const lowerSearchTerm = searchTerm.toLowerCase()
+        setFilteredQuestion(filteredQuestions)
+        setCurrentPage(1)
+    }, [searchTerm, questions])
 
-        return questionTitle.toLowerCase().includes(lowerSearchTerm)
-    })
+    useEffect(() => {
+        setFirstIndex((currentPage - 1) * itemsPerPage)
+        setLastIndex(
+            Math.min(firstIndex + itemsPerPage, filteredQuestion.length)
+        )
+        setCurrentItems(filteredQuestion.slice(firstIndex, lastIndex))
+        setTotalPage(Math.ceil(filteredQuestion.length / itemsPerPage))
+    }, [currentPage, filteredQuestion, firstIndex, lastIndex])
 
     const handleChangeSearchQuestions = (e) => {
         setSearchTerm(e.target.value)
-        setCurrentPage(1)
     }
 
     const handlePaginationChange = (page) => {
         setCurrentPage(page)
     }
-
-    const firstIndex = (currentPage - 1) * itemsPerPage
-    const lastIndex = Math.min(
-        firstIndex + itemsPerPage,
-        filteredQuestion.length
-    )
-    const currentItems = filteredQuestion.slice(firstIndex, lastIndex)
-    const totalPages = Math.ceil(filteredQuestion.length / itemsPerPage)
 
     // *************** PAGINATION AND SEARCH END
 
@@ -129,10 +138,9 @@ const QuestionDetail = () => {
 
             if (resp.status === 200 || resp.data.length > 0) {
                 setQuestions(resp.data)
+                const newQuestion = resp.data
 
-                const newQuestions = resp.data
-
-                const updatedQuestion = newQuestions.map((item) => {
+                const updatedQuestion = newQuestion.map((item) => {
                     const updatedAnswers = item.answers.map((answer) => {
                         return {
                             ...answer,
@@ -144,8 +152,6 @@ const QuestionDetail = () => {
                         answers: updatedAnswers
                     }
                 })
-
-                console.log(updatedQuestion)
                 setAnswers(updatedQuestion.map((item) => item.answers))
             } else {
                 console.log('error fetch QuestionDetail')
@@ -190,14 +196,16 @@ const QuestionDetail = () => {
                 console.log(resp.status)
 
                 if (resp.status === 200) {
-                    fetchQuestionDetail()
-                    setShowModal(false)
                     toast.update(id, Notify.options.createSuccess())
                 } else {
                     toast.update(id, Notify.options.createError())
                 }
             } catch (error) {
                 console.log(error)
+            } finally {
+                handleClearForm()
+                fetchQuestionDetail()
+                setShowModal(false)
             }
         } else console.log('error in validate')
     }
@@ -229,6 +237,33 @@ const QuestionDetail = () => {
         } catch (error) {
             toast.update(id, Notify.options.createError())
             console.error('Failed to upload file.', error)
+        } finally {
+            handleClearForm()
+        }
+    }
+
+    // Download excel file
+    const handleDownloadExcel = async () => {
+        try {
+            const response = await questionApi.downloadExcel()
+
+            // Convert the response data to a Blob
+            const blob = new Blob([response.data], {
+                type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            })
+
+            console.log(blob)
+
+            // Create a download link and trigger the download
+            const url = window.URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'example.xlsx'
+            document.body.appendChild(a)
+            a.click()
+            document.body.removeChild(a)
+        } catch (error) {
+            console.error('Error downloading Excel file:', error)
         }
     }
 
@@ -736,14 +771,14 @@ const QuestionDetail = () => {
                         opened={openItemIndex === index}
                     >
                         <Accordion.Control bg="#fff">
-                            <h4 className="p-2 d-flex align-items-center">
-                                <span className="text-muted font-weight-500">
+                            <h2 className="p-2 d-flex align-items-center">
+                                <span className="text-primary font-weight-500">
                                     <strong>Câu hỏi số {index + 1} : </strong>
                                     <span className="text-dark">
                                         {questionDetail.questionTitle}
                                     </span>
                                 </span>
-                            </h4>
+                            </h2>
                         </Accordion.Control>
                         <Accordion.Panel>
                             <Card
@@ -770,6 +805,7 @@ const QuestionDetail = () => {
                                                 label={`Tiêu đề câu hỏi: `}
                                                 className="w-100"
                                                 autosize
+                                                size="lg"
                                                 minRows={2}
                                                 onChange={(e) => {
                                                     questionRequest.questionTitle =
@@ -784,7 +820,12 @@ const QuestionDetail = () => {
                                                 }
                                             />
                                         ) : (
-                                            <span className="text-muted font-weight-500">
+                                            <h2
+                                                className="text-muted font-weight-500 p-2"
+                                                style={{
+                                                    background: '#f1f1f1'
+                                                }}
+                                            >
                                                 <strong>
                                                     Tiêu đề câu hỏi :{' '}
                                                 </strong>
@@ -793,7 +834,7 @@ const QuestionDetail = () => {
                                                         questionDetail.questionTitle
                                                     }
                                                 </span>
-                                            </span>
+                                            </h2>
                                         )}
                                     </h4>
                                     {/* Answer Display Area */}
@@ -1018,14 +1059,15 @@ const QuestionDetail = () => {
                                                     answer.answerId
                                                 )
                                             }}
+                                            size="lg"
                                             className="w-100 mb-2"
                                             name="text"
                                             value={answer.answerContent}
                                         />
                                     ) : (
-                                        <p className="text-dark d-flex align-items-center flex-wrap">
+                                        <h3 className="text-dark d-flex align-items-center flex-wrap">
                                             {answer.answerContent}
-                                        </p>
+                                        </h3>
                                     )}
 
                                     {editQuestion &&
@@ -1145,7 +1187,7 @@ const QuestionDetail = () => {
                                         <div>
                                             <img
                                                 src={`${PUBLIC_IMAGE}/courses/${questionPrev.courseImage}`}
-                                                alt={questionPrev.courseName}
+                                                alt={''}
                                                 className="course-image rounded-circle overflow-hidden"
                                                 width="70px"
                                                 height="70px"
@@ -1203,13 +1245,22 @@ const QuestionDetail = () => {
                                         </Button>
                                         <Button
                                             color="primary"
-                                            outline
                                             onClick={() => {
                                                 setUploadExcel(true)
                                                 setShowModal(true)
                                             }}
                                         >
                                             <IconBookUpload /> Upload Excel
+                                        </Button>
+                                        <Button
+                                            color="primary"
+                                            outline
+                                            onClick={() => {
+                                                handleDownloadExcel()
+                                            }}
+                                        >
+                                            <IconBookDownload /> tải file excel
+                                            mẫu
                                         </Button>
                                     </>
                                 )}

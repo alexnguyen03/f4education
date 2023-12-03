@@ -374,6 +374,40 @@ const Subjects = () => {
         []
     )
 
+    const columnCourseBySubject = useMemo(
+        () => [
+            {
+                accessorKey: 'courseName',
+                header: 'Tên Khóa Học',
+                size: 180
+            },
+            {
+                accessorKey: 'coursePrice',
+                header: 'Giá Khóa Học',
+                size: 80
+            },
+            {
+                accessorKey: 'courseDuration',
+                header: 'Số giờ học',
+                size: 80
+            },
+            {
+                accessorFn: (row) => row.status,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row === true) {
+                        return <Badge color="primary">Hoạt động</Badge>
+                    } else {
+                        return <Badge color="success">Vô hiệu hóa</Badge>
+                    }
+                },
+                header: 'Trạng thái',
+                size: 80
+            }
+        ],
+        []
+    )
+
     const displayActionHistory = (action) => {
         return action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'
     }
@@ -623,7 +657,7 @@ const Subjects = () => {
                                             value={subject.subjectId}
                                         />
                                     </FormGroup>
-                                    <FormGroup className="mb-3">
+                                    {/* <FormGroup className="mb-3">
                                         <label
                                             className="form-control-label"
                                             htmlFor="adminId"
@@ -638,7 +672,7 @@ const Subjects = () => {
                                             name="adminId"
                                             value={subject.adminId}
                                         />
-                                    </FormGroup>
+                                    </FormGroup> */}
                                 </>
                             )}
                             <FormGroup className="mb-3">
@@ -695,7 +729,10 @@ const Subjects = () => {
                 </Modal>
 
                 {/* Modal show history per subject */}
-                <Modal className="modal-dialog-centered" isOpen={ModalHistory}>
+                <Modal
+                    className="modal-dialog-centered modal-lg"
+                    isOpen={ModalHistory}
+                >
                     <div className="modal-header">
                         <h3 className="modal-title" id="modal-title-default">
                             {courseBySubject
@@ -721,32 +758,6 @@ const Subjects = () => {
                         </button>
                     </div>
                     <div className="modal-body">
-                        {courseBySubject && coursePerSubjectName.length > 0 && (
-                            <div
-                                className="d-flex jusitfy-content-between align-items-center 
-                        flex-wrap bg-white position-sticky top-0 py-3"
-                                style={{ zIndex: '1' }}
-                            >
-                                <h4 className="mr-auto">
-                                    Tổng khóa học:{' '}
-                                    {coursePerSubjectName.length > 0
-                                        ? coursePerSubjectName.length
-                                        : 0}
-                                </h4>
-                                <Button
-                                    color="default"
-                                    data-dismiss="modal"
-                                    type="button"
-                                    onClick={() => {
-                                        setModalHistory(false)
-                                        setCourseBySubject(false)
-                                    }}
-                                >
-                                    Trở lại
-                                </Button>
-                            </div>
-                        )}
-                        <br />
                         <Row className="container-xxl">
                             {loadingPopupHistory ? (
                                 <h3 className="mx-auto">
@@ -763,73 +774,37 @@ const Subjects = () => {
                                                     học nào.
                                                 </h3>
                                             ) : (
-                                                <>
-                                                    {coursePerSubjectName.map(
-                                                        (course) => (
-                                                            <Col
-                                                                key={
-                                                                    course.courseId
+                                                <MaterialReactTable
+                                                    muiTableBodyProps={{
+                                                        sx: {
+                                                            '& tr:nth-of-type(odd)':
+                                                                {
+                                                                    backgroundColor:
+                                                                        '#f5f5f5'
                                                                 }
-                                                                xl="12"
-                                                                lg="12"
-                                                                md="12"
-                                                                sm="12"
-                                                            >
-                                                                <Card className="mb-2">
-                                                                    <CardBody>
-                                                                        <img
-                                                                            // src="https://images.pexels.com/photos/1671436/pexels-photo-1671436.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1"
-                                                                            src={`${PUBLIC_IMAGE}/courses/${course.image}`}
-                                                                            className="img-fluid"
-                                                                            alt=""
-                                                                            style={{
-                                                                                width: '100%',
-                                                                                height: '250px',
-                                                                                objectFit:
-                                                                                    'cover'
-                                                                            }}
-                                                                        />
-                                                                        <h2 className="font-weight-600 mt-2">
-                                                                            {
-                                                                                course.courseName
-                                                                            }
-                                                                        </h2>
-                                                                        <div className="d-flex justify-content-start">
-                                                                            <h4 className="text-muted">
-                                                                                <span className="mr-2">
-                                                                                    Thời
-                                                                                    lượng:
-                                                                                </span>
-                                                                                <strong className="font-weight-500">
-                                                                                    {
-                                                                                        course.courseDuration
-                                                                                    }{' '}
-                                                                                    Giờ
-                                                                                </strong>
-                                                                            </h4>
-                                                                            <span className="font-weight-600 mx-3 mt--1">
-                                                                                |
-                                                                            </span>
-                                                                            <h4 className="text-muted">
-                                                                                <span className="mr-2">
-                                                                                    Giá
-                                                                                    khóa
-                                                                                    học:
-                                                                                </span>
-                                                                                <strong className="text-primary font-weight-700">
-                                                                                    {formatCurrency(
-                                                                                        course.coursePrice
-                                                                                    )}
-                                                                                </strong>
-                                                                            </h4>
-                                                                        </div>
-                                                                        {/* <hr className="text-muted" /> */}
-                                                                    </CardBody>
-                                                                </Card>
-                                                            </Col>
-                                                        )
-                                                    )}
-                                                </>
+                                                        }
+                                                    }}
+                                                    enableRowNumbers
+                                                    displayColumnDefOptions={{
+                                                        'mrt-row-numbers': {
+                                                            size: 5
+                                                        }
+                                                    }}
+                                                    columns={
+                                                        columnCourseBySubject
+                                                    }
+                                                    data={coursePerSubjectName}
+                                                    enableColumnOrdering
+                                                    enableStickyHeader
+                                                    enableStickyFooter
+                                                    muiTablePaginationProps={{
+                                                        rowsPerPageOptions: [
+                                                            10, 20, 50, 100
+                                                        ],
+                                                        showFirstButton: true,
+                                                        showLastButton: true
+                                                    }}
+                                                />
                                             )}
                                         </>
                                     ) : (

@@ -73,7 +73,7 @@ const TeacherAndStudentSidebar = (props) => {
 
     return (
         <Navbar
-            className="navbar-vertical fixed-left navbar-light  shadow "
+            className="navbar-vertical fixed-left navbar-light shadow "
             expand="md"
             id="sidenav-main"
         >

@@ -1,3 +1,6 @@
+import React, { useEffect, useCallback, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
+
 import {
     Document,
     Font,
@@ -9,6 +12,13 @@ import {
     View
 } from '@react-pdf/renderer'
 
+// QRCODE
+import QRCode from 'qrcode'
+
+// format
+import moment from 'moment/moment'
+
+// Register font and assets import
 import logo from '../../assets/img/brand/F4EDUCATION.png'
 import rectangle from '../../assets/img/rectangle.png'
 import rectangle2 from '../../assets/img/rectangle2.png'
@@ -20,9 +30,6 @@ import fontSource4 from '../../assets/fonts/kenyan coffee bd it.otf'
 
 // API
 import certificateApi from '../../api/certificateApi'
-import { useSearchParams } from 'react-router-dom'
-import { useEffect, useCallback, useState } from 'react'
-import moment from 'moment/moment'
 
 // Register new custom font
 Font.register({
@@ -87,6 +94,9 @@ const styles = StyleSheet.create({
 const CertificatePDF = () => {
     const user = JSON.parse(localStorage.getItem('user'))
 
+    // QR code
+    const [qrCodeImage, setQrCodeImage] = useState('')
+
     //  Route
     const [searchParams] = useSearchParams()
 
@@ -98,6 +108,7 @@ const CertificatePDF = () => {
     // FETCH
     const fetchCurrentCertificate = useCallback(async () => {
         setLoading(true)
+
         try {
             const resp = await certificateApi.getAllCertificateByCertificateId(
                 searchParams.get('certificateId')
@@ -113,9 +124,19 @@ const CertificatePDF = () => {
                     .trim()
                 setCourseName(value)
             }
-            setLoading(false)
+
+            // QR code
+            const url = window.location.href
+
+            // Generate QR code as an image
+            const qrCodeDataURL = await QRCode.toDataURL(url)
+
+            console.log(qrCodeDataURL)
+            setQrCodeImage(qrCodeDataURL)
         } catch (error) {
             console.log(error)
+        } finally {
+            setLoading(false)
         }
     }, [searchParams])
 
@@ -279,6 +300,7 @@ const CertificatePDF = () => {
                         }}
                         src={rectangle}
                     />
+
                     <Image
                         style={{
                             position: 'absolute',
@@ -290,6 +312,22 @@ const CertificatePDF = () => {
                         }}
                         src={rectangle2}
                     />
+
+                    {/* Use Image component to include QR code in the PDF */}
+                    {loading ? (
+                        <></>
+                    ) : (
+                        <Image
+                            style={{
+                                width: 100,
+                                height: 100,
+                                position: 'absolute',
+                                bottom: 35,
+                                right: 240
+                            }}
+                            src={qrCodeImage}
+                        />
+                    )}
                 </Page>
             </Document>
         </PDFViewer>

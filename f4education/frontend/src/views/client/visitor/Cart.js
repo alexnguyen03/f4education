@@ -18,7 +18,8 @@ import {
     Title,
     rem,
     getStylesRef,
-    Container
+    Container,
+    ActionIcon
 } from '@mantine/core'
 import { Carousel } from '@mantine/carousel'
 
@@ -30,6 +31,7 @@ import Notify from '../../../utils/Notify'
 import courseApi from '../../../api/courseApi'
 import cartEmptyimage from '../../../assets/img/cart-empty.png'
 import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
+import { IconTrash } from '@tabler/icons-react'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -230,7 +232,7 @@ function Cart() {
         }
 
         try {
-            const selectedCart = await handleAddCart(course,e)
+            const selectedCart = await handleAddCart(course, e)
 
             // store cart to localstorage
             localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
@@ -619,9 +621,14 @@ function Cart() {
                                                                 sm="6"
                                                             >
                                                                 <div>
-                                                                    <Link
+                                                                    {/* <Link
                                                                         to={`/cart/${cart.cartId}`}
                                                                         className="text-danger font-weight-700"
+                                                                        
+                                                                    > */}
+                                                                    <ActionIcon
+                                                                        color="red"
+                                                                        variant="light"
                                                                         onClick={(
                                                                             e
                                                                         ) => {
@@ -633,9 +640,9 @@ function Cart() {
                                                                             )
                                                                         }}
                                                                     >
-                                                                        Xóa khóa
-                                                                        học
-                                                                    </Link>
+                                                                        <IconTrash size="1rem" />
+                                                                    </ActionIcon>
+                                                                    {/* </Link> */}
                                                                 </div>
                                                             </Grid.Col>
                                                             <Grid.Col

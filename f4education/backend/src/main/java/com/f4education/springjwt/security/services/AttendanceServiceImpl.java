@@ -12,8 +12,10 @@ import org.springframework.stereotype.Service;
 import com.f4education.springjwt.interfaces.AttendanceService;
 import com.f4education.springjwt.models.Attendance;
 import com.f4education.springjwt.models.Classes;
+import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.AttendanceDTO;
+import com.f4education.springjwt.payload.response.AttendanceStudentReviewResponse;
 import com.f4education.springjwt.repository.AttendanceReposotory;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.StudentRepository;
@@ -53,6 +55,33 @@ public class AttendanceServiceImpl implements AttendanceService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public List<AttendanceStudentReviewResponse> getAttendanceForStudentReview(String studentId, Integer classId) {
+		List<Attendance> antendance = attendanceReposotory.findAllAttendanceByStudentIdAndClassId(studentId, classId);
+		return antendance.stream().map(this::convertToStudentResponseDTO).collect(Collectors.toList());
+	}
+
+	private AttendanceStudentReviewResponse convertToStudentResponseDTO(Attendance attendance) {
+		AttendanceStudentReviewResponse attendanceDTO = new AttendanceStudentReviewResponse();
+
+		BeanUtils.copyProperties(attendance, attendanceDTO);
+
+		attendanceDTO.setClassId(attendance.getClasses().getClassId());
+		attendanceDTO.setClassName(attendance.getClasses().getClassName());
+
+		List<RegisterCourse> rg = attendance.getClasses().getRegisterCourses();
+
+		for (RegisterCourse registerCourse : rg) {
+			if (registerCourse.getStudent().getStudentId().equals(attendance.getStudent().getStudentId())
+					&& registerCourse.getClasses().getClassId().equals(attendance.getClasses().getClassId())) {
+				attendanceDTO.setCourseName(registerCourse.getCourse().getCourseName());
+				break;
+			}
+		}
+
+		return attendanceDTO;
 	}
 
 	@Override

@@ -35,6 +35,13 @@ const questionApi = {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
     },
+    downloadExcel: () => {
+        const url = `/question-detail/download-excel`
+        return axiosClient.get(url, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            responseType: 'arraybuffer'
+        })
+    },
     createExamination: (classId) => {
         const url = `exam/${classId}`
         return axiosClient.post(url)
