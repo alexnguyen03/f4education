@@ -4,10 +4,15 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.CourseDetail;
 
+@Repository
+@EnableJpaRepositories
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findAllByAdmin_AdminId(String adminId);
 
@@ -38,7 +43,13 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "WHERE c.status = :status " + "ORDER BY bd.total_sales DESC", nativeQuery = true)
 	List<Object[]> findTop10CoursesWithBillDetails(Boolean status);
 
-	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName = :subjectName")
+	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName =:subjectName")
 	List<Course> getCourseBySubjectName(@Param("subjectName") String subjectName);
 
+	List<Course> findAllBySubject_SubjectName(String subjectName);// using DSL syntax
+	// @Query("SELECT c.courseDetail FROM Course c where
+	// c.registerCourses.classes.classId =:classId")
+
+	@Query("SELECT c.courseDetail FROM Course c  WHERE c.courseId =:courseId")
+	List<CourseDetail> getAllCourseContentByCourseId(@Param("courseId") Integer courseId);
 }

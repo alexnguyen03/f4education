@@ -42,4 +42,6 @@ public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, 
 	RegisterCourse findIfCourseIsDone(@Param("studentId") String studentId, @Param("classId") Integer classId,
 			@Param("registerCourseId") Integer registerCourseId, @Param("averagePoint") Float averagePoint);
 
+	public List<RegisterCourse> findAllByClasses_ClassId(Integer classId);
+
 }

@@ -129,6 +129,10 @@ const Subjects = () => {
             const resp = await courseApi.getCourseBySubjectName(
                 subjectName.trim()
             )
+            console.log(
+                '🚀 ~ file: Subjects.js:132 ~ fetchCourseBySubjectName ~ resp:',
+                resp
+            )
 
             if (resp.status === 200) {
                 console.log(resp.data)

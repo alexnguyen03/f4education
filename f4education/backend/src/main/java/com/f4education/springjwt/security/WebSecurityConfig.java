@@ -104,7 +104,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/certificate/**",
                                         "/api/point/**",
                                         "/api/attendance/**",
-                                        "/img/**")
+                                        "/img/courses/**")
                                 .permitAll()
                                 .requestMatchers(
                                         "/api/test/**",
@@ -135,7 +135,6 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/payment-method/**",
                                         "/api/course/newest-courses",
                                         "/api/register-course/**",
-                                        "/api/accounts/**",
                                         "/api/task/**",
                                         "/api/schedule/**",
                                         "/api/evaluation/**",

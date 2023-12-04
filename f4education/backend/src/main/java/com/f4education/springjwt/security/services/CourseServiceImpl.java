@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.CourseDetail;
 import com.f4education.springjwt.models.CourseHistory;
 import com.f4education.springjwt.models.Evaluate;
 import com.f4education.springjwt.models.RegisterCourse;
@@ -198,9 +199,8 @@ public class CourseServiceImpl implements CoursesService {
 		String action = "CREATE";
 
 		Course course = this.convertRequestToEntity(courseRequest);
-		Integer idCourse = courseRequest.getCourseId();
-
 		course.setStatus(true);
+		Integer idCourse = courseRequest.getCourseId();
 
 		if (idCourse != null) {
 			action = "UPDATE";
@@ -358,6 +358,14 @@ public class CourseServiceImpl implements CoursesService {
 	@Override
 	public Boolean isCourseNameExist(String courseName) {
 		return !courseRepository.isCourseNameExist(courseName).isEmpty();
+	}
+
+	@Override
+	public List<String> getAllCourseContentByClassId(Integer classId) {
+		Integer courseId = registerCourseRepository.findAllByClasses_ClassId(classId).get(0).getCourse()
+				.getCourseId();
+		return courseRepository.getAllCourseContentByCourseId(courseId).stream().map(CourseDetail::getLessionTitle)
+				.collect(Collectors.toList());
 	}
 
 }

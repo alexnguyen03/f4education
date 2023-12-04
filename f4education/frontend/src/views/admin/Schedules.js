@@ -16,6 +16,7 @@ import classRoomApi from '../../api/classRoomApi'
 import scheduleApi from '../../api/scheduleApi'
 import { convertArrayToLabel } from '../../utils/Convertor'
 import Notify from '../../utils/Notify'
+import courseApi from 'api/courseApi'
 function Schedules() {
     const [listClass, setListClass] = useState([])
     const [classListModal, setClassListModal] = useState(false)
@@ -26,21 +27,19 @@ function Schedules() {
     const [listSchedule, setListSchedule] = useState([])
     const [listClassroom, setListClassroom] = useState([])
     const [listClassroomAndSession, setListClassroomAndSession] = useState([])
-    const [classSelected, setClassSelected] = useState({})
+    const [classSelected, setClassSelected] = useState({
+        classId: 0
+    })
     const [sessionSelected, setSessionSelected] = useState({
         value: '',
-        label: 'fdf'
+        label: ''
     })
+    const [allContentByClassId, setAllContentByClassId] = useState([])
 
-    const [minDateUpdate, setMinDateUpdate] = useState(moment(new Date()))
-    const [breakDateSelected, setBreakDateSelected] = useState(
-        moment(new Date())
-    )
-    const [breakIndex, setBreakIndex] = useState()
     const [startDate, setStartDate] = useState(null)
     const [scheduleSelectedRow, setScheduleSelectedRow] = useState({
         scheduleId: '',
-        studyDate: moment(new Date()),
+        studyDate: '',
         session: '',
         classroom: '',
         isPractice: '',
@@ -49,16 +48,9 @@ function Schedules() {
     })
     const [classroomSelected, setClassroomSelected] = useState({
         value: '',
-        label: 'fgdfgd'
+        label: ''
     })
-    const [scheduleRequest, setScheduleRequest] = useState({
-        classId: '',
-        classroomId: '',
-        adminId: '',
-        sessionId: '',
-        note: '',
-        listSchedule: []
-    })
+
     const toggleModal = (state) => {
         switch (state) {
             case 'classListModal':
@@ -75,7 +67,6 @@ function Schedules() {
         }
     }
 
-    const [timetable, setTimetable] = useState([])
     const formatDate = (date) => {
         const formattedDate = moment(date)
             .locale('vi')
@@ -233,12 +224,16 @@ function Schedules() {
         []
     )
     //!  HANDLE FUNCTIONS
-    const handleSetupSchedule = () => {
+    const handleSetupSchedule = async () => {
         toggleModal('choiceSessionModal')
 
         setShowlistSchedule(true)
         const numberOfLessons =
             classSelected.registerCourses[0].courseDuration / 2
+        console.log(
+            '🚀 ~ file: Schedules.js:232 ~ handleSetupSchedule ~ numberOfLessons:',
+            numberOfLessons
+        )
 
         const ls = generateTimetable(startDate, numberOfLessons)
         console.log(
@@ -246,28 +241,44 @@ function Schedules() {
             ls
         )
 
-        const schedule = ls.map((item, index) => {
-            console.log(
-                '🚀 ~ file: Schedules.js:251 ~ schedule ~ item.date._d:',
-                item.date._d
+        try {
+            const resp = await courseApi.getAllCourseContentByClassId(
+                classSelected.classId
             )
-            return {
-                scheduleId: index,
-                studyDate: item.date._d,
-                session: item.session,
-                classroom: item.classroom,
-                isPractice: item.isPractice,
-                teacherName: classSelected.teacher.fullname,
-                content: 'Content !'
-            }
-        })
+            console.log(
+                '🚀 ~ file: Schedules.js:241 ~ handleSetupSchedule ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                setAllContentByClassId(resp.data)
+                const schedule = ls.map((item, index) => {
+                    var content = 'Chưa có nội dung!!!'
+                    if (resp.data[index]) {
+                        content = resp.data[index]
+                    }
+                    return {
+                        scheduleId: index,
+                        studyDate: item.date._d,
+                        session: item.session,
+                        classroom: item.classroom,
+                        isPractice: item.isPractice,
+                        teacherName: classSelected.teacher.fullname,
+                        content: content
+                    }
+                })
 
-        setListSchedule(schedule)
+                setListSchedule(schedule)
+            }
+        } catch (error) {
+            console.log(
+                '🚀 ~ file: Schedules.js:239 ~ handleSetupSchedule ~ error:',
+                error
+            )
+        }
     }
     const handleUpdateSchedule = () => {
         console.log(scheduleSelectedRow.scheduleId)
         const oldSchedule = listSchedule.filter((item) => {
-            console.log(item.scheduleId)
             if (item.scheduleId < scheduleSelectedRow.scheduleId) {
                 return {
                     scheduleId: item.scheduleId,
@@ -293,13 +304,20 @@ function Schedules() {
 
         const numberOfLessons =
             classSelected.registerCourses[0].courseDuration / 2 -
-            oldSchedule.length +
-            1
+            oldSchedule.length
+        console.log(
+            '🚀 ~ file: Schedules.js:306 ~ handleUpdateSchedule ~ numberOfLessons:',
+            numberOfLessons
+        )
 
         const lsScheduleUpdate = generateTimetable(startDate, numberOfLessons)
 
         const newSchedule = lsScheduleUpdate.map((item, index) => {
             index = index + lastItemIndex + 1
+            var content = 'Chưa có nội dung!!!'
+            if (allContentByClassId[index]) {
+                content = allContentByClassId[index]
+            }
             return {
                 scheduleId: index,
                 studyDate: item.date,
@@ -307,14 +325,14 @@ function Schedules() {
                 classroom: item.classroom,
                 isPractice: item.isPractice,
                 teacherName: classSelected.teacher.fullname,
-                content: 'Content !'
+                content: content
             }
         })
         console.log(
             '🚀 ~ file: Schedules.js:327 ~ newSchedule ~ newSchedule:',
             newSchedule
         )
-        toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
+        // toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
         toggleModal('scheduleModal')
         setListSchedule([...oldSchedule, ...newSchedule])
     }
@@ -410,7 +428,10 @@ function Schedules() {
     const handleChangeSchedule = (row) => {
         toggleModal('scheduleModal')
 
-        setScheduleSelectedRow({ ...row.original })
+        setScheduleSelectedRow({
+            ...row.original,
+            studyDate: row.original.studyDate
+        })
         const studyDateSelected = row.original.studyDate
         console.log(
             '🚀 ~ file: Schedules.js:390 ~ handleChangeSchedule ~ studyDateSelected:',
@@ -418,7 +439,7 @@ function Schedules() {
         )
         console.log(
             '🚀 ~ file: Schedules.js:385 ~ handleChangeSchedule ~ row.original:',
-            row.original
+            moment(row.original.studyDate).add(1, 'day')
         )
     }
 

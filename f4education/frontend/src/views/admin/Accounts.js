@@ -10,7 +10,7 @@ import accountApi from '../../api/accountApi'
 import moment from 'moment'
 import AccountHeader from 'components/Headers/AccountHeader'
 import { MaterialReactTable } from 'material-react-table'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { memo, useEffect, useMemo, useRef, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import React from 'react'
@@ -29,7 +29,7 @@ import {
     Row,
     ButtonGroup
 } from 'reactstrap'
-const IMG_URL = '/courses/'
+const IMG_URL = '/avatars/accounts/'
 const Accounts = () => {
     const user = JSON.parse(localStorage.getItem('user') ?? '')
     const [imgData, setImgData] = useState(null)
@@ -54,6 +54,7 @@ const Accounts = () => {
     const [errors, setErrors] = useState({})
     const [errors_1, setErrors_1] = useState({})
     const toastId = React.useRef(null)
+    const fileInputRef = useRef(null)
 
     // notification loading
     const notifi_loading = (mess) => {
@@ -420,6 +421,37 @@ const Accounts = () => {
         []
     )
 
+    const handleImageClick = () => {
+        fileInputRef.current.click()
+        console.log(
+            '🚀 ~ file: Courses.js:205 ~ handleImageClick ~ fileInputRef.current:',
+            fileInputRef.current
+        )
+    }
+    const onChangePicture = (e) => {
+        if (e.target.files[0]) {
+            const file = e.target.files[0]
+            setImage(file)
+
+            const reader = new FileReader()
+            reader.onload = () => {
+                setImgData(reader.result)
+            }
+            reader.readAsDataURL(file)
+
+            setStudent((prevCourse) => ({
+                ...prevCourse,
+                image: file.name
+            }))
+        } else {
+            setImage(null)
+            setImgData(null)
+            setStudent((prevCourse) => ({
+                ...prevCourse,
+                image: '' // Clear the image name
+            }))
+        }
+    }
     const columns_teacher = useMemo(
         () => [
             {
@@ -1062,10 +1094,15 @@ const Accounts = () => {
             // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
             try {
                 const resp = await accountApi.addAccount(formData)
+                console.log(
+                    '🚀 ~ file: Accounts.js:1097 ~ createStudent ~ resp:',
+                    resp
+                )
                 if (resp.status === 200) {
                     update_success('Thêm dữ liệu thành công')
                     handleResetForm_1()
-                    getAllStudent()
+                    // getAllStudent()
+                    setStudents([resp.data, ...students])
                 } else {
                     if (resp.data.message === '1') {
                         update_fail('Email đã được sử dụng')
@@ -2000,7 +2037,89 @@ const Accounts = () => {
                                                             >
                                                                 Ảnh đại diện
                                                             </Label>
-                                                            <div className="custom-file">
+                                                            <FormGroup className="d-none">
+                                                                <div className="custom-file">
+                                                                    <input
+                                                                        ref={
+                                                                            fileInputRef
+                                                                        }
+                                                                        type="file"
+                                                                        name="imageFile"
+                                                                        accept="image/*"
+                                                                        id="customFile"
+                                                                        onChange={
+                                                                            onChangePicture
+                                                                        }
+                                                                        // multiple={true}
+                                                                    />
+                                                                    <label
+                                                                        className="custom-file-label"
+                                                                        htmlFor="customFile"
+                                                                    >
+                                                                        {imgData
+                                                                            ? 'Chọn một ảnh khác'
+                                                                            : 'Chọn hình ảnh'}
+                                                                    </label>
+                                                                </div>
+                                                            </FormGroup>
+                                                            <div
+                                                                className="previewProfilePic px-3 border d-flex justify-content-center"
+                                                                style={{
+                                                                    height: '200px',
+                                                                    overflow:
+                                                                        'hidden',
+                                                                    position:
+                                                                        'relative',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                                onClick={
+                                                                    handleImageClick
+                                                                }
+                                                            >
+                                                                {imgData && (
+                                                                    <img
+                                                                        alt=""
+                                                                        // width={120}
+                                                                        className="playerProfilePic_home_tile"
+                                                                        src={
+                                                                            imgData
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {update &&
+                                                                    !imgData && (
+                                                                        <img
+                                                                            alt=""
+                                                                            className=""
+                                                                            src={
+                                                                                process
+                                                                                    .env
+                                                                                    .REACT_APP_IMAGE_URL +
+                                                                                IMG_URL +
+                                                                                student
+                                                                                    .student
+                                                                                    .image
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                <small
+                                                                    className={` position-absolute  text-center `}
+                                                                    style={{
+                                                                        top: '50%',
+                                                                        left: '50%',
+                                                                        transform:
+                                                                            'translate(-50%, -50%)',
+                                                                        textAlign:
+                                                                            'center'
+                                                                    }}
+                                                                >
+                                                                    {student.image ===
+                                                                    ''
+                                                                        ? 'Nhấn chọn ảnh cho học viên'
+                                                                        : null}
+                                                                </small>
+                                                            </div>
+                                                            {/* <div className="custom-file">
                                                                 <input
                                                                     type="file"
                                                                     name="imageFile"
@@ -2018,10 +2137,10 @@ const Accounts = () => {
                                                                     Chọn hình
                                                                     ảnh
                                                                 </label>
-                                                            </div>
+                                                            </div> */}
                                                         </FormGroup>
                                                     </Col>
-                                                    <div className="previewProfilePic px-3">
+                                                    {/* <div className="previewProfilePic px-3">
                                                         {imgData && (
                                                             <img
                                                                 alt=""
@@ -2061,7 +2180,7 @@ const Accounts = () => {
                                                                     }
                                                                 />
                                                             )}
-                                                    </div>
+                                                    </div> */}
                                                 </Row>
                                             </Col>
                                         </Row>
