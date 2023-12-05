@@ -9,7 +9,7 @@ import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 
 @Service
 public interface QuestionDetailService {
-	List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId);
+	List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId, String studentId);
 	
 	List<QuestionDetailDTO> findAll();
 	

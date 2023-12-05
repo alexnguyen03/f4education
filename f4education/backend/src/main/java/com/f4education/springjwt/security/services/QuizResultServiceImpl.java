@@ -1,6 +1,7 @@
 package com.f4education.springjwt.security.services;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,12 +54,20 @@ public class QuizResultServiceImpl implements QuizResultService {
 
 	private QuizResult convertToEntity(QuizResultRequest quizResultRequest, QuizResult quizResult) {
 		BeanUtils.copyProperties(quizResultRequest, quizResult);
-		Course course = courseRepository.findById(quizResultRequest.getCourseId()).get();
-		Classes classes = classRepository.findById(quizResultRequest.getClassId()).get();
-		Student student = studentRepository.findById(quizResultRequest.getStudentId()).get();
+
+		Course course = courseRepository.findById(quizResultRequest.getCourseId()).orElseThrow(
+				() -> new NoSuchElementException("Không tìm thấy Course với ID: " + quizResultRequest.getCourseId()));
+
+		Classes classes = classRepository.findById(quizResultRequest.getClassId()).orElseThrow(
+				() -> new NoSuchElementException("Không tìm thấy Classes với ID: " + quizResultRequest.getClassId()));
+
+		Student student = studentRepository.findById(quizResultRequest.getStudentId()).orElseThrow(
+				() -> new NoSuchElementException("Không tìm thấy Student với ID: " + quizResultRequest.getStudentId()));
+
 		quizResult.setCourse(course);
 		quizResult.setClasses(classes);
 		quizResult.setStudent(student);
+
 		return quizResult;
 	}
 

@@ -11,4 +11,7 @@ import com.f4education.springjwt.models.QuizResult;
 public interface QuizResultRepository extends JpaRepository<QuizResult, Integer> {
     @Query("SELECT at.student.studentId, COUNT(at.student.studentId) FROM QuizResult AS at WHERE at.classes.classId = :classId GROUP BY at.student.studentId")
     public List<Object[]> getAllByClassId(@Param("classId") Integer classId);
+    
+    @Query("SELECT at FROM QuizResult AS at WHERE at.classes.classId = :classId AND at.student.studentId = :studentId")
+    public List<QuizResult> getAllByClassIdAndStudenId(@Param("classId") Integer classId, @Param("studentId") String studentId);
 }

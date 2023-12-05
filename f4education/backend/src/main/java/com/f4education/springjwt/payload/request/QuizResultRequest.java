@@ -16,7 +16,7 @@ public class QuizResultRequest {
 	private Integer quizzId;
 
 	@JsonProperty("score")
-	private Integer score;
+	private Float score;
 	
 	@JsonProperty("duration")
 	private Integer duration;

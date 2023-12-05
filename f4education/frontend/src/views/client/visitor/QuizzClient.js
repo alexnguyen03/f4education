@@ -13,7 +13,7 @@ import {
 import React, { useState, useEffect } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams, useNavigate } from 'react-router-dom'
 
 import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
@@ -22,136 +22,7 @@ const user = JSON.parse(localStorage.getItem('user'))
 
 function QuizzClient() {
     const [searchParams, setSearchParams] = useSearchParams()
-    // const [time, setTime] = useState(10 * 60)
-    // const [elapsedTime, setElapsedTime] = useState(0)
-    // const [isFinished, setIsFinished] = useState(true)
-    // const useReverseTimer = () => {
-    //     useEffect(() => {
-    //         let intervalId
-
-    //         if (time > 0 && !isFinished) {
-    //             intervalId = setInterval(() => {
-    //                 setTime((prevTime) => prevTime - 1)
-    //                 setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
-    //             }, 1000)
-    //         }
-
-    //         return () => {
-    //             clearInterval(intervalId)
-    //         }
-    //     }, [time, isFinished])
-
-    //     return time
-    // }
-    // const timeRemaining = useReverseTimer()
-    // const minutes = Math.floor(timeRemaining / 60)
-    // const seconds = timeRemaining % 60
-
-    // const initialTime = 10 * 60
-    // const [time, setTime] = useState(initialTime)
-    // const [initialized, setInitialized] = useState(false)
-
-    // useEffect(() => {
-    //     const storedTime = localStorage.getItem('quizTime')
-
-    //     if (storedTime && !initialized) {
-    //         setTime(parseInt(storedTime, 10))
-    //         setInitialized(true)
-    //     }
-
-    //     const handleBeforeUnload = () => {
-    //         localStorage.setItem('quizTime', time.toString())
-    //     }
-
-    //     const intervalId = setInterval(() => {
-    //         setTime((prevTime) => {
-    //             const newTime = prevTime - 1
-    //             if (newTime <= 0) {
-    //                 clearInterval(intervalId)
-    //                 return 0
-    //             }
-    //             return newTime
-    //         })
-    //     }, 1000)
-
-    //     window.addEventListener('beforeunload', handleBeforeUnload)
-
-    //     return () => {
-    //         clearInterval(intervalId)
-    //         window.removeEventListener('beforeunload', handleBeforeUnload)
-    //     }
-    // }, [time, initialized])
-
-    // const [time, setTime] = useState(10 * 60)
-    // const [elapsedTime, setElapsedTime] = useState(0)
-    // const [isFinished, setIsFinished] = useState(false)
-
-    // const handleBeforeUnload = () => {
-    //     localStorage.setItem('quizTime', JSON.stringify(time))
-    //     localStorage.setItem('elapsedTime', JSON.stringify(elapsedTime))
-    //     localStorage.setItem('isFinished', JSON.stringify(isFinished))
-    // }
-
-    // useEffect(() => {
-    //     const storedTime = JSON.parse(localStorage.getItem('quizTime')) || time
-    //     const storedElapsedTime =
-    //         JSON.parse(localStorage.getItem('elapsedTime')) || 0
-    //     const storedIsFinished =
-    //         JSON.parse(localStorage.getItem('isFinished')) || false
-
-    //     setTime(storedTime)
-    //     setElapsedTime(storedElapsedTime)
-    //     setIsFinished(storedIsFinished)
-
-    //     const intervalId = setInterval(() => {
-    //         if (time > 0 && !isFinished) {
-    //             setTime((prevTime) => prevTime - 1)
-    //             setElapsedTime((prevElapsedTime) => prevElapsedTime + 1)
-    //         } else {
-    //             clearInterval(intervalId)
-    //         }
-    //     }, 1000)
-
-    //     window.addEventListener('beforeunload', handleBeforeUnload)
-
-    //     return () => {
-    //         clearInterval(intervalId)
-    //         window.removeEventListener('beforeunload', handleBeforeUnload)
-    //     }
-    // }, [time, isFinished])
-    const storedStartTime = localStorage.getItem('countdown_start_time')
-    const storedSeconds = localStorage.getItem('countdown_seconds')
-
-    const [startTime, setStartTime] = useState(
-        storedStartTime || Date.now().toString()
-    )
-
-    const [seconds, setSeconds] = useState(
-        storedSeconds ? parseInt(storedSeconds) : 600
-    )
-
-    useEffect(() => {
-        localStorage.setItem('countdown_start_time', startTime)
-        localStorage.setItem('countdown_seconds', seconds.toString())
-    }, [startTime, seconds])
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setSeconds((prevSeconds) => {
-                if (prevSeconds <= 0) {
-                    return 0
-                }
-                return prevSeconds - 1
-            })
-        }, 1000)
-
-        return () => clearInterval(timer)
-    }, [])
-
-    const formatTime = (time) => (time < 10 ? `0${time}` : time)
-
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
+    let navigate = useNavigate()
 
     const itemsBreadcum = [
         { title: 'Trang chủ', href: '/' },
@@ -180,16 +51,21 @@ function QuizzClient() {
         }
     ])
 
+    const [isDoing, setIsDoing] = useState(false)
+
     const getQuestionDetailsByClassId = async () => {
         try {
             const resp = await questionDetailApi.getQuestionDetailsByClassId(
-                searchParams.get('classId')
+                searchParams.get('classId'),
+                user.username
             )
             if (resp.status === 200 && resp.data.length > 0) {
                 setQuestionDetail(resp.data)
                 startTimer()
             } else {
+                setIsDoing(true)
             }
+            console.log(resp.data)
         } catch (error) {
             console.log(error)
         }
@@ -263,7 +139,7 @@ function QuizzClient() {
     const startTimer = () => {
         setShowQuestion(true)
         // setIsFinished(false)
-        // setElapsedTime(0)
+        setElapsedTime(0)
     }
 
     const handleFinish = () => {
@@ -329,7 +205,7 @@ function QuizzClient() {
 
         console.log(`Tổng điểm số radio: ${totalScoreRadio}`)
         console.log(`Tổng điểm số checkbox: ${totalScoreCheckbox}`)
-        addQuizzResult(2, totalScoreCheckbox + totalScoreRadio)
+        addQuizzResult(elapsedTime, totalScoreCheckbox + totalScoreRadio)
     }
 
     const findAnswer = (questionDetailId, answerId) => {
@@ -362,6 +238,11 @@ function QuizzClient() {
             const resp = await quizzResultApi.createQuizzResult(
                 quizzResultRequest
             )
+            if (resp.status === 200) {
+                navigate({
+                    pathname: '/student/classes'
+                })
+            }
         } catch (error) {
             console.log('Thêm lỗi', error)
         }
@@ -380,6 +261,57 @@ function QuizzClient() {
     useEffect(() => {
         getQuestionDetailsByClassId()
     }, [])
+
+    const storedStartTime = localStorage.getItem('countdown_start_time')
+    const storedSeconds = localStorage.getItem('countdown_seconds')
+    const [elapsedTime, setElapsedTime] = useState(0)
+
+    const [startTime, setStartTime] = useState(
+        storedStartTime || Date.now().toString()
+    )
+
+    const [seconds, setSeconds] = useState(
+        storedSeconds
+            ? 80 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
+            : 80
+    )
+
+    useEffect(() => {
+        localStorage.setItem('countdown_start_time', startTime)
+        localStorage.setItem('countdown_seconds', seconds.toString())
+    }, [startTime, seconds])
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setSeconds((prevSeconds) => {
+                if (prevSeconds <= 0) {
+                    return 0
+                } else {
+                    setElapsedTime((prevSeconds) => prevSeconds + 1)
+                }
+                return prevSeconds - 1
+            })
+        }, 1000)
+
+        return () => clearInterval(timer)
+    }, [])
+
+    useEffect(() => {
+        if (seconds === 0) {
+            handleFinish()
+            handleReset()
+        }
+    }, [seconds])
+
+    const formatTime = (time) => (time < 10 ? `0${time}` : time)
+
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+
+    const handleReset = () => {
+        setStartTime(Date.now().toString())
+        setSeconds(80)
+    }
 
     return (
         <>
@@ -418,33 +350,11 @@ function QuizzClient() {
                                             Thời gian còn lại
                                         </span>
                                         <br />
-                                        {/* <span className="display-2">
-                                            {seconds > 10
-                                                ? `0${minutes}`
-                                                : minutes}
-                                        </span>
-                                        <span className="display-2">
-                                            :
-                                            {seconds < 10
-                                                ? `0${seconds}`
-                                                : seconds}
-                                        </span> */}
-                                        {/* <span className="display-2">
-                                            {Math.floor(time / 60)
-                                                .toString()
-                                                .padStart(2, '0')}
-                                        </span>
-                                        <span className="display-2">
-                                            :
-                                            {(time % 60)
-                                                .toString()
-                                                .padStart(2, '0')}
-                                        </span> */}
                                         <span className="display-2">
                                             {formatTime(minutes)}
                                         </span>
                                         <span className="display-2">
-                                            : {formatTime(remainingSeconds)}
+                                            :{formatTime(remainingSeconds)}
                                         </span>
                                     </p>
                                 </div>
@@ -470,7 +380,7 @@ function QuizzClient() {
                                     }}
                                 >
                                     <h1 className="display-2 text-dark mx-auto mt-3">
-                                        Quiz 1
+                                        BÀI KIỂM TRA TRẮC NGHIỆM
                                     </h1>
                                     {questionDetail.map(
                                         (question, indexQuestion) => (
@@ -493,16 +403,8 @@ function QuizzClient() {
                                                                     answer.isCorrect ===
                                                                     true
                                                             ).length >= 2
-                                                                ? `Chọn tối đa ${
-                                                                      question.answer.filter(
-                                                                          (
-                                                                              answer
-                                                                          ) =>
-                                                                              answer.isCorrect ===
-                                                                              true
-                                                                      ).length
-                                                                  } đáp án`
-                                                                : ''}
+                                                                ? 'Chọn ít nhất 2 đáp án'
+                                                                : 'Chọn ít nhất 1 đáp án'}
                                                         </h4>
                                                     </div>
                                                 </div>
@@ -634,6 +536,10 @@ function QuizzClient() {
                     </div>
                 </div>
             ) : (
+                ''
+            )}
+
+            {showQuestion === false && isDoing === false && (
                 <Stack mt={250} mx="auto" align="center">
                     <Title order={2} color="dark">
                         <Loader color="rgba(46, 46, 46, 1)" />
@@ -641,6 +547,14 @@ function QuizzClient() {
                     <Text c="dimmed" fz="lg">
                         Vui lòng chờ trong giây lát...
                     </Text>
+                </Stack>
+            )}
+
+            {isDoing == true && (
+                <Stack mt={250} mx="auto" align="center">
+                    <Title order={2} color="dark">
+                        Bạn đã làm bài kiểm tra rồi!!!
+                    </Title>
                 </Stack>
             )}
         </>
