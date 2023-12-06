@@ -52,6 +52,8 @@ import BarChart from 'variables/BarChart'
 
 // API
 import courseAPI from '../api/courseApi'
+import reportApi from 'api/reportApi'
+import { Chart } from 'chart.js'
 import { LoadingOverlay } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import moment from 'moment/moment'
@@ -152,8 +154,8 @@ const Index = () => {
     }
 
     // Thống kê khóa học
-    const [startDate, setStartDate] = useState(null)
-    const [endDate, setEndDate] = useState(null)
+    const [startDateCourse, setStartDateCourse] = useState(null)
+    const [endDateCourse, setEndDateCourse] = useState(null)
 
     const [data, setData] = useState([])
 
@@ -237,7 +239,7 @@ const Index = () => {
             ? filteredData.sort((a, b) => b.totalRenueve - a.totalRenueve)
             : []
 
-        const revenueChart = document.getElementById('revenueChart')
+        const revenueChart = document.getElementById('revenueChartCourse')
 
         if (revenueChart) {
             const myChart = new Chart(revenueChart, {
@@ -624,7 +626,7 @@ const Index = () => {
                     <Col className="mt-5">
                         <div className="d-flex justify-content-end align-items-center my-5">
                             <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
-                                Bộ lọc theo ngày tháng năm:
+                                Bộ lọc khóa học theo ngày tháng năm:
                             </h5>
                             <div className="d-flex justify-content-start">
                                 <DateInput
@@ -633,8 +635,8 @@ const Index = () => {
                                     mr={10}
                                     clearable
                                     w={320}
-                                    value={startDate}
-                                    onChange={(value) => setStartDate(value)}
+                                    value={startDateCourse}
+                                    onChange={(value) => setStartDateCourse(value)}
                                 />
 
                                 <DateInput
@@ -642,12 +644,15 @@ const Index = () => {
                                     variant="filled"
                                     clearable
                                     w={320}
-                                    value={endDate}
-                                    onChange={(value) => setEndDate(value)}
+                                    value={endDateCourse}
+                                    onChange={(value) => setEndDateCourse(value)}
                                 />
                             </div>
                         </div>
-                        <canvas id="revenueChart" className="w-100 h-100" />
+                        <canvas id="revenueChartCourse" className="w-100 h-100" />
+                    </Col>
+                </Row>
+            </Container>
         </>
     )
 }
