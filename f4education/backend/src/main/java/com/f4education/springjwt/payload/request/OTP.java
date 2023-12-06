@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class OTP {
     String email;
-    int OTP;
+    int codeOTP;
     Date date;
 }

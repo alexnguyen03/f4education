@@ -2,6 +2,7 @@ package com.f4education.springjwt.controllers;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -58,24 +59,79 @@ public class AccountController {
 
     private List<OTP> list = new ArrayList<OTP>();
 
-    private static int randomOTP() {
+    private int randomOTP() {
         Random random = new Random();
         return random.nextInt(9000) + 1000;
     }
 
-    private OTP checkOTP(OTP otp) {
+    private OTP udpateOTP(OTP otp, boolean udpateOTP) {
         for (int i = 0; i < list.size(); i++) {
             OTP otp2 = list.get(i);
-            long timeDifference = Math.abs((otp.getDate().getTime() - otp2.getDate().getTime()) / 1000);
-            if (timeDifference > 60) {
+            Date now = new Date();
+
+            Long timeDifference = null;
+            try {
+                timeDifference = Math.abs((now.getTime() - otp2.getDate().getTime()) / 1000);
+            } catch (Exception e) {
+            }
+            if (timeDifference != null && timeDifference > 60) {
                 list.remove(i);
             } else {
                 if (otp2.getEmail().equals(otp.getEmail())) {
+                    if (udpateOTP) {
+                        list.set(i, otp);
+                        otp2 = otp;
+                    }
                     return otp2;
                 }
             }
         }
         return null;
+    }
+
+    @PostMapping(value = "/checkEmailForPassWord") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> checkMailForPassWord(@RequestBody OTP otp) {
+
+        // ! kiểm tra xem email đó có tồn tại hay không?
+        Boolean checkEmailExit = accountService.existsByEmail(otp.getEmail().trim());
+        if (!checkEmailExit) {// ! email chưa đăng ký tài khoản nào
+            return ResponseEntity
+                    .badRequest()
+                    .body("1");
+        }
+
+        // ! kiểm tra OTP
+        int code = randomOTP();
+        OTP otpNew = new OTP(otp.getEmail().trim(), code, new Date());// tạo OTP mới để cập nhật
+        OTP otpUpdate = udpateOTP(otpNew, true);
+
+        if (otpUpdate == null) {
+            list.add(otpNew);
+            otpUpdate = otpNew;
+        }
+
+        // ! Gửi mail cho người dùng
+        String mail = otpUpdate.getEmail().toString();
+        mailer.queue(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
+        return ResponseEntity.ok().body(otpUpdate);
+    }
+
+    @PostMapping(value = "/checkOTPForPassWord") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> checkOTPForPassWord(@RequestBody OTP otp) {
+        OTP otpUpdate = udpateOTP(otp, false);
+        Date now = new Date();
+        if (((now.getTime() - otpUpdate.getDate().getTime()) / 1000) > 60) {// ! đã qua 60s, OTP đã hết hạn sử dụng
+            return ResponseEntity
+                    .badRequest()
+                    .body(1);// ! dead OTP
+        } else {
+            if (otpUpdate.getCodeOTP() != otp.getCodeOTP()) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(2);// ! wrong OTP
+            }
+        }
+        return ResponseEntity.ok().body(null);
     }
 
     @GetMapping
@@ -130,21 +186,6 @@ public class AccountController {
         String mail = accountDTO.getEmail().toString();
         mailer.queue(mail, "", "", null);
         return ResponseEntity.ok().body(new MessageResponse("2"));
-    }
-
-    @PostMapping(value = "/checkEmailForPassWord")
-    public ResponseEntity<?> checkMailForPassWord(@RequestBody AccountDTO accountDTO) {
-        // Boolean checkEmailExit =
-        // accountService.existsByEmail(accountDTO.getEmail().trim());
-        // if (checkEmailExit) {
-        // return ResponseEntity
-        // .badRequest()
-        // .body(new MessageResponse("1"));
-        // }
-        // String mail = accountDTO.getEmail().toString();
-        // mailer.queue(mail, "", "", null);
-        // return ResponseEntity.ok().body(new MessageResponse("2"));
-        return null;
     }
 
     // ! Chuyển đổi json sang DTO và set img vào DTO nếu có file có tồn tại

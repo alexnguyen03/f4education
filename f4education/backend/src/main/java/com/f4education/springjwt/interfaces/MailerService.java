@@ -44,6 +44,8 @@ public interface MailerService {
 
 	void queue(String to, String subject, String body, Date date);
 
+	void queue(String to, String subject, String body, Date date, int OTP);
+
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
 }

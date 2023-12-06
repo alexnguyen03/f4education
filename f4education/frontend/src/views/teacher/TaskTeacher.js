@@ -346,7 +346,12 @@ const TaskTeacher = () => {
 
         // functions will be used to validate values at corresponding key
         validate: {
-            title: (value) => (value === '' ? 'Không để trống tên gọi' : null),
+            title: (value) => {
+                if (value === '') {
+                    return 'Không để trống tên gọi'
+                }
+                return null
+            },
             startDate: (value) =>
                 value === '' ? 'Vui lòng chọn thời gian bắt đầu' : null,
             endDate: (value) =>
