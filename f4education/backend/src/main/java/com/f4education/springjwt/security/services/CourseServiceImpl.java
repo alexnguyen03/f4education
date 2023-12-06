@@ -1,5 +1,9 @@
 package com.f4education.springjwt.security.services;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -21,6 +25,8 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 import com.f4education.springjwt.payload.request.ThoiLuongRange;
 import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.repository.AdminRepository;
@@ -403,4 +409,103 @@ public class CourseServiceImpl implements CoursesService {
 		return !courseRepository.isCourseNameExist(courseName).isEmpty();
 	}
 
+//	@Override
+//	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) {
+//		List<ReportCourseCountStudentDTO> list = new ArrayList<ReportCourseCountStudentDTO>();
+//		List<Course> listCourse = courseRepository.getAll("Đã đăng ký");
+//		for (Course c : listCourse) {
+//			Long studentCount = 0l;
+//			if (startDate == null && endDate == null) { // ! lấy hết
+//				studentCount = (long) c.getRegisterCourses().size();
+//			} else {
+//				if (!c.getRegisterCourses().isEmpty()) {
+//					for (RegisterCourse r : c.getRegisterCourses()) {// ! lọc qua những phiếu đăng ký
+//						Date date = r.getRegistrationDate();
+//						if (endDate == null) { // ! check từ ngày bắt đầu trở về sau
+//							if (date.after(startDate)) {
+//								studentCount++;
+//							} else {
+//								if (startDate == null) { // ! check từ ngày kết thúc trở về trước
+//									if (date.before(endDate)) {
+//										studentCount++;
+//									}
+//								} else {
+//									if (check(date, startDate, endDate)) {
+//										studentCount++;
+//									}
+//								}
+//							}
+//						}
+//					}
+//				}
+//			}
+//
+//			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+//		}
+//		System.out.println(list);
+//		return list;
+//	}
+
+//	@Override
+//	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) throws ParseException {
+//		List<ReportCourseCountStudentDTO> list = new ArrayList<>();
+//		List<Course> listCourse = courseRepository.getAll();
+//
+//		for (Course c : listCourse) {
+//			Long studentCount = 0L;
+//
+//			if (!c.getRegisterCourses().isEmpty()) {
+//				for (RegisterCourse r : c.getRegisterCourses()) {
+//					Date date = r.getRegistrationDate();
+//
+//					// Check the status and filter by registration date range
+//					if (r.getStatus().equalsIgnoreCase("Đã đăng ký") && !isWithinDateRange(date, startDate, endDate)) {
+//						System.out.println(isWithinDateRange(date, startDate, endDate));
+//						studentCount++;
+//					} 					
+//				}
+//			}
+//
+//			// Add the course and student count to the result list
+//			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+//		}
+//		System.out.println(list);
+//		return list;
+//	}
+
+	@Override
+	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
+		List<ReportCourseCountStudentDTO> list = new ArrayList<>();
+		List<Course> listCourse = courseRepository.getAll();
+
+		for (Course c : listCourse) {
+			Long studentCount = 0L;
+			List<Date> registrationDates = new ArrayList<>();
+
+			if (!c.getRegisterCourses().isEmpty()) {
+				for (RegisterCourse r : c.getRegisterCourses()) {
+					Date date = r.getRegistrationDate();
+
+					// Check the status and filter by registration date range
+					if (r.getStatus().equalsIgnoreCase("Đã đăng ký")) {
+						studentCount++;
+						registrationDates.add(date);
+					}
+				}
+			}
+
+			// Add the course, student count, and registration dates to the result list
+			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount, registrationDates));
+		}
+
+		System.out.println(list);
+		return list;
+	}
+
+	@Override
+	public List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate() {
+		List<ReportCourseCountStudentCertificateDTO> list = courseRepository.getCoursesWithStudentCountCertificate();
+		System.out.println(list);
+		return list;
+	}
 }

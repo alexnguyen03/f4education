@@ -1,12 +1,21 @@
 package com.f4education.springjwt.repository;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
 
+import org.springframework.data.domain.Example;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
 
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findAllByAdmin_AdminId(String adminId);
@@ -41,4 +50,18 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName = :subjectName")
 	List<Course> getCourseBySubjectName(@Param("subjectName") String subjectName);
 
+//	@Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO(c.courseName, COUNT(rc.student.studentId)) "
+//			+ "FROM Course c " + "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
+//			+ "WHERE LOWER(rc.status) = LOWER(:status) " + "GROUP BY c.courseId, c.courseName")
+//	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(@Param("status") String status);
+
+	@Query("SELECT c FROM Course c JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
+			+ "GROUP BY c")
+	List<Course> getAll();
+
+	@Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO(c.courseName, COUNT(p.student.studentId)) "
+			+ "FROM Course c " + "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
+			+ "JOIN Classes cl ON cl.classId = rc.classes.classId " + "JOIN Point p ON p.classes.classId = cl.classId "
+			+ "WHERE p.averagePoint >= 5.0 " + "GROUP BY c.courseId, c.courseName")
+	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
 }
