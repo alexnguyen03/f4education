@@ -571,7 +571,7 @@ const ClientNavbar = () => {
                                                                                     sm="4"
                                                                                 >
                                                                                     <img
-                                                                                        src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                                                                        src={`${PUBLIC_IMAGE}/avatars/courses/${cart.course.image}`}
                                                                                         alt="cart item img"
                                                                                         className="img-fluid"
                                                                                         style={{

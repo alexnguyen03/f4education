@@ -67,11 +67,12 @@ public class FirebaseStorageService {
                         Iterable<Blob> blobs = storage.list(bucketName, Storage.BlobListOption.prefix(folderPrefix))
                                         .iterateAll();
 
+                        System.out.println("============= update cache");
                         // Set Cache-Control header to no-cache for each blob
                         for (Blob blob : blobs) {
                                 BlobInfo updatedBlobInfo = blob.toBuilder().setCacheControl("no-cache").build();
-                                storage.update(updatedBlobInfo);
                                 System.out.println("Cache-Control set to no-cache for: " + blob.getName());
+                                storage.update(updatedBlobInfo);
                                 Blob updatedBlob = storage.get(bucketName, blob.getName());
                                 String cacheControl = updatedBlob.getCacheControl();
                                 System.out.println("Cache-Control: " + cacheControl);

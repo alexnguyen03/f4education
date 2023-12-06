@@ -39,10 +39,11 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Notify from '../../utils/Notify'
 
-const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const ClassInformationDetail = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // ************* Routes Variable
     const data = useParams()
     let navigate = useNavigate()
@@ -123,7 +124,7 @@ const ClassInformationDetail = () => {
 
     const fetchClassByTeacher = async () => {
         try {
-            const resp = await classApi.getAllClassByTeacherId(teacherId)
+            const resp = await classApi.getAllClassByTeacherId(user.username)
             console.log(
                 '🚀 ~ file: ClassInformationDetail.js:109 ~ fetchClassByTeacher ~ resp:',
                 resp
@@ -300,7 +301,7 @@ const ClassInformationDetail = () => {
                     const row = cell.getValue()
                     return (
                         <Image
-                            src={`${PUBLIC_IMAGE}/courses/${row.image}`}
+                            src={`${PUBLIC_IMAGE}/avatars/courses/${row.image}`}
                             width={40}
                             height={40}
                             radius={50}

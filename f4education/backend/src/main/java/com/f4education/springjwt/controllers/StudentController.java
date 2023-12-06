@@ -55,6 +55,7 @@ public class StudentController {
 
 				String imageURL = firebaseStorageService.uploadImage(file.get(),
 						"students/", studentRequest.getStudentId().trim());
+				firebaseStorageService.isUpdatedNoCahe("students/");
 				studentRequest.setImage(studentRequest.getStudentId());
 			}
 		} catch (JsonProcessingException e) {

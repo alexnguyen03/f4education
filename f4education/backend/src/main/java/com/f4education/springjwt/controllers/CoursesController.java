@@ -116,6 +116,7 @@ public class CoursesController {
 			if (!file.isEmpty()) {
 				String imageURL = firebaseStorageService.uploadImage(file.get(),
 						"courses/", courseRequest.getCourseName().trim());
+				firebaseStorageService.isUpdatedNoCahe("courses/");
 				System.out.println(imageURL + "========================");
 				// File savedFile = xfileService.save(file.orElse(null), "/courses");
 				courseRequest.setImage(courseRequest.getCourseName().trim());

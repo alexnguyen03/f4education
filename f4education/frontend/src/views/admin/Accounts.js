@@ -29,10 +29,14 @@ import {
     Row,
     ButtonGroup
 } from 'reactstrap'
+import Notify from '../../utils/Notify'
+import { LoadingOverlay } from '@mantine/core'
+
 const IMG_URL = '/avatars/accounts/'
 const Accounts = () => {
     const user = JSON.parse(localStorage.getItem('user') ?? '')
     const [imgData, setImgData] = useState(null)
+    const [loadingRequest, setLoadingRequest] = useState(false)
     const [loadingHistoryInfo, setLoadingHistoryInfo] = useState(true)
     const [showHistoryInfo, setShowHistoryInfo] = useState(false)
     const [showForm_1, setShowForm_1] = useState(false)
@@ -136,7 +140,7 @@ const Accounts = () => {
         }
     })
 
-    //Nhận data vai trò giảng viên gửi lên từ server
+    //Nhận data vai trò giáo viên gửi lên từ server
     const [teacher, setTeacher] = useState({
         id: 0,
         username: '',
@@ -249,7 +253,7 @@ const Accounts = () => {
         }))
     }
 
-    // Thay đổi giá trị các thuộc tính của giảng viên
+    // Thay đổi giá trị các thuộc tính của giáo viên
     const handelOnChangeInput_2 = (e) => {
         const { name, value } = e.target
         setTeacher((prevTeacher) => ({
@@ -439,16 +443,56 @@ const Accounts = () => {
             }
             reader.readAsDataURL(file)
 
-            setStudent((prevCourse) => ({
-                ...prevCourse,
-                image: file.name
+            setStudent((prevStudent) => ({
+                ...prevStudent,
+                student: {
+                    ...prevStudent.student,
+
+                    image: file.name
+                }
+            }))
+            setTeacher((prevTeacher) => ({
+                ...prevTeacher,
+                teacher: {
+                    ...prevTeacher.teacher,
+
+                    image: file.name
+                }
+            }))
+            setAdmin((prevAdmin) => ({
+                ...prevAdmin,
+                admin: {
+                    ...prevAdmin.admin,
+
+                    image: file.name
+                }
             }))
         } else {
             setImage(null)
             setImgData(null)
-            setStudent((prevCourse) => ({
-                ...prevCourse,
-                image: '' // Clear the image name
+            setStudent((prevStudent) => ({
+                ...prevStudent,
+                student: {
+                    ...prevStudent.student,
+
+                    image: '' // Clear the image name
+                }
+            }))
+            setTeacher((prevTeacher) => ({
+                ...prevTeacher,
+                teacher: {
+                    ...prevTeacher.teacher,
+
+                    image: '' // Clear the image name
+                }
+            }))
+            setAdmin((prevAdmin) => ({
+                ...prevAdmin,
+                admin: {
+                    ...prevAdmin.admin,
+
+                    image: '' // Clear the image name
+                }
             }))
         }
     }
@@ -476,7 +520,7 @@ const Accounts = () => {
                         ) {
                             return (
                                 <span className="text-danger">
-                                    Chưa có thông tin giảng viên
+                                    Chưa có thông tin giáo viên
                                 </span>
                             )
                         } else {
@@ -485,12 +529,12 @@ const Accounts = () => {
                     } catch (error) {
                         return (
                             <span className="text-danger">
-                                Chưa có thông tin giảng viên
+                                Chưa có thông tin giáo viên
                             </span>
                         )
                     }
                 },
-                header: 'Tên giảng viên',
+                header: 'Tên giáo viên',
                 size: 70
             },
             {
@@ -632,7 +676,7 @@ const Accounts = () => {
         () => [
             {
                 accessorKey: 'fullname',
-                header: 'Tên giảng viên',
+                header: 'Tên giáo viên',
                 size: 100
             },
             {
@@ -696,7 +740,7 @@ const Accounts = () => {
         setRSelected(selectedSutdent.student.gender)
     }
 
-    // Mở model edit của giảng viên
+    // Mở model edit của giáo viên
     const handleEditFrom_2 = (row) => {
         setShowForm_2(true)
         setUpdate(true)
@@ -755,7 +799,7 @@ const Accounts = () => {
         setErrors_1({})
     }
 
-    // Reset model của giảng viên
+    // Reset model của giáo viên
     const handleResetForm_2 = async () => {
         // hide form
         setShowForm_2((pre) => !pre)
@@ -822,7 +866,7 @@ const Accounts = () => {
         }
     }
 
-    // Gọi API của giảng viên
+    // Gọi API của giáo viên
     const handleSubmitForm_2 = (e) => {
         e.preventDefault()
         if (update) {
@@ -1087,32 +1131,44 @@ const Accounts = () => {
         const validate = validateForm_1()
 
         if (Object.keys(validate).length === 0) {
-            notifi_loading('Đang thêm dữ liệu...')
             const formData = new FormData()
             formData.append('request', JSON.stringify(studentRequest))
             formData.append('file', image)
             // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
+            var id = null
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
+                setLoadingRequest(true)
                 const resp = await accountApi.addAccount(formData)
                 console.log(
                     '🚀 ~ file: Accounts.js:1097 ~ createStudent ~ resp:',
                     resp
                 )
                 if (resp.status === 200) {
+                    setLoadingRequest(false)
+                    toast.update(id, Notify.options.createSuccess())
+
                     update_success('Thêm dữ liệu thành công')
                     handleResetForm_1()
                     // getAllStudent()
                     setStudents([resp.data, ...students])
                 } else {
+                    toast.update(id, Notify.options.createError())
+
+                    setLoadingRequest(false)
                     if (resp.data.message === '1') {
+                        //! cập nhật lại theo Notify
                         update_fail('Email đã được sử dụng')
                     } else {
-                        update_fail('Lỗi kết nối server')
+                        toast.update(id, Notify.options.createError())
+
+                        setLoadingRequest(false)
                     }
                 }
             } catch (error) {
+                setLoadingRequest(false)
                 console.log('updateTeacher', error)
-                update_fail('Lỗi kết nối server')
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors_1(validate)
@@ -1124,124 +1180,184 @@ const Accounts = () => {
         const validationErrors = validateForm_1()
 
         if (Object.keys(validationErrors).length === 0) {
-            notifi_loading('Đang cập nhật dữ liệu...')
             const formData = new FormData()
             formData.append('request', JSON.stringify(studentRequest))
             formData.append('file', image)
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
+                setLoadingRequest(true)
                 const resp = await accountApi.updateAccount(formData)
                 if (resp.status === 200) {
+                    toast.update(id, Notify.options.updateSuccess())
+
                     handleResetForm_1()
-                    getAllStudent()
-                    update_success('Cập nhật thành công!')
+                    // getAllStudent()
+                    setLoadingRequest(false)
+
+                    setStudents(
+                        students.map((item) => {
+                            if (item.id === student.id) {
+                                return resp.data
+                            }
+                            return item
+                        })
+                    )
                 } else {
-                    update_fail('Lỗi kết nối server!')
+                    toast.update(Notify.options.updateError())
+
+                    setLoadingRequest(false)
                 }
             } catch (error) {
+                setLoadingRequest(false)
+                toast.update(Notify.options.updateError())
+
                 console.log('updateTeacher', error)
-                update_fail('Lỗi kết nối server!')
             }
         } else {
             setErrors_1(validationErrors)
         }
     }
-    // Cập nhật thông tin giảng viên
+    // Cập nhật thông tin giáo viên
     const updateTeacher = async () => {
         const validationErrors = validateForm_2()
 
         if (Object.keys(validationErrors).length === 0) {
-            notifi_loading('Đang cập nhật dữ liệu...')
             const formData = new FormData()
             formData.append('request', JSON.stringify(teacherRequest))
             formData.append('file', image)
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
+                setLoadingRequest(true)
+
                 const resp = await accountApi.updateAccount(formData)
                 if (resp.status === 200) {
+                    toast.update(id, Notify.options.updateSuccess())
                     handleResetForm_2()
-                    getAllTeacher()
-                    update_success('Cập nhật thành công!')
+                    // getAllTeacher()
+                    setTeachers(
+                        teachers.map((item) => {
+                            if (item.id === teacher.id) {
+                                return resp.data
+                            }
+                            return item
+                        })
+                    )
                 } else {
-                    update_fail('Lỗi kết nối server!')
+                    toast.update(Notify.options.updateError())
+
+                    setLoadingRequest(false)
                 }
             } catch (error) {
                 console.log('updateTeacher', error)
-                update_fail('Lỗi kết nối server!')
+                toast.update(Notify.options.updateError())
+
+                setLoadingRequest(false)
             }
         } else {
             setErrors(validationErrors)
         }
     }
 
-    // Thêm thông tin giảng viên
+    // Thêm thông tin giáo viên
     const createTeacher = async () => {
         const validationErrors = validateForm_2()
 
         if (Object.keys(validationErrors).length == 0) {
-            notifi_loading('Đang thêm dữ liệu...')
             const formData = new FormData()
             formData.append('request', JSON.stringify(teacherRequest))
             formData.append('file', image)
             // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
+
+            var id = null
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
+                setLoadingRequest(true)
                 const resp = await accountApi.addAccount(formData)
                 if (resp.status === 200) {
-                    update_success('Thêm dữ liệu thành công')
+                    setLoadingRequest(false)
+                    toast.update(id, Notify.options.createSuccess())
                     handleResetForm_2()
-                    getAllTeacher()
+                    // getAllTeacher()
+                    setTeachers([resp.data, ...teachers])
                 } else {
+                    toast.update(id, Notify.options.createError())
+
                     if (resp.data.message === '1') {
                         update_fail('Email đã được sử dụng')
                     } else {
-                        update_fail('Lỗi kết nối server')
+                        setLoadingRequest(false)
                     }
                 }
             } catch (error) {
                 console.log('updateTeacher', error)
-                update_fail('Lỗi kết nối server')
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors(validationErrors)
         }
     }
 
-    // Cập nhật thông tin giảng viên
+    // Cập nhật thông tin giáo viên
     const updateAdmin = async () => {
         const validationErrors = validateForm_3()
 
         if (Object.keys(validationErrors).length === 0) {
-            notifi_loading('Đang cập nhật dữ liệu...')
             const formData = new FormData()
             formData.append('request', JSON.stringify(adminRequest))
             formData.append('file', image)
+
+            const id = toast(Notify.msg.loading, Notify.options.loading())
             try {
+                setLoadingRequest(true)
+
                 const resp = await accountApi.updateAccount(formData)
                 if (resp.status === 200) {
+                    toast.update(id, Notify.options.updateSuccess())
+                    setLoadingRequest(false)
+
                     handleResetForm_3()
-                    getAllAdmin()
-                    update_success('Cập nhật thành công!')
+                    // getAllAdmin()
+                    setAdmins(
+                        admins.map((item) => {
+                            if (item.id === admin.id) {
+                                return resp.data
+                            }
+                            return item
+                        })
+                    )
                 } else {
-                    update_fail('Lỗi kết nối server!')
+                    toast.update(Notify.options.updateError())
+
+                    setLoadingRequest(false)
                 }
             } catch (error) {
-                console.log('updateTeacher', error)
-                update_fail('Lỗi kết nối server!')
+                setLoadingRequest(false)
+                toast.update(Notify.options.updateError())
+
+                console.log('updateAdmin', error)
             }
         } else {
             setErrors(validationErrors)
         }
     }
 
-    // Thêm thông tin giảng viên
+    // Thêm thông tin giáo viên
     const createAdmin = async () => {
         const validationErrors = validateForm_3()
 
         if (Object.keys(validationErrors).length === 0) {
-            notifi_loading('Đang thêm dữ liệu...')
             const formData = new FormData()
             formData.append('request', JSON.stringify(adminRequest))
             formData.append('file', image)
             // console.log("🚀 ~ file: Teachers.js:300 ~ updateTeacher ~ image:", image);
+            var id = null
+
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
+                setLoadingRequest(true)
+
                 const resp = await accountApi.addAccount(formData)
                 console.log(
                     '🚀 ~ file: Accounts.js:1192 ~ getAllTeacher ~ resp:',
@@ -1249,25 +1365,33 @@ const Accounts = () => {
                 )
                 if (resp.status === 200) {
                     handleResetForm_3()
-                    getAllAdmin()
-                    update_success('Thêm dữ liệu thành công')
+                    // getAllAdmin()
+                    setAdmins([resp.data, ...admins])
+                    setLoadingRequest(false)
+                    toast.update(id, Notify.options.createSuccess())
                 } else {
+                    toast.update(id, Notify.options.createError())
+
+                    setLoadingRequest(false)
+
                     if (resp.data.message === '1') {
                         update_fail('Email đã được sử dụng')
                     } else {
-                        update_fail('Lỗi kết nối server')
+                        toast.update(id, Notify.options.createError())
+
+                        setLoadingRequest(false)
                     }
                 }
             } catch (error) {
                 console.log('updateTeacher', error)
-                update_fail('Lỗi kết nối server')
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors(validationErrors)
         }
     }
 
-    //gọi API lấy data với vai trò giảng viên
+    //gọi API lấy data với vai trò giáo viên
     const getAllTeacher = async () => {
         console.log('getAllTeacher ~ teachers:', teachers)
         try {
@@ -1525,24 +1649,6 @@ const Accounts = () => {
             <AccountHeader />
             <Container className="mt--7" fluid>
                 <Card className="bg-secondary shadow">
-                    {/* Header */}
-                    <CardHeader className="bg-white border-0 d-flex justify-content-between">
-                        <h3 className="mb-0">
-                            {showHistoryTable
-                                ? 'LỊCH SỬ CHỈNH SỬA GIÁO VIÊN'
-                                : 'BẢNG TÀI KHOẢN'}
-                        </h3>
-                        <Button
-                            color="default"
-                            type="button"
-                            onClick={() => {}}
-                        >
-                            {showHistoryTable
-                                ? 'Danh sách giáo viên'
-                                : 'Lịch sử giảng viên '}
-                        </Button>
-                    </CardHeader>
-
                     <CardBody>
                         <Tabs
                             defaultActiveKey="sinhVien"
@@ -1623,7 +1729,7 @@ const Accounts = () => {
                             <Tab
                                 eventKey="gaingVien"
                                 className="bold-title"
-                                title={<strong>Giảng viên</strong>}
+                                title={<strong>Giáo viên</strong>}
                             >
                                 <MaterialReactTable
                                     enableColumnResizing
@@ -1653,7 +1759,7 @@ const Accounts = () => {
                                             variant="contained"
                                         >
                                             <i className="bx bx-layer-plus"></i>
-                                            Thêm giảng viên
+                                            Thêm giáo viên
                                         </Button>
                                     )}
                                     enableRowActions
@@ -1776,6 +1882,10 @@ const Accounts = () => {
                                 onSubmit={handleSubmitForm_1}
                                 encType="multipart/form-data"
                             >
+                                <LoadingOverlay
+                                    visible={loadingRequest}
+                                    overlayBlur={2}
+                                />
                                 <div className="modal-header">
                                     <h3 className="mb-0">
                                         Thông tin tài khoản
@@ -2036,6 +2146,7 @@ const Accounts = () => {
                                                                 className="form-control-label"
                                                             >
                                                                 Ảnh đại diện
+                                                                {/* học viên */}
                                                             </Label>
                                                             <FormGroup className="d-none">
                                                                 <div className="custom-file">
@@ -2113,7 +2224,9 @@ const Accounts = () => {
                                                                             'center'
                                                                     }}
                                                                 >
-                                                                    {student.image ===
+                                                                    {student
+                                                                        .student
+                                                                        .image ===
                                                                     ''
                                                                         ? 'Nhấn chọn ảnh cho học viên'
                                                                         : null}
@@ -2207,7 +2320,7 @@ const Accounts = () => {
                             </Form>
                         </Modal>
 
-                        {/* Model thông tin giảng viên */}
+                        {/* Model thông tin giáo viên */}
                         <Modal
                             className="modal-dialog-centered  modal-lg "
                             isOpen={showForm_2}
@@ -2218,6 +2331,10 @@ const Accounts = () => {
                                 onSubmit={handleSubmitForm_2}
                                 encType="multipart/form-data"
                             >
+                                <LoadingOverlay
+                                    visible={loadingRequest}
+                                    overlayBlur={2}
+                                />
                                 <div className="modal-header">
                                     <h3 className="mb-0">
                                         Thông tin tài khoản
@@ -2329,7 +2446,7 @@ const Accounts = () => {
                                             </Col>
                                         </Row>
                                         <br />
-                                        <h3>Thông tin giảng viên</h3>
+                                        <h3>Thông tin giáo viên</h3>
                                         <hr />
                                         <Row>
                                             <Col sm={6}>
@@ -2338,13 +2455,13 @@ const Accounts = () => {
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
-                                                        Tên giảng viên
+                                                        Tên giáo viên
                                                     </label>
 
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-course-name"
-                                                        placeholder="Tên giảng viên"
+                                                        placeholder="Tên giáo viên"
                                                         type="text"
                                                         onChange={
                                                             handelOnChangeInput_2
@@ -2576,38 +2693,89 @@ const Accounts = () => {
                                                                 className="form-control-label"
                                                             >
                                                                 Ảnh đại diện
+                                                                {/* teacher */}
                                                             </Label>
-                                                            <div className="custom-file">
-                                                                <input
-                                                                    type="file"
-                                                                    name="imageFile"
-                                                                    accept="image/*"
-                                                                    className="custom-file-input form-control-alternative"
-                                                                    id="customFile"
-                                                                    onChange={
-                                                                        onChangePicture_2
-                                                                    }
-                                                                />
-                                                                <label
-                                                                    className="custom-file-label"
-                                                                    htmlFor="customFile"
+                                                            <FormGroup className="d-none">
+                                                                <div className="custom-file">
+                                                                    <input
+                                                                        ref={
+                                                                            fileInputRef
+                                                                        }
+                                                                        type="file"
+                                                                        name="imageFile"
+                                                                        accept="image/*"
+                                                                        id="customFile"
+                                                                        onChange={
+                                                                            onChangePicture
+                                                                        }
+                                                                        // multiple={true}
+                                                                    />
+                                                                </div>
+                                                            </FormGroup>
+                                                            <div
+                                                                className="previewProfilePic px-3 border d-flex justify-content-center"
+                                                                style={{
+                                                                    height: '200px',
+                                                                    overflow:
+                                                                        'hidden',
+                                                                    position:
+                                                                        'relative',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                                onClick={
+                                                                    handleImageClick
+                                                                }
+                                                            >
+                                                                {imgData && (
+                                                                    <img
+                                                                        alt=""
+                                                                        // width={120}
+                                                                        className="playerProfilePic_home_tile"
+                                                                        src={
+                                                                            imgData
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {update &&
+                                                                    !imgData && (
+                                                                        <img
+                                                                            alt=""
+                                                                            className=""
+                                                                            src={
+                                                                                process
+                                                                                    .env
+                                                                                    .REACT_APP_IMAGE_URL +
+                                                                                IMG_URL +
+                                                                                teacher
+                                                                                    .teacher
+                                                                                    .image
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                <small
+                                                                    className={` position-absolute  text-center `}
+                                                                    style={{
+                                                                        top: '50%',
+                                                                        left: '50%',
+                                                                        transform:
+                                                                            'translate(-50%, -50%)',
+                                                                        textAlign:
+                                                                            'center'
+                                                                    }}
                                                                 >
-                                                                    Chọn hình
-                                                                    ảnh
-                                                                </label>
+                                                                    {teacher
+                                                                        .teacher
+                                                                        .image ===
+                                                                    ''
+                                                                        ? 'Nhấn chọn ảnh cho giáo viên'
+                                                                        : null}
+                                                                </small>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <div className="previewProfilePic px-3">
-                                                        {imgData && (
-                                                            <img
-                                                                alt=""
-                                                                width={350}
-                                                                className="playerProfilePic_home_tile"
-                                                                src={imgData}
-                                                            />
-                                                        )}
-                                                        {!imgData && (
+
+                                                    {!teacher.teacher.image &&
+                                                        !imgData && (
                                                             <img
                                                                 alt=""
                                                                 width={350}
@@ -2616,29 +2784,10 @@ const Accounts = () => {
                                                                     process.env
                                                                         .REACT_APP_IMAGE_URL +
                                                                     IMG_URL +
-                                                                    teacher
-                                                                        .teacher
-                                                                        .image
+                                                                    'defaultImgUser.jpg'
                                                                 }
                                                             />
                                                         )}
-                                                        {!teacher.teacher
-                                                            .image &&
-                                                            !imgData && (
-                                                                <img
-                                                                    alt=""
-                                                                    width={350}
-                                                                    className=""
-                                                                    src={
-                                                                        process
-                                                                            .env
-                                                                            .REACT_APP_IMAGE_URL +
-                                                                        IMG_URL +
-                                                                        'defaultImgUser.jpg'
-                                                                    }
-                                                                />
-                                                            )}
-                                                    </div>
                                                 </Row>
                                             </Col>
                                         </Row>
@@ -2676,6 +2825,10 @@ const Accounts = () => {
                                 onSubmit={handleSubmitForm_3}
                                 encType="multipart/form-data"
                             >
+                                <LoadingOverlay
+                                    visible={loadingRequest}
+                                    overlayBlur={2}
+                                />
                                 <div className="modal-header">
                                     <h3 className="mb-0">
                                         Thông tin tài khoản
@@ -3028,38 +3181,88 @@ const Accounts = () => {
                                                                 className="form-control-label"
                                                             >
                                                                 Ảnh đại diện
+                                                                {/* admin */}
                                                             </Label>
-                                                            <div className="custom-file">
-                                                                <input
-                                                                    type="file"
-                                                                    name="imageFile"
-                                                                    accept="image/*"
-                                                                    className="custom-file-input form-control-alternative"
-                                                                    id="customFile"
-                                                                    onChange={
-                                                                        onChangePicture_3
-                                                                    }
-                                                                />
-                                                                <label
-                                                                    className="custom-file-label"
-                                                                    htmlFor="customFile"
+                                                            <FormGroup className="d-none">
+                                                                <div className="custom-file">
+                                                                    <input
+                                                                        ref={
+                                                                            fileInputRef
+                                                                        }
+                                                                        type="file"
+                                                                        name="imageFile"
+                                                                        accept="image/*"
+                                                                        id="customFile"
+                                                                        onChange={
+                                                                            onChangePicture
+                                                                        }
+                                                                        // multiple={true}
+                                                                    />
+                                                                </div>
+                                                            </FormGroup>
+                                                            <div
+                                                                className="previewProfilePic px-3 border d-flex justify-content-center"
+                                                                style={{
+                                                                    height: '200px',
+                                                                    overflow:
+                                                                        'hidden',
+                                                                    position:
+                                                                        'relative',
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                                onClick={
+                                                                    handleImageClick
+                                                                }
+                                                            >
+                                                                {imgData && (
+                                                                    <img
+                                                                        alt=""
+                                                                        // width={120}
+                                                                        className="playerProfilePic_home_tile"
+                                                                        src={
+                                                                            imgData
+                                                                        }
+                                                                    />
+                                                                )}
+                                                                {update &&
+                                                                    !imgData && (
+                                                                        <img
+                                                                            alt=""
+                                                                            className=""
+                                                                            src={
+                                                                                process
+                                                                                    .env
+                                                                                    .REACT_APP_IMAGE_URL +
+                                                                                IMG_URL +
+                                                                                admin
+                                                                                    .admin
+                                                                                    .image
+                                                                            }
+                                                                        />
+                                                                    )}
+                                                                <small
+                                                                    className={` position-absolute  text-center `}
+                                                                    style={{
+                                                                        top: '50%',
+                                                                        left: '50%',
+                                                                        transform:
+                                                                            'translate(-50%, -50%)',
+                                                                        textAlign:
+                                                                            'center'
+                                                                    }}
                                                                 >
-                                                                    Chọn hình
-                                                                    ảnh
-                                                                </label>
+                                                                    {admin.admin
+                                                                        .image ===
+                                                                    ''
+                                                                        ? 'Nhấn chọn ảnh cho quản trị viên'
+                                                                        : null}
+                                                                </small>
                                                             </div>
                                                         </FormGroup>
                                                     </Col>
-                                                    <div className="previewProfilePic px-3">
-                                                        {imgData && (
-                                                            <img
-                                                                alt=""
-                                                                width={350}
-                                                                className="playerProfilePic_home_tile"
-                                                                src={imgData}
-                                                            />
-                                                        )}
-                                                        {!imgData && (
+
+                                                    {!admin.admin.image &&
+                                                        !imgData && (
                                                             <img
                                                                 alt=""
                                                                 width={350}
@@ -3068,27 +3271,10 @@ const Accounts = () => {
                                                                     process.env
                                                                         .REACT_APP_IMAGE_URL +
                                                                     IMG_URL +
-                                                                    admin.admin
-                                                                        .image
+                                                                    'defaultImgUser.jpg'
                                                                 }
                                                             />
                                                         )}
-                                                        {!admin.admin.image &&
-                                                            !imgData && (
-                                                                <img
-                                                                    alt=""
-                                                                    width={350}
-                                                                    className=""
-                                                                    src={
-                                                                        process
-                                                                            .env
-                                                                            .REACT_APP_IMAGE_URL +
-                                                                        IMG_URL +
-                                                                        'defaultImgUser.jpg'
-                                                                    }
-                                                                />
-                                                            )}
-                                                    </div>
                                                 </Row>
                                             </Col>
                                         </Row>
