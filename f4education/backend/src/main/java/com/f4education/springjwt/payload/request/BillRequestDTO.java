@@ -13,4 +13,6 @@ public class BillRequestDTO {
     private Integer checkoutMethodId;
 
     private String studentId;
+    
+    private Integer courseId;
 }

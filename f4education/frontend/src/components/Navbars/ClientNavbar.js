@@ -12,12 +12,13 @@ import {
     Burger,
     Button,
     Grid,
+    Group,
     HoverCard,
-    List,
     Menu,
     rem,
     ScrollArea,
-    ThemeIcon
+    Stack,
+    Text
 } from '@mantine/core'
 import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks'
 import {
@@ -39,17 +40,13 @@ import subjectApi from '../../api/subjectApi'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
-const category_1 = ['Java', 'C#', 'PHP', 'JavaScript']
-const category_2 = ['NextJS', 'ReactJS', 'AngularJS', 'NodeJS']
-const category_3 = ['SQL Server', 'MySQL', 'Xampp']
-
 const ClientNavbar = () => {
     const user = JSON.parse(localStorage.getItem('user'))
+    const userNull = !user ? true : false
     const listCart = JSON.parse(localStorage.getItem('userCart')) || []
 
     const ref = useElementSize()
     const navigate = useNavigate()
-    const smallScreen = useMediaQuery('(max-width: 500px)')
     const [searchParams] = useSearchParams()
 
     const [lastScrollTop, setLastScrollTop] = useState(0)
@@ -62,11 +59,13 @@ const ClientNavbar = () => {
     const [listCourse, setListCourse] = useState([])
     const [listSubject, setListSubject] = useState([])
     const [courseByLevel, setCourseByLevel] = useState([])
+    const [parentCategory, setParentCategory] = useState([])
+    const [checkRole, setCheckRole] = useState('')
 
+    // Fetch area
     const fetchCart = async () => {
         try {
             const userCart = JSON.parse(localStorage.getItem('userCart')) || []
-            console.log(userCart)
             setCarts(userCart)
         } catch (error) {
             console.log(error)
@@ -78,10 +77,11 @@ const ClientNavbar = () => {
             const resp = await courseApi.getAll()
 
             if (resp.status === 200 && resp.data.length > 0) {
+                // const uniqueValues = [
+                //     ...new Set(resp.data.map((item) => item.courseName))
+                // ]
                 setListCourse(resp.data)
             }
-
-            console.log(resp.data)
         } catch (error) {
             console.log(error)
         }
@@ -93,11 +93,36 @@ const ClientNavbar = () => {
 
             if (resp.status === 200 && resp.data.length > 0) {
                 setListSubject(resp.data)
+
+                // Shuffle the array randomly
+                const shuffledSubjects = shuffleArray([...resp.data])
+
+                // Calculate the indices to split the array into three parts
+                const totalSubjects = shuffledSubjects.length
+                const firstThird = Math.floor(totalSubjects / 3)
+                const secondThird = firstThird * 2
+
+                // Separate the array into three child arrays
+                const frontend = shuffledSubjects.slice(0, firstThird)
+                const backend = shuffledSubjects.slice(firstThird, secondThird)
+                const orther = shuffledSubjects.slice(secondThird)
+
+                // Store the three arrays in a variable
+                const resultArrays = { frontend, backend, orther }
+                console.log(resultArrays)
+                setParentCategory(resultArrays)
             }
-            console.log(resp.data)
         } catch (error) {
             console.log(error)
         }
+    }
+
+    const shuffleArray = (array) => {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1))
+            ;[array[i], array[j]] = [array[j], array[i]]
+        }
+        return array
     }
 
     // get Total Price from list totalCartItem
@@ -114,21 +139,43 @@ const ClientNavbar = () => {
             await Promise.all([fetchSubject(), fetchCourse()])
         }
         fetchData()
-    }, [user.username])
+    }, [user !== null ? user.username : ''])
 
     useEffect(() => {
         fetchCart()
     }, [searchParams.get('checkoutComplete'), listCart.length])
 
+    useEffect(() => {
+        if (user) {
+            const checkUserRole = user.roles.some((us) => us === 'ROLE_USER')
+            const checkTeacherRole = user.roles.some(
+                (us) => us === 'ROLE_TEACHER'
+            )
+            const checkAdminRole = user.roles.some((us) => us === 'ROLE_ADMIN')
+
+            if (checkUserRole) {
+                setCheckRole('user')
+            } else if (checkTeacherRole) {
+                setCheckRole('teacher')
+            } else if (checkAdminRole) {
+                setCheckRole('admin')
+            } else {
+                setCheckRole('user')
+            }
+        }
+    }, [user])
+
     // *************** CART VARIABLE - AREA END
     const handleItemClick = (index) => {
         const newActiveItems = [...activeItems]
         newActiveItems[index] = true
+
         for (let i = 0; i < newActiveItems.length; i++) {
             if (i !== index) {
                 newActiveItems[i] = false
             }
         }
+        console.log(newActiveItems)
         setActiveItems(newActiveItems)
     }
 
@@ -158,9 +205,6 @@ const ClientNavbar = () => {
                 }
             })
 
-            // if (scrollTop === 0) {
-            //   navbar.style.top = 0;
-            // }
             if (scrollTop > lastScrollTop) {
                 navbar.style.top = '-80px'
             } else {
@@ -174,8 +218,25 @@ const ClientNavbar = () => {
         const listCourseFilter = listCourse.filter(
             (course) => course.subject.subjectId === subjectId
         )
-        console.log(listCourseFilter)
         setCourseByLevel(listCourseFilter)
+    }
+
+    const handleOnChangeSearch = (value) => {
+        console.log(value)
+        if (value === undefined) {
+            return
+        }
+
+        const currentCourse = listCourse.find(
+            (course) => course.courseName.toLowerCase() === value.toLowerCase()
+        )
+        console.log(currentCourse)
+
+        if (currentCourse === undefined) {
+            return
+        } else {
+            navigate(`/course/${currentCourse.courseId}`)
+        }
     }
 
     return (
@@ -287,92 +348,66 @@ const ClientNavbar = () => {
                                 </HoverCard.Target>
 
                                 <HoverCard.Dropdown mt="xl">
-                                    {/* <Group position="apart" px={rem('1.5rem')}>
-                                        <Text fw={500}>Khóa học</Text>
-                                        <Link to="/course" fz="xs">
-                                            Tất cả khóa học
-                                        </Link>
-                                    </Group>
-
-                                    <Divider my="sm" /> */}
-
-                                    <Grid gutter="xl" p={rem('1.5rem')}>
-                                        {/* Level 1 category */}
-                                        <ScrollArea
-                                            p={20}
-                                            h={500}
-                                            offsetScrollbars
-                                        >
-                                            <List
-                                                spacing="xs"
-                                                size="sm"
-                                                center
-                                                icon={
-                                                    <ThemeIcon
-                                                        color="indigo"
-                                                        size={24}
-                                                        radius="xl"
-                                                    >
-                                                        <IconChevronRight size="1rem" />
-                                                    </ThemeIcon>
-                                                }
-                                            >
-                                                {listSubject.map((subject) => (
-                                                    <HoverCard
-                                                        position="right-start"
-                                                        radius="sm"
-                                                        shadow="md"
-                                                        withinPortal
-                                                    >
-                                                        <HoverCard.Target>
-                                                            <List.Item
-                                                                key={
-                                                                    subject.subjectId
-                                                                }
-                                                                onMouseEnter={() =>
-                                                                    handleOnChangeLevelCategory(
-                                                                        subject.subjectId
-                                                                    )
-                                                                }
-                                                            >
-                                                                {
-                                                                    subject.subjectName
-                                                                }
-                                                            </List.Item>
-                                                        </HoverCard.Target>
-                                                        {/* Level 2 category */}
-                                                        <HoverCard.Dropdown
-                                                            ml={57}
-                                                            mt={-30}
-                                                            p={20}
+                                    <ScrollArea p={20} h={500} offsetScrollbars>
+                                        <Grid gutter="xl" p={rem('1.5rem')}>
+                                            <Stack display="block">
+                                                {listSubject.map(
+                                                    (subject, index) => (
+                                                        <HoverCard
+                                                            position="right-start"
+                                                            radius="sm"
+                                                            shadow="md"
+                                                            withinPortal
+                                                            maw={450}
+                                                            key={index}
                                                         >
-                                                            <List
-                                                                spacing="xs"
-                                                                size="sm"
-                                                                center
-                                                                icon={
-                                                                    <ThemeIcon
-                                                                        color="violet"
-                                                                        size={
-                                                                            24
-                                                                        }
-                                                                        radius="xl"
-                                                                    >
-                                                                        <IconChevronRight size="1rem" />
-                                                                    </ThemeIcon>
-                                                                }
-                                                                mah={500}
-                                                                styles={{
-                                                                    root: {
-                                                                        overflow:
-                                                                            'scroll'
+                                                            <HoverCard.Target>
+                                                                <Group
+                                                                    position="apart"
+                                                                    key={
+                                                                        subject.subjectId
                                                                     }
-                                                                }}
+                                                                    onMouseEnter={() =>
+                                                                        handleOnChangeLevelCategory(
+                                                                            subject.subjectId
+                                                                        )
+                                                                    }
+                                                                    mb={10}
+                                                                >
+                                                                    <Text
+                                                                        color="dark"
+                                                                        size="lg"
+                                                                    >
+                                                                        {
+                                                                            subject.subjectName
+                                                                        }
+                                                                    </Text>
+                                                                    <IconChevronRight />
+                                                                </Group>
+                                                            </HoverCard.Target>
+                                                            {/* Level 2 category */}
+                                                            <HoverCard.Dropdown
+                                                                ml={54}
+                                                                mt={-45}
+                                                                p={20}
+                                                                maw={450}
                                                             >
+                                                                <Text
+                                                                    color="dimmed"
+                                                                    fw={700}
+                                                                    mb={20}
+                                                                    size="lg"
+                                                                >
+                                                                    Những khóa
+                                                                    học phổ biến
+                                                                </Text>
                                                                 {courseByLevel.length ===
                                                                 0 ? (
                                                                     <>
-                                                                        <List.Item>
+                                                                        <Text
+                                                                            color="dimmed"
+                                                                            size="lg"
+                                                                        >
                                                                             Môn
                                                                             học
                                                                             hiện
@@ -380,38 +415,57 @@ const ClientNavbar = () => {
                                                                             có
                                                                             khóa
                                                                             học.
-                                                                        </List.Item>
+                                                                        </Text>
                                                                     </>
                                                                 ) : (
                                                                     <>
-                                                                        {courseByLevel.map(
-                                                                            (
-                                                                                course
-                                                                            ) => (
-                                                                                <List.Item
-                                                                                    key={
-                                                                                        course.courseId
-                                                                                    }
-                                                                                >
-                                                                                    <Link
-                                                                                        to={`/course/${course.courseId}`}
-                                                                                    >
-                                                                                        {
-                                                                                            course.courseName
+                                                                        <ScrollArea
+                                                                            p={
+                                                                                20
+                                                                            }
+                                                                            h={
+                                                                                500
+                                                                            }
+                                                                            offsetScrollbars
+                                                                        >
+                                                                            {courseByLevel.map(
+                                                                                (
+                                                                                    course
+                                                                                ) => (
+                                                                                    <Text
+                                                                                        key={
+                                                                                            course.courseId
                                                                                         }
-                                                                                    </Link>
-                                                                                </List.Item>
-                                                                            )
-                                                                        )}
+                                                                                        size="lg"
+                                                                                        mb={
+                                                                                            10
+                                                                                        }
+                                                                                    >
+                                                                                        <Link
+                                                                                            to={`/course/${course.courseId}`}
+                                                                                            style={{
+                                                                                                color: '#000',
+                                                                                                fontSize:
+                                                                                                    '1.25rem'
+                                                                                            }}
+                                                                                        >
+                                                                                            {
+                                                                                                course.courseName
+                                                                                            }
+                                                                                        </Link>
+                                                                                    </Text>
+                                                                                )
+                                                                            )}
+                                                                        </ScrollArea>
                                                                     </>
                                                                 )}
-                                                            </List>
-                                                        </HoverCard.Dropdown>
-                                                    </HoverCard>
-                                                ))}
-                                            </List>
-                                        </ScrollArea>
-                                    </Grid>
+                                                            </HoverCard.Dropdown>
+                                                        </HoverCard>
+                                                    )
+                                                )}
+                                            </Stack>
+                                        </Grid>
+                                    </ScrollArea>
                                 </HoverCard.Dropdown>
                             </HoverCard>
                         </li>
@@ -423,13 +477,13 @@ const ClientNavbar = () => {
                                         to={'/cart'}
                                         className={`
                 ${
-                    activeItems[1]
+                    activeItems[3]
                         ? 'nav-link custom-nav-link active'
                         : 'nav-link custom-nav-link'
                 }
                 ${styles['custom-nav-link']}
                 `}
-                                        onClick={() => handleItemClick(1)}
+                                        onClick={() => handleItemClick(3)}
                                     >
                                         Giỏ hàng
                                     </Link>
@@ -443,12 +497,14 @@ const ClientNavbar = () => {
                         justify-content-sm-center text-center text-dark ml-auto"
                     >
                         <Autocomplete
-                            placeholder="Tìm khóa học.."
+                            placeholder="Tìm khóa học..."
                             className="mt-1"
                             ref={ref}
                             style={{ width: rem(300) }}
                             icon={<IconSearch />}
                             data={listCourse.map((c) => c.courseName)}
+                            // value={searchValue}
+                            onChange={(e) => handleOnChangeSearch(e)}
                         />
                         {user !== null ? (
                             <>
@@ -497,9 +553,17 @@ const ClientNavbar = () => {
                                                         >
                                                             {carts.length > 0 &&
                                                                 carts.map(
-                                                                    (cart) => (
+                                                                    (
+                                                                        cart,
+                                                                        index
+                                                                    ) => (
                                                                         <>
-                                                                            <Row className="mt-2">
+                                                                            <Row
+                                                                                className="mt-2"
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                            >
                                                                                 <Col
                                                                                     xl="4"
                                                                                     lg="4"
@@ -624,17 +688,33 @@ const ClientNavbar = () => {
 
                                     <Menu.Dropdown>
                                         <Menu.Label>DASHBOARD</Menu.Label>
-                                        <Link to="/student/classes">
-                                            <Menu.Item
-                                                icon={
-                                                    <IconLayoutDashboard
-                                                        size={14}
-                                                    />
-                                                }
-                                            >
-                                                Hệ thống học tập
-                                            </Menu.Item>
-                                        </Link>
+                                        {checkRole === 'user' && (
+                                            <Link to="/student/classes">
+                                                <Menu.Item
+                                                    icon={
+                                                        <IconLayoutDashboard
+                                                            size={14}
+                                                        />
+                                                    }
+                                                >
+                                                    Hệ thống học tập
+                                                </Menu.Item>
+                                            </Link>
+                                        )}
+                                        {checkRole === 'teacher' && (
+                                            <Link to="/teacher/class-info">
+                                                <Menu.Item
+                                                    icon={
+                                                        <IconLayoutDashboard
+                                                            size={14}
+                                                        />
+                                                    }
+                                                >
+                                                    Hệ thống giáo viên
+                                                </Menu.Item>
+                                            </Link>
+                                        )}
+
                                         <Link to="/student/classes">
                                             <Menu.Item
                                                 icon={
@@ -644,15 +724,19 @@ const ClientNavbar = () => {
                                                 Tài khoản
                                             </Menu.Item>
                                         </Link>
-                                        <Link to="/student/classes">
-                                            <Menu.Item
-                                                icon={
-                                                    <IconSchoolBell size={14} />
-                                                }
-                                            >
-                                                Lịch học
-                                            </Menu.Item>
-                                        </Link>
+                                        {checkRole === 'teacher' && (
+                                            <Link to="/teacher/schedule">
+                                                <Menu.Item
+                                                    icon={
+                                                        <IconSchoolBell
+                                                            size={14}
+                                                        />
+                                                    }
+                                                >
+                                                    Lịch dạy
+                                                </Menu.Item>
+                                            </Link>
+                                        )}
 
                                         <Menu.Divider />
 

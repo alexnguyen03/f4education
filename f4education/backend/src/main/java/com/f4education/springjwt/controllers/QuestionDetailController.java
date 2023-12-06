@@ -5,17 +5,22 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.http.HttpStatus;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -210,4 +215,21 @@ public class QuestionDetailController {
 		return file;
 	}
 
+	@GetMapping("/download-excel")
+    public ResponseEntity<InputStreamResource> downloadExcel() throws IOException {
+        // Load Excel file from the resources folder
+        ClassPathResource resource = new ClassPathResource("static/excel/questionDetail.xlsx");
+        InputStream inputStream = resource.getInputStream();
+
+        // Set up HTTP headers
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        headers.setContentDispositionFormData("attachment", "questionDetail.xlsx");
+
+        // Create InputStreamResource from the Excel file
+        InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+
+        // Return ResponseEntity with InputStreamResource and headers
+        return new ResponseEntity<>(inputStreamResource, headers, HttpStatus.SC_OK);
+    }
 }

@@ -9,15 +9,10 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LearningResultResponse {
+public class AttendanceStudentReviewResponse {
+	private Integer attendanceId;
+	private Date attendanceDate;
 	private Integer classId;
 	private String className;
-	private String status;
-	private Date startDate;
-	private Date endDate;	
-	private String teacherImage;
-	private String teacherName;
-	private Integer maximumQuantity;
-	private Integer courseDuration;
 	private String courseName;
 }

@@ -11,11 +11,13 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.BillService;
 import com.f4education.springjwt.models.Bill;
+import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.PaymentMethod;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
 import com.f4education.springjwt.payload.response.BillResponseDTO;
 import com.f4education.springjwt.repository.BillRepository;
+import com.f4education.springjwt.repository.CourseRepository;
 import com.f4education.springjwt.repository.PaymentMethodRepository;
 import com.f4education.springjwt.repository.StudentRepository;
 
@@ -29,6 +31,9 @@ public class BillServiceImp implements BillService {
 
 	@Autowired
 	private StudentRepository studentRepository;
+
+	@Autowired
+	private CourseRepository courseRepository;
 
 	@Override
 	public List<BillResponseDTO> getAllBill() {
@@ -84,6 +89,7 @@ public class BillServiceImp implements BillService {
 		BeanUtils.copyProperties(bill, billRespDTO);
 
 		billRespDTO.setPaymentMethod(paymentMethod.getPaymentMethodName());
+		billRespDTO.setCourseId(bill.getCourse().getCourseId());
 		billRespDTO.setStatus(bill.getStatus());
 		billRespDTO.setTotalPrice(bill.getTotalPrice());
 
@@ -92,31 +98,34 @@ public class BillServiceImp implements BillService {
 
 	private Bill convertRequestToEntity(BillRequestDTO billRequestDTO) {
 		Bill bill = new Bill();
-		System.out.println(billRequestDTO.getCheckoutMethodId());
+		
 		PaymentMethod paymentMethod = paymentMethodRepository
 				.findById(billRequestDTO.getCheckoutMethodId()).get();
 		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
+		Course course = courseRepository.findById(billRequestDTO.getCourseId()).get();
 
 		BeanUtils.copyProperties(billRequestDTO, bill);
-		System.out.println(paymentMethod);
 		
 		bill.setTotalPrice(billRequestDTO.getTotalPrice());
 		bill.setPaymentMethod(paymentMethod);
 		bill.setStudent(student);
+		bill.setCourse(course);
 
 		return bill;
 	}
 
 	private void convertRequestToEntity(BillRequestDTO billRequestDTO, Bill bill) {
+		
 		PaymentMethod paymentMethod = paymentMethodRepository
 				.findById(billRequestDTO.getCheckoutMethodId()).get();
-
 		Student student = studentRepository.findById(billRequestDTO.getStudentId()).get();
+		Course course = courseRepository.findById(billRequestDTO.getCourseId()).get();
 
 		BeanUtils.copyProperties(billRequestDTO, bill);
 
 		bill.setTotalPrice(billRequestDTO.getTotalPrice());
 		bill.setPaymentMethod(paymentMethod);
 		bill.setStudent(student);
+		bill.setCourse(course);
 	}
 }

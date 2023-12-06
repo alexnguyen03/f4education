@@ -71,7 +71,9 @@ const Checkout = () => {
             setPayPalCheckout(false)
             setShowingPayPal(false)
             setCheckOutMethod(1)
-        } else if (e.target.id === 'paypal') {
+        }
+
+        if (e.target.id === 'paypal') {
             setCheckOutMethod(2)
         }
     }
@@ -82,8 +84,7 @@ const Checkout = () => {
         if (checkOutMethod === 1) {
             setPayPalCheckout(false)
             setShowingPayPal(false)
-            setCheckOutMethod('vnpay')
-
+            setCheckOutMethod(1)
             // API direct to VNPay checkout
             try {
                 const resp = await paymentApi.createPayment(bill)
@@ -93,10 +94,11 @@ const Checkout = () => {
                 console.log(error)
             }
             return
-        } else if (checkOutMethod === 2) {
+        }
+        if (checkOutMethod === 2) {
+            setCheckOutMethod(2)
             setPayPalCheckout(true)
             setShowingPayPal(true)
-            setCheckOutMethod('paypal')
         }
     }
 
@@ -151,6 +153,7 @@ const Checkout = () => {
                 return
             }
 
+            setCheckOutMethod(2)
             setPayPalCheckout(true)
             setShowModal(true)
             setCheckoutComplete({
@@ -177,17 +180,20 @@ const Checkout = () => {
                     courseId: cart.course.courseId,
                     createDate: cart.createDate,
                     totalPrice: totalPriceBill,
-                    studentId: user.username
+                    studentId: user.username,
+                    checkoutMethod: 2
                 }))
 
                 // Create RegisterCoures
                 handleCreateRegisterCourse(updateCartRequest)
 
                 // Create Bill
-                handleCreateBillAndBillDetail(updateCartRequest, totalPrice)
+                handleCreateBill(updateCartRequest, totalPrice)
 
                 // Update Cart
                 handleUpdateCart(updateCartRequest)
+
+                 // remove local
                 localStorage.removeItem('cartCheckout')
 
                 // PayPal checkout logic
@@ -216,6 +222,8 @@ const Checkout = () => {
                     return console.log('Check out fail, cancle progress')
                 }
                 if (responseCode === '00') {
+                    setCheckOutMethod(1)
+
                     setShowModal(true)
                     setCheckoutComplete({
                         status: 'success',
@@ -234,20 +242,20 @@ const Checkout = () => {
                             courseId: cart.course.courseId,
                             createDate: cart.createDate,
                             totalPrice: totalPrice,
-                            studentId: user.username
+                            studentId: user.username,
+                            checkoutMethod: 1
                         }))
 
                         // Create RegisterCoures
                         handleCreateRegisterCourse(updateCartRequest)
 
                         // Create Bill
-                        handleCreateBillAndBillDetail(
-                            updateCartRequest,
-                            totalPrice
-                        )
+                        handleCreateBill(updateCartRequest, totalPrice)
 
                         // Update Cart
                         handleUpdateCart(updateCartRequest)
+
+                        // remove local
                         localStorage.removeItem('cartCheckout')
                     }
                 } else {
@@ -256,9 +264,7 @@ const Checkout = () => {
             }
             return handleUpdateCartAndCreateBill()
         } else {
-            return console.log(
-                "Status normal, user just haven't checkout or stay for fun?"
-            )
+            return console.log('Status normal')
         }
     }, [responseCode])
 
@@ -277,19 +283,17 @@ const Checkout = () => {
         }
     }
 
-    const handleCreateBillAndBillDetail = async (updateCartRequest) => {
+    const handleCreateBill = (updateCartRequest) => {
         try {
             const billRequest = {
                 totalPrice: updateCartRequest[0].totalPrice,
-                checkoutMethodId: checkOutMethod,
-                studentId: user.username
+                checkoutMethodId: updateCartRequest[0].checkoutMethod,
+                studentId: user.username,
+                courseId: updateCartRequest[0].courseId
             }
-
-            // console.log(updateCartRequest[0].totalPrice)
-            // console.log(totalPrice)
             console.log('Bill: ' + JSON.stringify(billRequest))
 
-            await billApi.createBill(billRequest)
+            billApi.createBill(billRequest)
         } catch (error) {
             console.log('Bill: ' + error)
         }
@@ -297,19 +301,19 @@ const Checkout = () => {
         localStorage.removeItem('billCheckout')
 
         // create bill Request for add bill and bill Detail
-        const billDetailRequest = updateCartRequest.map((detail) => ({
-            totalPrice: updateCartRequest[0].totalPrice,
-            courseId: detail.courseId
-        }))
+        // const billDetailRequest = updateCartRequest.map((detail) => ({
+        //     totalPrice: updateCartRequest[0].totalPrice,
+        //     courseId: detail.courseId
+        // }))
 
         // Bill detail
-        try {
-            // console.log('BillDetail: ' + JSON.stringify(billDetailRequest))
+        // try {
+        //     console.log('BillDetail: ' + JSON.stringify(billDetailRequest))
 
-            await billApi.createBillDetail(billDetailRequest)
-        } catch (error) {
-            console.log('BillDetail: ' + error)
-        }
+        //     billApi.createBillDetail(billDetailRequest)
+        // } catch (error) {
+        //     console.log('BillDetail: ' + error)
+        // }
     }
 
     // update cart

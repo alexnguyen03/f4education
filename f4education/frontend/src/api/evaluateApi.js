@@ -5,6 +5,10 @@ const evaluateApi = {
         const url = '/evaluate'
         return axiosClient.get(url)
     },
+    getNewestEvaluate: () => {
+        const url = `/evaluate/newest-evaluete`
+        return axiosClient.get(url)
+    },
     getAllByCourseId: (courseId) => {
         const url = `/evaluate/course/${courseId}`
         return axiosClient.get(url)

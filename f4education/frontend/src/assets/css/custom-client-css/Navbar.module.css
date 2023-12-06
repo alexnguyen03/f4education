@@ -33,7 +33,7 @@
     }
 }
 
-.custom-nav-link.active.custom-nav-link::after {
+.custom-nav-link.active .custom-nav-link::after {
     display: block;
 }
 

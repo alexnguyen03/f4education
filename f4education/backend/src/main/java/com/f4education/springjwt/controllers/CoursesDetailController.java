@@ -4,16 +4,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.http.HttpStatus;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.InputStreamResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -25,6 +30,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -102,7 +108,7 @@ public class CoursesDetailController {
 
 		return ResponseEntity.badRequest().body("CourseDetail not found");
 	}
-
+	
 	@PostMapping(value = "/upload-excel/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> createCourseDetailByExcelImport(@RequestParam("excelFile") Optional<MultipartFile> file,
 			@PathVariable Integer courseId) {
@@ -149,9 +155,11 @@ public class CoursesDetailController {
 			List<CourseDetailDTO> saveList = new ArrayList<>();
 
 			Course course = courseRepository.findById(courseId).get();
-			if (dataList.size() < (course.getCourseDuration() / 4)) {
+			Integer courseDeration = (Integer) Math.round(course.getCourseDuration() / 4);
+			System.out.println(courseDeration);
+			if (dataList.size() <= (courseDeration - 1)) {
 				System.out.println(dataList.size());
-				return ResponseEntity.badRequest().body("CourseDuration_ " + (course.getCourseDuration() / 4));
+				return ResponseEntity.badRequest().body("CourseDuration_ " + (courseDeration - 1));
 			} else {
 				for (List<Object> rowData : dataList) {
 					CourseDetailDTO courseDetail = new CourseDetailDTO();
@@ -195,5 +203,23 @@ public class CoursesDetailController {
 		fos.write(multipartFile.getBytes());
 		fos.close();
 		return file;
+	}
+
+	@GetMapping("/download-excel")
+	public ResponseEntity<InputStreamResource> downloadExcel() throws IOException {
+		// Load Excel file from the resources folder
+		ClassPathResource resource = new ClassPathResource("static/excel/courseDetail.xlsx");
+		InputStream inputStream = resource.getInputStream();
+
+		// Set up HTTP headers
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+		headers.setContentDispositionFormData("attachment", "courseDetail.xlsx");
+
+		// Create InputStreamResource from the Excel file
+		InputStreamResource inputStreamResource = new InputStreamResource(inputStream);
+
+		// Return ResponseEntity with InputStreamResource and headers
+		return new ResponseEntity<>(inputStreamResource, headers, HttpStatus.SC_OK);
 	}
 }
