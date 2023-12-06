@@ -106,43 +106,45 @@ const CertificatePDF = () => {
     const [loading, setLoading] = useState(false)
 
     // FETCH
-    const fetchCurrentCertificate = useCallback(async () => {
-        setLoading(true)
-
-        try {
-            const resp = await certificateApi.getAllCertificateByCertificateId(
-                searchParams.get('certificateId')
-            )
-
-            if (resp.status === 200) {
-                setCertificate(resp.data)
-
-                const str = resp.data.certificateName
-                const prefix = 'Chứng chỉ khóa học'
-                const value = str
-                    .substring(str.indexOf(prefix) + prefix.length)
-                    .trim()
-                setCourseName(value)
-            }
-
-            // QR code
-            const url = window.location.href
-
-            // Generate QR code as an image
-            const qrCodeDataURL = await QRCode.toDataURL(url)
-
-            console.log(qrCodeDataURL)
-            setQrCodeImage(qrCodeDataURL)
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }, [searchParams])
-
     useEffect(() => {
-        fetchCurrentCertificate()
-    }, [fetchCurrentCertificate])
+        const fetchData = async () => {
+            try {
+                setLoading(true)
+
+                const resp =
+                    await certificateApi.getAllCertificateByCertificateId(
+                        searchParams.get('certificateId')
+                    )
+
+                if (resp.status === 200) {
+                    setCertificate(resp.data)
+
+                    const str = resp.data.certificateName
+                    const prefix = 'Chứng chỉ khóa học'
+                    const value = str
+                        .substring(str.indexOf(prefix) + prefix.length)
+                        .trim()
+                    setCourseName(value)
+                }
+
+                // QR code
+                const url = window.location.href
+
+                // Generate QR code as an image
+                const qrCodeDataURL = await QRCode.toDataURL(url)
+
+                console.log(qrCodeDataURL)
+                setQrCodeImage(qrCodeDataURL)
+
+                setLoading(false)
+            } catch (error) {
+                console.log(error)
+            }
+        }
+
+        Promise.all([fetchData()])
+
+    }, [searchParams])
 
     return (
         <PDFViewer style={styles.viewer}>
@@ -325,7 +327,7 @@ const CertificatePDF = () => {
                                 bottom: 35,
                                 right: 240
                             }}
-                            src={qrCodeImage}
+                            src={loading !== true && qrCodeImage}
                         />
                     )}
                 </Page>

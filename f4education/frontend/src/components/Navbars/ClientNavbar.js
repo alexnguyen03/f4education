@@ -186,7 +186,8 @@ const ClientNavbar = () => {
     const handleLogout = () => {
         localStorage.removeItem('user')
         fetchCart()
-        window.location.reload()
+        navigate('auth/login')
+        // window.location.reload()
         // const currentPath = window.location.pathname
         // console.log('Địa chỉ (path) hiện tại của trang web là:', currentPath)
     }
@@ -677,10 +678,8 @@ const ClientNavbar = () => {
                                 >
                                     <Menu.Target>
                                         <Avatar
-                                            component="a"
-                                            href="/"
-                                            target="_blank"
-                                            src="https://images.unsplash.com/photo-1695754189990-da05b9433ac4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60"
+                                            // src="https://images.unsplash.com/photo-1695754189990-da05b9433ac4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyMHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=500&q=60"
+                                            src={`${PUBLIC_IMAGE}/students/${user.image}`}
                                             alt="it's me"
                                             radius={50}
                                         />

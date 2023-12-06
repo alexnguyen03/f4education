@@ -43,6 +43,7 @@ const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const ClassInformationDetail = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
     // ************* Routes Variable
     const data = useParams()
     let navigate = useNavigate()
@@ -123,7 +124,7 @@ const ClassInformationDetail = () => {
 
     const fetchClassByTeacher = async () => {
         try {
-            const resp = await classApi.getAllClassByTeacherId(teacherId)
+            const resp = await classApi.getAllClassByTeacherId(user.username)
             console.log(
                 '🚀 ~ file: ClassInformationDetail.js:109 ~ fetchClassByTeacher ~ resp:',
                 resp
@@ -147,17 +148,17 @@ const ClassInformationDetail = () => {
     }
 
     const checkIfClassStudyToDay = async () => {
-        const today = moment(new Date()).format('DD-MM-yyyy')
         try {
             const resp = await scheduleApi.findAllScheduleByClassAndStudyDate(
-                data.classId,
-                today
+                data.classId
             )
 
-            console.log(resp.data)
-
-            if (resp.status === 200 && resp.data.length > 0) {
+            if (resp.status === 200) {
+                console.log(resp.data)
                 setClassStudyToday(true)
+            } else {
+                console.log('class dont study today')
+                setClassStudyToday(false)
             }
         } catch (error) {
             console.log(error)
@@ -605,32 +606,25 @@ const ClassInformationDetail = () => {
                                 <Flex justify="space-between" align="center">
                                     <Group position="left">
                                         {classStudyToday ? (
-                                            <>
-                                                <Button
-                                                    color="violet"
-                                                    size="md"
-                                                    mb="lg"
-                                                    onClick={() =>
-                                                        handleSaveAttendance()
-                                                    }
-                                                >
-                                                    Lưu điểm danh
-                                                </Button>
-                                            </>
+                                            <Button
+                                                color="violet"
+                                                size="md"
+                                                mb="lg"
+                                                onClick={() =>
+                                                    handleSaveAttendance()
+                                                }
+                                            >
+                                                Lưu điểm danh
+                                            </Button>
                                         ) : (
-                                            <>
-                                                <Button
-                                                    color="violet"
-                                                    size="md"
-                                                    mb="lg"
-                                                    onClick={() =>
-                                                        handleSaveAttendance()
-                                                    }
-                                                    disabled
-                                                >
-                                                    Lưu điểm danh
-                                                </Button>
-                                            </>
+                                            <Button
+                                                color="violet"
+                                                size="md"
+                                                mb="lg"
+                                                disabled
+                                            >
+                                                Lưu điểm danh
+                                            </Button>
                                         )}
                                     </Group>
 

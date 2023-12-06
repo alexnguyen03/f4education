@@ -561,6 +561,7 @@ const CourseProgress = () => {
                                         size="lg"
                                         leftIcon={<IconZoomQuestion />}
                                         mt={10}
+                                        fullWidth
                                         onClick={() => {
                                             handleShowTaskByClassId(
                                                 selectedCourse.classes.classId
@@ -909,7 +910,7 @@ const CourseProgress = () => {
                 </Box>
 
                 {/* In Progress Course */}
-                <Box mt={rem('8rem')}>
+                <Box mt={rem('10rem')}>
                     <Group position="left" mb={'lg'}>
                         <Title order={2} color="dark" fw={700}>
                             Các khóa học đang theo học

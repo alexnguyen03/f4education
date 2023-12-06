@@ -713,7 +713,7 @@ function CourseDetailClient() {
                                                         size="xl"
                                                     >
                                                         {' '}
-                                                        Giá khóa học:{' '}
+                                                        Học phí:{' '}
                                                         {formatCurrency(
                                                             course.coursePrice
                                                         )}
@@ -782,6 +782,13 @@ function CourseDetailClient() {
                                                     mt="md"
                                                     mb="xs"
                                                 >
+                                                    <Text
+                                                        color="dimmed"
+                                                        size="xl"
+                                                        fw={500}
+                                                    >
+                                                        Học phí:
+                                                    </Text>
                                                     <Title
                                                         order={1}
                                                         fw={700}
@@ -792,12 +799,6 @@ function CourseDetailClient() {
                                                             course.coursePrice
                                                         )}
                                                     </Title>
-                                                    <Badge
-                                                        color="pink"
-                                                        variant="light"
-                                                    >
-                                                        Giảm giá
-                                                    </Badge>
                                                 </Group>
 
                                                 {course.isPurchase ? (
@@ -906,7 +907,8 @@ function CourseDetailClient() {
                                                             color="dark"
                                                             size="md"
                                                         >
-                                                            Chứng chỉ hoàn thành
+                                                            Chứng nhận khi hoàn
+                                                            thành khóa học
                                                         </Text>
                                                     </Group>
                                                 </Stack>
@@ -992,6 +994,13 @@ function CourseDetailClient() {
                                 <Card.Section px="sm">
                                     <Stack px="lg">
                                         <Group position="apart" mt="md" mb="xs">
+                                            <Text
+                                                color="dimmed"
+                                                size="xl"
+                                                fw={500}
+                                            >
+                                                Học phí:
+                                            </Text>
                                             <Title
                                                 order={1}
                                                 fw={700}
@@ -1002,9 +1011,12 @@ function CourseDetailClient() {
                                                     course.coursePrice
                                                 )}
                                             </Title>
-                                            <Badge color="pink" variant="light">
-                                                Giảm giá
-                                            </Badge>
+                                            {/* <Badge
+                                                        color="pink"
+                                                        variant="light"
+                                                    >
+                                                        Giảm giá
+                                                    </Badge> */}
                                         </Group>
 
                                         {course.isPurchase ? (
@@ -1092,7 +1104,8 @@ function CourseDetailClient() {
                                             <Group>
                                                 <IconTrophy />
                                                 <Text color="dark" size="md">
-                                                    Chứng chỉ hoàn thành
+                                                    Chứng nhận khi hoàn thành
+                                                    khóa học
                                                 </Text>
                                             </Group>
                                         </Stack>

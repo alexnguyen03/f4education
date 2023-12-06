@@ -1,5 +1,6 @@
 package com.f4education.springjwt.repository;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -26,7 +27,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
 
 	@Query("SELECT sc FROM Schedule sc WHERE sc.classes.classId = :classId AND sc.studyDate = :studyDate")
 	public Schedule findAllScheduleByClassIdAndStudyDate(@Param("classId") Integer classId,
-			@Param("studyDate") Date studyDate);
+			@Param("studyDate") OffsetDateTime studyDate);
 
 	@Query(value = "SELECT s.scheduleId, s.studyDate, s.isPractice, s.classes.classId, s.sessions.sessionId "
 			+ "FROM Schedule s " + "JOIN Classes c ON s.classes.classId = c.classId "

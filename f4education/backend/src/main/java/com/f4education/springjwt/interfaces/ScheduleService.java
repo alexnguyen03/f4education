@@ -19,7 +19,7 @@ public interface ScheduleService {
 
 	List<ScheduleTeacherDTO> findAllScheduleTeacherByID(Integer id);
 
-	Schedule findScheduleByClassAndStudyDate(Integer classId, Date studyDate);
+	Schedule findScheduleByClassAndStudyDate(Integer classId);
 
 	List<AttendanceReviewStudent> findAllScheduleByAttendance(Integer classId, String studentId);
 }

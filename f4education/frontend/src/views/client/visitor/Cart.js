@@ -61,6 +61,7 @@ function Cart() {
 
     // *************** Logic UI Variable
     const [totalPrice, setTotalPrice] = useState(0)
+    const [selectedCoursePrice, setSelectedCoursePrice] = useState(0)
     let navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
@@ -256,6 +257,20 @@ function Cart() {
         setTotalPrice(newTotalPrice)
     }, [carts, loading])
 
+    useEffect(() => {
+        const newSelectedCart = carts.filter(
+            (item) => item.course.courseId === selectedItem
+        )
+
+        console.log(newSelectedCart)
+
+        if (newSelectedCart.length !== 0) {
+            setSelectedCoursePrice(newSelectedCart[0].course.coursePrice)
+        } else {
+            setSelectedCoursePrice(0)
+        }
+    }, [carts, selectedItem])
+
     // *************** Use Effect AREA
     useEffect(() => {
         fetchCart()
@@ -301,14 +316,14 @@ function Cart() {
                                 <Flex justify="flex-start" gap="md">
                                     <Text>
                                         {course.rating === 'NaN'
-                                            ? 5
+                                            ? 0
                                             : course.rating}
                                     </Text>
                                     <Group position="center">
                                         <Rating
                                             value={
                                                 course.rating === 'NaN'
-                                                    ? 5
+                                                    ? 0
                                                     : course.rating
                                             }
                                             fractions={2}
@@ -561,7 +576,7 @@ function Cart() {
                                                                                         .course
                                                                                         .rating ===
                                                                                     'NaN'
-                                                                                        ? 5
+                                                                                        ? 0
                                                                                         : parseFloat(
                                                                                               cart
                                                                                                   .course
@@ -705,10 +720,23 @@ function Cart() {
                                         className="mt-2 cart-summery-floating-bottom w-100"
                                     >
                                         <span className="font-weight-600 text-muted">
-                                            Tổng tiền:
+                                            Tổng tiền giỏ hàng:
                                             <br />
                                             <h3 className="font-weight-700">
                                                 {totalPrice.toLocaleString(
+                                                    'it-IT',
+                                                    {
+                                                        style: 'currency',
+                                                        currency: 'VND'
+                                                    }
+                                                )}
+                                            </h3>
+                                        </span>
+                                        <span className="font-weight-600 text-muted mt-3">
+                                            Tổng thanh toán:
+                                            <br />
+                                            <h3 className="font-weight-700">
+                                                {selectedCoursePrice.toLocaleString(
                                                     'it-IT',
                                                     {
                                                         style: 'currency',
