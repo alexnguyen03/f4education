@@ -96,6 +96,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/resource/**",
                                         "/api/cart/**",
                                         "/api/bills/**",
+                                        "/api/report/**",
                                         "api/bill-detail/**",
                                         "/api/payment-method/**",
                                         "/api/course/newest-courses",

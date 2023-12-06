@@ -1,9 +1,13 @@
 package com.f4education.springjwt.interfaces;
 
+import java.text.ParseException;
+import java.util.Date;
 import java.util.List;
 
 import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
+import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 import com.f4education.springjwt.payload.response.CourseResponse;
 
 public interface CoursesService {
@@ -33,4 +37,7 @@ public interface CoursesService {
 
 	String renameFolder(String folderName, String newFolderName) throws Exception;
 
+	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount();
+
+	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
 }

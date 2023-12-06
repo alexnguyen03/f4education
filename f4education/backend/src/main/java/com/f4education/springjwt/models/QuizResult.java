@@ -29,7 +29,7 @@ public class QuizResult implements Serializable {
 	@Column(name = "quizz_id")
 	private Integer quizzId;
 
-	private Integer score;
+	private Float score;
 
 	private Integer duration;
 

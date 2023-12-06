@@ -3,6 +3,7 @@ package com.f4education.springjwt.security.services;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -17,16 +18,21 @@ import com.f4education.springjwt.interfaces.QuestionDetailService;
 import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.Question;
 import com.f4education.springjwt.models.QuestionDetail;
+import com.f4education.springjwt.models.QuizResult;
 import com.f4education.springjwt.payload.request.QuestionDetailClientDTO;
 import com.f4education.springjwt.payload.request.QuestionDetailDTO;
 import com.f4education.springjwt.repository.AnswerReposotory;
 import com.f4education.springjwt.repository.QuestionDetailRepository;
 import com.f4education.springjwt.repository.QuestionRepository;
+import com.f4education.springjwt.repository.QuizResultRepository;
 
 @Service
 public class QuestionDetailServiceImpl implements QuestionDetailService {
 	@Autowired
 	QuestionDetailRepository questionDetailReposotory;
+
+	@Autowired
+	private QuizResultRepository quizResultRepository;
 
 	@Autowired
 	QuestionRepository questionReposotory;
@@ -35,16 +41,20 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 	AnswerReposotory answerReposotory;
 
 	@Override
-	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId) {
+	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId, String studentId) {
 		List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(classId);
-		System.out.println(questionDetail);
-		// Xáo trộn các phần tử trong danh sách
-	    Collections.shuffle(questionDetail);
-	    
-	    // Lấy 20 phần tử đầu tiên
-	    List<QuestionDetail> randomQuestions = questionDetail.subList(0, Math.min(questionDetail.size(), 20));
-	    System.out.println(randomQuestions);
-	    
+		List<QuizResult> quizResults = quizResultRepository.getAllByClassIdAndStudenId(classId, studentId);
+		List<QuestionDetail> randomQuestions = new ArrayList<>();
+		if (quizResults.size() < 1) {
+			System.out.println(questionDetail);
+			// Xáo trộn các phần tử trong danh sách
+			Collections.shuffle(questionDetail);
+
+			// Lấy 20 phần tử đầu tiên
+			randomQuestions = questionDetail.subList(0, Math.min(questionDetail.size(), 20));
+		}
+		System.out.println(randomQuestions);
+
 		return randomQuestions.stream().map(this::convertToDto).collect(Collectors.toList());
 	}
 

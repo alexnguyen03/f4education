@@ -16,7 +16,7 @@ import lombok.NoArgsConstructor;
 public class QuizResultDTO {
 	private Integer quizzId;
 
-	private Integer score;
+	private Float score;
 
 	private Integer duration;
 	
