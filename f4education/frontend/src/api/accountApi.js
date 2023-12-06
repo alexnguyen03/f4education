@@ -10,16 +10,16 @@ const accountApi = {
         const url = `/accounts/${role}`
         return axiosClient.get(url)
     },
-    // getAllTeachersHistory: () => {
-    //   const url = "/teachers-history";
-    //   return axiosClient.get(url);
-    // },
-    // getTeacherHistoryByCourseid: (id) => {
-    //   const url = `/teachers-history/${id}`;
-    //   return axiosClient.get(url);
-    // },
     checkMail: (body) => {
         const url = '/accounts/checkEmail'
+        return axiosClient.post(url, body)
+    },
+    checkMailForPassword: (body) => {
+        const url = '/accounts/checkEmailForPassWord'
+        return axiosClient.post(url, body)
+    },
+    checkOTPForPassword: (body) => {
+        const url = '/accounts/checkOTPForPassWord'
         return axiosClient.post(url, body)
     },
     addAccount: (body) => {

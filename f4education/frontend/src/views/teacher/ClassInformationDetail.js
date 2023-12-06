@@ -92,7 +92,7 @@ const ClassInformationDetail = () => {
     const [selectedFile, setSelectedFile] = useState([null])
 
     // ************* fetch Area
-    const fetchClass = async () => {
+    const fetchClass = async () => {    
         try {
             const resp = await classApi.getByClassId(data.classId)
             console.log(
