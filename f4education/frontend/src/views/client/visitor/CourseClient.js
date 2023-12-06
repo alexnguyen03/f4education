@@ -4,15 +4,19 @@ import {
     Breadcrumbs,
     Anchor,
     Text,
+    Rating,
+    Group,
     Pagination
 } from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import FilterListIcon from '@mui/icons-material/FilterList'
 import { ExpandMore, ExpandLess } from '@material-ui/icons'
 import StarIcon from '@mui/icons-material/Star'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { Search as SearchIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../../utils/Notify'
 import MicIcon from '@mui/icons-material/Mic'
 import SpeechRecognition, {
     useSpeechRecognition
@@ -24,6 +28,8 @@ const IMG_URL = '/courses/'
 const PRODUCTS_PER_PAGE = 10 // Số lượng sản phẩm trên mỗi trang
 
 function CourseClient() {
+    const user = JSON.parse(localStorage.getItem('user'))
+    let navigate = useNavigate()
     const [courses, setCourses] = useState([])
     const [subjects, setSubjects] = useState([])
     const [expandedRating, setExpandedRating] = useState(false)
@@ -32,15 +38,10 @@ function CourseClient() {
     const [checkedSubjects, setCheckedSubjects] = useState([])
     const [checkedDurations, setCheckedDurations] = useState([])
     const [selectedValuePrice, setSelectedValuePrice] = useState(null)
-    const [activeFilter, setActiveFilter] = useState(false)
     const [searchTerm, setSearchTerm] = useState('')
     const [isLoading, setLoading] = useState(true)
     const [currentPage, setCurrentPage] = useState(1)
     const { transcript, resetTranscript } = useSpeechRecognition()
-
-    const handleSearch = () => {
-        setSearchTerm(transcript)
-    }
 
     // Tính toán chỉ mục sản phẩm đầu tiên và cuối cùng trên trang hiện tại
     const indexOfLastProduct = currentPage * PRODUCTS_PER_PAGE
@@ -100,13 +101,14 @@ function CourseClient() {
             // Nếu checkbox được chọn, thêm giá trị vào mảng checkedSubjects
             setCheckedSubjects((prevCheckedSubjects) => [
                 ...prevCheckedSubjects,
-                value
+                value.toLowerCase()
             ])
-            setActiveFilter(true)
         } else {
             // Nếu checkbox bị bỏ chọn, xóa giá trị khỏi mảng checkedSubjects
             setCheckedSubjects((prevCheckedSubjects) =>
-                prevCheckedSubjects.filter((subject) => subject !== value)
+                prevCheckedSubjects.filter(
+                    (subject) => subject !== value.toLowerCase()
+                )
             )
         }
     }
@@ -120,7 +122,6 @@ function CourseClient() {
                 ...prevCheckedDurations,
                 value
             ])
-            setActiveFilter(true)
         } else {
             // Nếu checkbox bị bỏ chọn, xóa giá trị khỏi mảng checkedSubjects
             setCheckedDurations((prevCheckedDurations) =>
@@ -157,7 +158,6 @@ function CourseClient() {
 
     const handleSelectChange = (event) => {
         setSelectedValuePrice(event.target.value)
-        setActiveFilter(true)
         courses.sort((a, b) => {
             const durationA = parseFloat(a.coursePrice)
             const durationB = parseFloat(b.coursePrice)
@@ -172,33 +172,58 @@ function CourseClient() {
 
     const handleDeleteFilter = async () => {
         getAllCourse()
-        setActiveFilter(false)
     }
 
-    const handleRegistration = (course) => {
-        // Lưu thông tin khóa học vào state
-        console.log(course)
-        // Thực hiện các thao tác khác tại đây
-    }
+    // const filteredCourses = courses.filter((course) => {
+    //     const courseValues = Object.values(course)
+    //     const subjectName = course.subject.subjectName.toLowerCase()
+
+    //     // Kiểm tra xem có tên môn học trong mảng checkedSubjects hay không
+    //     const isSubjectChecked = checkedSubjects.includes(
+    //         subjectName.toLowerCase()
+    //     )
+
+    //     for (let i = 0; i < courseValues.length; i++) {
+    //         const value = courseValues[i]
+    //         if (
+    //             typeof value === 'string' &&
+    //             value.toLowerCase().includes(searchTerm.toLowerCase())
+    //         ) {
+    //             return value.toLowerCase().includes(searchTerm.toLowerCase())
+    //         }
+    //         if (typeof value === 'number' && value.toString() === searchTerm) {
+    //             return value.toString() === searchTerm
+    //         }
+    //         if (subjectName.toLowerCase().includes(searchTerm.toLowerCase())) {
+    //             return subjectName
+    //                 .toLowerCase()
+    //                 .includes(searchTerm.toLowerCase())
+    //         }
+    //     }
+    //     return false
+    // })
 
     const filteredCourses = courses.filter((course) => {
         const courseValues = Object.values(course)
         const subjectName = course.subject.subjectName.toLowerCase()
+        const lowerCaseSearchTerm = searchTerm.toLowerCase()
+
         for (let i = 0; i < courseValues.length; i++) {
             const value = courseValues[i]
+
             if (
-                typeof value === 'string' &&
-                value.toLowerCase().includes(searchTerm.toLowerCase())
+                (typeof value === 'string' || typeof value === 'number') &&
+                value.toString().toLowerCase().includes(lowerCaseSearchTerm)
             ) {
-                return value.toLowerCase().includes(searchTerm.toLowerCase())
-            }
-            if (typeof value === 'number' && value.toString() === searchTerm) {
-                return value.toString() === searchTerm
-            }
-            if (subjectName.toLowerCase().includes(searchTerm.toLowerCase())) {
-                return subjectName
-                    .toLowerCase()
-                    .includes(searchTerm.toLowerCase())
+                return true
+            } else if (
+                checkedSubjects.includes(
+                    course.subject.subjectName.toLowerCase()
+                )
+            ) {
+                checkedSubjects.includes(
+                    course.subject.subjectName.toLowerCase()
+                )
             }
         }
         return false
@@ -211,33 +236,105 @@ function CourseClient() {
 
     const totalPages = Math.ceil(filteredCourses.length / PRODUCTS_PER_PAGE)
 
+    // CART - CHECK OUT
+    const handleAddCart = (course, e) => {
+        e.preventDefault()
+        return new Promise((resolve, reject) => {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
+            try {
+                const userCart =
+                    JSON.parse(localStorage.getItem('userCart')) || []
+
+                const cart = {
+                    course: course
+                }
+
+                let currentCart = []
+
+                const cartExists = userCart.some(
+                    (userCartMap) =>
+                        userCartMap.course.courseId === course.courseId
+                )
+
+                if (!cartExists) {
+                    userCart.push(cart)
+                    localStorage.setItem('userCart', JSON.stringify(userCart))
+                    currentCart = [cart]
+                } else {
+                    const prevCart = userCart.filter(
+                        (userCartMap) =>
+                            userCartMap.course.courseId === course.courseId
+                    )
+                    currentCart = prevCart
+                }
+
+                toast.update(
+                    id,
+                    Notify.options.createSuccessParam(
+                        'Thêm vào giỏ hàng thành công'
+                    )
+                )
+                resolve(currentCart)
+            } catch (error) {
+                toast.update(id, Notify.options.createError())
+                console.log(error)
+                reject(error)
+            }
+        })
+    }
+
+    const handleCheckOutNow = async (course, e) => {
+        e.preventDefault()
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        if (user === null) {
+            toast.update(
+                id,
+                Notify.options.createErrorParam(
+                    'Vui lòng đăng nhập trước khi thanh toán'
+                )
+            )
+            return
+        }
+
+        try {
+            const selectedCart = await handleAddCart(course, e)
+
+            // store cart to localstorage
+            localStorage.setItem('cartCheckout', JSON.stringify(selectedCart))
+            return navigate('/payment/checkout')
+        } catch (error) {
+            toast.update(id, Notify.options.createError())
+            console.log(error)
+        }
+    }
+
     useEffect(() => {
         if (courses.length > 0) return
         getAllCourse()
         getAllSubject()
     }, [])
 
-    useEffect(() => {
-        findCoursesByCheckedSubject(checkedSubjects)
-        if (checkedSubjects.length === 0) {
-            getAllCourse()
-            setActiveFilter(false)
-        }
-    }, [checkedSubjects])
+    // useEffect(() => {
+    //     findCoursesByCheckedSubject(checkedSubjects)
+    //     if (checkedSubjects.length === 0) {
+    //         getAllCourse()
+    //         setActiveFilter(false)
+    //     }
+    // }, [checkedSubjects])
 
     useEffect(() => {
         findCoursesByCheckedDuration(checkedDurations)
         // Kiểm tra nếu không có checkbox nào được chọn
         if (checkedDurations.length === 0 || checkedDurations.length === 3) {
             getAllCourse()
-            setActiveFilter(false)
         }
     }, [checkedDurations])
 
     useEffect(() => {
         if (selectedValuePrice === 'none') {
             getAllCourse()
-            setActiveFilter(false)
         }
     }, [selectedValuePrice])
 
@@ -247,6 +344,7 @@ function CourseClient() {
 
     return (
         <>
+            <ToastContainer />
             {/* <Container> */}
             {/* BreadCums */}
             <Breadcrumbs
@@ -299,20 +397,10 @@ function CourseClient() {
                         </select>
                     </div>
                 </div>
-                {activeFilter && (
-                    <div className="pl-2 my-auto">
-                        <button
-                            className="border-0 bg-white"
-                            onClick={() => handleDeleteFilter()}
-                        >
-                            <h5>Xóa bộ lọc</h5>
-                        </button>
-                    </div>
-                )}
                 <div
                     className="p-2 mt-3"
                     style={{
-                        marginLeft: 800,
+                        marginLeft: 700,
                         width: '350px',
                         height: 58,
                         border: '1px solid #282a354d',
@@ -386,7 +474,6 @@ function CourseClient() {
                                             name="exampleRadios"
                                             id="exampleRadios1"
                                             value="option1"
-                                            checked
                                         />
                                         <label
                                             className="form-check-label"
@@ -530,7 +617,7 @@ function CourseClient() {
                                                 onChange={
                                                     handleCheckboxChangeTopic
                                                 }
-                                                checked={checkedSubjects.includes(
+                                                defaultChecked={checkedSubjects.includes(
                                                     subject.subjectName
                                                 )}
                                             />
@@ -540,9 +627,6 @@ function CourseClient() {
                                             >
                                                 {subject.subjectName}
                                             </label>
-                                            <span className="text-muted small ml-2">
-                                                (212)
-                                            </span>
                                         </div>
                                     ))}
                                 </div>
@@ -637,11 +721,14 @@ function CourseClient() {
                 </div>
                 <div className="p-2 col-9">
                     {isLoading ? (
-                        <Loader
-                            color="rgba(46, 46, 46, 1)"
-                            size={50}
-                            style={{ margin: '20% 50%' }}
-                        />
+                        <>
+                            <div className="w-100 text-center mt-6">
+                                <Loader color="rgba(46, 46, 46, 1)" size={50} />
+                                <h3 className="text-muted mt-3">
+                                    Vui lòng chờ trong giây lát!
+                                </h3>
+                            </div>
+                        </>
                     ) : (
                         currentCourses.map((course) => (
                             <div
@@ -684,38 +771,21 @@ function CourseClient() {
                                             {course.courseDescription}
                                         </span>
                                     </Text>
-                                    <b>4.0</b>
-                                    <span className="ml-2">
-                                        <StarIcon
-                                            style={{ marginBottom: 3 }}
-                                            fontSize="inherit"
-                                            color="warning"
+                                    <Group position="left">
+                                        <Rating
+                                            value={
+                                                course.rating === 'NaN'
+                                                    ? 0
+                                                    : course.rating
+                                            }
+                                            fractions={2}
+                                            readOnly
+                                            mx={2}
                                         />
-                                        <StarIcon
-                                            style={{ marginBottom: 3 }}
-                                            fontSize="inherit"
-                                            color="warning"
-                                        />
-                                        <StarIcon
-                                            style={{ marginBottom: 3 }}
-                                            fontSize="inherit"
-                                            color="warning"
-                                        />
-                                        <StarIcon
-                                            style={{ marginBottom: 3 }}
-                                            fontSize="inherit"
-                                            color="warning"
-                                        />
-                                        <StarIcon
-                                            style={{ marginBottom: 3 }}
-                                            fontSize="inherit"
-                                            color="warning"
-                                        />
-                                        <span class="text-muted small ml-2">
-                                            (212)
-                                        </span>
-                                    </span>
-                                    <br />
+                                        <Text color="dimmed">
+                                            ({course.reviewNumber})
+                                        </Text>
+                                    </Group>
                                     <Badge
                                         className="p-0"
                                         mb={5}
@@ -740,10 +810,10 @@ function CourseClient() {
                                             fontWeight: 'bold',
                                             borderRadius: 0,
                                             float: 'right',
-                                            marginTop: 10
+                                            marginTop: 9
                                         }}
-                                        onClick={() =>
-                                            handleRegistration(course)
+                                        onClick={(e) =>
+                                            handleAddCart(course, e)
                                         }
                                     >
                                         Thêm vào giỏ hàng
@@ -751,7 +821,7 @@ function CourseClient() {
                                 </div>
                                 <div
                                     className="col-lg-2 mb-3 p-0"
-                                    style={{ lineHeight: '0.8' }}
+                                    style={{ lineHeight: '0.7' }}
                                 >
                                     <div
                                         class="d-flex align-items-start flex-column mt-1"
@@ -774,8 +844,8 @@ function CourseClient() {
                                                 borderRadius: 0,
                                                 marginTop: 74
                                             }}
-                                            onClick={() =>
-                                                handleRegistration(course)
+                                            onClick={(e) =>
+                                                handleCheckOutNow(course, e)
                                             }
                                         >
                                             Đăng ký
@@ -786,12 +856,16 @@ function CourseClient() {
                         ))
                     )}
                     {/* Hiển thị thanh phân trang */}
-                    <Pagination
-                        total={totalPages}
-                        limit={PRODUCTS_PER_PAGE}
-                        value={currentPage}
-                        onChange={handlePageChange}
-                    />
+                    {isLoading === false && (
+                        <Pagination
+                            mb={20}
+                            position="center"
+                            total={totalPages}
+                            limit={PRODUCTS_PER_PAGE}
+                            value={currentPage}
+                            onChange={handlePageChange}
+                        />
+                    )}
                 </div>
             </div>
         </>
