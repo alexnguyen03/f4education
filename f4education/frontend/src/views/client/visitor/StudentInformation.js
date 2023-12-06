@@ -236,154 +236,117 @@ const StudentInformation = () => {
             {/* Toast */}
             <ToastContainer />
 
-            {/* <Container fluid > */}
-            <Tabs
-                color="violet"
-                variant="pills"
-                radius="xl"
-                defaultValue="gallery"
-                orientation="vertical"
-            >
-                <div className="container-fluid">
-                    <div className="row">
-                        <div
-                            className="col-lg-3 "
-                            style={{ minHeight: '700px' }}
-                        >
-                            <Tabs.List className="shadow px-3 pb-3">
-                                <Tabs.Tab
-                                    value="gallery"
-                                    className="d-flex justify-content-center text-lg mt-4 font-weight-bold"
-                                >
-                                    Tài khoản
-                                </Tabs.Tab>
-                            </Tabs.List>
-                        </div>
-                        <div className="col-lg-9 border">
-                            <Tabs.Panel value="gallery">
-                                {loading ? (
-                                    <LoadingOverlay
-                                        visible={loading}
-                                        zIndex={1000}
-                                        color="rgba(46, 46, 46, 1)"
-                                        size={50}
-                                        overlayProps={{ radius: 'sm', blur: 2 }}
-                                    />
-                                ) : (
-                                    <>
-                                        <div className="container px-4">
-                                            <div className="row">
-                                                <div className="col-lg-12 p-0">
-                                                    <p className="h1 font-weight-bold text-dark mt-3">
-                                                        Hồ sơ cá nhân
-                                                    </p>
-                                                </div>
-                                                <div className="col-lg-12 shadow">
-                                                    <div className="container">
-                                                        <div className="row">
-                                                            <div className="col-lg-3 my-2">
-                                                                {isEditing ===
-                                                                false ? (
-                                                                    // <img
-                                                                    //     className="rounded-circle  shadow p-2 "
-                                                                    //     height={'247px'}
-                                                                    //     width={'247px'}
-                                                                    //     src={imgData}
-                                                                    //     alt="student-profile"
-                                                                    // />
-                                                                    <>
-                                                                        <div
-                                                                            className="previewProfilePic p-2 d-flex border justify-content-center"
-                                                                            style={{
-                                                                                height: '230px',
-                                                                                width: '230px',
-                                                                                overflow:
-                                                                                    'hidden',
-                                                                                position:
-                                                                                    'relative',
-                                                                                cursor: 'pointer',
-                                                                                borderRadius:
-                                                                                    '50%'
-                                                                            }}
-                                                                            onClick={
-                                                                                handleImageClick
-                                                                            }
-                                                                        >
-                                                                            {imgData ===
-                                                                                null && (
-                                                                                <img
-                                                                                    className="rounded-circle shadow"
-                                                                                    src={
-                                                                                        process
-                                                                                            .env
-                                                                                            .REACT_APP_IMAGE_URL +
-                                                                                        IMG_URL +
-                                                                                        student.image
-                                                                                    }
-                                                                                    alt="student-profile"
-                                                                                />
-                                                                            )}
-                                                                            {imgData && (
-                                                                                <img
-                                                                                    className="rounded-circle shadow"
-                                                                                    src={
-                                                                                        imgData
-                                                                                    }
-                                                                                    alt="student-profile"
-                                                                                />
-                                                                            )}
-                                                                        </div>
+            {loading ? (
+                <LoadingOverlay
+                    visible={loading}
+                    zIndex={1000}
+                    color="rgba(46, 46, 46, 1)"
+                    size={50}
+                    overlayProps={{ radius: 'sm', blur: 2 }}
+                />
+            ) : (
+                <>
+                    <div className="container px-4">
+                        <div className="row">
+                            <div className="col-lg-12 p-0">
+                                <p className="h1 font-weight-bold text-dark mt-3">
+                                    Hồ sơ cá nhân
+                                </p>
+                            </div>
+                            <div className="col-lg-12 shadow">
+                                <div className="container">
+                                    <div className="row">
+                                        <div className="col-lg-3 my-2">
+                                            {isEditing === false ? (
+                                                // <img
+                                                //     className="rounded-circle  shadow p-2 "
+                                                //     height={'247px'}
+                                                //     width={'247px'}
+                                                //     src={imgData}
+                                                //     alt="student-profile"
+                                                // />
+                                                <>
+                                                    <div
+                                                        className="previewProfilePic p-2 d-flex border justify-content-center"
+                                                        style={{
+                                                            height: '230px',
+                                                            width: '230px',
+                                                            overflow: 'hidden',
+                                                            position:
+                                                                'relative',
+                                                            cursor: 'pointer',
+                                                            borderRadius: '50%'
+                                                        }}
+                                                        onClick={
+                                                            handleImageClick
+                                                        }
+                                                    >
+                                                        {imgData === null && (
+                                                            <img
+                                                                className="rounded-circle shadow"
+                                                                src={
+                                                                    process.env
+                                                                        .REACT_APP_IMAGE_URL +
+                                                                    IMG_URL +
+                                                                    student.image
+                                                                }
+                                                                alt="student-profile"
+                                                            />
+                                                        )}
+                                                        {imgData && (
+                                                            <img
+                                                                className="rounded-circle shadow"
+                                                                src={imgData}
+                                                                alt="student-profile"
+                                                            />
+                                                        )}
+                                                    </div>
 
-                                                                        <FormGroup className="d-none">
-                                                                            <div className="custom-file">
-                                                                                <input
-                                                                                    ref={
-                                                                                        fileInputRef
-                                                                                    }
-                                                                                    type="file"
-                                                                                    name="imageFile"
-                                                                                    accept="image/*"
-                                                                                    id="customFile"
-                                                                                    onChange={
-                                                                                        onChangePicture
-                                                                                    }
-                                                                                    onClick={
-                                                                                        handleImageClick
-                                                                                    }
-                                                                                />
-                                                                                <label
-                                                                                    className="custom-file-label"
-                                                                                    htmlFor="customFile"
-                                                                                >
-                                                                                    {imgData
-                                                                                        ? 'Chọn một ảnh khác'
-                                                                                        : 'Chọn hình ảnh'}
-                                                                                </label>
-                                                                            </div>
-                                                                        </FormGroup>
-                                                                    </>
-                                                                ) : (
-                                                                    <>
-                                                                        <img
-                                                                            className="playerProfilePic_home_tile rounded-circle shadow p-2"
-                                                                            height={
-                                                                                '230px'
-                                                                            }
-                                                                            width={
-                                                                                '230px'
-                                                                            }
-                                                                            src={
-                                                                                process
-                                                                                    .env
-                                                                                    .REACT_APP_IMAGE_URL +
-                                                                                IMG_URL +
-                                                                                student.image
-                                                                            }
-                                                                            alt="student-profile"
-                                                                        />
-                                                                    </>
-                                                                )}
-                                                                {/* {!imgData && (
+                                                    <FormGroup className="d-none">
+                                                        <div className="custom-file">
+                                                            <input
+                                                                ref={
+                                                                    fileInputRef
+                                                                }
+                                                                type="file"
+                                                                name="imageFile"
+                                                                accept="image/*"
+                                                                id="customFile"
+                                                                onChange={
+                                                                    onChangePicture
+                                                                }
+                                                                onClick={
+                                                                    handleImageClick
+                                                                }
+                                                            />
+                                                            <label
+                                                                className="custom-file-label"
+                                                                htmlFor="customFile"
+                                                            >
+                                                                {imgData
+                                                                    ? 'Chọn một ảnh khác'
+                                                                    : 'Chọn hình ảnh'}
+                                                            </label>
+                                                        </div>
+                                                    </FormGroup>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <img
+                                                        className="playerProfilePic_home_tile rounded-circle shadow p-2"
+                                                        height={'230px'}
+                                                        width={'230px'}
+                                                        src={
+                                                            process.env
+                                                                .REACT_APP_IMAGE_URL +
+                                                            IMG_URL +
+                                                            student.image
+                                                        }
+                                                        alt="student-profile"
+                                                    />
+                                                </>
+                                            )}
+                                            {/* {!imgData && (
                                                         <img
                                                                 className="rounded-circle shadow p-2"
                                                                 height={'247px'}
@@ -397,37 +360,27 @@ const StudentInformation = () => {
                                                                 alt="student-profile"
                                                             />
                                                         )} */}
-                                                            </div>
-                                                            <div className="col-lg-9 p-0 w-100 h-100 p-3 my-auto py-auto">
-                                                                <div className="d-flex justify-content-between align-items-center">
-                                                                    <div className="d-flex flex-column">
-                                                                        <span className="w-100 text-muted text-md font-weight-bold mb-2">
-                                                                            Học
-                                                                            viên
-                                                                        </span>
-                                                                        <span className="w-100 text-dark text-xl font-weight-bold mb-2">
-                                                                            {
-                                                                                student.fullname
-                                                                            }
-                                                                        </span>
-                                                                        <span className="w-100 text-muted text-md font-weight-bold mb-2">
-                                                                            Email: {
-                                                                                user.email
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                    <div className="mb-auto">
-                                                                        <span className="text-muted text-md font-weight-bold">
-                                                                            Mã
-                                                                            học
-                                                                            viên:{' '}
-                                                                            #{
-                                                                                user.id
-                                                                            }
-                                                                        </span>
-                                                                    </div>
-                                                                </div>
-                                                                {/* <Label
+                                        </div>
+                                        <div className="col-lg-9 p-0 w-100 h-100 p-3 my-auto py-auto">
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <div className="d-flex flex-column">
+                                                    <span className="w-100 text-muted text-md font-weight-bold mb-2">
+                                                        Học viên
+                                                    </span>
+                                                    <span className="w-100 text-dark text-xl font-weight-bold mb-2">
+                                                        {student.fullname}
+                                                    </span>
+                                                    <span className="w-100 text-muted text-md font-weight-bold mb-2">
+                                                        Email: {user.email}
+                                                    </span>
+                                                </div>
+                                                <div className="mb-auto">
+                                                    <span className="text-muted text-md font-weight-bold">
+                                                        Mã học viên: #{user.id}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            {/* <Label
                                                                     htmlFor="customFile"
                                                                     className="form-control-label text-dark font-weight-bold"
                                                                 >
@@ -456,201 +409,147 @@ const StudentInformation = () => {
                                                                         hình ảnh
                                                                     </label>
                                                                 </div> */}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
-                                        <div className="container px-4 py-2 mt-3">
-                                            <div className="row">
-                                                <div className="col-lg-12 mb-3 shadow">
-                                                    <div className="container mb-2">
-                                                        <div className="row">
-                                                            <div className="col-lg-12">
-                                                                <p className="text-lg font-weight-bold text-dark mt-2">
-                                                                    Thông tin cá
-                                                                    nhân
-                                                                </p>
-                                                            </div>
-                                                            <div className="col-lg-6">
-                                                                <p className="text-dark font-weight-bold mb-2">
-                                                                    Họ và tên
-                                                                </p>
-                                                                <ContentEditable
-                                                                    style={
-                                                                        contentEditableStyle
-                                                                    }
-                                                                    html={
-                                                                        htmlFullName
-                                                                    } // innerHTML of the editable div
-                                                                    disabled={
-                                                                        isEditing
-                                                                    } // use true to disable edition
-                                                                    onChange={
-                                                                        handleChangeFullName
-                                                                    } // handle innerHTML change
-                                                                />
-                                                                {errorFullName.fullname && (
-                                                                    <div className="text-danger mt-1 font-italic font-weight-light">
-                                                                        {
-                                                                            errorFullName.fullname
-                                                                        }
-                                                                    </div>
-                                                                )}
-                                                                <p className="text-dark font-weight-bold mb-2 mt-3">
-                                                                    Địa chỉ
-                                                                </p>
-                                                                <ContentEditable
-                                                                    style={
-                                                                        contentEditableStyle
-                                                                    }
-                                                                    html={
-                                                                        htmlAddress
-                                                                    } // innerHTML of the editable div
-                                                                    disabled={
-                                                                        isEditing
-                                                                    } // use true to disable edition
-                                                                    onChange={
-                                                                        handleChangeAddress
-                                                                    } // handle innerHTML change
-                                                                />
-                                                                {errorAddress.address && (
-                                                                    <div className="text-danger mt-1 font-italic font-weight-light">
-                                                                        {
-                                                                            errorAddress.address
-                                                                        }
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                            <div className="col-lg-6">
-                                                                <p className="text-dark font-weight-bold mb-2">
-                                                                    Số điện
-                                                                    thoại
-                                                                </p>
-                                                                <ContentEditable
-                                                                    style={
-                                                                        contentEditableStyle
-                                                                    }
-                                                                    html={
-                                                                        htmlPhone
-                                                                    } // innerHTML of the editable div
-                                                                    disabled={
-                                                                        isEditing
-                                                                    } // use true to disable edition
-                                                                    onChange={
-                                                                        handleChangePhone
-                                                                    } // handle innerHTML change
-                                                                />
-                                                                {errorPhone.phone && (
-                                                                    <div className="text-danger mt-1 font-italic font-weight-light">
-                                                                        {
-                                                                            errorPhone.phone
-                                                                        }
-                                                                    </div>
-                                                                )}
-                                                                <p className="text-dark font-weight-bold mb-2 mt-3">
-                                                                    Giới tính
-                                                                </p>
-                                                                {isEditing ? (
-                                                                    <Button color="primary mb-3">
-                                                                        {student.gender
-                                                                            ? 'Nam'
-                                                                            : 'Nữ'}
-                                                                    </Button>
-                                                                ) : (
-                                                                    <ButtonGroup>
-                                                                        <Button
-                                                                            color="primary mb-3"
-                                                                            outline
-                                                                            onClick={() =>
-                                                                                setGender(
-                                                                                    true
-                                                                                )
-                                                                            }
-                                                                            active={
-                                                                                student.gender ===
-                                                                                true
-                                                                            }
-                                                                        >
-                                                                            Nam
-                                                                        </Button>
-                                                                        <Button
-                                                                            color="primary mb-3"
-                                                                            outline
-                                                                            name="gender"
-                                                                            onClick={() =>
-                                                                                setGender(
-                                                                                    false
-                                                                                )
-                                                                            }
-                                                                            active={
-                                                                                student.gender ===
-                                                                                false
-                                                                            }
-                                                                        >
-                                                                            Nữ
-                                                                        </Button>
-                                                                    </ButtonGroup>
-                                                                )}
-                                                            </div>
-                                                            <div className="col-lg-12 mt-4">
-                                                                <Button
-                                                                    color="dark"
-                                                                    role="button"
-                                                                    className="float-right mb-3"
-                                                                    disabled={
-                                                                        isEditing
-                                                                    }
-                                                                    onClick={
-                                                                        updateStudent
-                                                                    }
-                                                                    style={{
-                                                                        minWidth:
-                                                                            '150px',
-                                                                        fontSize:
-                                                                            '1rem',
-                                                                        fontWeight:
-                                                                            '500'
-                                                                    }}
-                                                                >
-                                                                    Cập nhật
-                                                                </Button>
-                                                                <Button
-                                                                    color="dark"
-                                                                    outline
-                                                                    role="button"
-                                                                    className="float-right mr-3 mb-3"
-                                                                    onClick={
-                                                                        handleEditClick
-                                                                    }
-                                                                    style={{
-                                                                        minWidth:
-                                                                            '150px',
-                                                                        fontSize:
-                                                                            '1rem',
-                                                                        fontWeight:
-                                                                            '500'
-                                                                    }}
-                                                                >
-                                                                    {!isEditing
-                                                                        ? 'Trở lại'
-                                                                        : 'Chỉnh sửa'}
-                                                                </Button>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </>
-                                )}
-                            </Tabs.Panel>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </Tabs>
-            {/* </Container> */}
+                    <div className="container px-4 py-2 mt-3">
+                        <div className="row">
+                            <div className="col-lg-12 mb-3 shadow">
+                                <div className="container mb-2">
+                                    <div className="row">
+                                        <div className="col-lg-12">
+                                            <p className="text-lg font-weight-bold text-dark mt-2">
+                                                Thông tin cá nhân
+                                            </p>
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <p className="text-dark font-weight-bold mb-2">
+                                                Họ và tên
+                                            </p>
+                                            <ContentEditable
+                                                style={contentEditableStyle}
+                                                html={htmlFullName} // innerHTML of the editable div
+                                                disabled={isEditing} // use true to disable edition
+                                                onChange={handleChangeFullName} // handle innerHTML change
+                                            />
+                                            {errorFullName.fullname && (
+                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                    {errorFullName.fullname}
+                                                </div>
+                                            )}
+                                            <p className="text-dark font-weight-bold mb-2 mt-3">
+                                                Địa chỉ
+                                            </p>
+                                            <ContentEditable
+                                                style={contentEditableStyle}
+                                                html={htmlAddress} // innerHTML of the editable div
+                                                disabled={isEditing} // use true to disable edition
+                                                onChange={handleChangeAddress} // handle innerHTML change
+                                            />
+                                            {errorAddress.address && (
+                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                    {errorAddress.address}
+                                                </div>
+                                            )}
+                                        </div>
+                                        <div className="col-lg-6">
+                                            <p className="text-dark font-weight-bold mb-2">
+                                                Số điện thoại
+                                            </p>
+                                            <ContentEditable
+                                                style={contentEditableStyle}
+                                                html={htmlPhone} // innerHTML of the editable div
+                                                disabled={isEditing} // use true to disable edition
+                                                onChange={handleChangePhone} // handle innerHTML change
+                                            />
+                                            {errorPhone.phone && (
+                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                    {errorPhone.phone}
+                                                </div>
+                                            )}
+                                            <p className="text-dark font-weight-bold mb-2 mt-3">
+                                                Giới tính
+                                            </p>
+                                            {isEditing ? (
+                                                <Button color="primary mb-3">
+                                                    {student.gender
+                                                        ? 'Nam'
+                                                        : 'Nữ'}
+                                                </Button>
+                                            ) : (
+                                                <ButtonGroup>
+                                                    <Button
+                                                        color="primary mb-3"
+                                                        outline
+                                                        onClick={() =>
+                                                            setGender(true)
+                                                        }
+                                                        active={
+                                                            student.gender ===
+                                                            true
+                                                        }
+                                                    >
+                                                        Nam
+                                                    </Button>
+                                                    <Button
+                                                        color="primary mb-3"
+                                                        outline
+                                                        name="gender"
+                                                        onClick={() =>
+                                                            setGender(false)
+                                                        }
+                                                        active={
+                                                            student.gender ===
+                                                            false
+                                                        }
+                                                    >
+                                                        Nữ
+                                                    </Button>
+                                                </ButtonGroup>
+                                            )}
+                                        </div>
+                                        <div className="col-lg-12 mt-4">
+                                            <Button
+                                                color="dark"
+                                                role="button"
+                                                className="float-right mb-3"
+                                                disabled={isEditing}
+                                                onClick={updateStudent}
+                                                style={{
+                                                    minWidth: '150px',
+                                                    fontSize: '1rem',
+                                                    fontWeight: '500'
+                                                }}
+                                            >
+                                                Cập nhật
+                                            </Button>
+                                            <Button
+                                                color="dark"
+                                                outline
+                                                role="button"
+                                                className="float-right mr-3 mb-3"
+                                                onClick={handleEditClick}
+                                                style={{
+                                                    minWidth: '150px',
+                                                    fontSize: '1rem',
+                                                    fontWeight: '500'
+                                                }}
+                                            >
+                                                {!isEditing
+                                                    ? 'Trở lại'
+                                                    : 'Chỉnh sửa'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            )}
         </Container>
     )
 }

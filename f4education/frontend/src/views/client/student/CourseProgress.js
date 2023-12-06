@@ -310,6 +310,7 @@ const CourseProgress = () => {
         setLoadingCheckExam(false)
     }
     const handleShowQuestion = (classId) => {
+        console.log(classId)
         navigate({
             pathname: '/student/quizz',
             search: `?${createSearchParams({

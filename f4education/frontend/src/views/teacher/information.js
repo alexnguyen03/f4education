@@ -315,290 +315,142 @@ const Information = () => {
                     Cập nhật thông tin cá nhân
                 </Title>
 
-                <Paper shadow={'lg'} mt={30} py={50}>
-                    <Tabs
-                        color="dark"
-                        radius="xs"
-                        orientation="vertical"
-                        defaultValue="information-teacher"
-                        mt={30}
-                    >
-                        {loading ? (
-                            // <Overlay
-                                // visible={loading}
-                                // zIndex={10}
-                                // color="rgba(46, 46, 46, 1)"
-                                // overlayProps={{ radius: 'sm', blur: 0.5 }}
-                            // />
-                            <></>
-                        ) : (
-                            <>
-                                <Tabs.List>
-                                    <Tabs.Tab
-                                        value="information-teacher"
-                                        icon={<IconUserCircle size="1.2rem" />}
-                                        fw={300}
-                                        fz={'1.2rem'}
-                                        style={{
-                                            borderWidth: '6px'
+                <Paper shadow="sm" p="xl" mt={10} radius="md" withBorder>
+                    <Grid>
+                        <Grid.Col span={2}>
+                            <Flex
+                                direction={'column'}
+                                justify="center"
+                                align={'center'}
+                                gap={8}
+                                my={'auto'}
+                                mx={'auto'}
+                            >
+                                <Image
+                                    src={
+                                        process.env.REACT_APP_IMAGE_URL +
+                                        IMG_URL +
+                                        teacher.image
+                                    }
+                                    radius={30}
+                                    width={150}
+                                    height={150}
+                                    fit={'contain'}
+                                    alt="teacher_image"
+                                    withPlaceholder
+                                />
+                                <Text
+                                    color="dimmed"
+                                    size="md"
+                                    fw={500}
+                                    lineClamp={3}
+                                >
+                                    Giảng viên
+                                </Text>
+                                <Text
+                                    color="dark"
+                                    size="xl"
+                                    fw={500}
+                                    lineClamp={3}
+                                >
+                                    {teacher.fullname}
+                                </Text>
+                            </Flex>
+                        </Grid.Col>
+                        <Grid.Col span={10}>
+                            <Grid my={'auto'}>
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Email:
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {`${teacher.teacherId}@gmail.com`}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Giới tính:
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {teacher.gender ? 'Nam' : 'Nữ'}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Ngày sinh:
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {moment(teacher.dateOfBirth).format(
+                                                'DD/MM/yyyy'
+                                            )}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+                            </Grid>
+
+                            <Divider mt={30} />
+
+                            <Grid mt={30}>
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Địa chỉ:
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {teacher.address}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Số điện thoại:
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {teacher.phone}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Căn cước công dân (CCCD):
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {teacher.citizenIdentification}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+                                <Grid.Col xl={6} lg={6} md={6}>
+                                    <Group position="left">
+                                        <Text color="dimmed" size="xl" fw={500}>
+                                            Trình độ:
+                                        </Text>
+                                        <Text color="dark" size="xl" fw={500}>
+                                            {teacher.levels}
+                                        </Text>
+                                    </Group>
+                                </Grid.Col>
+                                <Grid.Col mt={30}>
+                                    <Button
+                                        color="primary"
+                                        sỉze="lg"
+                                        onClick={() => {
+                                            handleEditFrom()
                                         }}
                                     >
-                                        Thông tin tài khoản
-                                    </Tabs.Tab>
-                                </Tabs.List>
-
-                                <Tabs.Panel value="information-teacher" px="xl">
-                                    <Title
-                                        order={2}
-                                        color="dark"
-                                        fw={500}
-                                        mb={20}
-                                        mt={10}
-                                    >
-                                        Hồ sơ cá nhân
-                                    </Title>
-                                    <Paper
-                                        shadow="sm"
-                                        p="xl"
-                                        mt={10}
-                                        radius="md"
-                                        withBorder
-                                    >
-                                        <Grid>
-                                            <Grid.Col span={2}>
-                                                <Flex
-                                                    direction={'column'}
-                                                    justify="center"
-                                                    align={'center'}
-                                                    gap={8}
-                                                    my={'auto'}
-                                                    mx={'auto'}
-                                                >
-                                                    <Image
-                                                        src={
-                                                            process.env
-                                                                .REACT_APP_IMAGE_URL +
-                                                            IMG_URL +
-                                                            teacher.image
-                                                        }
-                                                        radius={30}
-                                                        width={150}
-                                                        height={150}
-                                                        fit={'contain'}
-                                                        alt="teacher_image"
-                                                        withPlaceholder
-                                                    />
-                                                    <Text
-                                                        color="dimmed"
-                                                        size="md"
-                                                        fw={500}
-                                                        lineClamp={3}
-                                                    >
-                                                        Giảng viên
-                                                    </Text>
-                                                    <Text
-                                                        color="dark"
-                                                        size="xl"
-                                                        fw={500}
-                                                        lineClamp={3}
-                                                    >
-                                                        {teacher.fullname}
-                                                    </Text>
-                                                </Flex>
-                                            </Grid.Col>
-                                            <Grid.Col span={10}>
-                                                <Grid my={'auto'}>
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Email:
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {`${teacher.teacherId}@gmail.com`}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Giới tính:
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {teacher.gender
-                                                                    ? 'Nam'
-                                                                    : 'Nữ'}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Ngày sinh:
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {moment(
-                                                                    teacher.dateOfBirth
-                                                                ).format(
-                                                                    'DD/MM/yyyy'
-                                                                )}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                </Grid>
-
-                                                <Divider mt={30} />
-
-                                                <Grid mt={30}>
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Địa chỉ:
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {
-                                                                    teacher.address
-                                                                }
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Số điện thoại:
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {teacher.phone}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Căn cước công
-                                                                dân (CCCD):
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {
-                                                                    teacher.citizenIdentification
-                                                                }
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                    <Grid.Col
-                                                        xl={6}
-                                                        lg={6}
-                                                        md={6}
-                                                    >
-                                                        <Group position="left">
-                                                            <Text
-                                                                color="dimmed"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                Trình độ:
-                                                            </Text>
-                                                            <Text
-                                                                color="dark"
-                                                                size="xl"
-                                                                fw={500}
-                                                            >
-                                                                {teacher.levels}
-                                                            </Text>
-                                                        </Group>
-                                                    </Grid.Col>
-                                                    <Grid.Col mt={30}>
-                                                        <Button
-                                                            color="primary"
-                                                            sỉze="lg"
-                                                            onClick={() => {
-                                                                handleEditFrom()
-                                                            }}
-                                                        >
-                                                            Cập nhật thông tin
-                                                            cá nhân
-                                                        </Button>
-                                                    </Grid.Col>
-                                                </Grid>
-                                            </Grid.Col>
-                                        </Grid>
-                                    </Paper>
-                                </Tabs.Panel>
-                            </>
-                        )}
-                    </Tabs>
+                                        Cập nhật thông tin cá nhân
+                                    </Button>
+                                </Grid.Col>
+                            </Grid>
+                        </Grid.Col>
+                    </Grid>
                 </Paper>
             </Container>
 
