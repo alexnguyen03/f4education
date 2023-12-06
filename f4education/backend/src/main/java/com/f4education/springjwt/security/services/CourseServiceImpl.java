@@ -259,9 +259,33 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	private CourseDTO convertEntityToDTO(Course course) {
-		return new CourseDTO(course.getCourseId(), course.getCourseName(), course.getCoursePrice(),
-				course.getCourseDuration(), course.getCourseDescription(), course.getSubject(), course.getImage(),
-				course.getStatus());
+		CourseDTO courseDTO = new CourseDTO();
+		BeanUtils.copyProperties(course, courseDTO);
+		
+		List<RegisterCourse> registerCourse = course.getRegisterCourses();
+
+		Float totalRating = (float) 0;
+		List<Evaluate> evaluateList = new ArrayList<>();
+		List<Student> studentList = new ArrayList<>();
+
+		for (RegisterCourse rg : registerCourse) {
+			for (Evaluate evaluate : rg.getEvaluates()) {
+				totalRating += evaluate.getRating();
+				evaluateList.add(evaluate);
+			}
+			studentList.add(rg.getStudent());
+		}
+
+		// Calculate value
+		Integer totalReview = evaluateList.size();
+		Integer totalStudent = studentList.size();
+		totalRating = totalRating / evaluateList.size();
+
+		courseDTO.setRating(totalRating);
+		courseDTO.setReviewNumber(totalReview);
+		courseDTO.setTotalStudent(totalStudent);
+		
+		return courseDTO;
 	}
 
 	private CourseResponse convertToResponseDTO(Course course, Boolean isPurchase, Integer registerCourseId) {
