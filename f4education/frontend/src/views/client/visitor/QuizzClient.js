@@ -272,8 +272,8 @@ function QuizzClient() {
 
     const [seconds, setSeconds] = useState(
         storedSeconds
-            ? 80 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
-            : 80
+            ? 124 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
+            : 124
     )
 
     useEffect(() => {
@@ -310,7 +310,7 @@ function QuizzClient() {
 
     const handleReset = () => {
         setStartTime(Date.now().toString())
-        setSeconds(80)
+        setSeconds(124)
     }
 
     return (
