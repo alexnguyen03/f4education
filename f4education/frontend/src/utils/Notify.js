@@ -30,17 +30,19 @@ const Notify = {
                 closeOnClick: true
             }
         },
+
+        //! toast SUCCESS ----------------------------------------------------------------
+        changePasswordSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Cập nhật mật khẩu thành công!',
+                ...defaultOptions
+            }
+        },
         updateSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
                 render: 'Cập nhật thành công!',
-                ...defaultOptions
-            }
-        },
-        updateError: () => {
-            return {
-                render: 'Cập nhật thất bại!',
-                type: toast.TYPE.ERROR,
                 ...defaultOptions
             }
         },
@@ -58,20 +60,7 @@ const Notify = {
                 ...defaultOptions
             }
         },
-        createError: () => {
-            return {
-                type: toast.TYPE.ERROR,
-                render: 'Thêm mới thất bại!',
-                ...defaultOptions
-            }
-        },
-        createErrorParam: (message) => {
-            return {
-                type: toast.TYPE.ERROR,
-                render: message,
-                ...defaultOptions
-            }
-        },
+
         deleteSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
@@ -83,6 +72,44 @@ const Notify = {
             return {
                 type: toast.TYPE.SUCCESS,
                 render: 'OTP chính xác!',
+                ...defaultOptions
+            }
+        },
+
+        uploadFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Upload file thành công!',
+                ...defaultOptions
+            }
+        },
+        deleteFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Xóa file thành công!',
+                ...defaultOptions
+            }
+        },
+        sendedMail: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Đã gửi OTP đến email của bạn!',
+                ...defaultOptions
+            }
+        },
+
+        //! toast ERROR ----------------------------------------------------------------
+        undefinedAccount: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Email chưa đăng ký tài khoản!',
+                ...defaultOptions
+            }
+        },
+        updateError: () => {
+            return {
+                render: 'Cập nhật thất bại!',
+                type: toast.TYPE.ERROR,
                 ...defaultOptions
             }
         },
@@ -122,35 +149,20 @@ const Notify = {
                 ...defaultOptions
             }
         },
-        uploadFileSuccess: () => {
-            return {
-                type: toast.TYPE.SUCCESS,
-                render: 'Upload file thành công!',
-                ...defaultOptions
-            }
-        },
-        deleteFileSuccess: () => {
-            return {
-                type: toast.TYPE.SUCCESS,
-                render: 'Xóa file thành công!',
-                ...defaultOptions
-            }
-        },
-        sendedMail: () => {
-            return {
-                type: toast.TYPE.SUCCESS,
-                render: 'Đã gửi OTP đến email của bạn!',
-                ...defaultOptions
-            }
-        },
-        undefinedAccount: () => {
+        createError: () => {
             return {
                 type: toast.TYPE.ERROR,
-                render: 'Email chưa đăng ký tài khoản!',
+                render: 'Thêm mới thất bại!',
                 ...defaultOptions
             }
         },
-
+        createErrorParam: (message) => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: message,
+                ...defaultOptions
+            }
+        },
         warningParam: (param) => {
             // loi chung thi dung ong nay
             return {
