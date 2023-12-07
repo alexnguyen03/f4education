@@ -14,8 +14,8 @@ const scheduleApi = {
         const url = '/schedule/teacher/' + accountId
         return axiosClient.get(url)
     },
-    findAllScheduleByClassAndStudyDate: (classId, studyDate) => {
-        const url = `/schedule/classes?classId=${classId}&studyDate=${studyDate}`
+    findAllScheduleByClassAndStudyDate: (classId) => {
+        const url = `/schedule/classes?classId=${classId}`
         return axiosClient.get(url)
     },
     getScheduleByAttendance: (classId, studentId) => {

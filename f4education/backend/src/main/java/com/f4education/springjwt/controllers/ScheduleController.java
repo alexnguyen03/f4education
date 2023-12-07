@@ -1,5 +1,7 @@
 package com.f4education.springjwt.controllers;
 
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Date;
 import java.util.List;
 
@@ -51,16 +53,16 @@ public class ScheduleController {
 	}
 
 	@GetMapping("/classes")
-	public ResponseEntity<?> getAllScheduleByClassId(@RequestParam("classId") Integer classId,
-			@RequestParam("studyDate") Date studyDate) {
-		Schedule scheduleResponse = scheduleService.findScheduleByClassAndStudyDate(classId, studyDate);
+	public ResponseEntity<?> checkIfClassStudyToday(@RequestParam("classId") Integer classId) {
+		Schedule scheduleResponse = scheduleService.findScheduleByClassAndStudyDate(classId);
 		return ResponseEntity.ok(scheduleResponse);
 	}
 
 	@GetMapping("/student")
 	public ResponseEntity<?> findAllScheduleByAttendance(@RequestParam("classId") Integer classId,
 			@RequestParam("studentId") String studentId) {
-		List<AttendanceReviewStudent> scheduleResponse = scheduleService.findAllScheduleByAttendance(classId, studentId);
+		List<AttendanceReviewStudent> scheduleResponse = scheduleService.findAllScheduleByAttendance(classId,
+				studentId);
 		return ResponseEntity.ok(scheduleResponse);
 	}
 

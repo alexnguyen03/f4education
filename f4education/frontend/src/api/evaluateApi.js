@@ -34,6 +34,10 @@ const evaluateApi = {
         //ham nay tao danh gia giao vien
         const url = `/evaluation/teacher/${teacherId}`
         return axiosClient.get(url)
+    },
+    getAllReportEvaluationTeacher: () => {
+        const url = `/evaluation/report`
+        return axiosClient.get(url)
     }
 }
 

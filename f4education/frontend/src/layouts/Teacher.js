@@ -1,5 +1,11 @@
-import { useEffect, React, useRef, useState } from 'react'
-import { useLocation, Route, Routes, Navigate } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import {
+    Navigate,
+    Route,
+    Routes,
+    useLocation,
+    useNavigate
+} from 'react-router-dom'
 // reactstrap components
 
 // core components
@@ -7,22 +13,21 @@ import TeacherAndStudentSidebar from '../components/Sidebar/TeacherAndStudentSid
 
 // import "../assets/css/custom-Teacher-css/Index.css";
 
-import { routesTeacher } from '../routes'
-import TeacherNavbar from 'components/Navbars/TeacherNavbar'
 import { Button, Container, Group, Menu } from '@mantine/core'
-import UserButton from 'components/UserButton/UserButton'
 import {
-    IconArrowsExchange,
-    IconArrowsLeftRight,
     IconChevronDown,
     IconChevronRight,
     IconEdit,
     IconLogout,
-    IconPasswordUser,
-    IconTrash
+    IconPasswordUser
 } from '@tabler/icons-react'
+import UserButton from 'components/UserButton/UserButton'
+import { routesTeacher } from '../routes'
 
 const Teacher = (props) => {
+    const user = JSON.parse(localStorage.getItem('user'))
+    let navigate = useNavigate()
+
     const mainContent = useRef(null)
     const location = useLocation()
     const [teacherName, setTeacherName] = useState('')
@@ -110,26 +115,43 @@ const Teacher = (props) => {
                             >
                                 <Menu.Target>
                                     <UserButton
-                                        image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
-                                        name="Harriette Spoonlicker"
-                                        email="hspoonlicker@outlook.com"
+                                        // image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
+                                        image={`${
+                                            process.env.REACT_APP_IMAGE_URL +
+                                            '/avatars/accounts/' +
+                                            user.imageName
+                                        }`}
+                                        name={`${user.fullName}`}
+                                        email={`${user.email}`}
                                         icon={userIcon}
                                     />
                                 </Menu.Target>
                                 <Menu.Dropdown>
                                     {/* <Menu.Label>Danger zone</Menu.Label> */}
-                                    <Menu.Item icon={<IconEdit size={14} />}>
+                                    <Menu.Item
+                                        icon={<IconEdit size={14} />}
+                                        onClick={() => {
+                                            navigate('/teacher/information')
+                                        }}
+                                    >
                                         Thông tin tài khoản
                                     </Menu.Item>
                                     <Menu.Divider />
                                     <Menu.Item
                                         icon={<IconPasswordUser size={14} />}
+                                        onClick={() => {
+                                            navigate('/teacher/information')
+                                        }}
                                     >
                                         Đổi mật khẩu
                                     </Menu.Item>
                                     <Menu.Item
                                         color="red"
                                         icon={<IconLogout size={14} />}
+                                        onClick={() => {
+                                            localStorage.removeItem('user')
+                                            navigate('/auth/login')
+                                        }}
                                     >
                                         Đăng xuất
                                     </Menu.Item>

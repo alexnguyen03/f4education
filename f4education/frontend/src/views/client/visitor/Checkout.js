@@ -193,7 +193,7 @@ const Checkout = () => {
                 // Update Cart
                 handleUpdateCart(updateCartRequest)
 
-                 // remove local
+                // remove local
                 localStorage.removeItem('cartCheckout')
 
                 // PayPal checkout logic
@@ -530,11 +530,11 @@ const Checkout = () => {
                                                     sm="2"
                                                 >
                                                     <img
-                                                        src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                                        width={'100%'}
-                                                        style={{
-                                                            maxHeight: '100px'
-                                                        }}
+                                                        src={`${PUBLIC_IMAGE}/avatars/courses/${cart.course.image}`}
+                                                        // width={'100%'}
+                                                        // style={{
+                                                        //     maxHeight: '100px'
+                                                        // }}
                                                         className="img-fluid"
                                                         alt={
                                                             cart.course
@@ -556,7 +556,7 @@ const Checkout = () => {
                                                             {cart.course
                                                                 .rating ===
                                                             'NaN'
-                                                                ? 5
+                                                                ? 0
                                                                 : parseFloat(
                                                                       cart
                                                                           .course
@@ -571,7 +571,7 @@ const Checkout = () => {
                                                                     cart.course
                                                                         .rating ===
                                                                     'NaN'
-                                                                        ? 5
+                                                                        ? 0
                                                                         : parseFloat(
                                                                               cart
                                                                                   .course
@@ -589,7 +589,7 @@ const Checkout = () => {
                                                                 cart.course
                                                                     .reviewNumber
                                                             }{' '}
-                                                            đánh giá) - từ{' '}
+                                                            đánh giá) - {' '}
                                                             {
                                                                 cart.course
                                                                     .totalStudent
@@ -653,7 +653,7 @@ const Checkout = () => {
                                         </h2>
                                         <div className="d-flex justify-content-between">
                                             <span className="text-muted">
-                                                Giá gốc:
+                                                Giá khóa học:
                                             </span>
                                             <span className="text-muted">
                                                 {totalPrice.toLocaleString(
@@ -665,14 +665,14 @@ const Checkout = () => {
                                                 )}
                                             </span>
                                         </div>
-                                        <div className="d-flex justify-content-between">
+                                        {/* <div className="d-flex justify-content-between">
                                             <span className="text-muted">
                                                 Giảm giá:
                                             </span>
                                             <span className="text-muted">
                                                 0đ
                                             </span>
-                                        </div>
+                                        </div> */}
                                         <hr />
                                         <div
                                             className={

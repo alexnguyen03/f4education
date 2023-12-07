@@ -21,7 +21,7 @@ import {
 var ps
 
 const TeacherAndStudentSidebar = (props) => {
-    const [collapseOpen, setCollapseOpen] = useState()
+    const [collapseOpen, setCollapseOpen] = useState(true)
     // verifies if routeName is the one active (in browser input)
     const activeRoute = (routeName) => {
         return props.location.pathname.indexOf(routeName) > -1 ? 'active' : ''
@@ -37,6 +37,7 @@ const TeacherAndStudentSidebar = (props) => {
     // creates the links that appear in the left menu / TeacherAndStudentSidebar
     const createLinks = (routes) => {
         return routes.map((prop, key) => {
+            console.log(prop.path, prop.name)
             if (
                 prop.path !== '/class-info/:classId' &&
                 prop.path !== '/class-info/point/:classId' &&
@@ -108,10 +109,7 @@ const TeacherAndStudentSidebar = (props) => {
                                 className="navbar-toggler"
                                 type="button"
                                 onClick={toggleCollapse}
-                            >
-                                <span />
-                                <span />
-                            </button>
+                            ></button>
                         </Col>
                     </Row>
                 </div>

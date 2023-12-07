@@ -27,6 +27,7 @@ import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.response.CourseResponse;
 import com.f4education.springjwt.security.services.CourseServiceImpl;
+import com.f4education.springjwt.security.services.FirebaseStorageService;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,6 +43,9 @@ public class CoursesController {
 
 	@Autowired
 	XFile xfileService;
+
+	@Autowired
+	FirebaseStorageService firebaseStorageService;
 
 	@GetMapping
 	// @PreAuthorize("hasRole('ADMIN')")
@@ -85,8 +89,10 @@ public class CoursesController {
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
-				File savedFile = xfileService.save(file.orElse(null), "/courses");
-				courseRequest.setImage(savedFile.getName());
+				String imageURL = firebaseStorageService.uploadImage(file.get(),
+						"courses/", courseRequest.getCourseName().trim());
+				System.out.println(imageURL + "========================");
+				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
@@ -108,15 +114,18 @@ public class CoursesController {
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
-				File savedFile = xfileService.save(file.orElse(null), "/courses");
-				courseRequest.setImage(savedFile.getName());
+				String imageURL = firebaseStorageService.uploadImage(file.get(),
+						"courses/", courseRequest.getCourseName().trim());
+				firebaseStorageService.isUpdatedNoCahe("courses/");
+				System.out.println(imageURL + "========================");
+				// File savedFile = xfileService.save(file.orElse(null), "/courses");
+				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
 		CourseDTO courseDTO = courseService.saveCourse(courseRequest);
 		return ResponseEntity.ok(courseDTO);
 	}
@@ -168,4 +177,11 @@ public class CoursesController {
 	public Boolean validateCourseName(@RequestParam String courseName) {
 		return courseService.isCourseNameExist(courseName);
 	}
+
+	@GetMapping("/schedule/{classId}")
+	public ResponseEntity<?> getAllCourseContentByClassId(@PathVariable("classId") Integer classId) {
+
+		return ResponseEntity.ok(courseService.getAllCourseContentByClassId(classId));
+	}
+
 }

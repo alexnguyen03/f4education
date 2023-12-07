@@ -1,14 +1,29 @@
 {
-	"configurations": [
-		{
-			"type": "java",
-			"name": "Spring Boot-SpringBootSecurityJwtApplication<spring-boot-security-jwt>",
-			"request": "launch",
-			"cwd": "${workspaceFolder}",
-			"mainClass": "com.f4education.springjwt.SpringBootSecurityJwtApplication",
-			"projectName": "spring-boot-security-jwt",
-			"args": "",
-			"envFile": "${workspaceFolder}/.env"
-		}
-	]
+    "configurations": [
+        {
+            "type": "java",
+            "name": "FirebaseStorageService",
+            "request": "launch",
+            "mainClass": "com.f4education.springjwt.security.services.FirebaseStorageService",
+            "projectName": "spring-boot-security-jwt"
+        },
+        {
+            "type": "java",
+            "name": "GoogleDriveRepository",
+            "request": "launch",
+            "mainClass": "com.f4education.springjwt.repository.GoogleDriveRepository",
+            "projectName": "spring-boot-security-jwt"
+        },
+        {
+            "type": "java",
+            "name": "Spring Boot-SpringBootSecurityJwtApplication<spring-boot-security-jwt>",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "mainClass": "com.f4education.springjwt.SpringBootSecurityJwtApplication",
+            "projectName": "spring-boot-security-jwt",
+            "args": "",
+            "envFile": "${workspaceFolder}/.env",
+            "vmArgs": " -Dcom.sun.management.jmxremote -Dcom.sun.management.jmxremote.port=53841 -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false -Dspring.jmx.enabled=true -Djava.rmi.server.hostname=localhost -Dspring.application.admin.enabled=true -Dspring.boot.project.name=spring-boot-security-jwt"
+        }
+    ]
 }

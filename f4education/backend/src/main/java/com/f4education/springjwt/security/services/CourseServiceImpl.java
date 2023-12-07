@@ -18,6 +18,7 @@ import com.f4education.springjwt.DriveQuickstart;
 import com.f4education.springjwt.interfaces.CoursesService;
 import com.f4education.springjwt.models.Bill;
 import com.f4education.springjwt.models.Course;
+import com.f4education.springjwt.models.CourseDetail;
 import com.f4education.springjwt.models.CourseHistory;
 import com.f4education.springjwt.models.Evaluate;
 import com.f4education.springjwt.models.RegisterCourse;
@@ -122,7 +123,7 @@ public class CourseServiceImpl implements CoursesService {
 			if (objArray.length >= 1) {
 				Course courseData = new Course();
 				courseData.setAdmin(null);
-//				courseData.setBillDetail(null);
+				// courseData.setBillDetail(null);
 				courseData.setCourseHistories(null);
 				courseData.setQuestions(null);
 				courseData.setResources(null);
@@ -131,7 +132,7 @@ public class CourseServiceImpl implements CoursesService {
 				Integer courseId = (Integer) objArray[0];
 				courseData.setCourseId(courseId);
 
-//				Get createDate
+				// Get createDate
 				Bill bill = billRepository.findById((Integer) objArray[10]).get();
 				listCreateDate.add(bill.getCreateDate());
 
@@ -174,7 +175,7 @@ public class CourseServiceImpl implements CoursesService {
 				courseData.setRegisterCourses(rg);
 				courseData.setStatus((Boolean) objArray[8].toString().equals("1") ? true : false);
 
-//				Total sales
+				// Total sales
 				totalListRenueve.add((Double) objArray[12]);
 
 				courses.add(courseData);
@@ -223,9 +224,8 @@ public class CourseServiceImpl implements CoursesService {
 		String action = "CREATE";
 
 		Course course = this.convertRequestToEntity(courseRequest);
-		Integer idCourse = courseRequest.getCourseId();
-
 		course.setStatus(true);
+		Integer idCourse = courseRequest.getCourseId();
 
 		if (idCourse != null) {
 			action = "UPDATE";
@@ -267,7 +267,7 @@ public class CourseServiceImpl implements CoursesService {
 	private CourseDTO convertEntityToDTO(Course course) {
 		CourseDTO courseDTO = new CourseDTO();
 		BeanUtils.copyProperties(course, courseDTO);
-		
+
 		List<RegisterCourse> registerCourse = course.getRegisterCourses();
 
 		Float totalRating = (float) 0;
@@ -290,7 +290,7 @@ public class CourseServiceImpl implements CoursesService {
 		courseDTO.setRating(totalRating);
 		courseDTO.setReviewNumber(totalReview);
 		courseDTO.setTotalStudent(totalStudent);
-		
+
 		return courseDTO;
 	}
 
@@ -409,69 +409,74 @@ public class CourseServiceImpl implements CoursesService {
 		return !courseRepository.isCourseNameExist(courseName).isEmpty();
 	}
 
-//	@Override
-//	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) {
-//		List<ReportCourseCountStudentDTO> list = new ArrayList<ReportCourseCountStudentDTO>();
-//		List<Course> listCourse = courseRepository.getAll("Đã đăng ký");
-//		for (Course c : listCourse) {
-//			Long studentCount = 0l;
-//			if (startDate == null && endDate == null) { // ! lấy hết
-//				studentCount = (long) c.getRegisterCourses().size();
-//			} else {
-//				if (!c.getRegisterCourses().isEmpty()) {
-//					for (RegisterCourse r : c.getRegisterCourses()) {// ! lọc qua những phiếu đăng ký
-//						Date date = r.getRegistrationDate();
-//						if (endDate == null) { // ! check từ ngày bắt đầu trở về sau
-//							if (date.after(startDate)) {
-//								studentCount++;
-//							} else {
-//								if (startDate == null) { // ! check từ ngày kết thúc trở về trước
-//									if (date.before(endDate)) {
-//										studentCount++;
-//									}
-//								} else {
-//									if (check(date, startDate, endDate)) {
-//										studentCount++;
-//									}
-//								}
-//							}
-//						}
-//					}
-//				}
-//			}
-//
-//			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
-//		}
-//		System.out.println(list);
-//		return list;
-//	}
+	// @Override
+	// public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date
+	// startDate, Date endDate) {
+	// List<ReportCourseCountStudentDTO> list = new
+	// ArrayList<ReportCourseCountStudentDTO>();
+	// List<Course> listCourse = courseRepository.getAll("Đã đăng ký");
+	// for (Course c : listCourse) {
+	// Long studentCount = 0l;
+	// if (startDate == null && endDate == null) { // ! lấy hết
+	// studentCount = (long) c.getRegisterCourses().size();
+	// } else {
+	// if (!c.getRegisterCourses().isEmpty()) {
+	// for (RegisterCourse r : c.getRegisterCourses()) {// ! lọc qua những phiếu
+	// đăng ký
+	// Date date = r.getRegistrationDate();
+	// if (endDate == null) { // ! check từ ngày bắt đầu trở về sau
+	// if (date.after(startDate)) {
+	// studentCount++;
+	// } else {
+	// if (startDate == null) { // ! check từ ngày kết thúc trở về trước
+	// if (date.before(endDate)) {
+	// studentCount++;
+	// }
+	// } else {
+	// if (check(date, startDate, endDate)) {
+	// studentCount++;
+	// }
+	// }
+	// }
+	// }
+	// }
+	// }
+	// }
+	//
+	// list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+	// }
+	// System.out.println(list);
+	// return list;
+	// }
 
-//	@Override
-//	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date startDate, Date endDate) throws ParseException {
-//		List<ReportCourseCountStudentDTO> list = new ArrayList<>();
-//		List<Course> listCourse = courseRepository.getAll();
-//
-//		for (Course c : listCourse) {
-//			Long studentCount = 0L;
-//
-//			if (!c.getRegisterCourses().isEmpty()) {
-//				for (RegisterCourse r : c.getRegisterCourses()) {
-//					Date date = r.getRegistrationDate();
-//
-//					// Check the status and filter by registration date range
-//					if (r.getStatus().equalsIgnoreCase("Đã đăng ký") && !isWithinDateRange(date, startDate, endDate)) {
-//						System.out.println(isWithinDateRange(date, startDate, endDate));
-//						studentCount++;
-//					} 					
-//				}
-//			}
-//
-//			// Add the course and student count to the result list
-//			list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
-//		}
-//		System.out.println(list);
-//		return list;
-//	}
+	// @Override
+	// public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(Date
+	// startDate, Date endDate) throws ParseException {
+	// List<ReportCourseCountStudentDTO> list = new ArrayList<>();
+	// List<Course> listCourse = courseRepository.getAll();
+	//
+	// for (Course c : listCourse) {
+	// Long studentCount = 0L;
+	//
+	// if (!c.getRegisterCourses().isEmpty()) {
+	// for (RegisterCourse r : c.getRegisterCourses()) {
+	// Date date = r.getRegistrationDate();
+	//
+	// // Check the status and filter by registration date range
+	// if (r.getStatus().equalsIgnoreCase("Đã đăng ký") && !isWithinDateRange(date,
+	// startDate, endDate)) {
+	// System.out.println(isWithinDateRange(date, startDate, endDate));
+	// studentCount++;
+	// }
+	// }
+	// }
+	//
+	// // Add the course and student count to the result list
+	// list.add(new ReportCourseCountStudentDTO(c.getCourseName(), studentCount));
+	// }
+	// System.out.println(list);
+	// return list;
+	// }
 
 	@Override
 	public List<ReportCourseCountStudentDTO> getCoursesWithStudentCount() {
@@ -508,4 +513,13 @@ public class CourseServiceImpl implements CoursesService {
 		System.out.println(list);
 		return list;
 	}
+
+	@Override
+	public List<String> getAllCourseContentByClassId(Integer classId) {
+		Integer courseId = registerCourseRepository.findAllByClasses_ClassId(classId).get(0).getCourse()
+				.getCourseId();
+		return courseRepository.getAllCourseContentByCourseId(courseId).stream().map(CourseDetail::getLessionTitle)
+				.collect(Collectors.toList());
+	}
+
 }

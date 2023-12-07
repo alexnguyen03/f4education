@@ -5,7 +5,7 @@ const { toast } = require('react-toastify')
  * @param  type - the type
  */
 const defaultOptions = {
-    //options mac dinh neu muon them thi cu ghi de la ok !
+    //options mac dinh neu muon them thi cu ghi de la ok!
     autoClose: 5000,
     hideProgressBar: false,
     closeOnClick: true,
@@ -18,7 +18,7 @@ const defaultOptions = {
 const Notify = {
     msg: {
         loading: 'Đang xử lý...',
-        updateSuccess: 'Cập nhật thành công !'
+        updateSuccess: 'Cập nhật thành công!'
     },
     options: {
         loading: () => {
@@ -30,24 +30,26 @@ const Notify = {
                 closeOnClick: true
             }
         },
-        updateSuccess: () => {
+
+        //! toast SUCCESS ----------------------------------------------------------------
+        changePasswordSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
-                render: 'Cập nhật thành công !',
+                render: 'Cập nhật mật khẩu thành công!',
                 ...defaultOptions
             }
         },
-        updateError: () => {
+        updateSuccess: () => {
             return {
-                render: 'Cập nhật thất bại !',
-                type: toast.TYPE.ERROR,
+                type: toast.TYPE.SUCCESS,
+                render: 'Cập nhật thành công!',
                 ...defaultOptions
             }
         },
         createSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
-                render: 'Thêm mới thành công !',
+                render: 'Thêm mới thành công!',
                 ...defaultOptions
             }
         },
@@ -58,31 +60,84 @@ const Notify = {
                 ...defaultOptions
             }
         },
-        createError: () => {
-            return {
-                type: toast.TYPE.ERROR,
-                render: 'Thêm mới thất bại !',
-                ...defaultOptions
-            }
-        },
-        createErrorParam: (message) => {
-            return {
-                type: toast.TYPE.ERROR,
-                render: message,
-                ...defaultOptions
-            }
-        },
+
         deleteSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
-                render: 'Xóa thành công !',
+                render: 'Xóa thành công!',
+                ...defaultOptions
+            }
+        },
+        rightOTP: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'OTP chính xác!',
+                ...defaultOptions
+            }
+        },
+
+        uploadFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Upload file thành công!',
+                ...defaultOptions
+            }
+        },
+        deleteFileSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Xóa file thành công!',
+                ...defaultOptions
+            }
+        },
+        sendedMail: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Đã gửi OTP đến email của bạn!',
+                ...defaultOptions
+            }
+        },
+
+        //! toast ERROR ----------------------------------------------------------------
+        undefinedAccount: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Email chưa đăng ký tài khoản!',
+                ...defaultOptions
+            }
+        },
+        updateError: () => {
+            return {
+                render: 'Cập nhật thất bại!',
+                type: toast.TYPE.ERROR,
                 ...defaultOptions
             }
         },
         deleteError: () => {
             return {
                 type: toast.TYPE.ERROR,
-                render: 'Xóa thất bại !',
+                render: 'Xóa thất bại!',
+                ...defaultOptions
+            }
+        },
+        wrongOTP: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'OTP không chính xác!',
+                ...defaultOptions
+            }
+        },
+        deadOTP: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'OTP không còn hiệu lực!',
+                ...defaultOptions
+            }
+        },
+        usedEmail: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Email đã được sử dụng!',
                 ...defaultOptions
             }
         },
@@ -90,21 +145,21 @@ const Notify = {
             // loi chung thi dung ong nay
             return {
                 type: toast.TYPE.ERROR,
-                render: 'Lỗi. Vui lòng thử lại sau !',
+                render: 'Lỗi. Vui lòng thử lại sau!',
                 ...defaultOptions
             }
         },
-        uploadFileSuccess: () => {
+        createError: () => {
             return {
-                type: toast.TYPE.SUCCESS,
-                render: 'Upload file thành công !',
+                type: toast.TYPE.ERROR,
+                render: 'Thêm mới thất bại!',
                 ...defaultOptions
             }
         },
-        deleteFileSuccess: () => {
+        createErrorParam: (message) => {
             return {
-                type: toast.TYPE.SUCCESS,
-                render: 'Xóa file thành công !',
+                type: toast.TYPE.ERROR,
+                render: message,
                 ...defaultOptions
             }
         },

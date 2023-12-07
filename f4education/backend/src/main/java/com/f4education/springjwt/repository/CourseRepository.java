@@ -10,13 +10,18 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.repository.query.FluentQuery.FetchableFluentQuery;
+import org.springframework.stereotype.Repository;
 
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO;
 import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
+import com.f4education.springjwt.models.CourseDetail;
 
+@Repository
+@EnableJpaRepositories
 public interface CourseRepository extends JpaRepository<Course, Integer> {
 	List<Course> findAllByAdmin_AdminId(String adminId);
 
@@ -47,13 +52,18 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "WHERE c.status = :status ORDER BY bd.total_sales DESC", nativeQuery = true)
 	List<Object[]> findTop10CoursesWithBillDetails(Boolean status);
 
-	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName = :subjectName")
+	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName =:subjectName")
 	List<Course> getCourseBySubjectName(@Param("subjectName") String subjectName);
 
-//	@Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO(c.courseName, COUNT(rc.student.studentId)) "
-//			+ "FROM Course c " + "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
-//			+ "WHERE LOWER(rc.status) = LOWER(:status) " + "GROUP BY c.courseId, c.courseName")
-//	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(@Param("status") String status);
+	// @Query("SELECT new
+	// com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO(c.courseName,
+	// COUNT(rc.student.studentId)) "
+	// + "FROM Course c " + "JOIN RegisterCourse rc ON c.courseId =
+	// rc.course.courseId "
+	// + "WHERE LOWER(rc.status) = LOWER(:status) " + "GROUP BY c.courseId,
+	// c.courseName")
+	// List<ReportCourseCountStudentDTO> getCoursesWithStudentCount(@Param("status")
+	// String status);
 
 	@Query("SELECT c FROM Course c JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
 			+ "GROUP BY c")
@@ -64,4 +74,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "JOIN Classes cl ON cl.classId = rc.classes.classId " + "JOIN Point p ON p.classes.classId = cl.classId "
 			+ "WHERE p.averagePoint >= 5.0 " + "GROUP BY c.courseId, c.courseName")
 	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
+
+	List<Course> findAllBySubject_SubjectName(String subjectName);// using DSL syntax
+	// @Query("SELECT c.courseDetail FROM Course c where
+	// c.registerCourses.classes.classId =:classId")
+
+	@Query("SELECT c.courseDetail FROM Course c  WHERE c.courseId =:courseId")
+	List<CourseDetail> getAllCourseContentByCourseId(@Param("courseId") Integer courseId);
 }

@@ -1,9 +1,12 @@
 package com.f4education.springjwt.controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
@@ -24,9 +27,11 @@ import com.f4education.springjwt.interfaces.AccountService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Teacher;
-
+import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.payload.request.AccountDTO;
+import com.f4education.springjwt.payload.request.OTP;
 import com.f4education.springjwt.payload.response.MessageResponse;
+import com.f4education.springjwt.security.services.FirebaseStorageService;
 import com.f4education.springjwt.security.services.MailerServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -49,10 +54,98 @@ public class AccountController {
     XFile xfileService;
 
     @Autowired
+    FirebaseStorageService firebaseStorageService;
+
+    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
     MailerServiceImpl mailer;
+
+    private List<OTP> list = new ArrayList<OTP>();
+
+    private int randomOTP() {
+        Random random = new Random();
+        return random.nextInt(9000) + 1000;
+    }
+
+    private OTP udpateOTP(OTP otp, boolean udpateOTP) {
+        for (int i = 0; i < list.size(); i++) {
+            OTP otp2 = list.get(i);
+            Date now = new Date();
+
+            Long timeDifference = null;
+            try {
+                timeDifference = Math.abs((now.getTime() - otp2.getDate().getTime()) / 1000);
+            } catch (Exception e) {
+            }
+            if (timeDifference != null && timeDifference > 60) {
+                list.remove(i);
+            } else {
+                if (otp2.getEmail().equals(otp.getEmail())) {
+                    if (udpateOTP) {
+                        list.set(i, otp);
+                        otp2 = otp;
+                    }
+                    return otp2;
+                }
+            }
+        }
+        return null;
+    }
+
+    @PostMapping(value = "/checkEmailForPassWord") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> checkMailForPassWord(@RequestBody OTP otp) {
+
+        // ! kiểm tra xem email đó có tồn tại hay không?
+        Boolean checkEmailExit = accountService.existsByEmail(otp.getEmail().trim());
+        if (!checkEmailExit) {// ! email chưa đăng ký tài khoản nào
+            return ResponseEntity
+                    .badRequest()
+                    .body("1");
+        }
+
+        // ! kiểm tra OTP
+        int code = randomOTP();
+        OTP otpNew = new OTP(otp.getEmail().trim(), code, new Date());// tạo OTP mới để cập nhật
+        OTP otpUpdate = udpateOTP(otpNew, true);
+
+        if (otpUpdate == null) {
+            list.add(otpNew);
+            otpUpdate = otpNew;
+        }
+
+        // ! Gửi mail cho người dùng
+        String mail = otpUpdate.getEmail().toString();
+        mailer.queue(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
+        return ResponseEntity.ok().body(otpUpdate);
+    }
+
+    @PostMapping(value = "/checkOTPForPassWord") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> checkOTPForPassWord(@RequestBody OTP otp) {
+        OTP otpUpdate = udpateOTP(otp, false);
+        Date now = new Date();
+        if (((now.getTime() - otpUpdate.getDate().getTime()) / 1000) > 60) {// ! đã qua 60s, OTP đã hết hạn sử dụng
+            return ResponseEntity
+                    .badRequest()
+                    .body(1);// ! dead OTP
+        } else {
+            if (otpUpdate.getCodeOTP() != otp.getCodeOTP()) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(2);// ! wrong OTP
+            }
+        }
+        return ResponseEntity.ok().body(null);
+    }
+
+    @PostMapping(value = "/changePassword") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> changePassword(@RequestBody AccountDTO accountDTO) {
+        User user = accountService.findByEmail(accountDTO.getEmail());
+        user.setPassword(encoder.encode(accountDTO.getPassword()));
+        accountService.save(user);
+        return ResponseEntity.ok().body(null);
+    }
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -115,12 +208,13 @@ public class AccountController {
         try {
             accountDTO = mapper.readValue(teacherRequestString,
                     AccountDTO.class);
-            File savedFile = null;
+
+            String savedFile = null;
             String id = null;
             try {
                 id = accountDTO.getEmail().substring(0, accountDTO.getEmail().indexOf("@"));
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
             accountDTO.setUsername(id);
             if (create) {
@@ -129,15 +223,24 @@ public class AccountController {
 
             if (file.isPresent()) {
                 if (!file.isEmpty()) {
-                    savedFile = xfileService.save(file.orElse(null), "/courses");
+                    try {
+                        savedFile = firebaseStorageService.uploadImage(file.orElse(null),
+                                "accounts/", accountDTO.getUsername().trim());
+
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
                 }
+
             }
             switch (accountDTO.getRoles()) {
                 // ! Role = 3 có vai trò là Admin
                 case 3:
                     Admin admin = accountDTO.getAdmin();
                     if (savedFile != null) {
-                        admin.setImage(savedFile.getName());
+                        admin.setImage(accountDTO.getUsername());
                     }
                     if (create) {
                         admin.setAdminId(id);
@@ -149,7 +252,7 @@ public class AccountController {
                 case 2:
                     Teacher teacher = accountDTO.getTeacher();
                     if (savedFile != null) {
-                        teacher.setImage(savedFile.getName());
+                        teacher.setImage(accountDTO.getUsername());
                     }
                     if (create) {
                         teacher.setTeacherId(id);
@@ -161,7 +264,7 @@ public class AccountController {
                 default:
                     Student student = accountDTO.getStudent();
                     if (savedFile != null) {
-                        student.setImage(savedFile.getName());
+                        student.setImage(accountDTO.getUsername());
                     }
                     if (create) {
                         student.setStudentId(id);

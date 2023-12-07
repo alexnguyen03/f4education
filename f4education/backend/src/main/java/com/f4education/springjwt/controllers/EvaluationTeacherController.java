@@ -28,4 +28,10 @@ public class EvaluationTeacherController {
 
 	}
 
+	@GetMapping("/report")
+	public ResponseEntity<?> getAllReportEvaluationTeacher() {
+		return ResponseEntity.ok(evaluationTeacherService.getAllReportEvaluationTeacher());
+
+	}
+
 }

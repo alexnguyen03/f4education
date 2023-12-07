@@ -2,6 +2,7 @@ package com.f4education.springjwt.security.services;
 
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -155,8 +156,20 @@ public class ScheduleServiceImpl implements ScheduleService {
 	}
 
 	@Override
-	public Schedule findScheduleByClassAndStudyDate(Integer classId, Date studyDate) {
-		Schedule schedule = scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId, studyDate);
+	public Schedule findScheduleByClassAndStudyDate(Integer classId) {
+		
+		OffsetDateTime studyDate = OffsetDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+        // Format the OffsetDateTime and parse it back to OffsetDateTime
+        String formattedDate = studyDate.format(formatter);
+        OffsetDateTime formattedOffsetDateTime = OffsetDateTime.parse(formattedDate + "T00:00:00+00:00");
+        
+		Schedule schedule = scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId, formattedOffsetDateTime);
+		System.out.println("check class is study");
+		System.out.println(classId);
+		System.out.println(formattedOffsetDateTime);
+		System.out.println(schedule);
 		return schedule;
 	}
 

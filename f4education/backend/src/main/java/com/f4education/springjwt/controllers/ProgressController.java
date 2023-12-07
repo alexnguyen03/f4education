@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.f4education.springjwt.security.services.ProgressServiceImpl;
+import com.f4education.springjwt.interfaces.ProgressService;
 
 @CrossOrigin("*")
 @RestController
@@ -16,14 +16,11 @@ import com.f4education.springjwt.security.services.ProgressServiceImpl;
 public class ProgressController {
     
     @Autowired
-    ProgressServiceImpl progressServiceImpl;
+    ProgressService progressService;
 
     @GetMapping("/{classId}")
     public ResponseEntity<?> getAllProgress(@PathVariable("classId") Integer classId) {
-        return ResponseEntity.ok(progressServiceImpl.getAllProgress(classId));
+        return ResponseEntity.ok(progressService.getAllProgress(classId));
     }
     
-
-
-
 }

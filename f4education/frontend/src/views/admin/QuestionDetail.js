@@ -1186,7 +1186,7 @@ const QuestionDetail = () => {
                                     <>
                                         <div>
                                             <img
-                                                src={`${PUBLIC_IMAGE}/courses/${questionPrev.courseImage}`}
+                                                src={`${PUBLIC_IMAGE}/avatars/courses/${questionPrev.courseImage}`}
                                                 alt={''}
                                                 className="course-image rounded-circle overflow-hidden"
                                                 width="70px"

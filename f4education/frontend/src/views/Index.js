@@ -19,9 +19,8 @@ import { useEffect, useState } from 'react'
 // node.js library that concatenates classes (strings)
 import classnames from 'classnames'
 // javascipt plugin for creating charts
-// import Chart from 'chart.js'
 // react plugin used to create charts
-// import { Line, Bar } from 'react-chartjs-2'
+import { Line, Bar } from 'react-chartjs-2'
 // reactstrap components
 import {
     Button,
@@ -35,7 +34,9 @@ import {
     Table,
     Container,
     Row,
-    Col
+    Col,
+    TabPane,
+    TabContent
 } from 'reactstrap'
 
 // core components
@@ -48,7 +49,10 @@ import {
 
 // Component import
 import Header from 'components/Headers/Header.js'
-import BarChart from 'variables/BarChart'
+
+import evaluateApi from '../api/evaluateApi'
+import { Box, Group, Paper, Space, Title } from '@mantine/core'
+import ReportEvaluationTeacher from './admin/ReportEvaluationTeacher'
 
 // API
 import courseAPI from '../api/courseApi'
@@ -58,10 +62,17 @@ import { LoadingOverlay } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import moment from 'moment/moment'
 import { DateInput } from '@mantine/dates'
+import BarChart from 'variables/BarChart'
 
 const Index = () => {
     const user = JSON.parse(localStorage.getItem('user'))
 
+    const [dataForEvaluatioTeacherChart, setDataForEvaluatioTeacherChart] =
+        useState([])
+    // if (window.Chart) {
+    //     parseOptions(Chart, chartOptions())
+    // }
+    const [tabs, setTabs] = useState(2)
     // Main Variable
     // Revenue Start
     const [totalRevenue, setTotalRevenue] = useState(0)
@@ -159,6 +170,88 @@ const Index = () => {
 
     const [data, setData] = useState([])
 
+    const toggleNavsInEvaluateTeacher = (e, state, index) => {
+        e.preventDefault()
+        setTabs(index)
+    }
+    //! Evauluation Teacher
+
+    const optionsInEvaluationTeacherChart = {
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        },
+        title: {
+            display: true,
+            text: 'Thời gian giảng dạy của giảng viên'
+        }
+    }
+    const dataInEvaluationTeacherChartByTime = {
+        labels: [
+            'Rất hay trễ giờ',
+            'Nhiều lần trễ giờ',
+            'Trễ giờ 1 vài lần',
+            'Luôn đi đúng giờ'
+        ],
+        datasets: [
+            {
+                label: 'Số lượt đánh giá',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }
+        ]
+    }
+
+    function generateRandomNumber(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min
+    }
+    function generateRandomColor() {
+        const r = Math.floor(Math.random() * 256) // Tạo giá trị ngẫu nhiên từ 0 đến 255 cho thành phần màu đỏ
+        const g = Math.floor(Math.random() * 256) // Tạo giá trị ngẫu nhiên từ 0 đến 255 cho thành phần màu xanh lá cây
+        const b = Math.floor(Math.random() * 256) // Tạo giá trị ngẫu nhiên từ 0 đến 255 cho thành phần màu xanh lam
+
+        return `rgb(${r}, ${g}, ${b})` // Trả về chuỗi mã màu RGB
+    }
+
+    const groupByClassId = (data) => {
+        return data.reduce((acc, currentValue) => {
+            const { teacherName } = currentValue
+            if (!acc[teacherName]) {
+                acc[teacherName] = []
+            }
+            acc[teacherName].push(currentValue)
+            return acc
+        }, {})
+    }
+
+    const groupByClassIdAndTitle = (data) => {
+        return data.reduce((acc, currentValue) => {
+            const { teacherName, title } = currentValue
+            const key = `${teacherName}_${title}`
+            if (!acc[key]) {
+                acc[key] = []
+            }
+            acc[key].push(currentValue)
+            return acc
+        }, {})
+    }
     // Thêm state mới để lưu trữ dữ liệu gốc không thay đổi
     const [originalData, setOriginalData] = useState([])
 
@@ -294,365 +387,293 @@ const Index = () => {
 
             {/* Page content */}
             <Container className="mt--7" fluid>
-                <Row>
-                    <Col className="mb-5 mb-xl-0">
-                        {loading ? (
-                            <LoadingOverlay
-                                visible={visible}
-                                overlayOpacity={1}
-                                overlayBlur={2}
-                                overlayColor="#191c4d"
-                            />
-                        ) : (
-                            <Card className="shadow">
-                                <CardHeader>
-                                    <Row className="align-items-center">
-                                        <div className="col">
-                                            <h4 className="text-uppercase text-dark ls-1 mb-1">
-                                                Tổng quan
-                                            </h4>
-                                            <h1 className="text-dark mb-0">
-                                                Top 10 khóa học theo doanh thu
-                                            </h1>
-                                        </div>
-                                        <div className="col">
-                                            <Nav
-                                                className="justify-content-end"
-                                                pills
-                                            >
-                                                <NavItem>
-                                                    <NavLink
-                                                        className={classnames(
-                                                            'py-2 px-3',
-                                                            {
-                                                                active:
-                                                                    activeNav ===
-                                                                    1
-                                                            }
-                                                        )}
-                                                        href="#pablo"
-                                                        onClick={(e) =>
-                                                            toggleNavs(e, 1)
-                                                        }
+                <Card className="shadow">
+                    <CardBody>
+                        <div className="nav-wrapper">
+                            <Nav
+                                className="nav-fill flex-column flex-md-row"
+                                id="tabs-icons-text"
+                                pills
+                                role="tablist"
+                            >
+                                <NavItem>
+                                    <NavLink
+                                        aria-selected={tabs === 1}
+                                        className={classnames(
+                                            'mb-sm-3 mb-md-0',
+                                            {
+                                                active: tabs === 1
+                                            }
+                                        )}
+                                        onClick={(e) =>
+                                            toggleNavsInEvaluateTeacher(
+                                                e,
+                                                'tabs',
+                                                1
+                                            )
+                                        }
+                                        href="#pablo"
+                                        role="tab"
+                                    >
+                                        <i className="ni ni-cloud-upload-96 mr-2" />
+                                        Đánh giá Giáo Viên
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        aria-selected={tabs === 2}
+                                        className={classnames(
+                                            'mb-sm-3 mb-md-0',
+                                            {
+                                                active: tabs === 2
+                                            }
+                                        )}
+                                        onClick={(e) =>
+                                            toggleNavsInEvaluateTeacher(
+                                                e,
+                                                'tabs',
+                                                2
+                                            )
+                                        }
+                                        href="#pablo"
+                                        role="tab"
+                                    >
+                                        <i className="ni ni-bell-55 mr-2" />
+                                        Thông kê doanh thu
+                                    </NavLink>
+                                </NavItem>
+                                <NavItem>
+                                    <NavLink
+                                        aria-selected={tabs === 3}
+                                        className={classnames(
+                                            'mb-sm-3 mb-md-0',
+                                            {
+                                                active: tabs === 3
+                                            }
+                                        )}
+                                        onClick={(e) =>
+                                            toggleNavsInEvaluateTeacher(
+                                                e,
+                                                'tabs',
+                                                3
+                                            )
+                                        }
+                                        href="#pablo"
+                                        role="tab"
+                                    >
+                                        <i className="ni ni-calendar-grid-58 mr-2" />
+                                        Thống kê khóa học
+                                    </NavLink>
+                                </NavItem>
+                            </Nav>
+                        </div>
+                        <Card className="shadow">
+                            <CardBody>
+                                <TabContent activeTab={'tabs' + tabs}>
+                                    <TabPane tabId="tabs1">
+                                        {/* <ReportEvaluationTeacher /> */}
+                                    </TabPane>
+                                    <TabPane tabId="tabs2">
+                                        <div
+                                            style={{
+                                                minHeight: '70vh'
+                                            }}
+                                        >
+                                            <Row className="align-items-center">
+                                                <div className="col">
+                                                    <h4 className="text-uppercase text-dark ls-1 mb-1">
+                                                        Tổng quan
+                                                    </h4>
+                                                    <h1 className="text-dark mb-0">
+                                                        Top 10 khóa học theo
+                                                        doanh thu
+                                                    </h1>
+                                                </div>
+                                                <div className="col">
+                                                    <Nav
+                                                        className="justify-content-end"
+                                                        pills
                                                     >
-                                                        <span className="d-none d-md-block fw-500">
-                                                            Theo tháng hiện tại
-                                                        </span>
-                                                        <span className="d-md-none">
-                                                            M
-                                                        </span>
-                                                    </NavLink>
-                                                </NavItem>
-                                                <NavItem>
-                                                    <NavLink
-                                                        className={classnames(
-                                                            'py-2 px-3',
-                                                            {
-                                                                active:
-                                                                    activeNav ===
-                                                                    2
-                                                            }
-                                                        )}
-                                                        data-toggle="tab"
-                                                        href="#pablo"
-                                                        onClick={(e) =>
-                                                            toggleNavs(e, 2)
-                                                        }
-                                                    >
-                                                        <span className="d-none d-md-block fw-500">
-                                                            Theo tuần hiện tại
-                                                        </span>
-                                                        <span className="d-md-none">
-                                                            W
-                                                        </span>
-                                                    </NavLink>
-                                                </NavItem>
-                                            </Nav>
-                                        </div>
-                                    </Row>
-                                    <div className="row mt-3">
-                                        <div className="col">
-                                            <div className="d-flex justify-content-end align-items-center">
-                                                <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
-                                                    Bộ lọc theo ngày tháng:
-                                                </h5>
-                                                <div className="d-flex justify-content-start">
-                                                    <DateInput
-                                                        placeholder="Ngày bắt đầu"
-                                                        variant="filled"
-                                                        mr={10}
-                                                        clearable
-                                                        w={320}
-                                                        value={startDate}
-                                                        onChange={(value) =>
-                                                            setStartDate(value)
-                                                        }
-                                                    />
+                                                        <NavItem>
+                                                            <NavLink
+                                                                className={classnames(
+                                                                    'py-2 px-3',
+                                                                    {
+                                                                        active:
+                                                                            activeNav ===
+                                                                            1
+                                                                    }
+                                                                )}
+                                                                href="#pablo"
+                                                                onClick={(e) =>
+                                                                    toggleNavs(
+                                                                        e,
+                                                                        1
+                                                                    )
+                                                                }
+                                                            >
+                                                                <span className="d-none d-md-block fw-500">
+                                                                    Theo tháng
+                                                                    hiện tại
+                                                                </span>
+                                                                <span className="d-md-none">
+                                                                    M
+                                                                </span>
+                                                            </NavLink>
+                                                        </NavItem>
+                                                        <NavItem>
+                                                            <NavLink
+                                                                className={classnames(
+                                                                    'py-2 px-3',
+                                                                    {
+                                                                        active:
+                                                                            activeNav ===
+                                                                            2
+                                                                    }
+                                                                )}
+                                                                data-toggle="tab"
+                                                                href="#pablo"
+                                                                onClick={(e) =>
+                                                                    toggleNavs(
+                                                                        e,
+                                                                        2
+                                                                    )
+                                                                }
+                                                            >
+                                                                <span className="d-none d-md-block fw-500">
+                                                                    Theo tuần
+                                                                    hiện tại
+                                                                </span>
+                                                                <span className="d-md-none">
+                                                                    W
+                                                                </span>
+                                                            </NavLink>
+                                                        </NavItem>
+                                                    </Nav>
+                                                </div>
+                                            </Row>
 
-                                                    <DateInput
-                                                        placeholder="Ngày kết thúc"
-                                                        variant="filled"
-                                                        clearable
-                                                        w={320}
-                                                        value={endDate}
-                                                        onChange={(value) =>
-                                                            setEndDate(value)
-                                                        }
-                                                    />
+                                            <div className="row mt-3">
+                                                <div className="col">
+                                                    <div className="d-flex justify-content-end align-items-center">
+                                                        <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
+                                                            Bộ lọc theo ngày
+                                                            tháng:
+                                                        </h5>
+                                                        <div className="d-flex justify-content-start">
+                                                            <DateInput
+                                                                placeholder="Ngày bắt đầu"
+                                                                variant="filled"
+                                                                mr={10}
+                                                                clearable
+                                                                w={320}
+                                                                value={
+                                                                    startDate
+                                                                }
+                                                                onChange={(
+                                                                    value
+                                                                ) =>
+                                                                    setStartDate(
+                                                                        value
+                                                                    )
+                                                                }
+                                                            />
+
+                                                            <DateInput
+                                                                placeholder="Ngày kết thúc"
+                                                                variant="filled"
+                                                                clearable
+                                                                w={320}
+                                                                value={endDate}
+                                                                onChange={(
+                                                                    value
+                                                                ) =>
+                                                                    setEndDate(
+                                                                        value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
+                                            {loading ? (
+                                                <LoadingOverlay
+                                                    visible={visible}
+                                                    overlayOpacity={1}
+                                                    overlayBlur={2}
+                                                    overlayColor="#191c4d"
+                                                    // overlayColor="rgba(0, 0, 0, 0.3)"
+                                                />
+                                            ) : (
+                                                /* Chart */
+                                                <BarChart
+                                                    data={filteredRevenueData}
+                                                />
+                                            )}
                                         </div>
-                                    </div>
-                                </CardHeader>
-                                <CardBody>
-                                    {/* Chart */}
-                                    <BarChart data={filteredRevenueData} />
-                                </CardBody>
-                            </Card>
-                        )}
-                    </Col>
-                </Row>
-                <Row className="mt-5">
-                    <Col className="mb-5 mb-xl-0" xl="8">
-                        <Card className="shadow">
-                            <CardHeader className="border-0">
-                                <Row className="align-items-center">
-                                    <div className="col">
-                                        <h3 className="mb-0">Page visits</h3>
-                                    </div>
-                                    <div className="col text-right">
-                                        <Button
-                                            color="primary"
-                                            href="#pablo"
-                                            onClick={(e) => e.preventDefault()}
-                                            size="sm"
-                                        >
-                                            See all
-                                        </Button>
-                                    </div>
-                                </Row>
-                            </CardHeader>
-                            <Table
-                                className="align-items-center table-flush"
-                                responsive
-                            >
-                                <thead className="thead-light">
-                                    <tr>
-                                        <th scope="col">Page name</th>
-                                        <th scope="col">Visitors</th>
-                                        <th scope="col">Unique users</th>
-                                        <th scope="col">Bounce rate</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">/argon/</th>
-                                        <td>4,569</td>
-                                        <td>340</td>
-                                        <td>
-                                            <i className="fas fa-arrow-up text-success mr-3" />{' '}
-                                            46,53%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">/argon/index.html</th>
-                                        <td>3,985</td>
-                                        <td>319</td>
-                                        <td>
-                                            <i className="fas fa-arrow-down text-warning mr-3" />{' '}
-                                            46,53%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">/argon/charts.html</th>
-                                        <td>3,513</td>
-                                        <td>294</td>
-                                        <td>
-                                            <i className="fas fa-arrow-down text-warning mr-3" />{' '}
-                                            36,49%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">/argon/tables.html</th>
-                                        <td>2,050</td>
-                                        <td>147</td>
-                                        <td>
-                                            <i className="fas fa-arrow-up text-success mr-3" />{' '}
-                                            50,87%
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">/argon/profile.html</th>
-                                        <td>1,795</td>
-                                        <td>190</td>
-                                        <td>
-                                            <i className="fas fa-arrow-down text-danger mr-3" />{' '}
-                                            46,53%
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </Table>
+                                    </TabPane>
+                                    <TabPane tabId="tabs3">
+                                        <Container className="mt--7" fluid>
+                                            <Row className="mt-5">
+                                                <Col className="mt-5">
+                                                    <div className="d-flex justify-content-end align-items-center my-5">
+                                                        <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
+                                                            Bộ lọc khóa học theo
+                                                            ngày tháng năm:
+                                                        </h5>
+                                                        <div className="d-flex justify-content-start">
+                                                            <DateInput
+                                                                placeholder="Ngày bắt đầu"
+                                                                variant="filled"
+                                                                mr={10}
+                                                                clearable
+                                                                w={320}
+                                                                value={
+                                                                    startDateCourse
+                                                                }
+                                                                onChange={(
+                                                                    value
+                                                                ) =>
+                                                                    setStartDateCourse(
+                                                                        value
+                                                                    )
+                                                                }
+                                                            />
+
+                                                            <DateInput
+                                                                placeholder="Ngày kết thúc"
+                                                                variant="filled"
+                                                                clearable
+                                                                w={320}
+                                                                value={
+                                                                    endDateCourse
+                                                                }
+                                                                onChange={(
+                                                                    value
+                                                                ) =>
+                                                                    setEndDateCourse(
+                                                                        value
+                                                                    )
+                                                                }
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <canvas
+                                                        id="revenueChartCourse"
+                                                        // className="w-100 h-100"
+                                                    />
+                                                </Col>
+                                            </Row>
+                                        </Container>
+                                    </TabPane>
+                                </TabContent>
+                            </CardBody>
                         </Card>
-                    </Col>
-                    <Col xl="4">
-                        <Card className="shadow">
-                            <CardHeader className="border-0">
-                                <Row className="align-items-center">
-                                    <div className="col">
-                                        <h3 className="mb-0">Social traffic</h3>
-                                    </div>
-                                    <div className="col text-right">
-                                        <Button
-                                            color="primary"
-                                            href="#pablo"
-                                            onClick={(e) => e.preventDefault()}
-                                            size="sm"
-                                        >
-                                            See all
-                                        </Button>
-                                    </div>
-                                </Row>
-                            </CardHeader>
-                            <Table
-                                className="align-items-center table-flush"
-                                responsive
-                            >
-                                <thead className="thead-light">
-                                    <tr>
-                                        <th scope="col">Referral</th>
-                                        <th scope="col">Visitors</th>
-                                        <th scope="col" />
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <th scope="row">Facebook</th>
-                                        <td>1,480</td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <span className="mr-2">
-                                                    60%
-                                                </span>
-                                                <div>
-                                                    <Progress
-                                                        max="100"
-                                                        value="60"
-                                                        barClassName="bg-gradient-danger"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Facebook</th>
-                                        <td>5,480</td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <span className="mr-2">
-                                                    70%
-                                                </span>
-                                                <div>
-                                                    <Progress
-                                                        max="100"
-                                                        value="70"
-                                                        barClassName="bg-gradient-success"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Google</th>
-                                        <td>4,807</td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <span className="mr-2">
-                                                    80%
-                                                </span>
-                                                <div>
-                                                    <Progress
-                                                        max="100"
-                                                        value="80"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">Instagram</th>
-                                        <td>3,678</td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <span className="mr-2">
-                                                    75%
-                                                </span>
-                                                <div>
-                                                    <Progress
-                                                        max="100"
-                                                        value="75"
-                                                        barClassName="bg-gradient-info"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <th scope="row">twitter</th>
-                                        <td>2,645</td>
-                                        <td>
-                                            <div className="d-flex align-items-center">
-                                                <span className="mr-2">
-                                                    30%
-                                                </span>
-                                                <div>
-                                                    <Progress
-                                                        max="100"
-                                                        value="30"
-                                                        barClassName="bg-gradient-warning"
-                                                    />
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </Table>
-                        </Card>
-                    </Col>
-                </Row>
+                    </CardBody>
+                </Card>
             </Container>
             {/* Page content End*/}
-            <Container className="mt--7" fluid>
-                <Row className="mt-5">
-                    <Col className="mt-5">
-                        <div className="d-flex justify-content-end align-items-center my-5">
-                            <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
-                                Bộ lọc khóa học theo ngày tháng năm:
-                            </h5>
-                            <div className="d-flex justify-content-start">
-                                <DateInput
-                                    placeholder="Ngày bắt đầu"
-                                    variant="filled"
-                                    mr={10}
-                                    clearable
-                                    w={320}
-                                    value={startDateCourse}
-                                    onChange={(value) => setStartDateCourse(value)}
-                                />
-
-                                <DateInput
-                                    placeholder="Ngày kết thúc"
-                                    variant="filled"
-                                    clearable
-                                    w={320}
-                                    value={endDateCourse}
-                                    onChange={(value) => setEndDateCourse(value)}
-                                />
-                            </div>
-                        </div>
-                        <canvas id="revenueChartCourse" className="w-100 h-100" />
-                    </Col>
-                </Row>
-            </Container>
         </>
     )
 }

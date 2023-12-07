@@ -3,7 +3,7 @@ import Register from './views/examples/Register.js'
 import ClientRegister from 'views/client/visitor/Register.js'
 import Subjects from 'views/admin/Subjects'
 import Sessions from 'views/admin/Sessions'
-import Courses from 'views/admin/Courses.js'
+import Courses from './views/admin/Courses'
 import Teachers from 'views/admin/Teachers.js'
 import Classs from 'views/admin/Classs.js'
 import ClasssRoom from 'views/admin/ClasssRoom.js'
@@ -16,6 +16,7 @@ import CourseClient from '../../../f4education/frontend/src/views/client/visitor
 import TeacherResources from 'views/teacher/TeacherResources'
 import Cart from '../../../f4education/frontend/src/views/client/visitor/Cart'
 import CheckMail from 'views/client/visitor/CheckMail'
+import ForgotPassword from 'views/client/visitor/ForgotPassword'
 import Checkout from '../../../f4education/frontend/src/views/client/visitor/Checkout'
 import ClassDetail from 'views/admin/ClassDetail'
 import Login from './views/examples/Login'
@@ -46,6 +47,7 @@ import EvaluateTeacher from './views/client/student/EvaluateTeacher'
 import EvaluateTeacherViewByTeacher from './views/client/student/EvaluateTeacherViewByTeacher.js'
 import PaymentHistory from 'views/client/student/PaymentHistory'
 import ClassResult from 'views/teacher/ClassResult'
+import ClassProgress from 'views/teacher/ClassProgress'
 import TeacherSchedule from 'views/teacher/TeacherSchedule'
 import TaskTeacher from 'views/teacher/TaskTeacher'
 import Attendance from 'views/client/student/Attendance.js'
@@ -230,6 +232,13 @@ export var routesClient = [
         layout: '/client'
     },
     {
+        path: '/forgot-password',
+        name: 'Thông tin email',
+        icon: 'ni ni-planet text-blue',
+        component: <ForgotPassword />,
+        layout: '/client'
+    },
+    {
         path: '/client-register/:email',
         name: 'Thông tin tài khoản',
         icon: 'ni ni-planet text-blue',
@@ -307,6 +316,13 @@ export const routesTeacher = [
         name: 'Kết quả lớp học',
         icon: 'ni ni-planet text-blue',
         component: <ClassResult />,
+        layout: '/teacher'
+    },
+    {
+        path: '/class-progress',
+        name: 'Tiến độ lớp học',
+        icon: 'ni ni-planet text-blue',
+        component: <ClassProgress />,
         layout: '/teacher'
     }
 ]

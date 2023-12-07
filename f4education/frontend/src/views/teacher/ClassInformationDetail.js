@@ -39,10 +39,11 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Notify from '../../utils/Notify'
 
-const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const ClassInformationDetail = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     // ************* Routes Variable
     const data = useParams()
     let navigate = useNavigate()
@@ -52,6 +53,7 @@ const ClassInformationDetail = () => {
     const [classInfor, setClassInfor] = useState({
         classId: '',
         className: '',
+        courseName: '',
         startDate: '',
         endDate: '',
         status: '',
@@ -123,7 +125,7 @@ const ClassInformationDetail = () => {
 
     const fetchClassByTeacher = async () => {
         try {
-            const resp = await classApi.getAllClassByTeacherId(teacherId)
+            const resp = await classApi.getAllClassByTeacherId(user.username)
             console.log(
                 '🚀 ~ file: ClassInformationDetail.js:109 ~ fetchClassByTeacher ~ resp:',
                 resp
@@ -147,17 +149,17 @@ const ClassInformationDetail = () => {
     }
 
     const checkIfClassStudyToDay = async () => {
-        const today = moment(new Date()).format('DD-MM-yyyy')
         try {
             const resp = await scheduleApi.findAllScheduleByClassAndStudyDate(
-                data.classId,
-                today
+                data.classId
             )
 
-            console.log(resp.data)
-
-            if (resp.status === 200 && resp.data.length > 0) {
+            if (resp.status === 200) {
+                console.log(resp.data)
                 setClassStudyToday(true)
+            } else {
+                console.log('class dont study today')
+                setClassStudyToday(false)
             }
         } catch (error) {
             console.log(error)
@@ -300,7 +302,7 @@ const ClassInformationDetail = () => {
                     const row = cell.getValue()
                     return (
                         <Image
-                            src={`${PUBLIC_IMAGE}/courses/${row.image}`}
+                            src={`${PUBLIC_IMAGE}/avatars/courses/${row.image}`}
                             width={40}
                             height={40}
                             radius={50}
@@ -467,6 +469,7 @@ const ClassInformationDetail = () => {
                                     alt="Norway"
                                     className={styles.avatar}
                                 /> */}
+
                             <Avatar
                                 src="https://th.bing.com/th/id/OIP.0MP14fOr1ykZDCnNZ5grFwHaGZ?pid=ImgDet&rs=1"
                                 size={80}
@@ -474,6 +477,7 @@ const ClassInformationDetail = () => {
                                 mx="auto"
                                 mt={-30}
                             />
+
                             <Title order={2} fw={500} mt="sm" align="center">
                                 {classInfor.className}
                             </Title>
@@ -605,32 +609,25 @@ const ClassInformationDetail = () => {
                                 <Flex justify="space-between" align="center">
                                     <Group position="left">
                                         {classStudyToday ? (
-                                            <>
-                                                <Button
-                                                    color="violet"
-                                                    size="md"
-                                                    mb="lg"
-                                                    onClick={() =>
-                                                        handleSaveAttendance()
-                                                    }
-                                                >
-                                                    Lưu điểm danh
-                                                </Button>
-                                            </>
+                                            <Button
+                                                color="violet"
+                                                size="md"
+                                                mb="lg"
+                                                onClick={() =>
+                                                    handleSaveAttendance()
+                                                }
+                                            >
+                                                Lưu điểm danh
+                                            </Button>
                                         ) : (
-                                            <>
-                                                <Button
-                                                    color="violet"
-                                                    size="md"
-                                                    mb="lg"
-                                                    onClick={() =>
-                                                        handleSaveAttendance()
-                                                    }
-                                                    disabled
-                                                >
-                                                    Lưu điểm danh
-                                                </Button>
-                                            </>
+                                            <Button
+                                                color="violet"
+                                                size="md"
+                                                mb="lg"
+                                                disabled
+                                            >
+                                                Lưu điểm danh
+                                            </Button>
                                         )}
                                     </Group>
 
