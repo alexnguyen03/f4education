@@ -39,11 +39,11 @@ import { toast, ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import Notify from '../../utils/Notify'
 
-const teacherId = 'nguyenhoainam121nTC'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const ClassInformationDetail = () => {
     const user = JSON.parse(localStorage.getItem('user'))
+
     // ************* Routes Variable
     const data = useParams()
     let navigate = useNavigate()
@@ -53,6 +53,7 @@ const ClassInformationDetail = () => {
     const [classInfor, setClassInfor] = useState({
         classId: '',
         className: '',
+        courseName: '',
         startDate: '',
         endDate: '',
         status: '',
@@ -92,7 +93,7 @@ const ClassInformationDetail = () => {
     const [selectedFile, setSelectedFile] = useState([null])
 
     // ************* fetch Area
-    const fetchClass = async () => {    
+    const fetchClass = async () => {
         try {
             const resp = await classApi.getByClassId(data.classId)
             console.log(
@@ -301,7 +302,7 @@ const ClassInformationDetail = () => {
                     const row = cell.getValue()
                     return (
                         <Image
-                            src={`${PUBLIC_IMAGE}/courses/${row.image}`}
+                            src={`${PUBLIC_IMAGE}/avatars/courses/${row.image}`}
                             width={40}
                             height={40}
                             radius={50}
@@ -468,6 +469,7 @@ const ClassInformationDetail = () => {
                                     alt="Norway"
                                     className={styles.avatar}
                                 /> */}
+
                             <Avatar
                                 src="https://th.bing.com/th/id/OIP.0MP14fOr1ykZDCnNZ5grFwHaGZ?pid=ImgDet&rs=1"
                                 size={80}
@@ -475,6 +477,7 @@ const ClassInformationDetail = () => {
                                 mx="auto"
                                 mt={-30}
                             />
+
                             <Title order={2} fw={500} mt="sm" align="center">
                                 {classInfor.className}
                             </Title>

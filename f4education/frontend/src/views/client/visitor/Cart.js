@@ -288,7 +288,7 @@ function Cart() {
                     <>
                         <Card.Section>
                             <Image
-                                src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                src={`${PUBLIC_IMAGE}/avatars/courses/${course.image}`}
                                 fit="cover"
                                 width="100%"
                                 height={200}
@@ -508,7 +508,7 @@ function Cart() {
                                                             to={`/course/${cart.course.courseId}`}
                                                         >
                                                             <img
-                                                                src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
+                                                                src={`${PUBLIC_IMAGE}/avatars/courses/${cart.course.image}`}
                                                                 // src={cart.course.courseImage}
                                                                 alt={`${cart.course.courseName}`}
                                                                 className="img-fluid"

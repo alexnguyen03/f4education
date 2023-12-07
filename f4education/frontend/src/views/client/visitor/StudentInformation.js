@@ -7,7 +7,7 @@ import { Button, ButtonGroup, FormGroup, Label } from 'reactstrap'
 
 import { useRef } from 'react'
 import studentApi from '../../../api/studentApi'
-const IMG_URL = '/students/'
+const IMG_URL = '/avatars/accounts/'
 
 const StudentInformation = () => {
     const user = JSON.parse(localStorage.getItem('user'))

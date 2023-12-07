@@ -36,7 +36,6 @@ const listOptionView = [
 const Schedule = () => {
     const today = new Date('2024-01-04').toDateString().substring(4, 16)
     const [showSchedule, setShowSchedule] = useState(false)
-
     const [searchParams, setSearchParams] = useSearchParams()
     const [classSelected, setClassSelected] = useState()
     const [classes, setClasses] = useState([])

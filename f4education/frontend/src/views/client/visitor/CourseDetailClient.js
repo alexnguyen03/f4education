@@ -509,7 +509,7 @@ function CourseDetailClient() {
                                                                 {items}
                                                             </Breadcrumbs>
                                                             <Image
-                                                                src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                                                src={`${PUBLIC_IMAGE}/avatars/courses/${course.image}`}
                                                                 height={200}
                                                                 alt={
                                                                     course.courseName
@@ -767,7 +767,7 @@ function CourseDetailClient() {
                                     <>
                                         <Card.Section>
                                             <Image
-                                                src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                                src={`${PUBLIC_IMAGE}/avatars/courses/${course.image}`}
                                                 height={200}
                                                 alt={course.courseName}
                                                 mt={-10}
@@ -983,7 +983,7 @@ function CourseDetailClient() {
                             <>
                                 <Card.Section>
                                     <Image
-                                        src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                        src={`${PUBLIC_IMAGE}/avatars/courses/${course.image}`}
                                         height={200}
                                         alt={course.courseName}
                                         mt={-10}
@@ -1251,7 +1251,7 @@ function CourseDetailClient() {
                         {/* Requirement */}
                         <Box my={rem('2rem')}>
                             <Text color="dark" fw={700} size="xl" mb="lg">
-                                Yêu câu
+                                Yêu cầu
                             </Text>
                             <List withPadding>
                                 <List.Item>
@@ -1369,268 +1369,264 @@ function CourseDetailClient() {
                             )}
 
                             {listEvaluate.length === 0 && !loading ? (
-                                <>
-                                    <Box
-                                        sx={(theme) => ({
+                                <Box
+                                    sx={(theme) => ({
+                                        backgroundColor:
+                                            theme.colorScheme === 'dark'
+                                                ? theme.colors.dark[6]
+                                                : theme.colors.gray[0],
+                                        textAlign: 'center',
+                                        padding: theme.spacing.xl,
+                                        borderRadius: theme.radius.md,
+                                        cursor: 'pointer',
+
+                                        '&:hover': {
                                             backgroundColor:
                                                 theme.colorScheme === 'dark'
-                                                    ? theme.colors.dark[6]
-                                                    : theme.colors.gray[0],
-                                            textAlign: 'center',
-                                            padding: theme.spacing.xl,
-                                            borderRadius: theme.radius.md,
-                                            cursor: 'pointer',
-
-                                            '&:hover': {
-                                                backgroundColor:
-                                                    theme.colorScheme === 'dark'
-                                                        ? theme.colors.dark[5]
-                                                        : theme.colors.gray[1]
-                                            }
-                                        })}
+                                                    ? theme.colors.dark[5]
+                                                    : theme.colors.gray[1]
+                                        }
+                                    })}
+                                >
+                                    <Text
+                                        color="dimmed"
+                                        fw={700}
+                                        size="md"
+                                        align="center"
                                     >
-                                        <Text
-                                            color="dimmed"
-                                            fw={700}
-                                            size="md"
-                                            align="center"
-                                        >
-                                            Khóa học hiện chưa có phản hồi nào
-                                        </Text>
-                                    </Box>
-                                </>
+                                        Khóa học hiện chưa có phản hồi nào
+                                    </Text>
+                                </Box>
                             ) : (
-                                <>
-                                    <Grid gutter="xl">
-                                        {/* Item */}
-                                        {listEvaluate.length > 0 && (
-                                            <>
-                                                {currentItems.map(
-                                                    (evaluate, index) => (
-                                                        <>
-                                                            <Grid.Col
-                                                                xl={6}
-                                                                lg={6}
-                                                                md={12}
-                                                                sm={12}
-                                                                key={index}
-                                                            >
-                                                                <Stack>
-                                                                    <Divider />
-                                                                    <Group>
-                                                                        <Avatar
-                                                                            src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
-                                                                            alt={
-                                                                                evaluate.studentName
-                                                                            }
-                                                                            radius="xl"
-                                                                        />
-                                                                        <Stack spacing="xs">
-                                                                            <Group
-                                                                                w="100%"
-                                                                                position="apart"
-                                                                            >
-                                                                                <Text
-                                                                                    size="sm"
-                                                                                    m={
-                                                                                        0
-                                                                                    }
-                                                                                    p={
-                                                                                        0
-                                                                                    }
-                                                                                >
-                                                                                    {
-                                                                                        evaluate.studentName
-                                                                                    }
-                                                                                </Text>
-                                                                                {user !==
-                                                                                null ? (
-                                                                                    <>
-                                                                                        {evaluate.studentId ===
-                                                                                            user.username && (
-                                                                                            <ActionIcon
-                                                                                                color="red"
-                                                                                                variant="light"
-                                                                                                onClick={() =>
-                                                                                                    handleDeleteEvaluate(
-                                                                                                        evaluate.evaluateId
-                                                                                                    )
-                                                                                                }
-                                                                                            >
-                                                                                                <IconTrash size="1rem" />
-                                                                                            </ActionIcon>
-                                                                                        )}
-                                                                                        {evaluate.studentId ===
-                                                                                            user.username && (
-                                                                                            <ActionIcon
-                                                                                                color="indigo"
-                                                                                                variant="light"
-                                                                                                onClick={() => {
-                                                                                                    handleResetEvaluate()
-                                                                                                    handleEditEvaluate(
-                                                                                                        evaluate
-                                                                                                    )
-                                                                                                    setIsUpdateEvaluate(
-                                                                                                        !isUpdateEvaluate
-                                                                                                    )
-                                                                                                }}
-                                                                                            >
-                                                                                                <IconPencil size="1rem" />
-                                                                                            </ActionIcon>
-                                                                                        )}
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <>
-
-                                                                                    </>
-                                                                                )}
-                                                                            </Group>
+                                <Grid gutter="xl">
+                                    {/* Item */}
+                                    {listEvaluate.length > 0 && (
+                                        <>
+                                            {currentItems.map(
+                                                (evaluate, index) => (
+                                                    <>
+                                                        <Grid.Col
+                                                            xl={6}
+                                                            lg={6}
+                                                            md={12}
+                                                            sm={12}
+                                                            key={index}
+                                                        >
+                                                            <Stack>
+                                                                <Divider />
+                                                                <Group>
+                                                                    <Avatar
+                                                                        src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
+                                                                        alt={
+                                                                            evaluate.studentName
+                                                                        }
+                                                                        radius="xl"
+                                                                    />
+                                                                    <Stack spacing="xs">
+                                                                        <Group
+                                                                            w="100%"
+                                                                            position="apart"
+                                                                        >
                                                                             <Text
-                                                                                size="xs"
+                                                                                size="sm"
                                                                                 m={
                                                                                     0
                                                                                 }
                                                                                 p={
                                                                                     0
                                                                                 }
-                                                                                c="dimmed"
                                                                             >
-                                                                                {/* {moment(
+                                                                                {
+                                                                                    evaluate.studentName
+                                                                                }
+                                                                            </Text>
+                                                                            {user !==
+                                                                            null ? (
+                                                                                <>
+                                                                                    {evaluate.studentId ===
+                                                                                        user.username && (
+                                                                                        <ActionIcon
+                                                                                            color="red"
+                                                                                            variant="light"
+                                                                                            onClick={() =>
+                                                                                                handleDeleteEvaluate(
+                                                                                                    evaluate.evaluateId
+                                                                                                )
+                                                                                            }
+                                                                                        >
+                                                                                            <IconTrash size="1rem" />
+                                                                                        </ActionIcon>
+                                                                                    )}
+                                                                                    {evaluate.studentId ===
+                                                                                        user.username && (
+                                                                                        <ActionIcon
+                                                                                            color="indigo"
+                                                                                            variant="light"
+                                                                                            onClick={() => {
+                                                                                                handleResetEvaluate()
+                                                                                                handleEditEvaluate(
+                                                                                                    evaluate
+                                                                                                )
+                                                                                                setIsUpdateEvaluate(
+                                                                                                    !isUpdateEvaluate
+                                                                                                )
+                                                                                            }}
+                                                                                        >
+                                                                                            <IconPencil size="1rem" />
+                                                                                        </ActionIcon>
+                                                                                    )}
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+
+                                                                                </>
+                                                                            )}
+                                                                        </Group>
+                                                                        <Text
+                                                                            size="xs"
+                                                                            m={
+                                                                                0
+                                                                            }
+                                                                            p={
+                                                                                0
+                                                                            }
+                                                                            c="dimmed"
+                                                                        >
+                                                                            {/* {moment(
                                                                                 evaluate.reviewDate
                                                                             ).format(
                                                                                 'DD-MM-yyyy h:m:s A'
                                                                             )} */}
-                                                                                Đã
-                                                                                đánh
-                                                                                giá{' '}
-                                                                                {formatTimeAgo(
-                                                                                    evaluate.reviewDate
-                                                                                )}
-                                                                            </Text>
-                                                                            <Group
-                                                                                m={
-                                                                                    0
-                                                                                }
-                                                                                p={
-                                                                                    0
-                                                                                }
-                                                                            >
-                                                                                {isUpdateEvaluate &&
-                                                                                evaluate.studentId ===
-                                                                                    user.username &&
-                                                                                evaluate.evaluateId ===
-                                                                                    evaluateRequest.evaluateId ? (
-                                                                                    <>
-                                                                                        <Rating
-                                                                                            fractions={
-                                                                                                2
-                                                                                            }
-                                                                                            defaultValue={
-                                                                                                0
-                                                                                            }
-                                                                                            value={
-                                                                                                evaluateRequest.rating
-                                                                                            }
-                                                                                            onChange={(
-                                                                                                newValue
-                                                                                            ) =>
-                                                                                                setEvaluateRequest(
-                                                                                                    {
-                                                                                                        ...evaluateRequest,
-                                                                                                        rating: newValue
-                                                                                                    }
-                                                                                                )
-                                                                                            }
-                                                                                        />
-                                                                                    </>
-                                                                                ) : (
-                                                                                    <>
-                                                                                        <Rating
-                                                                                            fractions={
-                                                                                                2
-                                                                                            }
-                                                                                            value={
-                                                                                                evaluate.rating
-                                                                                            }
-                                                                                            readOnly
-                                                                                        />
-                                                                                    </>
-                                                                                )}
-                                                                            </Group>
-                                                                        </Stack>
-                                                                    </Group>
-                                                                    {isUpdateEvaluate &&
-                                                                    evaluate.studentId ===
-                                                                        user.username &&
-                                                                    evaluate.evaluateId ===
-                                                                        evaluateRequest.evaluateId ? (
-                                                                        <>
-                                                                            <Textarea
-                                                                                minRows={
-                                                                                    2
-                                                                                }
-                                                                                value={
-                                                                                    evaluateRequest.content
-                                                                                }
-                                                                                onChange={(
-                                                                                    event
-                                                                                ) =>
-                                                                                    setEvaluateRequest(
-                                                                                        (
-                                                                                            prevEvaluateRequest
-                                                                                        ) => ({
-                                                                                            ...prevEvaluateRequest,
-                                                                                            content:
-                                                                                                event
-                                                                                                    .target
-                                                                                                    .value
-                                                                                        })
-                                                                                    )
-                                                                                }
-                                                                            />
+                                                                            Đã
+                                                                            đánh
+                                                                            giá{' '}
+                                                                            {formatTimeAgo(
+                                                                                evaluate.reviewDate
+                                                                            )}
+                                                                        </Text>
+                                                                        <Group
+                                                                            m={
+                                                                                0
+                                                                            }
+                                                                            p={
+                                                                                0
+                                                                            }
+                                                                        >
+                                                                            {isUpdateEvaluate &&
+                                                                            evaluate.studentId ===
+                                                                                user.username &&
+                                                                            evaluate.evaluateId ===
+                                                                                evaluateRequest.evaluateId ? (
+                                                                                <>
+                                                                                    <Rating
+                                                                                        fractions={
+                                                                                            2
+                                                                                        }
+                                                                                        defaultValue={
+                                                                                            0
+                                                                                        }
+                                                                                        value={
+                                                                                            evaluateRequest.rating
+                                                                                        }
+                                                                                        onChange={(
+                                                                                            newValue
+                                                                                        ) =>
+                                                                                            setEvaluateRequest(
+                                                                                                {
+                                                                                                    ...evaluateRequest,
+                                                                                                    rating: newValue
+                                                                                                }
+                                                                                            )
+                                                                                        }
+                                                                                    />
+                                                                                </>
+                                                                            ) : (
+                                                                                <>
+                                                                                    <Rating
+                                                                                        fractions={
+                                                                                            2
+                                                                                        }
+                                                                                        value={
+                                                                                            evaluate.rating
+                                                                                        }
+                                                                                        readOnly
+                                                                                    />
+                                                                                </>
+                                                                            )}
+                                                                        </Group>
+                                                                    </Stack>
+                                                                </Group>
+                                                                {isUpdateEvaluate &&
+                                                                evaluate.studentId ===
+                                                                    user.username &&
+                                                                evaluate.evaluateId ===
+                                                                    evaluateRequest.evaluateId ? (
+                                                                    <>
+                                                                        <Textarea
+                                                                            minRows={
+                                                                                2
+                                                                            }
+                                                                            value={
+                                                                                evaluateRequest.content
+                                                                            }
+                                                                            onChange={(
+                                                                                event
+                                                                            ) =>
+                                                                                setEvaluateRequest(
+                                                                                    (
+                                                                                        prevEvaluateRequest
+                                                                                    ) => ({
+                                                                                        ...prevEvaluateRequest,
+                                                                                        content:
+                                                                                            event
+                                                                                                .target
+                                                                                                .value
+                                                                                    })
+                                                                                )
+                                                                            }
+                                                                        />
 
-                                                                            <Button
-                                                                                variant="filled"
-                                                                                color="violet"
-                                                                                mr="auto"
-                                                                                onClick={() =>
-                                                                                    handleUpdateEvaluate()
-                                                                                }
-                                                                            >
-                                                                                Cập
-                                                                                nhật
-                                                                            </Button>
-                                                                        </>
-                                                                    ) : (
-                                                                        <>
-                                                                            <Text
-                                                                                pl={
-                                                                                    54
-                                                                                }
-                                                                                size="md"
-                                                                                color="dark"
-                                                                                lineClamp={
-                                                                                    2
-                                                                                }
-                                                                                mah={
-                                                                                    80
-                                                                                }
-                                                                            >
-                                                                                {
-                                                                                    evaluate.content
-                                                                                }
-                                                                            </Text>
-                                                                        </>
-                                                                    )}
-                                                                </Stack>
-                                                            </Grid.Col>
-                                                        </>
-                                                    )
-                                                )}
-                                            </>
-                                        )}
-                                    </Grid>
-                                </>
+                                                                        <Button
+                                                                            variant="filled"
+                                                                            color="violet"
+                                                                            mr="auto"
+                                                                            onClick={() =>
+                                                                                handleUpdateEvaluate()
+                                                                            }
+                                                                        >
+                                                                            Cập
+                                                                            nhật
+                                                                        </Button>
+                                                                    </>
+                                                                ) : (
+                                                                    <>
+                                                                        <Text
+                                                                            pl={
+                                                                                54
+                                                                            }
+                                                                            size="md"
+                                                                            color="dark"
+                                                                            lineClamp={
+                                                                                2
+                                                                            }
+                                                                            mah={
+                                                                                80
+                                                                            }
+                                                                        >
+                                                                            {
+                                                                                evaluate.content
+                                                                            }
+                                                                        </Text>
+                                                                    </>
+                                                                )}
+                                                            </Stack>
+                                                        </Grid.Col>
+                                                    </>
+                                                )
+                                            )}
+                                        </>
+                                    )}
+                                </Grid>
                             )}
 
                             {totalPages > 1 && (
@@ -1718,7 +1714,7 @@ function CourseDetailClient() {
                                                                                 }
                                                                             >
                                                                                 <Image
-                                                                                    src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                                                                    src={`${PUBLIC_IMAGE}/avatars/courses/${course.image}`}
                                                                                     alt={
                                                                                         course.courseName
                                                                                     }

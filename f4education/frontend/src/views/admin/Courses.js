@@ -38,7 +38,8 @@ import {
     ListGroupItem,
     ListGroup,
     Badge,
-    FormFeedback
+    FormFeedback,
+    ButtonGroup
 } from 'reactstrap'
 import subjectApi from '../../api/subjectApi'
 import Select from 'react-select'
@@ -53,11 +54,11 @@ import { Link } from 'react-router-dom'
 import Notify from '../../utils/Notify'
 import { ToastContainer, toast } from 'react-toastify'
 import { LoadingOverlay } from '@mantine/core'
-const IMG_URL = '/courses/'
+const IMG_URL = '/avatars/courses/'
 const Courses = () => {
     const user = JSON.parse(localStorage.getItem('user'))
     const [image, setImage] = useState(null)
-
+    const [imageUrl, setImageUrl] = useState('')
     const [imgData, setImgData] = useState(null)
     const [showForm, setShowForm] = useState(false)
     const [loadingValidate, setLoadingValidate] = useState(false)
@@ -78,6 +79,7 @@ const Courses = () => {
     const [options, setOptions] = useState([{ value: '0', label: '' }])
     const [msgError, setMsgError] = useState({})
     const [listHistoryById, setListHistoryById] = useState([])
+
     const [course, setCourse] = useState({
         courseId: 'null',
         courseName: '',
@@ -85,6 +87,7 @@ const Courses = () => {
         coursePrice: 6000000,
         courseDescription: '',
         image: '',
+        status: '',
         subject: {
             subjectId: 0,
             subjectName: '',
@@ -258,6 +261,20 @@ const Courses = () => {
                 size: 60
             },
             {
+                accessorKey: 'status',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    return (
+                        <Badge color={row.status ? 'success' : 'danger'}>
+                            {row.status ? 'Đang hoạt động' : 'Đang ẩn'}
+                        </Badge>
+                    )
+                },
+                header: 'Trạng thái',
+                size: 60
+            },
+            {
                 accessorKey: 'subject.admin.fullname',
                 header: 'Tên người tạo',
                 size: 80
@@ -268,14 +285,6 @@ const Courses = () => {
 
     const columnsCoursesHistory = useMemo(
         () => [
-            // {
-            // 	enableColumnOrdering: true,
-            // 	enableEditing: false, //disable editing on this column
-            // 	enableSorting: true,
-            // 	accessorKey: 'courseId',
-            // 	header: 'Mã khóa học',
-            // 	size: 20,
-            // },
             {
                 accessorKey: 'subjectName',
                 header: 'Tên môn học',
@@ -394,6 +403,7 @@ const Courses = () => {
             coursePrice: 6000000,
             courseDescription: '',
             image: '',
+            status: '',
             subject: {
                 subjectId: 0,
                 subjectName: '',
@@ -414,6 +424,7 @@ const Courses = () => {
     const handleShowAddForm = () => {
         setShowForm((pre) => !pre)
         setUpdate(false)
+        setCourse((prev) => ({ ...prev, status: true }))
         handleSelect(options[0])
     }
     const handleSubmitForm = (e) => {
@@ -429,7 +440,8 @@ const Courses = () => {
             courseDescription: course.courseDescription,
             image: course.image,
             subjectId: parseInt(selectedSubject.value),
-            adminId: user.username
+            adminId: user.username,
+            status: course.status
         }
 
         console.log(
@@ -979,6 +991,50 @@ const Courses = () => {
                                                     {msgError.coursePriceErr}
                                                 </FormFeedback>
                                             )}
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <label
+                                                className="form-control-label"
+                                                htmlFor="input-last-name"
+                                            >
+                                                Trạng thái
+                                            </label>
+                                            <div>
+                                                <ButtonGroup>
+                                                    <Button
+                                                        color="success"
+                                                        outline
+                                                        onClick={() => {
+                                                            setCourse(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    status: true
+                                                                })
+                                                            )
+                                                        }}
+                                                        name="status"
+                                                        active={course.status}
+                                                    >
+                                                        Hoạt động
+                                                    </Button>
+                                                    <Button
+                                                        color="danger"
+                                                        outline
+                                                        name="status"
+                                                        active={!course.status}
+                                                        onClick={() => {
+                                                            setCourse(
+                                                                (prev) => ({
+                                                                    ...prev,
+                                                                    status: false
+                                                                })
+                                                            )
+                                                        }}
+                                                    >
+                                                        Ẩn
+                                                    </Button>
+                                                </ButtonGroup>
+                                            </div>
                                         </FormGroup>
                                     </div>
                                     <hr className="my-4" />

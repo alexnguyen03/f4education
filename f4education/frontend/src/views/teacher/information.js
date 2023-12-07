@@ -29,7 +29,7 @@ import {
 } from '@mantine/core'
 import { IconUserCircle } from '@tabler/icons-react'
 import teacherApi from 'api/teacherApi'
-const IMG_URL = '/teachers/'
+const IMG_URL = '/avatars/accounts/'
 
 const Information = () => {
     const user = JSON.parse(localStorage.getItem('user'))

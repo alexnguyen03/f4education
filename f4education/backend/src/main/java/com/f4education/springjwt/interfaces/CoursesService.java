@@ -35,6 +35,8 @@ public interface CoursesService {
 
 	List<CourseDTO> getCourseBySubjectName(String subjectName);
 
+	List<String> getAllCourseContentByClassId(Integer classId);
+
 	String renameFolder(String folderName, String newFolderName) throws Exception;
 
 	List<ReportCourseCountStudentDTO> getCoursesWithStudentCount();

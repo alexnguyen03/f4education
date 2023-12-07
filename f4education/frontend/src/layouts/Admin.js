@@ -74,7 +74,11 @@ const Admin = (props) => {
                     adminName={adminName}
                     adminImg={adminImg}
                 />
-                <Routes>
+                <Routes
+                    style={{
+                        minHeight: '70vh'
+                    }}
+                >
                     {getRoutes(routes)}
                     <Route
                         path="*"

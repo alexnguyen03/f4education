@@ -11,5 +11,7 @@
     "[java]": {
         "editor.defaultFormatter": "redhat.java"
     },
-    "java.debug.settings.onBuildFailureProceed": true
+    "java.debug.settings.onBuildFailureProceed": true,
+    "editor.fontLigatures": true,
+    "editor.fontFamily": "'Fira Code', 'Cascadia Code', 'Consolas'"
 }

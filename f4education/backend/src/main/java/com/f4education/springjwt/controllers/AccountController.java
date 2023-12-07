@@ -1,6 +1,7 @@
 package com.f4education.springjwt.controllers;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -30,6 +31,7 @@ import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.payload.request.AccountDTO;
 import com.f4education.springjwt.payload.request.OTP;
 import com.f4education.springjwt.payload.response.MessageResponse;
+import com.f4education.springjwt.security.services.FirebaseStorageService;
 import com.f4education.springjwt.security.services.MailerServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -50,6 +52,9 @@ public class AccountController {
 
     @Autowired
     XFile xfileService;
+
+    @Autowired
+    FirebaseStorageService firebaseStorageService;
 
     @Autowired
     PasswordEncoder encoder;
@@ -195,12 +200,13 @@ public class AccountController {
         try {
             accountDTO = mapper.readValue(teacherRequestString,
                     AccountDTO.class);
-            File savedFile = null;
+
+            String savedFile = null;
             String id = null;
             try {
                 id = accountDTO.getEmail().substring(0, accountDTO.getEmail().indexOf("@"));
             } catch (Exception e) {
-
+                e.printStackTrace();
             }
             accountDTO.setUsername(id);
             if (create) {
@@ -209,15 +215,24 @@ public class AccountController {
 
             if (file.isPresent()) {
                 if (!file.isEmpty()) {
-                    savedFile = xfileService.save(file.orElse(null), "/courses");
+                    try {
+                        savedFile = firebaseStorageService.uploadImage(file.orElse(null),
+                                "accounts/", accountDTO.getUsername().trim());
+
+                    } catch (IOException e) {
+                        // TODO Auto-generated catch block
+                        e.printStackTrace();
+                    }
+
                 }
+
             }
             switch (accountDTO.getRoles()) {
                 // ! Role = 3 có vai trò là Admin
                 case 3:
                     Admin admin = accountDTO.getAdmin();
                     if (savedFile != null) {
-                        admin.setImage(savedFile.getName());
+                        admin.setImage(accountDTO.getUsername());
                     }
                     if (create) {
                         admin.setAdminId(id);
@@ -229,7 +244,7 @@ public class AccountController {
                 case 2:
                     Teacher teacher = accountDTO.getTeacher();
                     if (savedFile != null) {
-                        teacher.setImage(savedFile.getName());
+                        teacher.setImage(accountDTO.getUsername());
                     }
                     if (create) {
                         teacher.setTeacherId(id);
@@ -241,7 +256,7 @@ public class AccountController {
                 default:
                     Student student = accountDTO.getStudent();
                     if (savedFile != null) {
-                        student.setImage(savedFile.getName());
+                        student.setImage(accountDTO.getUsername());
                     }
                     if (create) {
                         student.setStudentId(id);

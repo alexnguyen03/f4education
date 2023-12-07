@@ -1,12 +1,17 @@
 package com.f4education.springjwt.controllers;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.models.ERole;
@@ -32,6 +38,7 @@ import com.f4education.springjwt.payload.request.TokenRefreshRequest;
 import com.f4education.springjwt.payload.response.JwtResponse;
 import com.f4education.springjwt.payload.response.MessageResponse;
 import com.f4education.springjwt.payload.response.TokenRefreshResponse;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RoleRepository;
 import com.f4education.springjwt.repository.UserRepository;
 import com.f4education.springjwt.security.jwt.JwtUtils;
@@ -202,4 +209,5 @@ public class AuthController {
         userDetails.getImageName()));
 
   }
+
 }

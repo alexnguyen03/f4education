@@ -24,7 +24,7 @@ import SpeechRecognition, {
 
 import courseApi from 'api/courseApi'
 import subjectApi from 'api/subjectApi'
-const IMG_URL = '/courses/'
+const IMG_URL = '/avatars/courses/'
 const PRODUCTS_PER_PAGE = 10 // Số lượng sản phẩm trên mỗi trang
 
 function CourseClient() {

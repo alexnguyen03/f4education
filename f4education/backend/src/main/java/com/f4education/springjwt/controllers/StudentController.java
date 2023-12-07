@@ -16,6 +16,7 @@ import com.f4education.springjwt.interfaces.StudentService;
 import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.payload.request.StudentDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
+import com.f4education.springjwt.security.services.FirebaseStorageService;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,32 +33,37 @@ public class StudentController {
 
 	@Autowired
 	XFile xfileService;
+	@Autowired
+	FirebaseStorageService firebaseStorageService;
 
 	@GetMapping("/{id}")
-//	@PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
 	public ResponseEntity<?> getStudent(@PathVariable("id") String studentID) {
 		StudentDTO studentDTO = studentService.getStudentDTOByID(studentID);
 		return ResponseEntity.ok(studentDTO);
 	}
 
 	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateStudent(@RequestPart("studentRequest") String studentRequestString,
 			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
-		StudentDTO teacherRequest = new StudentDTO();
+		StudentDTO studentRequest = new StudentDTO();
 		try {
-			teacherRequest = mapper.readValue(studentRequestString, StudentDTO.class);
+			studentRequest = mapper.readValue(studentRequestString, StudentDTO.class);
 			if (!file.isEmpty()) {
-				File savedFile = xfileService.save(file.orElse(null), "/students");
-				teacherRequest.setImage(savedFile.getName());
+
+				String imageURL = firebaseStorageService.uploadImage(file.get(),
+						"students/", studentRequest.getStudentId().trim());
+				firebaseStorageService.isUpdatedNoCahe("students/");
+				studentRequest.setImage(studentRequest.getStudentId());
 			}
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		StudentDTO studentDTO = studentService.updateStudent(teacherRequest);
+		StudentDTO studentDTO = studentService.updateStudent(studentRequest);
 		return ResponseEntity.ok(studentDTO);
 	}
 }

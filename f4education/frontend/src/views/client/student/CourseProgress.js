@@ -107,6 +107,10 @@ const CourseProgress = () => {
             const resp = await registerCoursecAPI.getAllCourseProgress(
                 user.username
             )
+            console.log(
+                '🚀 ~ file: CourseProgress.js:110 ~ fetchCourseProgress ~ resp:',
+                resp
+            )
             const reversedData = resp.data.reverse()
             setCourseProgresses(reversedData)
 
@@ -679,7 +683,7 @@ const CourseProgress = () => {
                         >
                             <Card.Section>
                                 <Image
-                                    src={`${PUBLIC_IMAGE}/courses/${selectedCourse.course.image}`}
+                                    src={`${PUBLIC_IMAGE}/avatars/courses/${selectedCourse.course.image}`}
                                     height={250}
                                     alt="Norway"
                                     withPlaceholder
@@ -1030,7 +1034,7 @@ const CourseProgress = () => {
                                                                                 <Card.Section>
                                                                                     <Image
                                                                                         // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                                                                        src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
+                                                                                        src={`${PUBLIC_IMAGE}/avatars/courses/${progress.course.image}`}
                                                                                         height={
                                                                                             160
                                                                                         }
@@ -1208,7 +1212,7 @@ const CourseProgress = () => {
                                                                         <Card.Section>
                                                                             <Image
                                                                                 // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                                                                src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
+                                                                                src={`${PUBLIC_IMAGE}/avatars/courses/${progress.course.image}`}
                                                                                 height={
                                                                                     160
                                                                                 }
@@ -1388,7 +1392,7 @@ const CourseProgress = () => {
                                         >
                                             <Card.Section>
                                                 <Image
-                                                    src={`${PUBLIC_IMAGE}/courses/${course.image}`}
+                                                    src={`${PUBLIC_IMAGE}/avatars/courses/${course.image}`}
                                                     height={200}
                                                     withPlaceholder
                                                     alt={course.courseName}
@@ -1727,7 +1731,7 @@ const CourseProgress = () => {
                                                                             <Card.Section>
                                                                                 <Image
                                                                                     // src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                                                                    src={`${PUBLIC_IMAGE}/courses/${progress.course.image}`}
+                                                                                    src={`${PUBLIC_IMAGE}/avatars/courses/${progress.course.image}`}
                                                                                     height={
                                                                                         160
                                                                                     }
