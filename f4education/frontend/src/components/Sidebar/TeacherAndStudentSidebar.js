@@ -39,7 +39,10 @@ const TeacherAndStudentSidebar = (props) => {
         return routes.map((prop, key) => {
             if (
                 prop.path !== '/class-info/:classId' &&
-                prop.path !== '/class-info/point/:classId'
+                prop.path !== '/class-info/point/:classId' &&
+                prop.path !== '/quizz' &&
+                prop.path !== '/task' &&
+                prop.path !== '/classes/recources/:classId'
             ) {
                 return (
                     <NavItem key={key}>

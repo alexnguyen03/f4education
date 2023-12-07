@@ -84,6 +84,7 @@ public class ResourceController {
 
 	@GetMapping("/file/{folderId}")
 	public ResponseEntity<?> getAllFilesByFolder(@PathVariable("folderId") String folderId) throws Exception {
+		System.out.println(folderId);
 		List<GoogleDriveFileDTO> lists = new ArrayList<>();
 		lists.addAll(resourceService.getAllFilesByFolderLesson(folderId));
 		lists.addAll(resourceService.getAllFilesByFolderResource(folderId));
