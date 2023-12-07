@@ -137,6 +137,11 @@ const ClassDetail = () => {
     }
 
     const handleOnChangeRegisterCoure = (val) => {
+        console.log(
+            '🚀 ~ file: ClassDetail.js:140 ~ handleOnChangeRegisterCoure ~ val:',
+            val
+        )
+        //! handle get courseId
         const registeCourseSelected = allRegisterCourses.find((item) => {
             return item.registerCourseId === val.value
         })

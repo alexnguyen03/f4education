@@ -513,4 +513,14 @@ public class GoogleDriveRepository {
 		}
 	}
 
+	// serving images
+	public byte[] getImageBytes(String fileId) throws GeneralSecurityException, IOException {
+		DriveQuickstart driveService = new DriveQuickstart();
+
+		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+		driveService.getInstance().files().get(fileId).executeMediaAndDownloadTo(outputStream);
+
+		return outputStream.toByteArray();
+	}
+
 }

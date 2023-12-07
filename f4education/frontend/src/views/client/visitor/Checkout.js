@@ -193,7 +193,7 @@ const Checkout = () => {
                 // Update Cart
                 handleUpdateCart(updateCartRequest)
 
-                 // remove local
+                // remove local
                 localStorage.removeItem('cartCheckout')
 
                 // PayPal checkout logic
@@ -530,11 +530,11 @@ const Checkout = () => {
                                                     sm="2"
                                                 >
                                                     <img
-                                                        src={`${PUBLIC_IMAGE}/courses/${cart.course.image}`}
-                                                        width={'100%'}
-                                                        style={{
-                                                            maxHeight: '100px'
-                                                        }}
+                                                        src={`${PUBLIC_IMAGE}/avatars/courses/${cart.course.image}`}
+                                                        // width={'100%'}
+                                                        // style={{
+                                                        //     maxHeight: '100px'
+                                                        // }}
                                                         className="img-fluid"
                                                         alt={
                                                             cart.course

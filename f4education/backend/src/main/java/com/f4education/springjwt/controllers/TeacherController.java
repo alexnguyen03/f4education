@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.payload.request.TeacherDTO;
+import com.f4education.springjwt.security.services.FirebaseStorageService;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -29,7 +30,7 @@ public class TeacherController {
 	TeacherService teacherService;
 
 	@Autowired
-	XFile xfileService;
+	FirebaseStorageService firebaseStorageService;
 
 	@GetMapping
 	@PreAuthorize("hasRole('ADMIN')")
@@ -39,26 +40,28 @@ public class TeacherController {
 	}
 
 	@GetMapping("/{id}")
-//	@PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('TEACHER') or hasRole('ADMIN')")
 	public ResponseEntity<?> getTeacher(@PathVariable("id") String teacherID) {
 		TeacherDTO teacher = teacherService.getTeacherDTOByID(teacherID);
 		return ResponseEntity.ok(teacher);
 	}
 
 	@PutMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> updateSubject(@RequestPart("teacherRequest") String teacherRequestString,
 			@RequestParam("file") Optional<MultipartFile> file) {
 		ObjectMapper mapper = new ObjectMapper();
 		TeacherDTO teacherRequest = new TeacherDTO();
 		try {
 			teacherRequest = mapper.readValue(teacherRequestString, TeacherDTO.class);
-//			if (file.isPresent()) {
-				if (!file.isEmpty()) {
-					File savedFile = xfileService.save(file.orElse(null), "/teachers");
-					teacherRequest.setImage(savedFile.getName());
-				}
-//			}
+			// if (file.isPresent()) {
+			if (!file.isEmpty()) {
+
+				String imageURL = firebaseStorageService.uploadImage(file.get(),
+						"teachers/", teacherRequest.getTeacherId().trim());
+				teacherRequest.setImage(teacherRequest.getTeacherId());
+			}
+			// }
 		} catch (JsonProcessingException e) {
 			e.printStackTrace();
 		} catch (IOException e) {

@@ -12,7 +12,7 @@ import { routesStudent } from '../routes'
 const Student = (props) => {
     const mainContent = useRef(null)
     const location = useLocation()
-    const [showSideBar, setShowSideBar] = useState(false)
+    const [showSideBar, setShowSideBar] = useState(true)
 
     useEffect(() => {}, [])
 

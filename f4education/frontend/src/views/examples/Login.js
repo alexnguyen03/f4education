@@ -308,11 +308,7 @@ const Login = () => {
                                     <label
                                         className="custom-control-label"
                                         htmlFor=" customCheckLogin"
-                                    >
-                                        <span className="text-muted">
-                                            Ghi nhớ tài khoản
-                                        </span>
-                                    </label>
+                                    ></label>
                                 </div>
                                 <div className="text-center">
                                     <Button

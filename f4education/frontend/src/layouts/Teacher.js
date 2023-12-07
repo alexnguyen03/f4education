@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react'
 import {
-    Navigate, Route,
-    Routes, useLocation, useNavigate
+    Navigate,
+    Route,
+    Routes,
+    useLocation,
+    useNavigate
 } from 'react-router-dom'
 // reactstrap components
 
@@ -113,7 +116,11 @@ const Teacher = (props) => {
                                 <Menu.Target>
                                     <UserButton
                                         // image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
-                                        image={`${user.imageName}`}
+                                        image={`${
+                                            process.env.REACT_APP_IMAGE_URL +
+                                            '/avatars/accounts/' +
+                                            user.imageName
+                                        }`}
                                         name={`${user.fullName}`}
                                         email={`${user.email}`}
                                         icon={userIcon}

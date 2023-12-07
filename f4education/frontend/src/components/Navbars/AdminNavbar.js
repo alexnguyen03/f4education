@@ -81,23 +81,23 @@ const AdminNavbar = (props) => {
                         <UncontrolledDropdown nav>
                             <DropdownToggle className="pr-0" nav>
                                 <Media className="align-items-center">
-                                    <span className="avatar avatar-sm rounded-circle">
+                                    <Media className="ml-2 d-none d-lg-block">
+                                        <span className="mb-0 text-sm font-weight-bold">
+                                            {props.adminName}
+                                        </span>
+                                    </Media>
+                                    <span className="avatar avatar-sm rounded-circle ml-2">
                                         <img
                                             alt="..."
                                             height={40}
                                             src={
                                                 process.env
                                                     .REACT_APP_IMAGE_URL +
-                                                '/courses/' +
+                                                '/avatars/accounts/' +
                                                 props.adminImg
                                             }
                                         />
                                     </span>
-                                    <Media className="ml-2 d-none d-lg-block">
-                                        <span className="mb-0 text-sm font-weight-bold">
-                                            {props.adminName}
-                                        </span>
-                                    </Media>
                                 </Media>
                             </DropdownToggle>
                             <DropdownMenu className="dropdown-menu-arrow" right>

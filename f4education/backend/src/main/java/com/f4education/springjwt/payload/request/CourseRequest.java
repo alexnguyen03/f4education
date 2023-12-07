@@ -40,6 +40,9 @@ public class CourseRequest {
 	@JsonProperty("image")
 	private String image;
 
+	@JsonProperty("status")
+	private Boolean status;
+
 	@Override
 	public String toString() {
 		return "CourseRequest{" +

@@ -9,7 +9,8 @@ import {
     Container,
     Row,
     Col,
-    Modal
+    Modal,
+    Badge
 } from 'reactstrap'
 import ClasssHeader from 'components/Headers/ClasssHeader'
 import { useState, useMemo, useEffect } from 'react'
@@ -26,9 +27,12 @@ import classApi from 'api/classApi'
 import classHistoryApi from 'api/classHistoryApi'
 import { Link } from 'react-router-dom'
 import { formatDate } from '../../utils/formater'
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
 
 const Classs = () => {
     const [classses, setClassses] = useState([])
+    const [loading, setLoading] = useState(false)
     const [classHistories, setClassHistories] = useState([])
     const [classHistoryByClassId, setClassHistotyByClassId] = useState([])
     const [showFormClass, setShowFormClass] = useState(false)
@@ -175,9 +179,15 @@ const Classs = () => {
     // lấy tấc cả dữ liệu Class từ database (gọi api)
     const getDataClass = async () => {
         try {
+            setLoading(true)
             const resp = await classApi.getAllClass()
-            setClassses(resp.data)
+
+            if (resp.status === 200) {
+                setLoading(false)
+                setClassses(resp.data)
+            }
         } catch (error) {
+            setLoading(false)
             console.log(error)
         }
     }
@@ -187,12 +197,18 @@ const Classs = () => {
         e.preventDefault()
         const validationErrors = validateForm()
         if (Object.keys(validationErrors).length === 0) {
+            var id = null
+
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
+
                 const resp = await classApi.createClass(classs)
-                alert('Thêm thành công')
+                toast.update(id, Notify.options.createSuccess())
+
                 handleResetForm()
             } catch (error) {
                 console.log('Thêm thất bại', error)
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors(validationErrors)
@@ -280,7 +296,11 @@ const Classs = () => {
 
     // hiển thị tiếng việt
     const displayActionHistory = (action) => {
-        return action === 'CREATE' ? 'Thêm mới' : 'Cập nhật'
+        if (action === 'UPDATE') {
+            return <Badge color="primary">Cập nhật</Badge>
+        } else if (action === 'CREATE') {
+            return <Badge color="success">Tạo mới </Badge>
+        }
     }
 
     // bảng lịch sử lớp học
@@ -494,6 +514,7 @@ const Classs = () => {
                                         }
                                     }
                                 }}
+                                state={{ isLoading: loading }}
                             />
                         </CardBody>
                     )}

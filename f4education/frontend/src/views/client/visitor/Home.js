@@ -284,7 +284,7 @@ const Home = () => {
                     <Card className={`${cartStyle['card-hover-overlay']}`}>
                         <Card.Section>
                             <Image
-                                src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                                src={`${PUBLIC_IMAGE}/avatars/courses/${learn.image}`}
                                 fit="cover"
                                 width={'100%'}
                                 height={200}
@@ -396,7 +396,7 @@ const Home = () => {
             <Card className={`${cartStyle['card-hover-overlay']}`}>
                 <Card.Section>
                     <Image
-                        src={`${PUBLIC_IMAGE}/courses/${learn.image}`}
+                        src={`${PUBLIC_IMAGE}/avatars/courses/${learn.image}`}
                         fit="cover"
                         width={'100%'}
                         height={200}
@@ -497,19 +497,14 @@ const Home = () => {
                 <Card withBorder shadow="xl" h={250}>
                     <Stack>
                         <Group position="left">
-                            <Text
-                                color="dark"
-                                lineClamp={2}
-                                size="md"
-                                fw={500}
-                            >
+                            <Text color="dark" lineClamp={2} size="md" fw={500}>
                                 <span className="text-primary">Khóa học:</span>{' '}
                                 {evaluate.courseName}
                             </Text>
                         </Group>
                         <Group>
                             <Avatar
-                                src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
+                                src={`${PUBLIC_IMAGE}/avatars/accounts/${evaluate.studentImage}`}
                                 alt={evaluate.studentName}
                                 radius="xl"
                             />
