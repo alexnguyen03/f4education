@@ -351,13 +351,13 @@ const SubmitHomework = () => {
                                         <Text my={5}>{task.description}</Text>
                                         <Text my={5}>
                                             Thời gian:{' '}
-                                            {/* {moment(task.startDate).format(
+                                            {moment(task.startDate).format(
                                                 'DD/MM/yyyy, h:mm:ss A'
                                             )}{' '}
                                             -{' '}
                                             {moment(task.endDate).format(
                                                 'DD/MM/yyyy, h:mm:ss A'
-                                            )} */}
+                                            )}
                                         </Text>
                                         <Text my={5}>
                                             Giáo viên: {task.teacherName}
@@ -445,7 +445,7 @@ const SubmitHomework = () => {
                                                         loadingFileStudent
                                                 }}
                                                 enableRowActions={
-                                                    !isCurrentDateInRange(
+                                                    isCurrentDateInRange(
                                                         task.startDate,
                                                         task.endDate
                                                     )
