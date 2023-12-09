@@ -61,8 +61,9 @@ import { Chart } from 'chart.js'
 import { LoadingOverlay } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import moment from 'moment/moment'
-import { DateInput } from '@mantine/dates'
+import { DateInput, MonthPickerInput, YearPickerInput } from '@mantine/dates'
 import BarChart from 'variables/BarChart'
+import { IconCalendar, IconRefresh } from '@tabler/icons-react'
 
 const Index = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -87,6 +88,8 @@ const Index = () => {
         useState(reportRevenue)
     const [startDate, setStartDate] = useState(null)
     const [endDate, setEndDate] = useState(null)
+    const [monthFilter, setMonthFilter] = useState(null)
+    const [yearFilter, setYearFilter] = useState(null)
     // Revenue End
 
     // Fetch Area
@@ -118,6 +121,14 @@ const Index = () => {
         )
     }
 
+    const handleResetFilter = () => {
+        setFilteredRevenueData(reportRevenue)
+        setStartDate(null)
+        setEndDate(null)
+        setMonthFilter(null)
+        setYearFilter(null)
+    }
+
     // Use Effect
     useEffect(() => {
         fetchRevenue()
@@ -142,6 +153,29 @@ const Index = () => {
             })
         )
     }, [startDate, endDate, reportRevenue])
+
+    useEffect(() => {
+        if (monthFilter !== null) {
+            const newData = reportRevenue.filter(
+                (item) =>
+                    moment(item.createDate).month() + 1 ===
+                    monthFilter.getMonth() + 1
+            )
+            setFilteredRevenueData(newData)
+        }
+    }, [monthFilter, reportRevenue])
+
+    useEffect(() => {
+        if (yearFilter !== null) {
+            const newData = reportRevenue.filter(
+                (item) =>
+                    moment(item.createDate).year() === yearFilter.getFullYear()
+            )
+            console.log(newData)
+            console.log(yearFilter.getFullYear())
+            setFilteredRevenueData(newData)
+        }
+    }, [yearFilter, reportRevenue])
 
     // Templates Variable
     const [activeNav, setActiveNav] = useState(1)
@@ -496,6 +530,21 @@ const Index = () => {
                                                     >
                                                         <NavItem>
                                                             <NavLink
+                                                                className="py-2 px-3"
+                                                                onClick={() => {
+                                                                    handleResetFilter()
+                                                                }}
+                                                                style={{
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                            >
+                                                                <span className="d-none d-md-block fw-500">
+                                                                    <IconRefresh />
+                                                                </span>
+                                                            </NavLink>
+                                                        </NavItem>
+                                                        <NavItem>
+                                                            <NavLink
                                                                 className={classnames(
                                                                     'py-2 px-3',
                                                                     {
@@ -554,45 +603,100 @@ const Index = () => {
                                             </Row>
 
                                             <div className="row mt-3">
-                                                <div className="col">
-                                                    <div className="d-flex justify-content-end align-items-center">
-                                                        <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
-                                                            Bộ lọc theo ngày
-                                                            tháng:
-                                                        </h5>
+                                                <div className="col mb-4">
+                                                    <div className="d-flex justify-content-between align-items-center">
                                                         <div className="d-flex justify-content-start">
-                                                            <DateInput
-                                                                placeholder="Ngày bắt đầu"
-                                                                variant="filled"
-                                                                mr={10}
-                                                                clearable
-                                                                w={320}
+                                                            <MonthPickerInput
+                                                                icon={
+                                                                    <IconCalendar
+                                                                        size="1.1rem"
+                                                                        stroke={
+                                                                            1.5
+                                                                        }
+                                                                    />
+                                                                }
+                                                                label="Chọn tháng thống kê"
+                                                                placeholder="Chọn tháng thống kê"
                                                                 value={
-                                                                    startDate
+                                                                    monthFilter
                                                                 }
                                                                 onChange={(
                                                                     value
                                                                 ) =>
-                                                                    setStartDate(
+                                                                    setMonthFilter(
                                                                         value
                                                                     )
                                                                 }
-                                                            />
-
-                                                            <DateInput
-                                                                placeholder="Ngày kết thúc"
-                                                                variant="filled"
+                                                                w={250}
                                                                 clearable
-                                                                w={320}
-                                                                value={endDate}
+                                                            />
+                                                            <YearPickerInput
+                                                                icon={
+                                                                    <IconCalendar
+                                                                        size="1.1rem"
+                                                                        stroke={
+                                                                            1.5
+                                                                        }
+                                                                    />
+                                                                }
+                                                                label="Chọn năm thống kê"
+                                                                placeholder="Chọn năm thống kê"
+                                                                value={
+                                                                    yearFilter
+                                                                }
                                                                 onChange={(
                                                                     value
                                                                 ) =>
-                                                                    setEndDate(
+                                                                    setYearFilter(
                                                                         value
                                                                     )
                                                                 }
+                                                                w={250}
+                                                                ml={20}
+                                                                clearable
                                                             />
+                                                        </div>
+                                                        <div>
+                                                            <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
+                                                                Bộ lọc theo ngày
+                                                                tháng:
+                                                            </h5>
+                                                            <div className="d-flex justify-content-start">
+                                                                <DateInput
+                                                                    placeholder="Ngày bắt đầu"
+                                                                    variant="filled"
+                                                                    mr={10}
+                                                                    clearable
+                                                                    w={320}
+                                                                    value={
+                                                                        startDate
+                                                                    }
+                                                                    onChange={(
+                                                                        value
+                                                                    ) =>
+                                                                        setStartDate(
+                                                                            value
+                                                                        )
+                                                                    }
+                                                                />
+
+                                                                <DateInput
+                                                                    placeholder="Ngày kết thúc"
+                                                                    variant="filled"
+                                                                    clearable
+                                                                    w={320}
+                                                                    value={
+                                                                        endDate
+                                                                    }
+                                                                    onChange={(
+                                                                        value
+                                                                    ) =>
+                                                                        setEndDate(
+                                                                            value
+                                                                        )
+                                                                    }
+                                                                />
+                                                            </div>
                                                         </div>
                                                     </div>
                                                 </div>
