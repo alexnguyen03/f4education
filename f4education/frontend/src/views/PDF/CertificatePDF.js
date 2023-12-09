@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSearchParams } from 'react-router-dom'
 
 import {
@@ -143,7 +143,6 @@ const CertificatePDF = () => {
         }
 
         Promise.all([fetchData()])
-
     }, [searchParams])
 
     return (
@@ -214,9 +213,7 @@ const CertificatePDF = () => {
                                         fontSize: 35
                                     }}
                                 >
-                                    {user !== null
-                                        ? user.fullName
-                                        : 'Vui lòng đăng nhập để tiếp tục'}
+                                    {!loading && certificate.studentName}
                                 </Text>
                                 <Text
                                     style={{

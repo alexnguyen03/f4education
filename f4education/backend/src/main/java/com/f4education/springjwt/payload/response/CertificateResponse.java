@@ -15,12 +15,10 @@ public class CertificateResponse {
 	private Integer certificateId;
 
 	private String certificateName;
-
-	private Date startDate;
-
-	private Date endDate;
 	
 	private Date createDate;
-
-	private RegisterCourse registerCourse;
+	
+	private String studentId;
+	
+	private String studentName;
 }

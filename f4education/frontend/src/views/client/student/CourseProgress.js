@@ -322,6 +322,7 @@ const CourseProgress = () => {
             })}`
         })
     }
+    
     const handleCreateCertificate = async () => {
         try {
             const resp = await certificateApi.createCertificate(certificate)
@@ -361,7 +362,6 @@ const CourseProgress = () => {
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
-                        studentId: user.username ? user.username : '',
                         certificateId: existCertificate.certificateId
                     })}`
                 })
@@ -376,7 +376,6 @@ const CourseProgress = () => {
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
-                        studentId: user.username ? user.username : '',
                         certificateId: resp.data.certificateId
                     })}`
                 })

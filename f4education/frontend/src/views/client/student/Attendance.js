@@ -229,71 +229,98 @@ const Attendance = () => {
                     </>
                 ) : (
                     <>
-                        {listAttendance.map((attendance, index) => (
-                            <Grid.Col span={12} key={index} mb={30}>
-                                <Card withBorder shadow="md" w={'100%'} p={10}>
-                                    <Card.Section p={15}>
-                                        <Group position="left">
-                                            <IconBook
-                                                size={rem('2rem')}
-                                                color="#5F3DC4"
-                                            />
-                                            <Title
-                                                order={2}
-                                                color="dark"
-                                                fw={700}
-                                            >
-                                                Khóa học {attendance.courseName}{' '}
-                                                - Lớp {attendance.className}
-                                            </Title>
-                                        </Group>
-                                    </Card.Section>
-                                    <Divider />
-                                    <Card.Section>
-                                        <MaterialReactTable
-                                            enableColumnResizing
-                                            enableGrouping
-                                            enableStickyHeader
-                                            enableStickyFooter
-                                            enableRowNumbers
-                                            displayColumnDefOptions={{
-                                                'mrt-row-numbers': {
-                                                    size: 5
-                                                }
-                                            }}
-                                            columns={attendanceColumn}
-                                            data={attendance.schedule}
-                                            renderTopToolbarCustomActions={() => (
-                                                <Text
-                                                    color="dark"
-                                                    fw={500}
-                                                    size="lg"
-                                                    p={10}
-                                                >
-                                                    Đã vắng{' '}
-                                                    <strong className="text-danger">
-                                                        {attendance.totalAbsent}{' '}
-                                                        /{' '}
-                                                        {
-                                                            attendance.schedule
-                                                                .length
+                        {listAttendance.length === 0 ? (
+                            <>
+                                <Title
+                                    order={2}
+                                    color="dark"
+                                    my={rem('5rem')}
+                                    mx="auto"
+                                    maw={700}
+                                >
+                                    Hiện chưa có khóa học đang trong quá trình
+                                    học!
+                                </Title>
+                            </>
+                        ) : (
+                            <>
+                                {listAttendance.map((attendance, index) => (
+                                    <Grid.Col span={12} key={index} mb={30}>
+                                        <Card
+                                            withBorder
+                                            shadow="md"
+                                            w={'100%'}
+                                            p={10}
+                                        >
+                                            <Card.Section p={15}>
+                                                <Group position="left">
+                                                    <IconBook
+                                                        size={rem('2rem')}
+                                                        color="#5F3DC4"
+                                                    />
+                                                    <Title
+                                                        order={2}
+                                                        color="dark"
+                                                        fw={700}
+                                                    >
+                                                        Khóa học{' '}
+                                                        {attendance.courseName}{' '}
+                                                        - Lớp{' '}
+                                                        {attendance.className}
+                                                    </Title>
+                                                </Group>
+                                            </Card.Section>
+                                            <Divider />
+                                            <Card.Section>
+                                                <MaterialReactTable
+                                                    enableColumnResizing
+                                                    enableGrouping
+                                                    enableStickyHeader
+                                                    enableStickyFooter
+                                                    enableRowNumbers
+                                                    displayColumnDefOptions={{
+                                                        'mrt-row-numbers': {
+                                                            size: 5
                                                         }
-                                                    </strong>{' '}
-                                                    tổng số buổi học
-                                                </Text>
-                                            )}
-                                            muiTablePaginationProps={{
-                                                rowsPerPageOptions: [
-                                                    10, 20, 50, 100
-                                                ],
-                                                showFirstButton: true,
-                                                showLastButton: true
-                                            }}
-                                        />
-                                    </Card.Section>
-                                </Card>
-                            </Grid.Col>
-                        ))}
+                                                    }}
+                                                    columns={attendanceColumn}
+                                                    data={attendance.schedule}
+                                                    renderTopToolbarCustomActions={() => (
+                                                        <Text
+                                                            color="dark"
+                                                            fw={500}
+                                                            size="lg"
+                                                            p={10}
+                                                        >
+                                                            Đã vắng{' '}
+                                                            <strong className="text-danger">
+                                                                {
+                                                                    attendance.totalAbsent
+                                                                }{' '}
+                                                                /{' '}
+                                                                {
+                                                                    attendance
+                                                                        .schedule
+                                                                        .length
+                                                                }
+                                                            </strong>{' '}
+                                                            tổng số buổi học
+                                                        </Text>
+                                                    )}
+                                                    muiTablePaginationProps={{
+                                                        rowsPerPageOptions: [
+                                                            10, 20, 50, 100
+                                                        ],
+                                                        showFirstButton: true,
+                                                        showLastButton: true
+                                                    }}
+                                                />
+                                            </Card.Section>
+                                        </Card>
+                                    </Grid.Col>
+                                ))}
+                            </>
+                        )}
                     </>
                 )}
             </Grid>

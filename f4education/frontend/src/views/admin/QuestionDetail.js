@@ -40,12 +40,14 @@ import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import {
     IconBookDownload,
     IconBookUpload,
+    IconFile3d,
     IconPhoto,
     IconUpload,
     IconX
 } from '@tabler/icons-react'
 import answersApi from '../../api/answersApi'
 import questionApi from '../../api/questionApi'
+import { useRef } from 'react'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -1393,26 +1395,36 @@ const QuestionDetail = () => {
                                             />
                                         </Dropzone.Reject>
                                         <Dropzone.Idle>
-                                            <IconPhoto
-                                                size="3.2rem"
+                                            <IconFile3d
+                                                size="3rem"
                                                 stroke={1.5}
                                             />
                                         </Dropzone.Idle>
 
                                         <div>
-                                            <Text size="xl" inline>
-                                                Thả files excel vào đây hoặc
-                                                click vào để chọn files
-                                            </Text>
-                                            <Text
-                                                size="sm"
-                                                color="dimmed"
-                                                inline
-                                                mt={7}
-                                            >
-                                                Thả mỗi lần một file, lưu ý dung
-                                                lượng file phải dưới 5MB
-                                            </Text>
+                                            {selectedFile !== null ? (
+                                                <Text size="xl" inline color={'lime'}>
+                                                    {selectedFile.name}
+                                                </Text>
+                                            ) : (
+                                                <>
+                                                    <Text size="xl" inline>
+                                                        Thả files excel vào đây
+                                                        hoặc click vào để chọn
+                                                        files
+                                                    </Text>
+                                                    <Text
+                                                        size="sm"
+                                                        color="dimmed"
+                                                        inline
+                                                        mt={7}
+                                                    >
+                                                        Thả mỗi lần một file,
+                                                        lưu ý dung lượng file
+                                                        phải dưới 5MB
+                                                    </Text>
+                                                </>
+                                            )}
                                         </div>
                                     </Group>
                                 </Dropzone>

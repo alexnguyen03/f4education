@@ -20,7 +20,7 @@ import {
     Stack,
     Text
 } from '@mantine/core'
-import { useDisclosure, useElementSize, useMediaQuery } from '@mantine/hooks'
+import { useDisclosure, useElementSize } from '@mantine/hooks'
 import {
     IconChevronDown,
     IconChevronRight,
@@ -34,6 +34,9 @@ import {
 // css module
 import styles from '../../assets/css/custom-client-css/Navbar.module.css'
 
+// Utils
+import { PreviousURI } from '../../utils/PreviousURI'
+
 // API
 import courseApi from '../../api/courseApi'
 import subjectApi from '../../api/subjectApi'
@@ -42,7 +45,6 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const ClientNavbar = () => {
     const user = JSON.parse(localStorage.getItem('user'))
-    const userNull = !user ? true : false
     const listCart = JSON.parse(localStorage.getItem('userCart')) || []
 
     const ref = useElementSize()
@@ -239,6 +241,11 @@ const ClientNavbar = () => {
             navigate(`/course/${currentCourse.courseId}`)
         }
     }
+
+    useEffect(() => {
+        PreviousURI.current = window.location.pathname
+        console.log(window.location.pathname)
+    }, [navigate])
 
     return (
         <nav

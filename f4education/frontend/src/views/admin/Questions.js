@@ -1,5 +1,5 @@
 import { Edit as EditIcon } from '@mui/icons-material'
-import { FormGroup, IconButton } from '@mui/material'
+import { Box, FormGroup, IconButton } from '@mui/material'
 import QuestionHeader from 'components/Headers/QuestionHeader'
 import { MaterialReactTable } from 'material-react-table'
 import { useEffect, useMemo, useState } from 'react'
@@ -28,6 +28,7 @@ import subjectApi from '../../api/subjectApi'
 import { Select } from '@mantine/core'
 import moment from 'moment/moment'
 import { Link } from 'react-router-dom'
+import { IconRefresh } from '@tabler/icons-react'
 
 // ************* Get LocalStorage
 
@@ -313,16 +314,25 @@ const Questions = () => {
                             )}
                             // Top Add new Subject button
                             renderTopToolbarCustomActions={() => (
-                                <Button
-                                    color={isUpdate ? 'primary' : 'success'}
-                                    onClick={() => setShowModal(true)}
-                                    variant="contained"
-                                    id="addSubjects"
-                                    // disabled={isSubjectHistoryShowing}
-                                >
-                                    <i className="bx bx-layer-plus"></i> Thêm
-                                    câu hỏi
-                                </Button>
+                                <Box>
+                                    <Button
+                                        color={isUpdate ? 'primary' : 'success'}
+                                        onClick={() => setShowModal(true)}
+                                        variant="contained"
+                                        id="addSubjects"
+                                        // disabled={isSubjectHistoryShowing}
+                                    >
+                                        <i className="bx bx-layer-plus"></i>{' '}
+                                        Thêm câu hỏi
+                                    </Button>
+                                    <Button
+                                        color="default"
+                                        onClick={() => fetchQuestions()}
+                                        variant="contained"
+                                    >
+                                        <IconRefresh />
+                                    </Button>
+                                </Box>
                             )}
                         />
                     </CardBody>
