@@ -1,5 +1,8 @@
 package com.f4education.springjwt.security.services;
 
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
@@ -149,7 +152,6 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 	@Override
 	public ScheduleResponse findAllScheduleByClassId(Integer classId) {
-
 		List<Schedule> schedules = scheduleRepository.findAllScheduleByClassId(classId);
 		ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
 		return scheduleResponse;
@@ -157,20 +159,42 @@ public class ScheduleServiceImpl implements ScheduleService {
 
 	@Override
 	public Schedule findScheduleByClassAndStudyDate(Integer classId) {
-		
 		OffsetDateTime studyDate = OffsetDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // Format the OffsetDateTime and parse it back to OffsetDateTime
-        String formattedDate = studyDate.format(formatter);
-        OffsetDateTime formattedOffsetDateTime = OffsetDateTime.parse(formattedDate + "T00:00:00+00:00");
-        
+		// Format the OffsetDateTime and parse it back to OffsetDateTime
+		String formattedDate = studyDate.format(formatter);
+		OffsetDateTime formattedOffsetDateTime = OffsetDateTime.parse(formattedDate + "T00:00:00+00:00");
+
 		Schedule schedule = scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId, formattedOffsetDateTime);
-		System.out.println("check class is study");
-		System.out.println(classId);
-		System.out.println(formattedOffsetDateTime);
-		System.out.println(schedule);
-		return schedule;
+		if (schedule != null) {
+			// Get StartTime session
+			LocalTime startTime = schedule.getSessions().getStartTime().toLocalTime();
+
+			// Get current date time
+			OffsetDateTime studyDateTime = OffsetDateTime.now().withYear(formattedOffsetDateTime.getYear())
+					.withMonth(formattedOffsetDateTime.getMonthValue())
+					.withDayOfMonth(formattedOffsetDateTime.getDayOfMonth()).withHour(LocalTime.now().getHour())
+					.withMinute(LocalTime.now().getMinute()).withSecond(LocalTime.now().getSecond());
+
+			// Check if studyDateTime is after 15 minutes from startTime
+			LocalDate currentDate = formattedOffsetDateTime.toLocalDate();
+			OffsetDateTime startDateTime = OffsetDateTime.of(currentDate, startTime, ZoneOffset.UTC);
+			OffsetDateTime startTimePlus15Minutes = startDateTime.plusMinutes(15);
+
+			if (studyDateTime.getHour() == startTime.getHour() && studyDateTime.getMinute() >= startTime.getMinute()
+					&& studyDateTime.isBefore(startTimePlus15Minutes)) {
+				System.out.println(startTimePlus15Minutes);
+				System.out.println(studyDateTime);
+				System.out.println(startTime);
+				System.out.println("Class is study");
+				return schedule;
+			} else {
+				System.out.println("Class not is study");
+				return null;
+			}
+		}
+		return null;
 	}
 
 	public ZoneOffset getTimeOffset() {
@@ -212,7 +236,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 			newData.setSessions(sessionsRepository.findById((Integer) ob[4]).get());
 
 			listSchedule.add(this.convertToAttendanceStudentResponses(newData));
-		} 
+		}
 
 		return listSchedule;
 	}

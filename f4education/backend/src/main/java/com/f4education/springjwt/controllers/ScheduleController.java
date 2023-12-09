@@ -55,6 +55,13 @@ public class ScheduleController {
 	@GetMapping("/classes")
 	public ResponseEntity<?> checkIfClassStudyToday(@RequestParam("classId") Integer classId) {
 		Schedule scheduleResponse = scheduleService.findScheduleByClassAndStudyDate(classId);
+		
+		System.out.println(scheduleResponse);
+		
+		if (scheduleResponse == null) {
+			return ResponseEntity.noContent().build();
+		}
+
 		return ResponseEntity.ok(scheduleResponse);
 	}
 

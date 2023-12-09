@@ -469,7 +469,7 @@ function Cart() {
                                         />
                                         <h2 className="font-weight-700">
                                             Giỏ hàng của bạn trống. <br />
-                                            Tiếp tục mua sắm để tìm một khóa học
+                                            Tiếp tục đăng ký để tìm một khóa học
                                             ưng ý!
                                         </h2>
                                         <Link to={'/course'}>

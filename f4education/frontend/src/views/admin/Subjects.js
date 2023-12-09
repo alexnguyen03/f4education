@@ -4,7 +4,11 @@ import SubjectHeader from 'components/Headers/SubjectHeader'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment'
 import React, { useEffect, useMemo, useState } from 'react'
-import { IconEyeSearch, IconListDetails } from '@tabler/icons-react'
+import {
+    IconEyeSearch,
+    IconListDetails,
+    IconRefresh
+} from '@tabler/icons-react'
 // reactstrap components
 import {
     Badge,
@@ -84,6 +88,8 @@ const Subjects = () => {
 
     // API Area
     const fetchSubjects = async () => {
+        setSubjectLoading(true)
+
         try {
             const resp = await subjectApi.getAllSubject()
 
@@ -97,6 +103,8 @@ const Subjects = () => {
             }
         } catch (error) {
             console.log(error)
+        } finally {
+            setSubjectLoading(false)
         }
     }
 
@@ -443,9 +451,7 @@ const Subjects = () => {
     // *************** Use effect area
     useEffect(() => {
         const fetchData = async () => {
-            setSubjectLoading(true)
             await Promise.all([fetchSubjects(), fetchSubjectHistory()])
-            setSubjectLoading(false)
         }
         fetchData()
     }, [])
@@ -570,15 +576,24 @@ const Subjects = () => {
                                 )}
                                 // Top Add new Subject button
                                 renderTopToolbarCustomActions={() => (
-                                    <Button
-                                        color="success"
-                                        onClick={() => setShowModal(true)}
-                                        variant="contained"
-                                        id="addSubjects"
-                                    >
-                                        <i className="bx bx-layer-plus mr-2"></i>{' '}
-                                        Thêm môn học
-                                    </Button>
+                                    <Box>
+                                        <Button
+                                            color="success"
+                                            onClick={() => setShowModal(true)}
+                                            variant="contained"
+                                            id="addSubjects"
+                                        >
+                                            <i className="bx bx-layer-plus mr-2"></i>{' '}
+                                            Thêm môn học
+                                        </Button>
+                                        <Button
+                                            color="default"
+                                            onClick={() => fetchSubjects()}
+                                            variant="contained"
+                                        >
+                                            <IconRefresh />
+                                        </Button>
+                                    </Box>
                                 )}
                             />
                         )}
