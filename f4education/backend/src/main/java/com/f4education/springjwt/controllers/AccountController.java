@@ -121,7 +121,7 @@ public class AccountController {
         return ResponseEntity.ok().body(otpUpdate);
     }
 
-    @PostMapping(value = "/checkOTPForPassWord") // ! Kiểm tra mail đúng chưa và gửi OTP
+    @PostMapping(value = "/checkOTP") // ! Kiểm OTP đúng không
     public ResponseEntity<?> checkOTPForPassWord(@RequestBody OTP otp) {
         OTP otpUpdate = udpateOTP(otp, false);
         Date now = new Date();
@@ -130,13 +130,13 @@ public class AccountController {
                     .badRequest()
                     .body(1);// ! dead OTP
         } else {
-            if (otpUpdate.getCodeOTP() != otp.getCodeOTP()) {
+            if (otpUpdate.getCodeOTP() != otp.getCodeOTP()) {// ! OTP không chính xác
                 return ResponseEntity
                         .badRequest()
                         .body(2);// ! wrong OTP
             }
         }
-        return ResponseEntity.ok().body(null);
+        return ResponseEntity.ok().body(otpUpdate);
     }
 
     @PostMapping(value = "/changePassword") // ! Kiểm tra mail đúng chưa và gửi OTP
@@ -145,6 +145,33 @@ public class AccountController {
         user.setPassword(encoder.encode(accountDTO.getPassword()));
         accountService.save(user);
         return ResponseEntity.ok().body(null);
+    }
+
+    @PostMapping(value = "/checkEmailForRegsiter") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> checkEmailForRegsiter(@RequestBody OTP otp) {
+
+        // ! kiểm tra xem email đó có tồn tại hay không?
+        Boolean checkEmailExit = accountService.existsByEmail(otp.getEmail().trim());
+        if (checkEmailExit) {// ! email đã được đăng tài khoản
+            return ResponseEntity
+                    .badRequest()
+                    .body("1");
+        }
+
+        // ! kiểm tra OTP
+        int code = randomOTP();
+        OTP otpNew = new OTP(otp.getEmail().trim(), code, new Date());// tạo OTP mới để cập nhật
+        OTP otpUpdate = udpateOTP(otpNew, true);
+
+        if (otpUpdate == null) {
+            list.add(otpNew);
+            otpUpdate = otpNew;
+        }
+
+        // ! Gửi mail cho người dùng
+        String mail = otpUpdate.getEmail().toString();
+        mailer.queue(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
+        return ResponseEntity.ok().body(otpUpdate);
     }
 
     @GetMapping
