@@ -138,7 +138,6 @@ function QuizzClient() {
     const [showQuestion, setShowQuestion] = useState(false)
     const startTimer = () => {
         setShowQuestion(true)
-        // setIsFinished(false)
         setElapsedTime(0)
     }
 
@@ -242,6 +241,7 @@ function QuizzClient() {
                 navigate({
                     pathname: '/student/classes'
                 })
+                finishQuiz()
             }
         } catch (error) {
             console.log('Thêm lỗi', error)
@@ -260,6 +260,7 @@ function QuizzClient() {
 
     useEffect(() => {
         getQuestionDetailsByClassId()
+        handleReset()
     }, [])
 
     const storedStartTime = localStorage.getItem('countdown_start_time')
@@ -272,8 +273,8 @@ function QuizzClient() {
 
     const [seconds, setSeconds] = useState(
         storedSeconds
-            ? 124 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
-            : 124
+            ? 90 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
+            : 90
     )
 
     useEffect(() => {
@@ -299,9 +300,14 @@ function QuizzClient() {
     useEffect(() => {
         if (seconds === 0) {
             handleFinish()
-            handleReset()
         }
     }, [seconds])
+
+    const finishQuiz = () => {
+        document.exitFullscreen().catch((err) => {
+            console.log(`Error attempting to exit fullscreen: ${err.message}`)
+        })
+    }
 
     const formatTime = (time) => (time < 10 ? `0${time}` : time)
 
@@ -310,7 +316,7 @@ function QuizzClient() {
 
     const handleReset = () => {
         setStartTime(Date.now().toString())
-        setSeconds(124)
+        setSeconds(90)
     }
 
     return (

@@ -11,7 +11,7 @@ import com.f4education.springjwt.payload.request.ReportCourseCountStudentDTO;
 import com.f4education.springjwt.payload.response.CourseResponse;
 
 public interface CoursesService {
-	List<CourseDTO> findAllCourseDTO();
+	List<CourseResponse> findAllCourseDTO(String studentId);
 
 	List<CourseResponse> findNewestCourse(String studentId);
 

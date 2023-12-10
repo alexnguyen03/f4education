@@ -47,10 +47,10 @@ public class CoursesController {
 	@Autowired
 	FirebaseStorageService firebaseStorageService;
 
-	@GetMapping
+	@GetMapping("/get-all/{studentId}")
 	// @PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getAllCourse() {
-		List<CourseDTO> list = courseService.findAllCourseDTO();
+	public ResponseEntity<?> getAllCourse(@PathVariable String studentId) {
+		List<CourseResponse> list = courseService.findAllCourseDTO(studentId);
 		return ResponseEntity.ok(list);
 	}
 
