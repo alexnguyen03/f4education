@@ -1,35 +1,29 @@
 package com.f4education.springjwt.security.services;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import org.springframework.beans.BeanUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
-
 import com.f4education.springjwt.interfaces.QuestionService;
 import com.f4education.springjwt.models.Admin;
-import com.f4education.springjwt.models.Answer;
 import com.f4education.springjwt.models.Course;
 import com.f4education.springjwt.models.Question;
 import com.f4education.springjwt.models.Subject;
 import com.f4education.springjwt.payload.request.QuestionDTO;
 import com.f4education.springjwt.payload.request.QuestionDTORequest;
 import com.f4education.springjwt.repository.AdminRepository;
-import com.f4education.springjwt.repository.AnswerReposotory;
 import com.f4education.springjwt.repository.CourseRepository;
-import com.f4education.springjwt.repository.QuestionReposotory;
+import com.f4education.springjwt.repository.QuestionRepository;
 import com.f4education.springjwt.repository.SubjectRepository;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class QuestionServiceImpl implements QuestionService {
 	@Autowired
-	QuestionReposotory questionReposotory;
-
-	@Autowired
-	AnswerReposotory answerReposotory;
+	QuestionRepository questionReposotory;
 
 	@Autowired
 	AdminRepository adminRepository;
@@ -42,105 +36,72 @@ public class QuestionServiceImpl implements QuestionService {
 
 	@Override
 	public List<QuestionDTO> getAllQuestion() {
-		List<Question> question = questionReposotory.findDistinctByCourseName();
-//        List<Question> question = questionReposotory.findAll();
-		return question.stream().map(this::convertToDto).collect(Collectors.toList());
+		List<Question> question = questionReposotory.findAll();
+		return question.stream().map(this::convertToQuestionResponse).collect(Collectors.toList());
 	}
 
 	@Override
-	public QuestionDTO getQuestionById(Integer questionId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public List<QuestionDTO> getQuestionByCourseName(String courseName) {
-		List<Question> questions = questionReposotory.findByCourseName(courseName.trim());
-		return questions.stream().map(this::convertToDto).collect(Collectors.toList());
+	public QuestionDTO findQuestionById(Integer questionId) {
+		Question question = questionReposotory.findById(questionId).get();
+		return question != null ? this.convertToQuestionResponse(question) : null;
 	}
 
 	@Override
-	public QuestionDTORequest createQuestion(QuestionDTORequest questionDTO) {
+	public QuestionDTO createQuestion(QuestionDTORequest questionDTO) {
 		Question question = this.convertRequestToEntity(questionDTO);
+		question.setCreateDate(new Date());
 
 		Question saveQuestion = questionReposotory.save(question);
 
-		if (saveQuestion.getAnswer().size() > 0) {
-			for (Answer as : saveQuestion.getAnswer()) {
-				as.setQuestion(saveQuestion);
-				answerReposotory.save(as);
-			}
-		}
-
-		return convertToDtoRequest(saveQuestion);
+		return convertToQuestionResponse(saveQuestion);
 	}
 
 	@Override
-	public QuestionDTORequest updateQuestion(Integer questionId, QuestionDTORequest questionDTO) {
+	public QuestionDTO updateQuestion(Integer questionId, QuestionDTORequest questionDTO) {
 		Optional<Question> exitQuestion = questionReposotory.findById(questionId);
 
-		if (!exitQuestion.isPresent()) {
+		if (exitQuestion.isEmpty()) {
 			return null;
 		}
 
-		Question question = this.convertRequestToEntity(questionDTO);
+		Question updateQuestion = questionReposotory.save(exitQuestion.get());
 
-		Question updateQuestion = questionReposotory.save(question);
-
-		for (Answer as : updateQuestion.getAnswer()) {
-			as.setQuestion(updateQuestion);
-			answerReposotory.save(as);
-		}
-
-		return convertToDtoRequest(updateQuestion);
+		return convertToQuestionResponse(updateQuestion);
 	}
 
-	private QuestionDTO convertToDto(Question question) {
+	private QuestionDTO convertToQuestionResponse(Question question) {
 		QuestionDTO questionDTO = new QuestionDTO();
+
+		BeanUtils.copyProperties(question, questionDTO);
+
 		questionDTO.setAdminName(question.getAdmin().getFullname());
-		questionDTO.setAnswer(question.getAnswer());
-
-		BeanUtils.copyProperties(question, questionDTO);
-
-		return questionDTO;
-	}
-
-	private QuestionDTORequest convertToDtoRequest(Question question) {
-		QuestionDTORequest questionDTO = new QuestionDTORequest();
-
-		Admin admin = adminRepository.findById(question.getAdmin().getAdminId()).get();
-		Course course = courseRepository.findById(question.getCourse().getCourseId()).get();
-
-		questionDTO.setCourseId(course.getCourseId());
-		questionDTO.setAdminId(admin.getAdminId());
-
-		BeanUtils.copyProperties(question, questionDTO);
+		questionDTO.setQuestionId(question.getQuestionId());
+		questionDTO.setSubjectName(question.getSubject().getSubjectName());
+		questionDTO.setCourseName(question.getCourse().getCourseName());
+		questionDTO.setCourseImage(question.getCourse().getImage());
 
 		return questionDTO;
 	}
 
-	private Question convertRequestToEntity(QuestionDTORequest questionDTO) {
+	private Question convertRequestToEntity(QuestionDTORequest questionDTORequest) {
 		Question question = new Question();
 
-		Admin admin = adminRepository.findById(questionDTO.getAdminId()).get();
-		Subject subject = subjectRepository.findById(questionDTO.getSubjectId()).get();
-		Course course = courseRepository.findById(questionDTO.getCourseId()).get();
+		Admin admin = adminRepository.findById(questionDTORequest.getAdminId()).get();
+		Subject subject = subjectRepository.findById(questionDTORequest.getSubjectId()).get();
+		Course course = courseRepository.findById(questionDTORequest.getCourseId()).get();
 
-		BeanUtils.copyProperties(questionDTO, question);
+		BeanUtils.copyProperties(questionDTORequest, question);
 
-		question.setQuestionTitle(questionDTO.getQuestionTitle());
-		question.setSubjectName(subject.getSubjectName());
-		question.setAdmin(admin);
 		question.setCourse(course);
-		question.setCreateDate(new Date());
-		question.setCourseName(course.getCourseName());
-		question.setAnswer(questionDTO.getAnswers());
+		question.setSubject(subject);
+		question.setAdmin(admin);
 
 		return question;
 	}
 
-//	public List<Answer> getListAnswerFormQuestionRequest(QuestionDTORequest questionRequest) {
-//		List<Answer> = this.convert
-//		return null;
-//	}
+	@Override
+	public Question getQuestionByCourseId(Integer courseId) {
+		return questionReposotory.findByCourseId(courseId);
+	}
 
 }

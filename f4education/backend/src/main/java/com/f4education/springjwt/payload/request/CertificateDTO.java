@@ -14,5 +14,9 @@ public class CertificateDTO {
 
 	private String certificateName;
 
-	private Date dateRange;
+	private Date startDate;
+
+	private Date endDate;
+
+	private Integer registerCourseId;
 }

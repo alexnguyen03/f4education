@@ -1,5 +1,6 @@
 package com.f4education.springjwt.payload.response;
 
+import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Course;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,8 +15,6 @@ public class RegisterCourseResponseDTO {
     private Integer registerCourseId;
 
     private Date registrationDate;
-
-    private Integer numberSession;
 
     private String status;
 
@@ -34,4 +33,10 @@ public class RegisterCourseResponseDTO {
     private Date startDate;
 
     private Date endDate;
+
+    private String studentId;
+
+    private Integer courseId;
+
+    private Integer classId;
 }

@@ -1,18 +1,61 @@
-import axiosClient from "./axiosClient";
+import axiosClient from './axiosClient'
 
 const questionApi = {
-  getAllQuestion: () => {
-    const url = "/questions";
-    return axiosClient.get(url);
-  },
-  createQuestion: (body) => {
-    const url = "/questions";
-    return axiosClient.post(url, body);
-  },
-  updateQuestion: (body, subjectId) => {
-    const url = `/subjects/${subjectId}`;
-    return axiosClient.put(url, body);
-  },
-};
+    getAllQuestion: () => {
+        const url = '/questions'
+        return axiosClient.get(url)
+    },
+    getQuestionById: (questionId) => {
+        const url = `/questions/${questionId}`
+        return axiosClient.get(url)
+    },
+    createQuestion: (body) => {
+        const url = '/questions'
+        return axiosClient.post(url, body)
+    },
+    getQuestionDetailByQuestionId: (questionId) => {
+        const url = `/question-detail/${questionId}`
+        return axiosClient.get(url)
+    },
+    createQuestionDetail: (body) => {
+        const url = '/question-detail'
+        return axiosClient.post(url, body)
+    },
+    updateQuestionDetail: (questionDetailId, body) => {
+        const url = `/question-detail/${questionDetailId}`
+        return axiosClient.put(url, body)
+    },
+    deleteQuestionDetail: (questionDetailId) => {
+        const url = `/question-detail/${questionDetailId}`
+        return axiosClient.delete(url)
+    },
+    uploadExcel: (file, questionId) => {
+        const url = `/question-detail/upload-excel/${questionId}`
+        return axiosClient.post(url, file, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
+    },
+    downloadExcel: () => {
+        const url = `/question-detail/download-excel`
+        return axiosClient.get(url, {
+            headers: { 'Content-Type': 'multipart/form-data' },
+            responseType: 'arraybuffer'
+        })
+    },
+    createExamination: (classId) => {
+        const url = `exam/${classId}`
+        return axiosClient.post(url)
+    },
 
-export default questionApi;
+    checkActivedExam: (classId) => {
+        const url = `exam/${classId}`
+        return axiosClient.get(url)
+    },
+
+    checkActivedExamByTodayAndClassId: (classId) => {
+        const url = `exam/student/${classId}`
+        return axiosClient.get(url)
+    }
+}
+
+export default questionApi

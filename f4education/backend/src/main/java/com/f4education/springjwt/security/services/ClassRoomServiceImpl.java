@@ -20,13 +20,13 @@ import com.f4education.springjwt.repository.ClassRoomRepository;
 
 @Service
 public class ClassRoomServiceImpl implements ClassRoomService {
-	
+
 	@Autowired
 	ClassRoomRepository classRoomRepository;
 
 	@Autowired
 	ClassRoomHistoryRepository classRoomHistoryRepository;
-	
+
 	@Autowired
 	private AdminRepository adminRepository;
 
@@ -41,7 +41,7 @@ public class ClassRoomServiceImpl implements ClassRoomService {
 		ClassRoom classRoom = classRoomRepository.findById(classroomId).get();
 		return convertToDto(classRoom);
 	}
-	
+
 	@Override
 	public ClassRoomDTO createClass(ClassRoomDTO classroomDTO) {
 		String action = "CREATE";
@@ -63,8 +63,8 @@ public class ClassRoomServiceImpl implements ClassRoomService {
 		this.saveClassRoomHistory(updateClassRoom, action);
 		return convertToDto(updateClassRoom);
 	}
-	
-	private ClassRoomDTO convertToDto(ClassRoom classRoom ) {
+
+	private ClassRoomDTO convertToDto(ClassRoom classRoom) {
 		ClassRoomDTO classRoomDTO = new ClassRoomDTO();
 		BeanUtils.copyProperties(classRoom, classRoomDTO);
 		Admin admin = adminRepository.findById(classRoom.getAdmin().getAdminId()).get();
@@ -73,11 +73,11 @@ public class ClassRoomServiceImpl implements ClassRoomService {
 		classRoomDTO.setAdmin(adminDTO);
 		return classRoomDTO;
 	}
-	
+
 	private void convertToEntity(ClassRoomDTO classroomDTO, ClassRoom classRoom) {
 		BeanUtils.copyProperties(classroomDTO, classRoom);
 	}
-	
+
 	private void saveClassRoomHistory(ClassRoom classRoom, String action) {
 		ClassRoomHistory classRoomHistory = new ClassRoomHistory();
 		BeanUtils.copyProperties(classRoom, classRoomHistory);
@@ -86,5 +86,10 @@ public class ClassRoomServiceImpl implements ClassRoomService {
 		classRoomHistory.setAction(action);
 		classRoomHistory.setAdminId(classRoom.getAdmin().getAdminId());
 		classRoomHistoryRepository.save(classRoomHistory);
+	}
+
+	@Override
+	public List<Object[]> getClassByNotInScheduleBySessionId(Date startDate) {
+		return classRoomRepository.findAvailableRoomsByDate(startDate);
 	}
 }

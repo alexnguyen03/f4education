@@ -3,57 +3,66 @@ package com.f4education.springjwt.security.services;
 import com.f4education.springjwt.interfaces.PaymentMethodService;
 import com.f4education.springjwt.models.PaymentMethod;
 import com.f4education.springjwt.payload.request.PaymentMethodDTO;
+import com.f4education.springjwt.payload.response.BillResponseDTO;
 import com.f4education.springjwt.repository.PaymentMethodRepository;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class PaymentMethodServiceImp implements PaymentMethodService {
-    @Autowired
-    PaymentMethodRepository paymentMethodRepository;
+	@Autowired
+	PaymentMethodRepository paymentMethodRepository;
 
-    @Override
-    public List<PaymentMethodDTO> getAllPaymentMethod() {
-        List<PaymentMethod> paymentMethod = paymentMethodRepository.findAll();
-        return paymentMethod.stream().map(this::convertToResponse).collect(Collectors.toList());
-    }
+	@Override
+	public List<PaymentMethodDTO> getAllPaymentMethod() {
+		List<PaymentMethod> paymentMethod = paymentMethodRepository.findAll();
+		return paymentMethod.stream().map(this::convertToResponse).collect(Collectors.toList());
+	}
 
-    @Override
-    public PaymentMethodDTO createPaymentMethod(PaymentMethodDTO paymentMethodDTO) {
-        PaymentMethod paymentMethod = this.convertRequestToEntity(paymentMethodDTO);
-        PaymentMethod createPaymentMethod = paymentMethodRepository.save(paymentMethod);
-        return convertToResponse(createPaymentMethod);
-    }
+	@Override
+	public PaymentMethodDTO createPaymentMethod(PaymentMethodDTO paymentMethodDTO) {
+		PaymentMethod paymentMethod = this.convertRequestToEntity(paymentMethodDTO);
 
-    @Override
-    public PaymentMethodDTO updatePaymentMethod(Integer paymentMethodId, PaymentMethodDTO paymentMethodDTO) {
-        PaymentMethod existPaymentMethod = paymentMethodRepository.findById(paymentMethodId).get();
+		PaymentMethod createPaymentMethod = paymentMethodRepository.save(paymentMethod);
 
-        existPaymentMethod.setPaymentMethodName(paymentMethodDTO.getPaymentMethodName());
+		return this.convertToResponse(createPaymentMethod);
+	}
 
-        PaymentMethod updatePaymentMethod = paymentMethodRepository.save(existPaymentMethod);
+	@Override
+	public PaymentMethodDTO updatePaymentMethod(Integer paymentMethodId, PaymentMethodDTO paymentMethodDTO) {
+		Optional<PaymentMethod> existPaymentMethod = paymentMethodRepository.findById(paymentMethodId);
 
-        return convertToResponse(updatePaymentMethod);
-    }
+		if (existPaymentMethod.isPresent()) {
+			
+			PaymentMethod payment = existPaymentMethod.get();
+			payment.setPaymentMethodName(paymentMethodDTO.getPaymentMethodName());
 
-    private PaymentMethod convertRequestToEntity(PaymentMethodDTO paymentMethodDTO) {
-        PaymentMethod paymentMethod = new PaymentMethod();
+			PaymentMethod updatePaymentMethod = paymentMethodRepository.save(payment);
 
-        BeanUtils.copyProperties(paymentMethodDTO, paymentMethod);
+			return this.convertToResponse(updatePaymentMethod);
+		}
+		return null;
+	}
 
-        return paymentMethod;
-    }
+	private PaymentMethod convertRequestToEntity(PaymentMethodDTO paymentMethodDTO) {
+		PaymentMethod paymentMethod = new PaymentMethod();
 
-    private PaymentMethodDTO convertToResponse(PaymentMethod paymentMethod) {
-        PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
+		BeanUtils.copyProperties(paymentMethodDTO, paymentMethod);
 
-        BeanUtils.copyProperties(paymentMethod, paymentMethodDTO);
-        paymentMethodDTO.setPaymentMethodId(paymentMethodDTO.getPaymentMethodId());
+		return paymentMethod;
+	}
 
-        return paymentMethodDTO;
-    }
+	private PaymentMethodDTO convertToResponse(PaymentMethod paymentMethod) {
+		PaymentMethodDTO paymentMethodDTO = new PaymentMethodDTO();
+
+		BeanUtils.copyProperties(paymentMethod, paymentMethodDTO);
+		paymentMethodDTO.setPaymentMethodId(paymentMethodDTO.getPaymentMethodId());
+
+		return paymentMethodDTO;
+	}
 }

@@ -1,0 +1,30 @@
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4) 0 0, #000 100% 0);
+    opacity: 0;
+    visibility: hidden;
+    padding: 0 10px;
+    transition: opacity 0.3s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.card-hover-overlay {
+    position: relative;
+
+    &:hover {
+        .overlay {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        transform: scale(1.1)
+    }
+}

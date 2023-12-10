@@ -1,0 +1,23 @@
+{
+    "prettier.jsxSingleQuote": true,
+    "prettier.tabWidth": 4,
+    "prettier.printWidth": 400,
+    "prettier.useTabs": true,
+    "prettier.semi": true,
+    "prettier.singleAttributePerLine": true,
+    "prettier.documentSelectors": ["js"],
+    "prettier.trailingComma": "all",
+    "prettier.bracketSameLine": true,
+    "prettier.resolveGlobalModules": true,
+    "singleQuote": true,
+    "printWidth": 80,
+    "editor.formatOnSave": true,
+    "proseWrap": "always",
+    "tabWidth": 4,
+    "requireConfig": false,
+    "useTabs": false,
+    "trailingComma": "none",
+    "bracketSpacing": true,
+    "jsxBracketSameLine": false,
+    "semi": false
+}

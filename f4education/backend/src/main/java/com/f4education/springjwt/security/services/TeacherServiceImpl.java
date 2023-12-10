@@ -1,6 +1,7 @@
 package com.f4education.springjwt.security.services;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.models.User;
+import com.f4education.springjwt.payload.request.CourseDTO;
 import com.f4education.springjwt.payload.request.TeacherDTO;
 import com.f4education.springjwt.repository.TeacherRepository;
 import com.f4education.springjwt.repository.UserRepository;
@@ -56,6 +58,6 @@ public class TeacherServiceImpl implements TeacherService {
 
     @Override
     public Teacher findByUserId(String userId) {
-        return null; // vi ma hien tai la tu tang nen chua lay duoc
+        return teacherRepository.findById(userId).get(); // vi ma hien tai la tu tang nen chua lay duoc
     }
 }

@@ -1,16 +1,24 @@
 package com.f4education.springjwt.security.services;
 
+import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.interfaces.PointService;
 import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.models.*;
-import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
-import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.payload.HandleResponseDTO;
+import com.f4education.springjwt.payload.request.ClassDTO;
+import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
+import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.repository.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -18,164 +26,304 @@ import java.util.stream.Collectors;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
-    @Autowired
-    private RegisterCourseRepository registerCourseRepository;
+	@Autowired
+	private RegisterCourseRepository registerCourseRepository;
+	@Autowired
+	private CourseRepository courseRepository;
+	@Autowired
+	private StudentRepository studentRepository;
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
+	@Autowired
+	private ClassRepository classRepository;
 
-    @Autowired
-    private CourseRepository courseRepository;
+	@Autowired
+	private ScheduleRepository scheduleRepository;
 
-    @Autowired
-    private StudentRepository studentRepository;
+	@Autowired
+	private final JdbcTemplate jdbcTemplate = new JdbcTemplate();
 
-    @Override
-    public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
-        List<RegisterCourse> registerCourses = registerCourseRepository.findAll();
-        List<RegisterCourseResponseDTO> responseDTOs = registerCourses.stream()
-                .map(this::convertToResponseDTO)
-                .collect(Collectors.toList());
+	@Autowired
+	SessionsRepository sessionsRepository;
 
-        return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse", responseDTOs);
-    }
+	@Autowired
+	TeacherService teacherService;
 
-    @Override
-    public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(Integer studentId) {
-        List<RegisterCourse> registerCourses = registerCourseRepository.findByStudentId(studentId);
-        if (registerCourses.isEmpty()) {
-            return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student ID cannot be found", null);
-        }
+	@Autowired
+	TeacherRepository teacherRepository;
+	@Autowired
+	ClassRoomRepository classRoomRepository;
 
-        List<RegisterCourseResponseDTO> responseDTOS = registerCourses.stream()
-                .map(this::convertToResponseDTO)
-                .toList();
-        return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse by Student ID", responseDTOS);
-    }
+	@Autowired
+	PointService pointService;
 
-    @Override
-    public HandleResponseDTO<RegisterCourseResponseDTO> getRegisterCourseById(Integer registerCourseId) {
-        Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
-        if (registerCourseOptional.isEmpty()) {
-            return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
-        }
+	@Autowired
+	ClassService classService;
 
-        RegisterCourse registerCourse = registerCourseOptional.get();
-        RegisterCourseResponseDTO responseDTO = convertToResponseDTO(registerCourse);
+	@Override
+	public HandleResponseDTO<List<RegisterCourseResponseDTO>> getAllRegisterCourse() {
+		List<RegisterCourse> registerCourses = registerCourseRepository.findAll();
+		List<RegisterCourseResponseDTO> responseDTOs = registerCourses.stream().map(this::convertToResponseDTO)
+				.collect(Collectors.toList());
+		return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse", responseDTOs);
+	}
 
-        return new HandleResponseDTO<>(HttpStatus.OK.value(), "Success", responseDTO);
-    }
+	@Override
+	public HandleResponseDTO<List<RegisterCourseResponseDTO>> findAllRegisterCourseByStudentId(String studentId) {
+		List<RegisterCourse> registerCourses = registerCourseRepository.findByStudentId(studentId);
+		if (registerCourses.isEmpty()) {
+			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student ID cannot be found", null);
+		}
+		List<RegisterCourseResponseDTO> responseDTOS = registerCourses.stream().map(this::convertToResponseDTO)
+				.toList();
+		return new HandleResponseDTO<>(HttpStatus.OK.value(), "List RegisterCourse by Student ID", responseDTOS);
+	}
 
-    @Override
-    public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(RegisterCourseRequestDTO registerCourseRequestDTO) {
-        Optional<Student> student = studentRepository.findById(registerCourseRequestDTO.getStudentId());
-        Optional<Course> course = courseRepository.findById(registerCourseRequestDTO.getCourseId());
+	@Override
+	public List<CourseProgressResponseDTO> getCourseProgressByStudentID(String studentId) {
+		List<RegisterCourse> registerCourses = registerCourseRepository.findCourseProgressByStudentId(studentId);
+		return registerCourses.stream().map(this::convertToCourseProgressResponseDTO).toList();
+	}
 
-        if (student.isEmpty()) {
-            return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student cannot be found", null);
-        }
+	@Override
+	public Boolean checkIfCourseIsDone(String studentId, Integer classId, Integer RegisterCourseId) {
+		RegisterCourse rg = registerCourseRepository.findIfCourseIsDone(studentId, classId, RegisterCourseId,
+				(float) 5.0);
+		return rg != null;
+	}
 
-        if (course.isEmpty()) {
-            return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Course cannot be found", null);
-        }
+	@Override
+	public List<ScheduleCourseProgressDTO> findAllScheduleByClassId(Integer classId) {
+		List<Schedule> registerCourses = scheduleRepository.findAllScheduleByClassId(classId);
+		return registerCourses.stream().map(this::convertToScheduleCourseProgressDTO).toList();
+	}
 
-        RegisterCourse registerCourse = convertRequestToEntity(registerCourseRequestDTO);
-        registerCourse.setStatus("Đã đăng ký");
-        registerCourse.setRegistrationDate(new Date());
-        registerCourse.setClasses(null);
-        registerCourse.setStartDate(null);
-        registerCourse.setEndDate(null);
+	public ScheduleCourseProgressDTO convertToScheduleCourseProgressDTO(Schedule schedule) {
+		ScheduleCourseProgressDTO courseResponse = new ScheduleCourseProgressDTO();
+		courseResponse.setClassId(schedule.getClasses().getClassId());
+		courseResponse.setStudyDate(schedule.getStudyDate());
+		courseResponse.setScheduleId(schedule.getScheduleId());
+		return courseResponse;
+	}
 
-        RegisterCourse createdRegisterCourse = registerCourseRepository.save(registerCourse);
-        RegisterCourseResponseDTO responseDTO = convertToResponseDTO(createdRegisterCourse);
+	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
+		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
 
-        System.out.println(createdRegisterCourse);
+		courseResponse.setCourse(registerCourse.getCourse());
+		courseResponse.setClasses(registerCourse.getClasses());
+		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
+		courseResponse.setRegisterCourseId(registerCourse.getRegisterCourseId());
 
-        return new HandleResponseDTO<>(HttpStatus.CREATED.value(), "Create Success", responseDTO);
-    }
+		return courseResponse;
+	}
 
-    @Override
-    public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId, RegisterCourseRequestDTO registerCourseRequestDTO) {
-        Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
-        if (registerCourseOptional.isEmpty()) {
-            return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
-        }
+	@Override
+	public HandleResponseDTO<RegisterCourseResponseDTO> getRegisterCourseById(Integer registerCourseId) {
+		Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
+		if (registerCourseOptional.isEmpty()) {
+			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
+		}
+		RegisterCourse registerCourse = registerCourseOptional.get();
+		RegisterCourseResponseDTO responseDTO = convertToResponseDTO(registerCourse);
+		return new HandleResponseDTO<>(HttpStatus.OK.value(), "Success", responseDTO);
+	}
 
-        RegisterCourse existRegisterCourse = registerCourseOptional.get();
-        existRegisterCourse.setStatus("Đã hủy");
-        existRegisterCourse.setRegistrationDate(new Date());
+	@Override
+	public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(
+			RegisterCourseRequestDTO registerCourseRequestDTO) {
+		Optional<Student> student = studentRepository.findById(registerCourseRequestDTO.getStudentId());
+		Optional<Course> course = courseRepository.findById(registerCourseRequestDTO.getCourseId());
+		if (student.isEmpty()) {
+			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Student cannot be found", null);
+		}
+		if (course.isEmpty()) {
+			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "Course cannot be found", null);
+		}
+		RegisterCourse registerCourse = convertRequestToEntity(registerCourseRequestDTO);
+		registerCourse.setStatus("Đã đăng ký");
+		registerCourse.setRegistrationDate(new Date());
+		registerCourse.setClasses(null);
+		registerCourse.setStartDate(null);
+		registerCourse.setEndDate(null);
+		RegisterCourse createdRegisterCourse = registerCourseRepository.save(registerCourse);
+		RegisterCourseResponseDTO responseDTO = convertToResponseDTO(createdRegisterCourse);
+		System.out.println(createdRegisterCourse);
+		return new HandleResponseDTO<>(HttpStatus.CREATED.value(), "Create Success", responseDTO);
+	}
 
-        if (!existRegisterCourse.getRegisterCourseId().equals(registerCourseRequestDTO.getRegisterCourseId())) {
-            return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID mismatch", null);
-        }
-        convertRequestToEntity(registerCourseRequestDTO, existRegisterCourse);
+	@Override
+	public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId,
+			RegisterCourseRequestDTO registerCourseRequestDTO) {
+		Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
+		if (registerCourseOptional.isEmpty()) {
+			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
+		}
+		RegisterCourse existRegisterCourse = registerCourseOptional.get();
+		existRegisterCourse.setStatus("Đã hủy");
+		existRegisterCourse.setRegistrationDate(new Date());
+		if (!existRegisterCourse.getRegisterCourseId().equals(registerCourseRequestDTO.getRegisterCourseId())) {
+			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID mismatch", null);
+		}
+		convertRequestToEntity(registerCourseRequestDTO, existRegisterCourse);
+		RegisterCourse updatedRegisterCourse = registerCourseRepository.save(existRegisterCourse);
+		RegisterCourseResponseDTO responseDTO = convertToResponseDTO(updatedRegisterCourse);
+		return new HandleResponseDTO<>(HttpStatus.OK.value(), "Update Success", responseDTO);
+	}
 
-        RegisterCourse updatedRegisterCourse = registerCourseRepository.save(existRegisterCourse);
-        RegisterCourseResponseDTO responseDTO = convertToResponseDTO(updatedRegisterCourse);
+	private RegisterCourseResponseDTO convertToResponseDTO(RegisterCourse registerCourse) {
+		RegisterCourseResponseDTO registerCourseDTO = new RegisterCourseResponseDTO();
+		BeanUtils.copyProperties(registerCourse, registerCourseDTO);
+		registerCourseDTO.setRegisterCourseId(registerCourse.getRegisterCourseId());
+		registerCourseDTO.setStatus(registerCourse.getStatus());
+		registerCourseDTO.setRegistrationDate(registerCourse.getRegistrationDate());
+		registerCourseDTO.setCourseDuration(registerCourse.getCourseDuration());
+		registerCourseDTO.setCoursePrice(registerCourse.getCoursePrice());
+		registerCourseDTO.setCourseDescription(registerCourse.getCourseDescription());
+		registerCourseDTO.setImage(registerCourseDTO.getImage());
+		registerCourseDTO.setCourseName(registerCourse.getCourse().getCourseName());
+		registerCourseDTO.setStudentName(registerCourse.getStudent().getFullname());
+		registerCourse.setClasses(registerCourse.getClasses());
+		registerCourseDTO.setStartDate(registerCourse.getStartDate());
+		registerCourseDTO.setStartDate(registerCourse.getEndDate());
+		registerCourseDTO.setCourseId(registerCourse.getCourse().getCourseId());
+		registerCourseDTO.setStudentId(registerCourse.getStudent().getStudentId());
+		if (registerCourse.getClasses() != null) {
+			registerCourseDTO.setClassId(registerCourse.getClasses().getClassId());
+		}
+		return registerCourseDTO;
+	}
 
-        return new HandleResponseDTO<>(HttpStatus.OK.value(), "Update Success", responseDTO);
-    }
+	private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
+		RegisterCourse registerCourse = new RegisterCourse();
 
-    private RegisterCourseResponseDTO convertToResponseDTO(RegisterCourse registerCourse) {
-        RegisterCourseResponseDTO registerCourseDTO = new RegisterCourseResponseDTO();
+		Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
+		Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
 
-        BeanUtils.copyProperties(registerCourse, registerCourseDTO);
+		BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
 
-        registerCourseDTO.setRegisterCourseId(registerCourse.getRegisterCourseId());
-        registerCourseDTO.setStatus(registerCourse.getStatus());
-        registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
-        registerCourseDTO.setRegistrationDate(registerCourse.getRegistrationDate());
-        registerCourseDTO.setCourseDuration(registerCourse.getCourseDuration());
-        registerCourseDTO.setCoursePrice(registerCourse.getCoursePrice());
-        registerCourseDTO.setCourseDescription(registerCourse.getCourseDescription());
-        registerCourseDTO.setImage(registerCourseDTO.getImage());
-        registerCourseDTO.setCourseName(registerCourse.getCourse().getCourseName());
-        registerCourseDTO.setStudentName(registerCourse.getStudent().getFullname());
-        registerCourseDTO.setStartDate(registerCourse.getStartDate());
-        registerCourseDTO.setStartDate(registerCourse.getEndDate());
-        registerCourseDTO.setNumberSession(registerCourse.getNumberSession());
+		if (course != null) {
+			registerCourse.setCourse(course);
+			registerCourse.setCourseDuration(course.getCourseDuration());
+			registerCourse.setCoursePrice(course.getCoursePrice());
+			registerCourse.setImage(course.getImage());
+			registerCourse.setCourseDescription(course.getCourseDescription());
+		}
 
-        return registerCourseDTO;
-    }
+		if (student != null) {
+			registerCourse.setStudent(student);
+		}
 
-    private RegisterCourse convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO) {
-        RegisterCourse registerCourse = new RegisterCourse();
+		return registerCourse;
+	}
 
-        Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
-        Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
+	private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO,
+			RegisterCourse registerCourse) {
+		Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
+		Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
+		BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
+		if (course != null) {
+			registerCourse.setCourse(course);
+			registerCourse.setCourseDuration(course.getCourseDuration());
+			registerCourse.setCoursePrice(course.getCoursePrice());
+			registerCourse.setImage(course.getImage());
+			registerCourse.setCourseDescription(course.getCourseDescription());
+		}
+		if (student != null) {
+			registerCourse.setStudent(student);
+		}
+	}
 
-        BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
+	@Override
+	public List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName() {
+		return registerCourseRepository.getAllNotHasClass().stream()
+				.collect(Collectors.toMap(registration -> registration.getCourse().getCourseId(),
+						registration -> registration, (a, b) -> a))
+				.values().stream().map(this::convertToResponseDTO).collect(Collectors.toList());
+	}
 
-        if (course != null) {
-            registerCourse.setCourse(course);
-            registerCourse.setCourseDuration(course.getCourseDuration());
-            registerCourse.setCoursePrice(course.getCoursePrice());
-            registerCourse.setImage(course.getImage());
-            registerCourse.setCourseDescription(course.getCourseDescription());
-            registerCourse.setNumberSession(course.getNumberSession());
-        }
+	@Override
+	public List<RegisterCourseResponseDTO> updateRegisterCourseInClass(
+			RegisterCourseRequestDTO registerCourseRequestDTO) {
 
-        if (student != null) {
-            registerCourse.setStudent(student);
-        }
+		RegisterCourse registerCourseFound = registerCourseRepository
+				.findById(registerCourseRequestDTO.getRegisterCourseId())
+				.get();
+		List<RegisterCourse> listRegisterCourse = registerCourseRepository
+				.findByCourseId(registerCourseFound.getCourse().getCourseId());
+		List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
+		List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
+		List<Point> listPoint = new ArrayList<Point>();
+		Classes newClasses = new Classes();
 
-        return registerCourse;
-    }
+		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
+		// List<EvaluationTeacher> lsEvaluationTeacher =
+		// foundClass.getEvaluationTeacher();
+		// List<Attendance> lsAttendance = foundClass.getAttendances();
 
-    private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO, RegisterCourse registerCourse) {
-        Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
-        Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
+		BeanUtils.copyProperties(foundClass, newClasses);
+		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
+		newClasses.setTeacher(foundTeacher);
+		// newClasses.setEvaluationTeacher(lsEvaluationTeacher);
+		newClasses.setStatus("Đang diễn ra");
 
-        BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
+		try {
 
-        if (course != null) {
-            registerCourse.setCourse(course);
-            registerCourse.setCourseDuration(course.getCourseDuration());
-            registerCourse.setCoursePrice(course.getCoursePrice());
-            registerCourse.setImage(course.getImage());
-            registerCourse.setCourseDescription(course.getCourseDescription());
-            registerCourse.setNumberSession(course.getNumberSession());
-        }
+			classService.saveOneClass(newClasses);
+		} catch (Exception e) {
+			// TODO: handle exception e.printStackTrace();
+		}
+		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
+		if (!listRegisterCourseIdToAdd.isEmpty()) {
 
-        if (student != null) {
-            registerCourse.setStudent(student);
-        }
-    }
+			filteredRegisterCoursesToAdd = listRegisterCourse.stream()
+					.filter(registerCourse -> listRegisterCourseIdToAdd
+							.contains(registerCourse.getRegisterCourseId()))
+					.collect(Collectors.toList());
+			Classes classes = foundClass;
+			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
+				registerCourse.setClasses(classes);
+				Point point = new Point();
+				point.setClasses(classes);
+				point.setStudent(registerCourse.getStudent());
+				point.setAttendancePoint((double) 0);
+				point.setExercisePoint((double) 0);
+				point.setAveragePoint((double) 0);
+				point.setQuizzPoint((double) 0);
+				listPoint.add(point);
+			});
+			pointService.save(listPoint);
+			registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+		}
+		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
+		if (!listRegisterCourseIdToDelete.isEmpty()) {
+
+			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
+					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
+					.collect(Collectors.toList());
+			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
+				registerCourse.setClasses(null);
+
+			});
+			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+		}
+
+		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
+				.collect(Collectors.toList());
+
+	}
+
+	@Override
+	public Boolean getRegisterCourseHasClass(Integer classId) {
+		List<RegisterCourse> listRegisterCourses = new ArrayList<>();
+		listRegisterCourses = registerCourseRepository.getRegisterCourseHasClass(classId);
+		return !listRegisterCourses.isEmpty();// false thì sẽ thì lớp đã tồn tại throw new
+		// UnsupportedOperationException("Unimplemented method
+		// 'getRegisterCourseHasClass'");
+	}
+
+	// @Override
+	// public void grantPermissionsByEmails(String folderName, List<String> emails)
+	// throws Exception {
+	// googleDriveRepository.grantPermissionsByEmails(folderName, emails);
+	// }
 }

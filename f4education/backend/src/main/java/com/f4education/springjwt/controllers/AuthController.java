@@ -1,15 +1,17 @@
 package com.f4education.springjwt.controllers;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import jakarta.validation.Valid;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +25,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.models.ERole;
@@ -35,15 +38,14 @@ import com.f4education.springjwt.payload.request.TokenRefreshRequest;
 import com.f4education.springjwt.payload.response.JwtResponse;
 import com.f4education.springjwt.payload.response.MessageResponse;
 import com.f4education.springjwt.payload.response.TokenRefreshResponse;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RoleRepository;
 import com.f4education.springjwt.repository.UserRepository;
-import com.f4education.springjwt.security.jwt.AuthEntryPointJwt;
 import com.f4education.springjwt.security.jwt.JwtUtils;
-import com.f4education.springjwt.security.jwt.exception.TokenRefreshException;
 import com.f4education.springjwt.security.services.RefreshTokenServiceImpl;
 import com.f4education.springjwt.security.services.UserDetailsImpl;
 
-import io.jsonwebtoken.JwtException;
+import jakarta.validation.Valid;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -76,7 +78,8 @@ public class AuthController {
 
     UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
     String jwt = jwtUtils.generateJwtToken(userDetails);
-    List<String> roles = userDetails.getAuthorities().stream()
+    List<String> roles = userDetails.getAuthorities()
+        .stream()
         .map(item -> item.getAuthority())
         .collect(Collectors.toList());
     RefreshToken refreshToken = refreshTokenService.findByUserId(userDetails.getId()).orElse(null);
@@ -206,4 +209,5 @@ public class AuthController {
         userDetails.getImageName()));
 
   }
+
 }

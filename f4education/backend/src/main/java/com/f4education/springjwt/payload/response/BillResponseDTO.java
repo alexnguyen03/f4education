@@ -12,7 +12,8 @@ import lombok.NoArgsConstructor;
 public class BillResponseDTO {
 	private Integer billId;
 	private Date createDate;
-	private Double totalPrice;
+	private Float totalPrice;
+	private Integer courseId;
 	private String status;
 	private String notes;
 	private String paymentMethod;

@@ -1,7 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
-import java.util.Date;
-
+import java.util.List;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,9 +10,22 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterCourseRequestDTO {
+	@JsonProperty("registerCourseId")
 	private Integer registerCourseId;
 
+	@JsonProperty("courseId")
 	private Integer courseId;
 
-	private Integer studentId;
+	private String studentId;
+
+	@JsonProperty("teacherId")
+	private String teacherId;
+
+	private Integer classId;
+
+	@JsonProperty("listRegisterCourseIdToAdd")
+	private List<Integer> listRegisterCourseIdToAdd;
+
+	@JsonProperty("listRegisterCourseIdToDelete")
+	private List<Integer> listRegisterCourseIdToDelete;
 }

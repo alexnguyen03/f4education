@@ -1,7 +1,9 @@
 package com.f4education.springjwt.payload.request;
 
-import java.io.Serializable;
 
+import com.f4education.springjwt.models.Admin;
+import com.f4education.springjwt.models.Student;
+import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.models.User;
 
 import lombok.AllArgsConstructor;
@@ -16,28 +18,50 @@ public class AccountDTO {
     String username;
     String password;
     String email;
-    Integer role;
-    Serializable info = null;
+    Boolean status;
+    Integer roles = 1;
 
+    Teacher teacher;
+    Admin admin;
+    Student student;
+
+    // Serializable info = null;
     public AccountDTO(User user) {
         this.id = user.getId();
+        this.status = user.getStatus();
         this.username = user.getUsername();
-        this.password = user.getEmail();
+        this.password = user.getPassword();
         this.email = user.getEmail();
-        this.role = user.getAccount_role().get(0).getRole().getId();
         try {
-            if (role == 1) {
+            this.roles = user.getAccount_role().get(0).getRole().getId();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
 
-                this.info = (Serializable) user.getStudents().get(0);
+        if (this.roles == 1) {
+            try {
+                this.student = user.getStudents().get(0);
+            } catch (Exception e) {
+                Student info = new Student();
+                this.student = info;
+            }
+        } else {
+            if (this.roles == 2) {
+                try {
+                    this.teacher = user.getTeachers().get(0);
+                } catch (Exception e) {
+                    Teacher info = new Teacher();
+                    this.teacher = info;
+                }
             } else {
-                if (role == 2) {
-                    this.info = (Serializable) user.getTeachers().get(0);
-                } else {
-                    this.info = (Serializable) user.getAdmins().get(0);
+                try {
+                    this.admin = user.getAdmins().get(0);
+                } catch (Exception e) {
+                    Admin info = new Admin();
+                    this.admin = info;
                 }
             }
-        } catch (Exception e) {
         }
-        System.out.println();
+
     }
 }

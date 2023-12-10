@@ -1,652 +1,466 @@
-import {FormGroup, IconButton} from '@mui/material';
-import QuestionHeader from 'components/Headers/QuestionHeader';
-import {MaterialReactTable} from 'material-react-table';
-import {useEffect, useMemo, useState} from 'react';
-import {Edit as EditIcon} from '@mui/icons-material';
+import { Edit as EditIcon } from '@mui/icons-material'
+import { Box, FormGroup, IconButton } from '@mui/material'
+import QuestionHeader from 'components/Headers/QuestionHeader'
+import { MaterialReactTable } from 'material-react-table'
+import { useEffect, useMemo, useState } from 'react'
 
 // reactstrap components
-import {Button, Card, CardBody, CardHeader, Col, Container, Input, InputGroup, InputGroupAddon, InputGroupText, Modal, Row} from 'reactstrap';
+import {
+    Button,
+    Card,
+    CardBody,
+    CardHeader,
+    Col,
+    Container,
+    Modal,
+    Row
+} from 'reactstrap'
+
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
 
 // Axios Custom API
-import questionApi from '../../api/questionApi';
-import courseApi from '../../api/courseApi';
-import subjectApi from '../../api/subjectApi';
+import courseApi from '../../api/courseApi'
+import questionApi from '../../api/questionApi'
+import subjectApi from '../../api/subjectApi'
 
 //React Mantine - route - moment
-import {Blockquote, Select} from '@mantine/core';
-import {Link} from 'react-router-dom';
-import moment from 'moment/moment';
+import { Select } from '@mantine/core'
+import moment from 'moment/moment'
+import { Link } from 'react-router-dom'
+import { IconRefresh } from '@tabler/icons-react'
 
-const QuestionData = [
-	{
-		questionId: 1,
-		subjectName: 'NextJS',
-		courseName: 'NextJS cơ bản cho người mới',
-		questionTitle: 'Làm thế nào để tạo mới nextjs project',
-		createDate: '2023-09-11T13:45:55.371+00:00',
-		answer: [
-			{
-				answerId: 1,
-				text: 'câu trả lời 1',
-				isCorrect: false,
-			},
-			{
-				answerId: 2,
-				text: 'câu trả lời 2',
-				isCorrect: false,
-			},
-			{
-				answerId: 3,
-				text: 'câu trả lời 3',
-				isCorrect: true,
-			},
-			{
-				answerId: 4,
-				text: 'câu trả lời 4',
-				isCorrect: false,
-			},
-		],
-		adminName: 'Nguyễn Hoài Nam',
-	},
-	{
-		questionId: 2,
-		subjectName: 'Python',
-		courseName: 'Python web nâng cao P2',
-		questionTitle: 'in hello world ra console',
-		createDate: '2023-09-11T13:45:55.374+00:00',
-		answer: [
-			{
-				answerId: 5,
-				text: 'câu trả lời 1',
-				isCorrect: false,
-			},
-			{
-				answerId: 6,
-				text: 'câu trả lời 2',
-				isCorrect: true,
-			},
-			{
-				answerId: 7,
-				text: 'câu trả lời 3',
-				isCorrect: false,
-			},
-		],
-		adminName: 'Nguyễn Hoài Nam',
-	},
-	{
-		questionId: 18,
-		subjectName: 'Java',
-		courseName: 'Java cơ bản cho người mới',
-		questionTitle: 'Làm sao để tạo project java mới?',
-		createDate: '2023-09-11T13:45:55.371+00:00',
-		answer: [
-			{
-				answerId: 17,
-				text: 'answer one',
-				isCorrect: false,
-			},
-			{
-				answerId: 18,
-				text: 'answer two',
-				isCorrect: false,
-			},
-		],
-		adminName: 'Nguyễn Hoài Nam',
-	},
-];
+// ************* Get LocalStorage
 
 const Questions = () => {
-	// ************* Main variable
-	const [questions, setQuestions] = useState(QuestionData);
-	const [courses, setCourses] = useState([]);
-	const [subjects, setSubjects] = useState([]);
-	const [questionLoading, setQuestionLoading] = useState(false);
+    const user = JSON.parse(localStorage.getItem('user'))
 
-	// ************* Get LocalStorage
-	const userDetail = JSON.parse(localStorage.getItem('user') | '');
+    // ************* Main variable
+    const [questions, setQuestions] = useState([])
+    const [courses, setCourses] = useState([])
+    const [subjects, setSubjects] = useState([])
+    const [questionLoading, setQuestionLoading] = useState(false)
 
-	// ************* Action variable
-	const [showModal, setShowModal] = useState(false);
-	const [isUpdate, setIsUpdate] = useState(false);
+    // ************* Action variable
+    const [showModal, setShowModal] = useState(false)
+    const [isUpdate, setIsUpdate] = useState(false)
 
-	// ************* Form variable
-	const [selectedSubjectId, setSelectedSubjectId] = useState(null);
-	const [selectedCourseId, setSelectedCourseId] = useState('Default Null');
+    // ************* Form variable
+    const [selectedSubjectId, setSelectedSubjectId] = useState(null)
+    const [selectedCourseId, setSelectedCourseId] = useState(null)
+    const [msgForm, setMsgForm] = useState({})
 
-	const [question, setQuestion] = useState({
-		subjectId: selectedSubjectId,
-		courseId: selectedCourseId,
-		questionTitle: '',
-		adminId: userDetail.username,
-	});
+    const [question] = useState({
+        subjectId: selectedSubjectId,
+        courseId: selectedCourseId,
+        adminId: user.username
+    })
 
-	const [answers, setAnswers] = useState({
-		text: '',
-		isCorrect: '',
-	});
+    // *************** Api Area
+    const fetchQuestions = async () => {
+        try {
+            setQuestionLoading(true)
+            const resp = await questionApi.getAllQuestion()
 
-	// *************** Api Area
-	const fetchQuestions = async () => {
-		try {
-			setQuestionLoading(true);
-			const resp = await questionApi.getAllQuestion();
-			setQuestions(resp);
-			setQuestionLoading(false);
-			console.log('restarted application');
-		} catch (error) {
-			console.log(error);
-		}
-	};
+            if (resp.status === 200 && resp.data.length > 0) {
+                setQuestions(resp.data)
+                console.log(resp.data)
+            }
+            setQuestionLoading(false)
+            console.log('restarted application')
+        } catch (error) {
+            setQuestionLoading(false)
+            console.log(error)
+        }
+    }
 
-	const fetchSubject = async () => {
-		try {
-			const resp = await subjectApi.getAllSubject();
-			setSubjects(resp);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+    const fetchSubject = async () => {
+        try {
+            const resp = await subjectApi.getAllSubject()
+            if (resp.status === 200 && resp.data.length > 0) {
+                setSubjects(resp.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-	const fetchCourse = async () => {
-		try {
-			const resp = await courseApi.getAll();
-			setCourses(resp);
-		} catch (error) {
-			console.log(error);
-		}
-	};
+    const fetchCourse = async () => {
+        try {
+            const resp = await courseApi.getAll()
+            if (resp.status === 200 && resp.data.length > 0) {
+                setCourses(resp.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
-	// + API_AREA > CRUD
-	const handleStoreQuestions = async () => {
-		try {
-			console.log(question);
-			handleDataTranferAnswers();
+    // + API_AREA > CRUD
+    const handleStoreQuestions = async () => {
+        const id = null
+        if (validateForm()) {
+            try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
+                setQuestionLoading(true)
+                const resp = await questionApi.createQuestion(question)
+                if (resp.status === 200 && resp.data.length > 0) {
+                    toast.update(id, Notify.options.createSuccess())
+                }
+            } catch (error) {
+                toast.update(id, Notify.options.createError())
+                console.log(error)
+            } finally {
+                setQuestionLoading(false)
+                setShowModal(false)
+                fetchQuestions()
+                handleClearForm()
+                toast.update(id, Notify.options.createError())
+            }
+        } else {
+            toast.update(id, Notify.options.createError())
+            console.log('error in validate')
+        }
+    }
 
-			// const body = question;
-			// const resp = await questionApi.createQuestion(body);
-			// console.log(resp.status);
-		} catch (error) {
-			console.log(error);
-		}
+    const handleClearForm = () => {
+        setSelectedCourseId(null)
+        setSelectedSubjectId(null)
+    }
 
-		setShowModal(false);
-	};
+    // *************** Validation area
+    const validateForm = () => {
+        if (selectedSubjectId === null) {
+            setMsgForm((preErr) => ({
+                ...preErr,
+                subjectNameError: 'Vui lòng chọn môn học'
+            }))
+        } else {
+            setMsgForm((preErr) => ({ ...preErr, subjectNameError: '' }))
+        }
 
-	const handleStoreAnswers = async () => {
-		try {
-			const body = answers;
-		} catch (error) {
-			console.log(error);
-		}
-		setShowModal(false);
-	};
+        if (selectedCourseId === null) {
+            setMsgForm((preErr) => ({
+                ...preErr,
+                courseNameErr: 'Vui lòng chọn khóa học'
+            }))
+        } else {
+            setMsgForm((preErr) => ({ ...preErr, courseNameErr: '' }))
+        }
 
-	// *************** Validation area
+        if (msgForm.courseNameErr !== '' || msgForm.subjectNameError !== '') {
+            return false
+        }
+        return true
+    }
 
-	// *************** Form action area
-	const handleChangeInput = (e) => {
-		setQuestion((prevQuestion) => ({
-			...prevQuestion,
-			[e.target.name]: e.target.value,
-		}));
-	};
+    // *************** React Data table area
+    function renderCellWithLink(row) {
+        const questionId = row.questionId
+        return (
+            <span>
+                <Link to={`/admin/question-detail/${questionId}`}>
+                    {row.courseName}
+                </Link>
+            </span>
+        )
+    }
 
-	const handleEditSubject = (row) => {
-		setShowModal(true);
-		setQuestion({...row.original});
-		setIsUpdate(true);
-	};
+    const columnQuestion = useMemo(
+        () => [
+            {
+                accessorKey: 'questionId',
+                header: 'ID',
+                enableColumnOrdering: false,
+                enableEditing: false, //disable editing on this column
+                enableSorting: false,
+                size: 40
+            },
+            {
+                accessorKey: 'subjectName',
+                header: 'Tên môn học',
+                size: 80
+            },
+            {
+                // accessorKey: "courseName",
+                accessorFn: (row) => row.courseName,
+                Cell: ({ cell }) => renderCellWithLink(cell.row.original),
+                header: 'Tên khóa học',
+                size: 180
+            },
+            {
+                accessorFn: (row) =>
+                    moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A'),
+                header: 'Ngày tạo',
+                size: 80
+            },
+            {
+                accessorKey: 'adminName',
+                header: 'Tên người tạo',
+                size: 120
+            }
+        ],
+        []
+    )
 
-	// + Tranfer and fill data to ANSWERS STATE
-	const handleDataTranferAnswers = () => {
-		const newAnswers = groups.map((group) => ({
-			isCorrect: group.radioValue,
-			text: group.inputValue,
-		}));
-		console.log(newAnswers);
-		setAnswers(newAnswers);
-	};
+    // ************* Select Handle Logic AREA
+    const subjectSelectValues = subjects.map((item) => ({
+        value: item.subjectId,
+        label: item.subjectName
+    }))
 
-	// *************** React Data table area
-	function renderCellWithLink(row) {
-		// console.log(row);
-		const courseName = row.courseName;
-		const id = row.questionId;
-		return (
-			<span key={id}>
-				<Link to={`/admin/question-detail/${courseName}`}>{row.courseName}</Link>
-			</span>
-		);
-	}
+    const handleChangeSelectSubject = (value) => {
+        setSelectedSubjectId(value)
+        question.subjectId = value
+    }
 
-	const columnQuestion = useMemo(
-		() => [
-			{
-				accessorKey: 'questionId',
-				header: 'ID',
-				enableColumnOrdering: false,
-				enableEditing: false, //disable editing on this column
-				enableSorting: false,
-				size: 40,
-			},
-			{
-				accessorKey: 'subjectName',
-				header: 'Tên môn học',
-				size: 80,
-			},
-			{
-				// accessorKey: "courseName",
-				accessorFn: (row) => row.courseName,
-				Cell: ({cell}) => renderCellWithLink(cell.row.original),
-				header: 'Tên khóa học',
-				size: 180,
-			},
-			{
-				accessorFn: (row) => moment(row.createDate).format('DD/MM/yyyy, h:mm:ss A'),
-				header: 'Ngày tạo',
-				size: 80,
-			},
-			{
-				accessorKey: 'adminName',
-				header: 'Tên người tạo',
-				size: 120,
-			},
-		],
-		[],
-	);
+    const filteredCourse = courses
+        .filter((item) => {
+            const subjectId = item.subject.subjectId
 
-	// *************** Render Input Answer AREA
-	const [groups, setGroups] = useState([
-		{radioValue: false, inputValue: ''},
-		{radioValue: false, inputValue: ''},
-	]);
+            if (selectedSubjectId === null) {
+                return false
+            }
+            const selectedSubjectIdValue = parseInt(selectedSubjectId) || null
 
-	const handleRadioChange = (index) => {
-		const updatedGroups = groups.map((group, i) => {
-			if (i === index) {
-				return {...group, radioValue: true};
-			} else {
-				return {...group, radioValue: false};
-			}
-		});
-		setGroups(updatedGroups);
-	};
+            return subjectId
+                .toString()
+                .includes(selectedSubjectIdValue.toString())
+        })
+        .filter((course) => {
+            return !questions.some(
+                (question) => question.courseName === course.courseName
+            )
+        })
 
-	const handleInputChange = (index, value) => {
-		const updatedGroups = [...groups];
-		updatedGroups[index].inputValue = value;
-		setGroups(updatedGroups);
-	};
+    const courseSelectValues = filteredCourse.map((item) => ({
+        value: item.courseId,
+        label: item.courseName
+    }))
 
-	const handleAddGroup = () => {
-		const newGroup = {radioValue: false, inputValue: ''};
-		setGroups([...groups, newGroup]);
-	};
+    const handleChangeSelectCourses = (value) => {
+        setSelectedCourseId(value)
+        question.courseId = value
+    }
 
-	const renderInputs = () => {
-		return groups.map((group, index) => (
-			<Col
-				xl={6}
-				lg={6}
-				md={6}
-				sm={12}
-				key={index + 1}>
-				<FormGroup className='mt-3'>
-					<label className='form-control-label'>Câu trả lời {index + 1}</label>
-					<div className='d-flex align-items-center'>
-						<div>
-							<label>
-								<input
-									className='mt-3'
-									type='radio'
-									checked={group.radioValue}
-									onChange={() => handleRadioChange(index)}
-									style={{width: '20px', height: '20px'}}
-								/>
-							</label>
-						</div>
-						{/* <Input
-	            className="form-control-alternative ml-2"
-	            type="text"
-	            value={group.inputValue}
-	            onChange={(e) => handleInputChange(index, e.target.value)}
-	          /> */}
-						{/* <InputGroup className="mb-4">
-	            <InputGroupAddon addonType="prepend">
-	              <InputGroupText>
-	                <i className="ni ni-fat-delete" />
-	              </InputGroupText>
-	            </InputGroupAddon>
-	            <Input
-	              placeholder="trả lời"
-	              className="ml-2"
-	              type="text"
-	              value={group.inputValue}
-	              onChange={(e) => handleInputChange(index, e.target.value)}
-	            />
-	          </InputGroup> */}
-						<InputGroup className='ml-2'>
-							<InputGroupAddon addonType='prepend'>
-								<InputGroupText>
-									<i className='ni ni-fat-delete' />
-								</InputGroupText>
-							</InputGroupAddon>
-							<Input
-								placeholder='question Title'
-								type='text'
-								value={group.inputValue}
-								onChange={(e) => handleInputChange(index, e.target.value)}
-							/>
-						</InputGroup>
-					</div>
-				</FormGroup>
-			</Col>
-		));
-	};
+    // *************** UseEffect area
+    useEffect(() => {
+        fetchQuestions()
+        fetchSubject()
+        fetchCourse()
+    }, [])
 
-	// ************* Select Handle Logic AREA
+    return (
+        <>
+            <ToastContainer />
 
-	const subjectSelectValues = subjects.map((item) => ({
-		value: item.subjectId,
-		label: item.subjectName,
-	}));
+            {/* HeaderSubject start */}
+            <QuestionHeader />
+            {/* HeaderSubject End */}
 
-	const handleChangeSelectSubject = (value) => {
-		setSelectedSubjectId(value);
-		question.subjectId = value;
-	};
+            {/* Page content */}
+            <Container className="mt--7" fluid>
+                <Card className="bg-secondary shadow">
+                    {/* Header */}
+                    <CardHeader className="bg-white border-0 d-flex justify-content-between">
+                        <h3 className="mb-0">Bảng câu hỏi</h3>
+                        <Button color="default" type="button" disabled>
+                            Lịch sử câu hỏi
+                        </Button>
+                    </CardHeader>
+                    <CardBody>
+                        {/* Table view */}
+                        <MaterialReactTable
+                            displayColumnDefOptions={{
+                                'mrt-row-actions': {
+                                    header: 'Thao tác',
+                                    size: 20
+                                },
+                                'mrt-row-numbers': {
+                                    size: 5
+                                }
+                            }}
+                            muiTableBodyProps={{
+                                sx: {
+                                    '& tr:nth-of-type(odd)': {
+                                        backgroundColor: '#f5f5f5'
+                                    }
+                                }
+                            }}
+                            initialState={{
+                                columnVisibility: { questionId: false }
+                            }}
+                            columns={columnQuestion}
+                            data={questions ?? []}
+                            state={{
+                                isLoading: questionLoading
+                            }}
+                            enableRowActions
+                            positionActionsColumn="last"
+                            enableRowNumbers
+                            enableColumnOrdering
+                            enableEditing
+                            enableStickyHeader
+                            enableColumnResizing
+                            muiTablePaginationProps={{
+                                rowsPerPageOptions: [10, 20, 50, 100]
+                            }}
+                            renderRowActions={({ row }) => (
+                                <div className="d-flex justify-content-start py-1">
+                                    <Link
+                                        to={`/admin/question-detail/${row.original.questionId}`}
+                                    >
+                                        <IconButton color="secondary">
+                                            <EditIcon />
+                                        </IconButton>
+                                    </Link>
+                                </div>
+                            )}
+                            // Top Add new Subject button
+                            renderTopToolbarCustomActions={() => (
+                                <Box>
+                                    <Button
+                                        color={isUpdate ? 'primary' : 'success'}
+                                        onClick={() => setShowModal(true)}
+                                        variant="contained"
+                                        id="addSubjects"
+                                        // disabled={isSubjectHistoryShowing}
+                                    >
+                                        <i className="bx bx-layer-plus"></i>{' '}
+                                        Thêm câu hỏi
+                                    </Button>
+                                    <Button
+                                        color="default"
+                                        onClick={() => fetchQuestions()}
+                                        variant="contained"
+                                    >
+                                        <IconRefresh />
+                                    </Button>
+                                </Box>
+                            )}
+                        />
+                    </CardBody>
+                </Card>
 
-	const courseSelectValues = courses.map((item) => ({
-		value: item.courseId,
-		label: item.courseName,
-	}));
+                {/* Modal Add - Update Question*/}
+                <Modal
+                    className="modal-dialog-centered modal-lg"
+                    isOpen={showModal}
+                    backdrop={'static'}
+                >
+                    <div className="modal-header">
+                        <h3 className="modal-title" id="modal-title-default">
+                            Thêm bộ câu hỏi
+                        </h3>
+                        <button
+                            aria-label="Close"
+                            className="close"
+                            data-dismiss="modal"
+                            type="button"
+                            onClick={() => {
+                                setShowModal(false)
+                                handleClearForm()
+                            }}
+                        >
+                            <span
+                                aria-hidden={true}
+                                onClick={() => {
+                                    setIsUpdate(false)
+                                    handleClearForm()
+                                }}
+                            >
+                                ×
+                            </span>
+                        </button>
+                    </div>
+                    <div className="modal-body">
+                        <form method="post">
+                            <Row>
+                                <Col xl={6} lg={6} md={6} sm={12}>
+                                    <FormGroup className="mb-3 col-6 col-sm-12">
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="name"
+                                        >
+                                            Môn học
+                                        </label>
+                                        <Select
+                                            placeholder="Chọn môn học"
+                                            searchable
+                                            clearable
+                                            name="subject"
+                                            value={selectedSubjectId}
+                                            onChange={handleChangeSelectSubject}
+                                            nothingFound="No options"
+                                            data={subjectSelectValues}
+                                            error={msgForm.subjectNameError}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                                <Col xl={6} lg={6} md={6} sm={12}>
+                                    <FormGroup className="mb-3 col-6 col-sm-12">
+                                        <label
+                                            className="form-control-label"
+                                            htmlFor="name"
+                                        >
+                                            <div className="d-flex justify-content-between align-items-center">
+                                                <span>Khóa học</span>
+                                                <span className="badge badge-success">
+                                                    {filteredCourse.length > 0
+                                                        ? filteredCourse.length
+                                                        : 0}{' '}
+                                                    khóa học
+                                                </span>
+                                            </div>
+                                        </label>
+                                        <Select
+                                            placeholder="Chọn khóa học"
+                                            searchable
+                                            clearable
+                                            disabled={
+                                                filteredCourse.length === 0
+                                            }
+                                            name="course"
+                                            value={selectedCourseId}
+                                            onChange={handleChangeSelectCourses}
+                                            nothingFound="No options"
+                                            data={courseSelectValues}
+                                            error={msgForm.courseNameErr}
+                                        />
+                                    </FormGroup>
+                                </Col>
+                            </Row>
+                        </form>
+                    </div>
+                    <div className="modal-footer">
+                        <Button
+                            color="default"
+                            outline
+                            data-dismiss="modal"
+                            type="button"
+                            onClick={() => {
+                                setShowModal(false)
+                                setIsUpdate(false)
+                                handleClearForm()
+                            }}
+                        >
+                            Trở lại
+                        </Button>
+                        <Button
+                            color="success"
+                            type="button"
+                            onClick={() => {
+                                handleStoreQuestions()
+                            }}
+                        >
+                            Thêm câu hỏi
+                        </Button>
+                    </div>
+                </Modal>
+            </Container>
+            {/* Page content end */}
+        </>
+    )
+}
 
-	const handleChangeSelectCourse = (value) => {
-		setSelectedCourseId(value);
-		question.courseId = value;
-	};
-
-	// *************** UseEffect area
-	useEffect(() => {
-		// fetchQuestions();
-		// fetchSubject();
-		// fetchCourse();
-	}, []);
-
-	// useEffect(() => {
-	//   console.log(userDetail);
-	// }, [userDetail]);
-
-	return (
-		<>
-			{/* HeaderSubject start */}
-			<QuestionHeader />
-			{/* HeaderSubject End */}
-
-			{/* Page content */}
-			<Container
-				className='mt--7'
-				fluid>
-				<Card className='bg-secondary shadow'>
-					{/* Header */}
-					<CardHeader className='bg-white border-0 d-flex justify-content-between'>
-						<h3 className='mb-0'>Bảng câu hỏi</h3>
-						<Button
-							color='default'
-							type='button'
-							disabled
-							// onClick={() => handleChangeSubjectListAndHistory()}
-						>
-							{/* {isSubjectHistoryShowing
-                ? "Danh sách môn học"
-                : "Lịch sử môn học"} */}
-							Lịch sử câu hỏi
-						</Button>
-					</CardHeader>
-					<CardBody>
-						{/* Table view */}
-						<MaterialReactTable
-							displayColumnDefOptions={{
-								'mrt-row-actions': {
-									header: 'Thao tác',
-									size: 20,
-								},
-							}}
-							columns={columnQuestion}
-							// data={questions}
-							data={questions ?? []}
-							state={{
-								isLoading: questionLoading,
-							}}
-							positionActionsColumn='last'
-							// editingMode="modal" //default
-							enableColumnOrdering
-							enableEditing
-							enableStickyHeader
-							enableColumnResizing
-							muiTablePaginationProps={{
-								rowsPerPageOptions: [10, 20, 50, 100],
-								showFirstButton: false,
-								showLastButton: false,
-							}}
-							renderRowActions={({row}) => (
-								<div className='d-flex justify-content-start py-1'>
-									<Link to={`/admin/question-detail/${row.original.courseName}`}>
-										<IconButton color='secondary'>
-											<EditIcon />
-										</IconButton>
-									</Link>
-								</div>
-							)}
-							// Top Add new Subject button
-							renderTopToolbarCustomActions={() => (
-								<Button
-									color={isUpdate ? 'primary' : 'success'}
-									onClick={() => setShowModal(true)}
-									variant='contained'
-									id='addSubjects'
-									// disabled={isSubjectHistoryShowing}
-								>
-									<i className='bx bx-layer-plus'></i> Thêm câu hỏi
-								</Button>
-							)}
-						/>
-					</CardBody>
-				</Card>
-
-				{/* Modal Add - Update Question*/}
-				<Modal
-					className='modal-dialog-centered modal-lg'
-					isOpen={showModal}
-					// toggle={showModal}
-					backdrop={'static'}>
-					<div className='modal-header'>
-						<h3
-							className='modal-title'
-							id='modal-title-default'>
-							Thêm bộ khóa học
-						</h3>
-						<button
-							aria-label='Close'
-							className='close'
-							data-dismiss='modal'
-							type='button'
-							onClick={() => setShowModal(false)}>
-							<span
-								aria-hidden={true}
-								onClick={() => setIsUpdate(false)}>
-								×
-							</span>
-						</button>
-					</div>
-					<div className='modal-body'>
-						<form method='post'>
-							<Row>
-								{/* {isUpdate && (
-                <FormGroup className="mb-3">
-                  <label className="form-control-label" htmlFor="questionId">
-                    Mã câu hỏi
-                  </label>
-                  <Input
-                    className="form-control-alternative"
-                    id="questionId"
-                    onChange={handleChangeInput}
-                    disabled
-                    name="questionId"
-                    value={question.questionId}
-                  />
-                </FormGroup>
-              )} */}
-								<Col
-									xl={6}
-									lg={6}
-									md={6}
-									sm={12}>
-									<FormGroup className='mb-3 col-6 col-sm-12'>
-										<label
-											className='form-control-label'
-											htmlFor='name'>
-											Môn học
-										</label>
-										{/* <Select
-                      // label="Your favorite framework/library"
-                      placeholder="Chọn môn học"
-                      searchable
-                      clearable
-                      value={value}
-                      onChange={setValue}
-                      nothingFound="No options"
-                      data={subjectSelectValue}
-                    /> */}
-										<Select
-											placeholder='Chọn môn học'
-											searchable
-											clearable
-											name='subject'
-											value={selectedSubjectId}
-											onChange={handleChangeSelectSubject}
-											nothingFound='No options'
-											data={subjectSelectValues}
-										/>
-									</FormGroup>
-								</Col>
-								<Col
-									xl={6}
-									lg={6}
-									md={6}
-									sm={12}>
-									<FormGroup className='mb-3 col-6 col-sm-12'>
-										<label
-											className='form-control-label'
-											htmlFor='name'>
-											Khóa học
-										</label>
-										<Select
-											// label="Your favorite framework/library"
-											placeholder='Chọn khóa học'
-											searchable
-											clearable
-											nothingFound='No options'
-											data={['React & Hook co ban', 'Angular RestAPI', 'Java Spring Boot RestFull Api', 'VueJs co ban']}
-										/>
-									</FormGroup>
-								</Col>
-								{/* <Col xl={6} lg={6} md={6} sm={12}>
-                  <FormGroup className="mb-3 col-6 col-sm-12">
-                    <label
-                      className="form-control-label"
-                      htmlFor="questionTitle"
-                    >
-                      Tiêu đề câu hỏi?
-                    </label> */}
-								{/* <Input
-                      className="form-control-alternative"
-                      id="questionTitle"
-                      onChange={handleChangeInput}
-                      name="questionTitle"
-                      value={question.questionTitle}
-                    /> */}
-								{/* <InputGroup>
-                      <InputGroupAddon addonType="prepend">
-                        <InputGroupText>
-                          <i className="ni ni-books" />
-                        </InputGroupText>
-                      </InputGroupAddon>
-                      <Input
-                        placeholder="question Title"
-                        type="text"
-                        id="questionTitle"
-                        onChange={handleChangeInput}
-                        name="questionTitle"
-                        value={question.questionTitle}
-                      />
-                    </InputGroup> */}
-								{/* </FormGroup> */}
-								{/* </Col> */}
-								{/* <Col xl={12} lg={12} md={12} sm={12}>
-                  <hr />
-                  <h5 className="font-weight-600">Câu trả lời</h5>
-                  <Blockquote
-                    cite="Chọn vào radio để đánh dấu câu trả lời đúng!"
-                    icon={null}
-                    className="mt--4 p-0"
-                  ></Blockquote>
-                  <div className="container">
-                    <Row> */}
-								{/* <label className="form-control-label" htmlFor="name">
-                        Số câu trả lời
-                      </label>
-                      <Input
-                        // label="Your favorite framework/library"
-                        type="number"
-                        placeholder="0"
-                        value={numberInputs}
-                        onChange={handleNumInputsChange}
-                        className="form-control-alternative"
-                      /> */}
-								{/* {renderInputs()} */}
-								{/* </Row>
-                  </div>
-                </Col> */}
-								{/* <div className="container">
-                  <Button
-                    color="dark"
-                    className="mt-3 float-left"
-                    onClick={handleAddGroup}
-                  >
-                    <i className="bx bx-list-plus"></i> Thêm câu trả lời
-                  </Button>
-                </div> */}
-							</Row>
-						</form>
-					</div>
-					<div className='modal-footer'>
-						<Button
-							color='default'
-							outline
-							data-dismiss='modal'
-							type='button'
-							onClick={() => {
-								setShowModal(false);
-								setIsUpdate(false);
-							}}>
-							Trở lại
-						</Button>
-						<Button
-							color='success'
-							type='button'
-							onClick={() => {
-								// isUpdate ? handleUpdateSubject() : handleCreateNewSubject();
-								handleStoreQuestions();
-							}}>
-							Thêm câu hỏi
-						</Button>
-					</div>
-				</Modal>
-			</Container>
-			{/* Page content end */}
-		</>
-	);
-};
-
-export default Questions;
+export default Questions

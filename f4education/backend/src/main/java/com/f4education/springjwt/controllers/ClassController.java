@@ -1,7 +1,6 @@
 package com.f4education.springjwt.controllers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,16 +12,18 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.f4education.springjwt.interfaces.ClassService;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.payload.request.ClassDTO;
-import com.f4education.springjwt.payload.request.SubjectDTO;
+import com.f4education.springjwt.payload.response.ClassesByTeacherResponse;
+import com.f4education.springjwt.payload.response.LearningResultResponse;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*")
 @RestController
-@RequestMapping("/api/classs")
+@RequestMapping("/api/classes")
 public class ClassController {
 
 	@Autowired
@@ -39,6 +40,11 @@ public class ClassController {
 		return classService.getClassById(classId);
 	}
 
+	@GetMapping("/teacher/{teacherId}")
+	public List<ClassesByTeacherResponse> findByTeacherId(@PathVariable("teacherId") String teacherId) {
+		return classService.getAllClassesByTeacherId(teacherId);
+	}
+
 	@PostMapping
 	public ClassDTO createSubject(@RequestBody ClassDTO classDTO) {
 		return classService.createClass(classDTO);
@@ -48,4 +54,21 @@ public class ClassController {
 	public ClassDTO updateSubject(@PathVariable("id") Integer classId, @RequestBody ClassDTO classDTO) {
 		return classService.updateClass(classId, classDTO);
 	}
+
+	@GetMapping("/actived")
+	public ResponseEntity<?> getAllClassActive() {
+		return ResponseEntity.ok(classService.findAllActiveClasses());
+	}
+
+	@GetMapping("/student/{studentId}")
+	public ResponseEntity<?> getClassByStudentId(@PathVariable("studentId") String studentId) {
+		return ResponseEntity.ok(classService.getClassByStudentId(studentId));
+	}
+
+	@GetMapping("/student/result/{studentId}")
+	public ResponseEntity<?> getLearningResult(@PathVariable("studentId") String studentId) {
+		List<LearningResultResponse> classes = classService.getAllClassLearningResult(studentId);
+		return ResponseEntity.ok(classes); 
+	}
+
 }
