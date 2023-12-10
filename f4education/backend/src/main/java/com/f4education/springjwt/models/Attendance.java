@@ -33,12 +33,10 @@ public class Attendance implements Serializable {
 
 	@ManyToOne
 	@JoinColumn(name = "class_id")
-	@JsonIgnore
 	Classes classes;
 
 	@ManyToOne
 	@JoinColumn(name = "student_id")
-	@JsonIgnore
 	Student student;
 
 	@Override

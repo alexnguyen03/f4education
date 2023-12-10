@@ -491,7 +491,7 @@ const Classs = () => {
                                         onClick={() => console.info('Delete')}
                                     >
                                         <Link
-                                            to={`/admin/class-detail/${row.row.original.classId}`}
+                                            to={`/admin/classs/class-detail/${row.row.original.classId}`}
                                             className="text-dark"
                                         >
                                             <IconButton color="primary">

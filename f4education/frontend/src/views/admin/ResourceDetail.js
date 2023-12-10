@@ -303,6 +303,14 @@ const Resource = () => {
         try {
             setIsLoading(true) // Bắt đầu quá trình tải dữ liệu
             const resp = await resourceApi.getAllFileByFolderId(folderId)
+            console.log(
+                '🚀 ~ file: ResourceDetail.js:306 ~ getAllFileByFolderId ~ folderId:',
+                folderId
+            )
+            console.log(
+                '🚀 ~ file: ResourceDetail.js:306 ~ getAllFileByFolderId ~ resp:',
+                resp
+            )
             const lessonFiles = resp.data.filter(
                 (file) => file.type === 'lesson'
             )

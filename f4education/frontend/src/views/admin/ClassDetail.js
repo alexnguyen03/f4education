@@ -24,6 +24,16 @@ import classApi from '../../api/classApi'
 import registerCourseApi from '../../api/registerCourseApi'
 import teacherApi from '../../api/teacherApi'
 import Notify from '../../utils/Notify'
+import {
+    IconCirclePlus,
+    IconFileMinus,
+    IconFilePlus,
+    IconMinus,
+    IconUserMinus,
+    IconUserPlus
+} from '@tabler/icons-react'
+import { IconPlus } from '@tabler/icons-react'
+import { IconCircleMinus } from '@tabler/icons-react'
 const IMG_TEACHER_URL = process.env.REACT_APP_IMAGE_URL + '/teachers/'
 const ClassDetail = () => {
     let { classIdParam } = useParams()
@@ -40,6 +50,7 @@ const ClassDetail = () => {
         classId: 0,
         className: '',
         courseName: '',
+        registerCourseId: 0,
         courseId: 0,
         startDate: '',
         endDate: '',
@@ -83,7 +94,7 @@ const ClassDetail = () => {
         console.log(deleteListRegisterId)
         const classRequest = {
             classId: classDetail.classId,
-            courseId: classDetail.courseId,
+            registerCourseId: classDetail.registerCourseId,
             teacherId: selectedTeacher.teacherId,
             listRegisterCourseIdToAdd: addListRegisterId.map((item) =>
                 item.value.trim()
@@ -99,6 +110,10 @@ const ClassDetail = () => {
         try {
             const resp = await registerCourseApi.updateRegisterCourse(
                 classRequest
+            )
+            console.log(
+                '🚀 ~ file: ClassDetail.js:104 ~ handleSave ~ resp:',
+                resp
             )
             if (resp.status === 200) {
                 toast.update(id, Notify.options.createSuccess())
@@ -139,21 +154,54 @@ const ClassDetail = () => {
     const handleOnChangeRegisterCoure = (val) => {
         console.log(
             '🚀 ~ file: ClassDetail.js:140 ~ handleOnChangeRegisterCoure ~ val:',
-            val
+            val.value
         )
         //! handle get courseId
-        const registeCourseSelected = allRegisterCourses.find((item) => {
+        const registerCourseSelected = allRegisterCourses.find((item) => {
+            console.log(
+                '🚀 ~ file: ClassDetail.js:162 ~ registerCourseSelected ~ item:',
+                item
+            )
             return item.registerCourseId === val.value
         })
+        console.log(
+            '🚀 ~ file: ClassDetail.js:167 ~ registerCourseSelected ~ registerCourseSelected:',
+            registerCourseSelected
+        )
 
+        setClassDetail((prev) => ({
+            ...prev,
+            registerCourseId: val.value
+        }))
+
+        const studentInClass = allRegisterCourses.filter((item) => {
+            return item.classId === parseInt(classIdParam)
+        })
+        console.log(
+            '🚀 ~ file: ClassDetail.js:180 ~ studentInClass ~ studentInClass:',
+            studentInClass
+        )
+        console.log(
+            '🚀 ~ file: ClassDetail.js:180 ~ studentInClass ~ allRegisterCourses:',
+            allRegisterCourses
+        )
+        setListStudentInClass([
+            ...convertRegisterToStudentArray(studentInClass)
+        ])
         const studentInCourse = allRegisterCourses.filter((item) => {
-            return item.courseId === registeCourseSelected.courseId
+            return (
+                item.courseId === registerCourseSelected.courseId &&
+                item.classId === null
+            )
         })
 
         setListStudentInCourse([
             ...convertRegisterToStudentArray(studentInCourse)
         ])
-        setDataTransfer([convertRegisterToStudentArray(studentInCourse), []])
+        setDataTransfer([
+            convertRegisterToStudentArray(studentInCourse),
+            convertRegisterToStudentArray(studentInClass)
+        ])
     }
     //! CALL APIS
 
@@ -161,6 +209,10 @@ const ClassDetail = () => {
         try {
             const resp = await registerCourseApi.checkRegisterCourseHasClass(
                 classIdParam
+            )
+            console.log(
+                '🚀 ~ file: ClassDetail.js:184 ~ checkRegisterCourseHasClass ~ resp:',
+                resp
             )
             if (!resp.data) {
                 getRegisterCourse()
@@ -213,7 +265,7 @@ const ClassDetail = () => {
     }
     const getAllStudentInCourse = async () => {
         setLoadingTransfer(true)
-        console.log('run getAll Student')
+
         try {
             const resp = await registerCourseApi.getAllRegisterCourse()
             console.log(
@@ -226,23 +278,31 @@ const ClassDetail = () => {
                 const listRegisterCourse = resp.data.data.filter((item) => {
                     return item.courseId === classDetail.courseId
                 })
-                console.log(classDetail.courseId)
-                console.log(listRegisterCourse)
+
                 const studentInClass = listRegisterCourse.filter((item) => {
                     return item.classId === parseInt(classIdParam)
                 })
-
+                setListStudentInClass([
+                    ...convertRegisterToStudentArray(studentInClass)
+                ])
                 const studentInCourse = listRegisterCourse.filter(
-                    (item) => item.classId !== parseInt(classIdParam)
+                    (item) =>
+                        item.classId !== parseInt(classIdParam) &&
+                        item.classId === null
                 )
 
                 setListStudentInCourse([
                     ...convertRegisterToStudentArray(studentInCourse)
                 ])
+                console.log(
+                    '🚀 ~ file: ClassDetail.js:259 ~ getAllStudentInCourse ~ ...convertRegisterToStudentArray(studentInCourse):',
+                    studentInCourse
+                )
 
-                setListStudentInClass([
-                    ...convertRegisterToStudentArray(studentInClass)
-                ])
+                console.log(
+                    '🚀 ~ file: ClassDetail.js:263 ~ getAllStudentInCourse ~ ...convertRegisterToStudentArray(studentInClass):',
+                    studentInClass
+                )
 
                 setLoadingTransfer(false)
                 setDataTransfer([
@@ -304,16 +364,37 @@ const ClassDetail = () => {
                 '🚀 ~ file: ClassDetail.js:267 ~ getClassByClassId ~ resp:',
                 resp
             )
-            const { teacher } = resp.data
-            console.log(
-                '🚀 ~ file: ClassDetail.js:303 ~ getClassByClassId ~ teacher:',
-                teacher
-            )
-            setSelectedTeacher({
-                fullname: teacher.fullname,
-                teacherId: teacher.teacherId
-            })
-            setClassDetail(resp.data)
+            if (resp.status === 200) {
+                let firstRegisterCourseId = null
+                if (resp.data.registerCourses.length > 0) {
+                    firstRegisterCourseId =
+                        resp.data.registerCourses[0].registerCourseId
+                }
+
+                const { teacher } = resp.data
+
+                if (teacher !== null) {
+                    setSelectedTeacher({
+                        fullname: teacher.fullname,
+                        teacherId: teacher.teacherId
+                    })
+                } else {
+                    setSelectedTeacher({
+                        fullname: 'Chưa chọn',
+                        teacherId: ''
+                    })
+                }
+
+                console.log(
+                    '🚀 ~ file: ClassDetail.js:393 ~ getClassByClassId ~ resp.data.classId:',
+                    resp.data.classId
+                )
+                setClassDetail({
+                    classId: resp.data.classId,
+                    ...resp.data,
+                    registerCourseId: firstRegisterCourseId
+                })
+            }
             setLoadingGetClassDetail(false)
         } catch (error) {
             console.log(error)
@@ -328,9 +409,15 @@ const ClassDetail = () => {
                         {status}
                     </Badge>
                 )
-            case 'Đang diễn ra':
+            case 'Đang chờ':
                 return (
                     <Badge className="font-weight-bold" color="primary">
+                        {status}
+                    </Badge>
+                )
+            case 'Đang diễn ra':
+                return (
+                    <Badge claszsName="font-weight-bold" color="primary">
                         {status}
                     </Badge>
                 )
@@ -405,6 +492,9 @@ const ClassDetail = () => {
                 ]}
                 transferAllMatchingFilter={true}
                 listHeight={450}
+                transferIcon={({ reversed }) => {
+                    return reversed ? <IconCircleMinus /> : <IconCirclePlus />
+                }}
             />
         )
     }

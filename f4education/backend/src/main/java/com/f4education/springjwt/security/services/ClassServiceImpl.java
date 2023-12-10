@@ -103,7 +103,7 @@ public class ClassServiceImpl implements ClassService {
 		return classDTO;
 	}
 
-	private void convertToEntity(ClassDTO classDTO, Classes classes) {
+	public void convertToEntity(ClassDTO classDTO, Classes classes) {
 		BeanUtils.copyProperties(classDTO, classes);
 	}
 

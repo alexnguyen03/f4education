@@ -57,7 +57,7 @@ const Client = (props) => {
                 {/* </Container> */}
 
                 {/* Page content */}
-                <Container fluid size="xl" mt={'xl'} pt={'xl'}>
+                <Container fluid px={'0'} size="xl" mt={'xl'} pt={'xl'}>
                     <div className="py-4 my-2"></div>
                     <Routes>
                         {getRoutes(routesClient)}
