@@ -157,7 +157,7 @@ const ClassInformationDetail = () => {
             if (resp.status === 200) {
                 console.log(resp.data)
                 setClassStudyToday(true)
-            } else {
+            } else if (resp.status === 403) {
                 console.log('class dont study today')
                 setClassStudyToday(false)
             }
@@ -229,13 +229,11 @@ const ClassInformationDetail = () => {
             prevStudents.map((student) => {
                 if (student.studentId.trim() === studentIdParam.trim()) {
                     if (e.target.defaultValue === 'present') {
-                        console.log('ok')
                         return {
                             ...student,
                             isPresent: true
                         }
                     } else if (e.target.defaultValue === 'absent') {
-                        console.log('ok')
                         return {
                             ...student,
                             isPresent: false
@@ -611,7 +609,7 @@ const ClassInformationDetail = () => {
                                         {classStudyToday ? (
                                             <Button
                                                 color="violet"
-                                                size="md"
+                                                size="lg"
                                                 mb="lg"
                                                 onClick={() =>
                                                     handleSaveAttendance()

@@ -10,3 +10,5 @@ export const convertArrayToLabel = (arr, valueKey, lableKey) => {
     }))
     return convertedArray
 }
+
+export const prevURIRef = null

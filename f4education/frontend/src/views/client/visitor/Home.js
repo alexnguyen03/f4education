@@ -55,32 +55,32 @@ const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const recommentTopic = [
     {
-        title: 'Python',
-        titleSecond: 'ReactJS'
+        title: 'NextJS',
+        titleSecond: 'React'
     },
     {
-        title: 'Khoa học máy tính',
-        titleSecond: 'NextJS'
+        title: 'Angular',
+        titleSecond: 'Javascript'
     },
     {
-        title: 'Nghiên cứu AI',
-        titleSecond: 'JavaScript'
+        title: 'C#',
+        titleSecond: 'Java'
     },
     {
-        title: 'R (Ngôn ngữ lập trình)',
-        titleSecond: 'Tư duy lập trình'
+        title: 'NodeJS',
+        titleSecond: 'Golang'
     },
     {
-        title: 'Deep learning',
-        titleSecond: 'Giải thuật'
+        title: 'C/C++',
+        titleSecond: 'Ruby'
     },
     {
-        title: 'Artificial Intelligence',
-        titleSecond: 'Cấu trúc dữ liệu'
+        title: 'Laravel',
+        titleSecond: 'PHP'
     },
     {
-        title: 'Web scrapping',
-        titleSecond: 'Cấu trúc dữ liệu'
+        title: 'PortgreSQL',
+        titleSecond: 'Figma'
     }
 ]
 

@@ -18,6 +18,10 @@ const accountApi = {
         const url = '/accounts/checkEmailForPassWord'
         return axiosClient.post(url, body)
     },
+    changePassword: (body) => {
+        const url = '/accounts/changePassword'
+        return axiosClient.post(url, body)
+    },
     checkOTPForPassword: (body) => {
         const url = '/accounts/checkOTPForPassWord'
         return axiosClient.post(url, body)

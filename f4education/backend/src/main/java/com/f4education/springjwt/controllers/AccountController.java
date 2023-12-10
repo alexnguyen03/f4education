@@ -27,7 +27,7 @@ import com.f4education.springjwt.interfaces.AccountService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Teacher;
-
+import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.payload.request.AccountDTO;
 import com.f4education.springjwt.payload.request.OTP;
 import com.f4education.springjwt.payload.response.MessageResponse;
@@ -136,6 +136,14 @@ public class AccountController {
                         .body(2);// ! wrong OTP
             }
         }
+        return ResponseEntity.ok().body(null);
+    }
+
+    @PostMapping(value = "/changePassword") // ! Kiểm tra mail đúng chưa và gửi OTP
+    public ResponseEntity<?> changePassword(@RequestBody AccountDTO accountDTO) {
+        User user = accountService.findByEmail(accountDTO.getEmail());
+        user.setPassword(encoder.encode(accountDTO.getPassword()));
+        accountService.save(user);
         return ResponseEntity.ok().body(null);
     }
 

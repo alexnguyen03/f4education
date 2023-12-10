@@ -41,9 +41,9 @@ const TeacherAndStudentSidebar = (props) => {
             if (
                 prop.path !== '/class-info/:classId' &&
                 prop.path !== '/class-info/point/:classId' &&
+                prop.path !== '/quizz' &&
                 prop.path !== '/task' &&
-                prop.path !== '/classes/recources/:classId' &&
-                prop.path !== '/quizz'
+                prop.path !== '/classes/recources/:classId'
             ) {
                 return (
                     <NavItem key={key}>

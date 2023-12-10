@@ -20,6 +20,7 @@ import { useNavigate } from 'react-router-dom'
 import { GoogleLogin } from 'react-google-login'
 import { gapi } from 'gapi-script'
 import { GoogleOAuthProvider } from '@react-oauth/google'
+import { PreviousURI } from '../../utils/PreviousURI'
 const Login = () => {
     const [user, setUser] = useState({
         id: '',
@@ -189,6 +190,11 @@ const Login = () => {
             })
         }
     }, [])
+
+    useEffect(() => {
+        console.log(PreviousURI.current)
+    }, [])
+
     return (
         <Col lg="5" md="7">
             <Box maw={400} pos="relative">

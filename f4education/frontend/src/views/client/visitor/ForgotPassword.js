@@ -1,41 +1,12 @@
-import {
-    Edit as EditIcon,
-    Margin,
-    RemoveCircleOutline as RemoveCircleOutlineIcon
-} from '@mui/icons-material'
-import { Box, IconButton } from '@mui/material'
-import accountApi from '../../../api/accountApi'
-import moment from 'moment'
-import AccountHeader from 'components/Headers/AccountHeader'
-import { MaterialReactTable } from 'material-react-table'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { Group, LoadingOverlay, PasswordInput, Stepper } from '@mantine/core'
+import { hasLength, useForm } from '@mantine/form'
+import { Box } from '@mui/material'
+import React, { memo, useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
-import Notify from '../../../utils/Notify'
-import {
-    Stepper,
-    Group,
-    TextInput,
-    Textarea,
-    PasswordInput
-} from '@mantine/core'
 import 'react-toastify/dist/ReactToastify.css'
-import { useForm, hasLength } from '@mantine/form'
-import React from 'react'
-import {
-    Button,
-    Card,
-    CardBody,
-    CardHeader,
-    Col,
-    Container,
-    Form,
-    FormGroup,
-    Input,
-    Label,
-    Modal,
-    Row,
-    ButtonGroup
-} from 'reactstrap'
+import { Button, CardBody, Container, Form, FormGroup, Input } from 'reactstrap'
+import accountApi from '../../../api/accountApi'
+import Notify from '../../../utils/Notify'
 const IMG_URL = '/courses/'
 const ForgotPassword = () => {
     const user = JSON.parse(localStorage.getItem('user') ?? '')
@@ -72,7 +43,7 @@ const ForgotPassword = () => {
         }))
     }
 
-    //! Xác nhận OTP chính xácp
+    //! Xác nhận OTP chính xác
     const handleSubmitForm = async (e) => {
         e.preventDefault()
 
@@ -127,22 +98,6 @@ const ForgotPassword = () => {
         }
     }
 
-    const validateForm = () => {
-        let validationErrors = {}
-        const isEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-        if (!OTP.email) {
-            validationErrors.email = 'Vui lòng nhập email!!!'
-            return validationErrors
-        } else {
-            if (!isEmail.test(OTP.email)) {
-                validationErrors.email = 'Không đúng định dạng email!!!'
-                return validationErrors
-            } else {
-                return {}
-            }
-        }
-    }
-
     // ! Update OTP start
     const [seconds, setSeconds] = useState(0)
 
@@ -179,6 +134,24 @@ const ForgotPassword = () => {
         setSeconds(60)
     }
 
+    const submit = async () => {
+        const OTPRequest = {
+            email: OTP.email,
+            password: form.values.confirmPassword
+        }
+        // console.log('🚀', taskRequest)
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        try {
+            const resp = await accountApi.changePassword(OTPRequest)
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.changePasswordSuccess())
+                nextStep()
+            }
+        } catch (error) {
+            toast.update(id, Notify.options.updateError())
+        }
+    }
+
     const form = useForm({
         initialValues: {
             password: '',
@@ -202,7 +175,7 @@ const ForgotPassword = () => {
         <>
             <ToastContainer />
 
-            <Container fluid style={{ paddingTop: '72px', width: '80%' }}>
+            <Container fluid style={{ paddingTop: '72px', width: '45%' }}>
                 <CardBody>
                     <Stepper
                         active={active}
@@ -212,11 +185,11 @@ const ForgotPassword = () => {
                     >
                         <Stepper.Step
                             label="Xác minh"
-                            description="Xác minh email tài khoản của bạn"
+                            description="email tài khoản của bạn"
                         >
                             <Form
                                 sm={6}
-                                className="mx-auto w-50"
+                                className="mx-auto w-75"
                                 onSubmit={handleSubmitForm}
                                 encType="multipart/form-data"
                                 isLoading="true"
@@ -338,7 +311,9 @@ const ForgotPassword = () => {
                                                 color="primary"
                                                 type="submit"
                                                 className="px-5"
-                                                disabled={OTP2 == 1}
+                                                disabled={
+                                                    OTP2 == 1 || seconds == 0
+                                                }
                                             >
                                                 Tiếp tục
                                             </Button>
@@ -348,44 +323,51 @@ const ForgotPassword = () => {
                             </Form>
                         </Stepper.Step>
                         <Stepper.Step
-                            label="Second step"
-                            description="Verify email"
+                            label="Cập nhật"
+                            description="mật khẩu mới"
                         >
-                            <Box maw={340} mx="auto">
-                                <form
-                                    onSubmit={form.onSubmit((values) =>
-                                        console.log(values)
-                                    )}
-                                >
-                                    <PasswordInput
-                                        label="Password"
-                                        placeholder="Password"
-                                        {...form.getInputProps('password')}
-                                    />
+                            <div sm={6} className="mx-auto w-75">
+                                <div className="modal-body shadow rounded">
+                                    <Box>
+                                        {/* <LoadingOverlay
+                                            visible={true}
+                                            overlayBlur={2}
+                                        /> */}
+                                        <form onSubmit={form.onSubmit(submit)}>
+                                            <PasswordInput
+                                                label="Mật khẩu mới"
+                                                placeholder="Mật khẩu mới..."
+                                                {...form.getInputProps(
+                                                    'password'
+                                                )}
+                                            />
 
-                                    <PasswordInput
-                                        mt="sm"
-                                        label="Confirm password"
-                                        placeholder="Confirm password"
-                                        {...form.getInputProps(
-                                            'confirmPassword'
-                                        )}
-                                    />
+                                            <PasswordInput
+                                                mt="sm"
+                                                label="Xác nhận mật khẩu mới"
+                                                placeholder="Xác nhận mật khẩu mới..."
+                                                {...form.getInputProps(
+                                                    'confirmPassword'
+                                                )}
+                                            />
 
-                                    <Group position="right" mt="md">
-                                        <Button type="submit">Submit</Button>
-                                    </Group>
-                                </form>
-                            </Box>
-                        </Stepper.Step>
-                        <Stepper.Step
-                            label="Final step"
-                            description="Get full access"
-                        >
-                            Step 3 content: Get full access
+                                            <Group position="right" mt="md">
+                                                <Button
+                                                    type="submit"
+                                                    color="primary"
+                                                >
+                                                    Cập nhật
+                                                </Button>
+                                            </Group>
+                                        </form>
+                                    </Box>
+                                </div>
+                            </div>
                         </Stepper.Step>
                         <Stepper.Completed>
-                            Completed, click back button to get to previous step
+                            <h3 className="d-flex justify-content-center">
+                                Chúc mừng bạn đã khôi phục mật khẩu thành công!
+                            </h3>
                         </Stepper.Completed>
                     </Stepper>
 

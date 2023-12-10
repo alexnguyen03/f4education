@@ -83,7 +83,8 @@ public class CertificateServiceImp implements CertificateService {
 
 		BeanUtils.copyProperties(certificate, certificateResponse);
 
-		certificateResponse.setRegisterCourse(certificate.getRegisterCourse());
+		certificateResponse.setStudentId(certificate.getRegisterCourse().getStudent().getStudentId());
+		certificateResponse.setStudentName(certificate.getRegisterCourse().getStudent().getFullname());
 
 		return certificateResponse;
 	}
@@ -98,14 +99,6 @@ public class CertificateServiceImp implements CertificateService {
 		certificate.setRegisterCourse(registerCourse);
 
 		return certificate;
-	}
-
-	private void convertRequestToEntity(CertificateDTO certificateDTO, Certificate certificate) {
-		RegisterCourse registerCourse = registerCourseRepository.findById(certificateDTO.getRegisterCourseId()).get();
-
-		BeanUtils.copyProperties(certificateDTO, certificate);
-
-		certificate.setRegisterCourse(registerCourse);
 	}
 
 }
