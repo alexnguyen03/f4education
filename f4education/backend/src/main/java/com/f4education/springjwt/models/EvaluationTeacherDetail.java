@@ -1,5 +1,7 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +17,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EvaluationTeacherDetail {
+public class EvaluationTeacherDetail implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "evaluation_teacher_detail_id")
@@ -26,7 +28,7 @@ public class EvaluationTeacherDetail {
     private Integer value;
 
     @ManyToOne
-    @JoinColumn(name = "evaluation_teacher_id")
+    @JoinColumn(name = "evaluate_teacher_id")
     private EvaluationTeacher evaluationTeacher;
 
     public EvaluationTeacherDetail(String title, Integer value) {

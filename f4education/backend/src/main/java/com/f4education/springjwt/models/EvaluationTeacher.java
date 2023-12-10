@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -19,10 +20,10 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class EvaluationTeacher {
+public class EvaluationTeacher implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "evaluate_teacher_id")
+    @Column(name = "evaluation_id")
     private Integer evaluateTeacherId;
 
     @Column(name = "complete_date")

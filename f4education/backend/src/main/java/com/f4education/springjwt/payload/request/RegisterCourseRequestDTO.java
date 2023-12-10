@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RegisterCourseRequestDTO {
+	@JsonProperty("registerCourseId")
 	private Integer registerCourseId;
 
 	@JsonProperty("courseId")

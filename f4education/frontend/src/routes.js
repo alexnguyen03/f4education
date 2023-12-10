@@ -116,8 +116,8 @@ export var routes = [
         layout: '/admin'
     },
     {
-        path: '/class-detail/:classIdParam',
-        name: 'Lớp học',
+        path: '/classs/class-detail/:classIdParam',
+        name: 'Lớp học chi tiết',
         icon: 'ni ni-single-02 text-yellow',
         component: <ClassDetail />,
         layout: '/admin'

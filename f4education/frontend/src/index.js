@@ -35,6 +35,10 @@ root.render(
                 path="/admin"
                 element={<Navigate to="/admin/index" replace />}
             />
+            <Route
+                path="/classs/class-detail/:classIdParam"
+                element={<AdminLayout />}
+            />
             <Route path="/admin/*/:courseId" element={<AdminLayout />} />
 
             {/* Client Route */}

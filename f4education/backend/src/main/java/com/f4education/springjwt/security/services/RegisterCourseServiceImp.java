@@ -1,49 +1,28 @@
 package com.f4education.springjwt.security.services;
 
-import java.util.ArrayList;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
+import com.f4education.springjwt.interfaces.ClassService;
+import com.f4education.springjwt.interfaces.PointService;
+import com.f4education.springjwt.interfaces.RegisterCourseService;
+import com.f4education.springjwt.interfaces.TeacherService;
+import com.f4education.springjwt.models.*;
+import com.f4education.springjwt.payload.HandleResponseDTO;
+import com.f4education.springjwt.payload.request.ClassDTO;
+import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
+import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
+import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
+import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
+import com.f4education.springjwt.repository.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import com.f4education.springjwt.interfaces.ClassService;
-import com.f4education.springjwt.interfaces.PointService;
-import com.f4education.springjwt.interfaces.RegisterCourseService;
-import com.f4education.springjwt.interfaces.TeacherService;
-import com.f4education.springjwt.models.ClassRoom;
-import com.f4education.springjwt.models.Classes;
-import com.f4education.springjwt.models.Course;
-import com.f4education.springjwt.models.Point;
-import com.f4education.springjwt.models.RegisterCourse;
-import com.f4education.springjwt.models.Schedule;
-import com.f4education.springjwt.models.Sessions;
-import com.f4education.springjwt.models.Student;
-import com.f4education.springjwt.models.Teacher;
-import com.f4education.springjwt.payload.HandleResponseDTO;
-import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
-import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
-import com.f4education.springjwt.payload.request.ScheduleDTO;
-import com.f4education.springjwt.payload.request.TeacherDTO;
-import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
-import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
-import com.f4education.springjwt.payload.response.ScheduleResponse;
-import com.f4education.springjwt.repository.ClassRepository;
-import com.f4education.springjwt.repository.ClassRoomRepository;
-import com.f4education.springjwt.repository.CourseRepository;
-import com.f4education.springjwt.repository.GoogleDriveRepository;
-import com.f4education.springjwt.repository.RegisterCourseRepository;
-import com.f4education.springjwt.repository.ScheduleRepository;
-import com.f4education.springjwt.repository.SessionsRepository;
-import com.f4education.springjwt.repository.StudentRepository;
-import com.f4education.springjwt.repository.TeacherRepository;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class RegisterCourseServiceImp implements RegisterCourseService {
@@ -110,7 +89,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	public Boolean checkIfCourseIsDone(String studentId, Integer classId, Integer RegisterCourseId) {
 		RegisterCourse rg = registerCourseRepository.findIfCourseIsDone(studentId, classId, RegisterCourseId,
 				(float) 5.0);
-		return rg != null ? true : false;
+		return rg != null;
 	}
 
 	@Override
@@ -129,12 +108,12 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	public CourseProgressResponseDTO convertToCourseProgressResponseDTO(RegisterCourse registerCourse) {
 		CourseProgressResponseDTO courseResponse = new CourseProgressResponseDTO();
-		
+
 		courseResponse.setCourse(registerCourse.getCourse());
 		courseResponse.setClasses(registerCourse.getClasses());
 		courseResponse.setTeacherName(registerCourse.getClasses().getTeacher().getFullname());
 		courseResponse.setRegisterCourseId(registerCourse.getRegisterCourseId());
-		
+
 		return courseResponse;
 	}
 
@@ -256,7 +235,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public List<RegisterCourseResponseDTO> getAllRegisterCoursesByCourse_CourseName() {
-		return registerCourseRepository.findAll().stream()
+		return registerCourseRepository.getAllNotHasClass().stream()
 				.collect(Collectors.toMap(registration -> registration.getCourse().getCourseId(),
 						registration -> registration, (a, b) -> a))
 				.values().stream().map(this::convertToResponseDTO).collect(Collectors.toList());
@@ -265,25 +244,46 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	@Override
 	public List<RegisterCourseResponseDTO> updateRegisterCourseInClass(
 			RegisterCourseRequestDTO registerCourseRequestDTO) {
+
+		RegisterCourse registerCourseFound = registerCourseRepository
+				.findById(registerCourseRequestDTO.getRegisterCourseId())
+				.get();
 		List<RegisterCourse> listRegisterCourse = registerCourseRepository
-				.findByCourseId(registerCourseRequestDTO.getCourseId());
+				.findByCourseId(registerCourseFound.getCourse().getCourseId());
 		List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
 		List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
 		List<Point> listPoint = new ArrayList<Point>();
+		Classes newClasses = new Classes();
+
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
+		// List<EvaluationTeacher> lsEvaluationTeacher =
+		// foundClass.getEvaluationTeacher();
+		// List<Attendance> lsAttendance = foundClass.getAttendances();
+
+		BeanUtils.copyProperties(foundClass, newClasses);
 		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
-		foundClass.setTeacher(foundTeacher);
-		classService.saveOneClass(foundClass);
+		newClasses.setTeacher(foundTeacher);
+		// newClasses.setEvaluationTeacher(lsEvaluationTeacher);
+		newClasses.setStatus("Đang diễn ra");
+
+		try {
+
+			classService.saveOneClass(newClasses);
+		} catch (Exception e) {
+			// TODO: handle exception e.printStackTrace();
+		}
 		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
 		if (!listRegisterCourseIdToAdd.isEmpty()) {
 
 			filteredRegisterCoursesToAdd = listRegisterCourse.stream()
-					.filter(registerCourse -> listRegisterCourseIdToAdd.contains(registerCourse.getRegisterCourseId()))
+					.filter(registerCourse -> listRegisterCourseIdToAdd
+							.contains(registerCourse.getRegisterCourseId()))
 					.collect(Collectors.toList());
+			Classes classes = foundClass;
 			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
-				registerCourse.setClasses(foundClass);
+				registerCourse.setClasses(classes);
 				Point point = new Point();
-				point.setClasses(foundClass);
+				point.setClasses(classes);
 				point.setStudent(registerCourse.getStudent());
 				point.setAttendancePoint((double) 0);
 				point.setExercisePoint((double) 0);
@@ -298,7 +298,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
 
 			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
-					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getRegisterCourseId()))
+					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
 				registerCourse.setClasses(null);
@@ -317,8 +317,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		List<RegisterCourse> listRegisterCourses = new ArrayList<>();
 		listRegisterCourses = registerCourseRepository.getRegisterCourseHasClass(classId);
 		return !listRegisterCourses.isEmpty();// false thì sẽ thì lớp đã tồn tại throw new
-												// UnsupportedOperationException("Unimplemented method
-												// 'getRegisterCourseHasClass'");
+		// UnsupportedOperationException("Unimplemented method
+		// 'getRegisterCourseHasClass'");
 	}
 
 	// @Override

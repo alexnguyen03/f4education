@@ -30,7 +30,10 @@ public interface RegisterCourseRepository extends JpaRepository<RegisterCourse, 
 	@Query("SELECT new com.f4education.springjwt.payload.request.ProgressDTO(rc) FROM RegisterCourse rc WHERE rc.classes.classId = :classId")
 	List<ProgressDTO> getAllProgress(@Param("classId") Integer classId);
 
+	@Query("SELECT rc FROM RegisterCourse rc WHERE rc.classes.classId  IS NULL")
+	List<RegisterCourse> getAllNotHasClass();
 	//
+
 	// @Query("SELECT new com.f4education.springjwt.models.ClassesByTeacher(rc,c,t)
 	// FROM RegisterCourse rc JOIN rc.classes c JOIN c.teacher t")
 	// List<ClassesByTeacher> getRegisterCourseWithTeacherAndClasses();

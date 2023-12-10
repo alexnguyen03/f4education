@@ -190,23 +190,22 @@ const Login = () => {
         }
     }, [])
     return (
-        <>
-            <Col lg="5" md="7">
-                <Box maw={400} pos="relative">
-                    <LoadingOverlay visible={loading} overlayBlur={2} />
-                    <Card className="bg-secondary shadow border-0">
-                        <CardHeader className="bg-transparent pb-4">
-                            {msgError.allErr && (
-                                <p className="text-danger text-center mt-1">
-                                    {msgError.allErr}
-                                </p>
-                            )}
+        <Col lg="5" md="7">
+            <Box maw={400} pos="relative">
+                <LoadingOverlay visible={loading} overlayBlur={2} />
+                <Card className="bg-secondary shadow border-0">
+                    <CardHeader className="bg-transparent pb-4">
+                        {msgError.allErr && (
+                            <p className="text-danger text-center mt-1">
+                                {msgError.allErr}
+                            </p>
+                        )}
 
-                            <div className="text-muted text-center mt-2 mb-3">
-                                <small>Đăng nhập bằng</small>
-                            </div>
-                            <div className="btn-wrapper text-center">
-                                {/* <Button
+                        <div className="text-muted text-center mt-2 mb-3">
+                            <small>Đăng nhập bằng</small>
+                        </div>
+                        <div className="btn-wrapper text-center">
+                            {/* <Button
                                     className="btn-neutral btn-icon"
                                     color="default"
                                     href="#pablo"
@@ -226,115 +225,104 @@ const Login = () => {
                                     </span>
                                 </Button> */}
 
-                                <GoogleLogin
-                                    clientId="477164526232-padd6dn43ofdo07ie2uad6avblrp9n9r.apps.googleusercontent.com"
-                                    buttonText="Đăng nhập bằng Google"
-                                    onSuccess={responseGoogleSuccess}
-                                    onFailure={responseGoogleError}
-                                    cookiePolicy={'single_host_origin'}
-                                />
-                            </div>
-                        </CardHeader>
-                        <CardBody className="px-lg-5 ">
-                            <div className="text-center text-muted mb-2">
-                                <small>hoặc</small>
-                            </div>
+                            <GoogleLogin
+                                clientId="477164526232-padd6dn43ofdo07ie2uad6avblrp9n9r.apps.googleusercontent.com"
+                                buttonText="Đăng nhập bằng Google"
+                                onSuccess={responseGoogleSuccess}
+                                onFailure={responseGoogleError}
+                                cookiePolicy={'single_host_origin'}
+                            />
+                        </div>
+                    </CardHeader>
+                    <CardBody className="px-lg-5 ">
+                        <div className="text-center text-muted mb-2">
+                            <small>hoặc</small>
+                        </div>
 
-                            <Form role="form">
-                                <FormGroup className="mb-3">
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="input-username"
-                                    >
-                                        Email hoặc Username
-                                    </label>
-                                    <InputGroup className="input-group-alternative">
-                                        <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                                <i className="ni ni-email-83" />
-                                            </InputGroupText>
-                                        </InputGroupAddon>
-                                        <Input
-                                            placeholder="Email hoặc Username"
-                                            type="text"
-                                            autoComplete="new-email"
-                                            name="username"
-                                            value={account.username}
-                                            onChange={handeleOnChangeInput}
-                                        />
-                                    </InputGroup>
-
-                                    {msgError.usernameErr && (
-                                        <p className="text-danger mt-1">
-                                            {msgError.usernameErr}
-                                        </p>
-                                    )}
-                                </FormGroup>
-                                <FormGroup>
-                                    <label
-                                        className="form-control-label"
-                                        htmlFor="input-username"
-                                    >
-                                        Mật khẩu
-                                    </label>
-                                    <InputGroup className="input-group-alternative">
-                                        <InputGroupAddon addonType="prepend">
-                                            <InputGroupText>
-                                                <i className="ni ni-lock-circle-open" />
-                                            </InputGroupText>
-                                        </InputGroupAddon>
-                                        <Input
-                                            placeholder="Mật khẩu"
-                                            type="password"
-                                            name="password"
-                                            onChange={handeleOnChangeInput}
-                                            autoComplete="new-password"
-                                            onKeyDown={handleKeyDown}
-                                            value={account.password}
-                                        />
-                                    </InputGroup>
-                                    {msgError.passwordErr && (
-                                        <p className="text-danger mt-1">
-                                            {msgError.passwordErr}
-                                        </p>
-                                    )}
-                                </FormGroup>
-                                <div className="custom-control custom-control-alternative custom-checkbox">
-                                    <input
-                                        className="custom-control-input"
-                                        id=" customCheckLogin"
-                                        type="checkbox"
-                                    />
-                                    <label
-                                        className="custom-control-label"
-                                        htmlFor=" customCheckLogin"
-                                    ></label>
-                                </div>
-                                <div className="text-center">
-                                    <Button
-                                        className="my-4"
-                                        color="primary"
-                                        type="button"
-                                        onClick={handleLogin}
-                                    >
-                                        Đăng nhập
-                                    </Button>
-                                </div>
-                            </Form>
-                            <div className="text-center">
-                                <a
-                                    className="text-light"
-                                    href="#pablo"
-                                    onClick={(e) => e.preventDefault()}
+                        <Form role="form">
+                            <FormGroup className="mb-3">
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="input-username"
                                 >
-                                    <small>Quên mật khẩu ?</small>
-                                </a>
+                                    Email hoặc Username
+                                </label>
+                                <InputGroup className="input-group-alternative">
+                                    <InputGroupAddon addonType="prepend">
+                                        <InputGroupText>
+                                            <i className="ni ni-email-83" />
+                                        </InputGroupText>
+                                    </InputGroupAddon>
+                                    <Input
+                                        placeholder="Email hoặc Username"
+                                        type="text"
+                                        autoComplete="new-email"
+                                        name="username"
+                                        value={account.username}
+                                        onChange={handeleOnChangeInput}
+                                    />
+                                </InputGroup>
+
+                                {msgError.usernameErr && (
+                                    <p className="text-danger mt-1">
+                                        {msgError.usernameErr}
+                                    </p>
+                                )}
+                            </FormGroup>
+                            <FormGroup>
+                                <label
+                                    className="form-control-label"
+                                    htmlFor="input-username"
+                                >
+                                    Mật khẩu
+                                </label>
+                                <InputGroup className="input-group-alternative">
+                                    <InputGroupAddon addonType="prepend">
+                                        <InputGroupText>
+                                            <i className="ni ni-lock-circle-open" />
+                                        </InputGroupText>
+                                    </InputGroupAddon>
+                                    <Input
+                                        placeholder="Mật khẩu"
+                                        type="password"
+                                        name="password"
+                                        onChange={handeleOnChangeInput}
+                                        autoComplete="new-password"
+                                        onKeyDown={handleKeyDown}
+                                        value={account.password}
+                                    />
+                                </InputGroup>
+                                {msgError.passwordErr && (
+                                    <p className="text-danger mt-1">
+                                        {msgError.passwordErr}
+                                    </p>
+                                )}
+                            </FormGroup>
+
+                            <div className="text-center">
+                                <Button
+                                    className="my-4"
+                                    color="primary"
+                                    type="button"
+                                    onClick={handleLogin}
+                                >
+                                    Đăng nhập
+                                </Button>
                             </div>
-                        </CardBody>
-                    </Card>
-                </Box>
-            </Col>
-        </>
+                        </Form>
+                        <div className="text-center">
+                            <a
+                                className="text-light"
+                                href="#pablo"
+                                onClick={(e) => e.preventDefault()}
+                            >
+                                <small>Quên mật khẩu ?</small>
+                            </a>
+                        </div>
+                    </CardBody>
+                </Card>
+            </Box>
+        </Col>
     )
 }
 export default Login

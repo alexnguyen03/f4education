@@ -1,6 +1,9 @@
 package com.f4education.springjwt.security.services;
 
 import java.io.IOException;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
+import java.util.ArrayList;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -87,51 +90,63 @@ public class FirebaseStorageService {
                 return isUpdated;
         }
 
-        public static void main(String[] args) {
-                try {
-                        StorageOptions storageOptions = StorageOptions.newBuilder()
-                                        .setProjectId("f4education-p2")
-                                        .setCredentials(GoogleCredentials
-                                                        .fromStream(new ClassPathResource("serviceAccountKey.json")
-                                                                        .getInputStream()))
-                                        .build();
-                        String bucketName = "f4education-p2.appspot.com";
-                        Storage storage = storageOptions.getService();
+        // public static String createUsername(String fullName) {
+        // String processedName = Normalizer.normalize(fullName, Form.NFD)
+        // .replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replaceAll("đ", "d")
+        // .replaceAll("Đ", "D");
 
-                        String folderPrefix = "avatars/accounts/";
+        // String result = createNewString(processedName.toLowerCase());
+        // return result;
+        // }
 
-                        // List the blobs with the specified folder prefix
-                        Iterable<Blob> blobs = storage.list(bucketName, Storage.BlobListOption.prefix(folderPrefix))
-                                        .iterateAll();
+        // public static String createNewString(String input) {
+        // String[] words = input.split(" ");
+        // StringBuilder newString = new StringBuilder();
 
-                        // Set Cache-Control header to no-cache for each blob
-                        for (Blob blob : blobs) {
-                                BlobInfo updatedBlobInfo = blob.toBuilder().setCacheControl("no-cache").build();
-                                storage.update(updatedBlobInfo);
-                                System.out.println("Cache-Control set to no-cache for: " + blob.getName());
-                                Blob updatedBlob = storage.get(bucketName, blob.getName());
-                                String cacheControl = updatedBlob.getCacheControl();
-                                System.out.println("Cache-Control: " + cacheControl);
-                        }
-                        // String blobName = "your-blob-name";
+        // if (words.length > 0) {
+        // newString.append(words[words.length - 1]); // Thêm từ cuối đầu tiên vào chuỗi
+        // mới
 
-                        // Get the blob
-                        // Blob blob = storage.get(bucketName, blobName);
+        // // Thêm từng ký tự đầu của các từ còn lại vào chuỗi mới
+        // for (int i = 0; i < words.length - 1; i++) {
+        // if (!words[i].isEmpty()) {
+        // newString.append(words[i].charAt(0)); // Thêm ký tự đầu của từ
+        // }
+        // }
+        // }
 
-                        // Set Cache-Control header to no-cache
-                        // BlobInfo updatedBlobInfo =
-                        // blob.toBuilder().setCacheControl("no-cache").build();
+        // return newString.toString();
+        // }
 
-                        // Update the blob with new Cache-Control header
-                        // storage.update(updatedBlobInfo);
+        // public static void main(String[] args) {
+        // ArrayList<String> danhSachTenVaGioiTinh = new ArrayList<>();
 
-                        // System.out.println("Cache-Control set to no-cache for the blob: " +
-                        // blobName);
+        // // Thêm thông tin vào ArrayList
+        // danhSachTenVaGioiTinh.add(new String("Nguyễn Văn An"));
+        // danhSachTenVaGioiTinh.add(new String("Trần Thị Bình"));
+        // danhSachTenVaGioiTinh.add(new String("Lê Văn Chiến"));
+        // danhSachTenVaGioiTinh.add(new String("Phạm Thị Dung"));
+        // danhSachTenVaGioiTinh.add(new String("Hoàng Văn Em"));
+        // danhSachTenVaGioiTinh.add(new String("Vũ Thị Phương"));
+        // danhSachTenVaGioiTinh.add(new String("Đặng Văn Giang"));
+        // danhSachTenVaGioiTinh.add(new String("Bùi Thị Hoa"));
+        // danhSachTenVaGioiTinh.add(new String("Đỗ Văn Ích"));
+        // danhSachTenVaGioiTinh.add(new String("Ngô Thị Khanh"));
+        // danhSachTenVaGioiTinh.add(new String("Hồ Văn Long"));
+        // danhSachTenVaGioiTinh.add(new String("Dương Thị Mai"));
+        // danhSachTenVaGioiTinh.add(new String("Mai Văn Nam"));
+        // danhSachTenVaGioiTinh.add(new String("Lý Thị Phượng"));
+        // danhSachTenVaGioiTinh.add(new String("Trịnh Văn Quân"));
+        // danhSachTenVaGioiTinh.add(new String("Phan Thị Linh"));
+        // danhSachTenVaGioiTinh.add(new String("Đinh Văn Sơn"));
+        // danhSachTenVaGioiTinh.add(new String("Trương Thị Thảo"));
+        // danhSachTenVaGioiTinh.add(new String("Võ Văn Uyên"));
+        // danhSachTenVaGioiTinh.add(new String("Đào Thị Vy"));
 
-                } catch (Exception e) {
-                        // TODO: handle exception
+        // // In danh sách tên và giới tính từ ArrayList
+        // for (String string : danhSachTenVaGioiTinh) {
+        // System.out.println(createUsername(string));
 
-                        e.printStackTrace();
-                }
-        }
+        // }
+        // }
 }
