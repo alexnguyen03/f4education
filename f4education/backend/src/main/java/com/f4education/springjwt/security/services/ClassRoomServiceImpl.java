@@ -43,10 +43,10 @@ public class ClassRoomServiceImpl implements ClassRoomService {
 	}
 
 	@Override
-	public ClassRoomDTO createClass(ClassRoomDTO classroomDTO) {
+	public ClassRoomDTO createClass(ClassRoomDTO classroomDTO, String adminId) {
 		String action = "CREATE";
 		ClassRoom classRoom = new ClassRoom();
-		Admin admin = adminRepository.findById("namnguyen").get();
+		Admin admin = adminRepository.findById(adminId).get();
 		convertToEntity(classroomDTO, classRoom);
 		classRoom.setAdmin(admin);
 		ClassRoom saveClassRoom = classRoomRepository.save(classRoom);

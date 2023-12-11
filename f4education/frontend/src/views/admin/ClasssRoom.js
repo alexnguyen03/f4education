@@ -18,7 +18,8 @@ import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
 import moment from 'moment'
 import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import Notify from '../../utils/Notify'
+import { IconRefresh } from '@tabler/icons-react'
 
 // gọi API từ classRoomApi
 import classRoomApi from 'api/classRoomApi'
@@ -27,6 +28,7 @@ import classRoomApi from 'api/classRoomApi'
 import classRoomHistoryApi from 'api/classRoomHistoryApi'
 
 const ClasssRoom = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
     const [classRooms, setClassRooms] = useState([])
     const [classRoomHistories, setClassRoomHistories] = useState([])
     const [classRoomHistoryByClassRoomId, setClassRoomHistotyByClassRoomId] =
@@ -48,13 +50,23 @@ const ClasssRoom = () => {
         status: 'Hoạt động'
     })
 
+    const isClassNameExists = (newClassRoomName) => {
+        // Kiểm tra xem tên lớp mới đã tồn tại trong đối tượng classs hay chưa
+        return Object.values(classRooms).some(
+            (cls) => cls.classroomName === newClassRoomName
+        )
+    }
+
     // bắt lỗi form
     const validateForm = () => {
         let validationErrors = {}
-        if (classRoom.classroomName.trim() === '') {
+        if (!classRoom.classroomName) {
             validationErrors.classroomName = 'Vui lòng nhập tên phòng học!!!'
         } else if (classRoom.classroomName.length > 20) {
-            validationErrors.classroomName = 'Tên phòng học quá dài !!!'
+            validationErrors.classroomName = 'Tên phòng học quá dài!!!'
+        }
+        if (isClassNameExists(classRoom.classroomName) && update) {
+            validationErrors.classroomName = 'Tên phòng học đã tồn tại !!!'
         }
         return validationErrors
     }
@@ -169,17 +181,22 @@ const ClasssRoom = () => {
         e.preventDefault()
         const validationErrors = validateForm()
         if (Object.keys(validationErrors).length === 0) {
+            var id = null
             try {
-                const resp = await classRoomApi.createClassRoom(classRoom)
+                id = toast(Notify.msg.loading, Notify.options.loading())
+                const resp = await classRoomApi.createClassRoom(
+                    classRoom,
+                    user.username
+                )
                 if (resp.status === 200) {
-                    notification('success', 'Thêm thành công !!!')
-                    getDataClassRoom()
+                    toast.update(id, Notify.options.createSuccess())
                     handleResetForm()
+                    getDataClassRoom()
                 } else {
-                    notification('error', 'Thêm thất bại !!!')
+                    toast.update(id, Notify.options.createError())
                 }
             } catch (error) {
-                console.log('Thêm thất bại', error)
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors(validationErrors)
@@ -191,20 +208,23 @@ const ClasssRoom = () => {
         e.preventDefault()
         const validationErrors = validateForm()
         if (Object.keys(validationErrors).length === 0) {
+            var id = null
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 const resp = await classRoomApi.updateClassRoom(
                     classRoom,
                     classRoom.classroomId
                 )
                 if (resp.status === 200) {
-                    notification('success', 'Cập nhật thành công !!!')
-                    getDataClassRoom()
+                    toast.update(id, Notify.options.updateSuccess())
                     handleResetForm()
+                    getDataClassRoom()
                 } else {
-                    notification('error', 'Cập nhật thất bại !!!')
+                    toast.update(id, Notify.options.updateError())
                 }
             } catch (error) {
                 console.log('Cập nhật thất bại', error)
+                toast.update(id, Notify.options.updateError())
             }
         } else {
             setErrors(validationErrors)
@@ -226,7 +246,7 @@ const ClasssRoom = () => {
             },
             {
                 accessorKey: 'admin.fullname',
-                header: 'Người chỉnh sửa',
+                header: 'Tên người tạo',
                 size: 100
             },
             {
@@ -325,6 +345,7 @@ const ClasssRoom = () => {
 
     return (
         <>
+            <ToastContainer />
             <ClassRoomHeader />
             <Container className="mt--7" fluid>
                 <Card className="bg-secondary shadow">
@@ -379,18 +400,27 @@ const ClasssRoom = () => {
                                 data={classRooms}
                                 positionActionsColumn="last"
                                 renderTopToolbarCustomActions={() => (
-                                    <Button
-                                        onClick={() => {
-                                            setClassRoom({
-                                                ...classRoom,
-                                                status: 'Hoạt động'
-                                            })
-                                            setShowForm((pre) => !pre)
-                                        }}
-                                        color="success"
-                                    >
-                                        Thêm phòng học
-                                    </Button>
+                                    <Box>
+                                        <Button
+                                            onClick={() => {
+                                                setClassRoom({
+                                                    ...classRoom,
+                                                    status: 'Hoạt động'
+                                                })
+                                                setShowForm((pre) => !pre)
+                                            }}
+                                            color="success"
+                                        >
+                                            Thêm phòng học
+                                        </Button>
+                                        <Button
+                                            color="default"
+                                            onClick={() => getDataClassRoom()}
+                                            variant="contained"
+                                        >
+                                            <IconRefresh />
+                                        </Button>
+                                    </Box>
                                 )}
                                 enableRowActions
                                 renderRowActions={({ row, table }) => (
@@ -600,19 +630,6 @@ const ClasssRoom = () => {
                     </div>
                 </Modal>
             </Container>
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
-            <ToastContainer />
         </>
     )
 }

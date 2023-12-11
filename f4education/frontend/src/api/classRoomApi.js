@@ -14,8 +14,8 @@ const classRoomApi = {
         const url = `/classroom/session`
         return axiosClient.post(url, startDate)
     },
-    createClassRoom: (body) => {
-        const url = '/classroom'
+    createClassRoom: (body, adminId) => {
+        const url = `/classroom/${adminId}`
         return axiosClient.post(url, body)
     },
     updateClassRoom: (body, classroomId) => {
