@@ -34,14 +34,14 @@ public class AttendanceController {
 	AttendanceReposotory attendanceReposotory;
 
 	@GetMapping
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> findAll() {
 		List<AttendanceDTO> attendances = attendanceService.getAllAttendance();
 		return ResponseEntity.ok(attendances);
 	}
 
 	@GetMapping("/{attendanceId}")
-//	@PreAuthorize("hasRole('ADMIN')")
+	// @PreAuthorize("hasRole('ADMIN')")
 	public ResponseEntity<?> findAllByAttendanceId(@PathVariable Integer attendanceId) {
 		AttendanceDTO attendances = attendanceService.getAttendanceByAttendanceId(attendanceId);
 		return ResponseEntity.ok(attendances);

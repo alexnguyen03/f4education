@@ -74,8 +74,8 @@ public class AttendanceServiceImpl implements AttendanceService {
 		List<RegisterCourse> rg = attendance.getClasses().getRegisterCourses();
 
 		for (RegisterCourse registerCourse : rg) {
-			if (registerCourse.getStudent().getStudentId().equals(attendance.getStudent().getStudentId())
-					&& registerCourse.getClasses().getClassId().equals(attendance.getClasses().getClassId())) {
+			if (registerCourse.getStudent().getStudentId().equals(attendance.getStudent().getStudentId()) &&
+					registerCourse.getClasses().getClassId().equals(attendance.getClasses().getClassId())) {
 				attendanceDTO.setCourseName(registerCourse.getCourse().getCourseName());
 				break;
 			}
@@ -94,16 +94,16 @@ public class AttendanceServiceImpl implements AttendanceService {
 		Attendance attendance = this.convertToEntity(attendanceDTO);
 
 		Optional<Student> student = studentReposotory.findById(attendanceDTO.getStudentId());
-//		For production
-//		String[] listMail = { student.get().getUser().getEmail() };
+		// For production
+		// String[] listMail = { student.get().getUser().getEmail() };
 
-//		For testing
+		// For testing
 		String[] listMail = { "hienttpc03323@fpt.edu.vn" };
 
 		attendance.setAttendanceDate(new Date());
 		Attendance newAttendance = attendanceReposotory.save(attendance);
 
-//		Send Mail
+		// Send Mail
 		Integer absentCount = attendanceReposotory.countAttendanceByClassAndStudent(attendanceDTO.getStudentId(),
 				attendanceDTO.getClassId());
 

@@ -1,6 +1,10 @@
 package com.f4education.springjwt.models;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -31,35 +35,36 @@ public class Classes implements Serializable {
 	private String status;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<ClassHistory> classHistories;
+	private List<ClassHistory> classHistories;
 	// @OneToMany(mappedBy = "classes")
 	// @JsonIgnore
 	// List<Comment> comments;
 
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<Schedule> schedules;
+	private List<Schedule> schedules;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<Task> tasks;
+	private List<Task> tasks;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<RegisterCourse> registerCourses;
+	private List<RegisterCourse> registerCourses;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<QuizResult> quizResults;
+	private List<QuizResult> quizResults;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<EvaluationTeacher> evaluationTeacher;
+	private List<EvaluationTeacher> evaluationTeacher;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<Examination> examinations;
+	private List<Examination> examinations;
 
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<Point> points;
+	private List<Point> points;
 
 	@OneToMany(mappedBy = "classes")
+	@JsonManagedReference
 	private List<Attendance> attendances;
 
 	@ManyToOne
@@ -70,10 +75,6 @@ public class Classes implements Serializable {
 	@JoinColumn(name = "teacher_id")
 	@JsonIgnore
 	Teacher teacher;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<Attendance> attendences;
 
 	@Override
 	public String toString() {

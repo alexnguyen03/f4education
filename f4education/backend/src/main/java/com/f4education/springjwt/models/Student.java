@@ -1,20 +1,17 @@
 package com.f4education.springjwt.models;
 
-import java.io.Serializable;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.List;
 
 @Data
 @Entity
@@ -62,16 +59,9 @@ public class Student implements Serializable {
 	@OneToMany(mappedBy = "student")
 	List<QuizResult> quizResults;
 
-	// @JsonIgnore
 	@OneToMany(mappedBy = "student")
-	List<Attendance> attendances;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "student")
-	List<Attendance> attendences;
-	// @JsonIgnore
-	// @OneToMany(mappedBy = "student")
-	// List<Schedule> schedules;
+	@JsonManagedReference
+	private List<Attendance> attendances;
 
 	@ManyToOne
 	@JsonIgnore

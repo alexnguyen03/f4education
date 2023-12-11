@@ -3,6 +3,7 @@ package com.f4education.springjwt.models;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Column;
@@ -31,17 +32,20 @@ public class Attendance implements Serializable {
 	@Column(name = "attendance_date")
 	private Date attendanceDate;
 
+	@JsonBackReference
 	@ManyToOne
 	@JoinColumn(name = "class_id")
 	Classes classes;
 
 	@ManyToOne
+	@JsonBackReference
 	@JoinColumn(name = "student_id")
-	Student student;
+	private Student student;
 
 	@Override
 	public String toString() {
-		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" + attendanceDate + "]";
+		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" +
+				attendanceDate + "]";
 	}
 
 }

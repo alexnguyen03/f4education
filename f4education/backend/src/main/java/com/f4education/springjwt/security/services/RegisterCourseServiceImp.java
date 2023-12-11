@@ -256,22 +256,15 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		Classes newClasses = new Classes();
 
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
-		// List<EvaluationTeacher> lsEvaluationTeacher =
-		// foundClass.getEvaluationTeacher();
-		// List<Attendance> lsAttendance = foundClass.getAttendances();
+		List<EvaluationTeacher> lsEvaluationTeacher = foundClass.getEvaluationTeacher();
+		List<Attendance> lsAttendance = foundClass.getAttendances();
 
 		BeanUtils.copyProperties(foundClass, newClasses);
 		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
 		newClasses.setTeacher(foundTeacher);
-		// newClasses.setEvaluationTeacher(lsEvaluationTeacher);
+		newClasses.setEvaluationTeacher(lsEvaluationTeacher);
 		newClasses.setStatus("Đang diễn ra");
 
-		try {
-
-			classService.saveOneClass(newClasses);
-		} catch (Exception e) {
-			// TODO: handle exception e.printStackTrace();
-		}
 		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
 		if (!listRegisterCourseIdToAdd.isEmpty()) {
 
@@ -291,8 +284,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 				point.setQuizzPoint((double) 0);
 				listPoint.add(point);
 			});
-			pointService.save(listPoint);
-			registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+
 		}
 		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
@@ -304,7 +296,33 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 				registerCourse.setClasses(null);
 
 			});
-			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+
+		}
+		try {
+			classService.saveOneClass(newClasses);
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			try {
+
+				pointService.save(listPoint);
+			} catch (Exception e1) {
+
+				e1.printStackTrace();
+				try {
+
+					registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+				} catch (Exception e2) {
+
+					e2.printStackTrace();
+					try {
+						registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+					} catch (Exception e3) {
+
+						e3.printStackTrace();
+					}
+				}
+			}
 		}
 
 		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
