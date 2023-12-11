@@ -151,6 +151,18 @@ public class GoogleDriveRepository {
 		}
 		return parentId;
 	}
+	
+	public String getFolderIdNoCreate(String folderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		String parentId = null;
+		String[] folderNames = folderName.split("/");
+
+		Drive driveInstance = driveQuickstart.getInstance();
+		for (String name : folderNames) {
+			parentId = searchFolderId(parentId, name, driveInstance);
+		}
+		return parentId;
+	}
 
 	private String findOrCreateFolder(String parentId, String folderName, Drive driveInstance) throws Exception {
 		String folderId = searchFolderId(parentId, folderName, driveInstance);

@@ -22,7 +22,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom'
 import BookmarkIcon from '@mui/icons-material/Bookmark'
 import { Box, IconButton } from '@mui/material'
 import moment from 'moment'
-import { IconBookUpload } from '@tabler/icons-react'
+import { IconBookDownload } from '@tabler/icons-react'
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
@@ -31,6 +31,7 @@ import resourceApi from 'api/resourceApi'
 
 import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInformation.module.scss'
 import { Try } from '@mui/icons-material'
+import logoTask from '../../assets/img/taskonlinetab.jpg'
 
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -289,56 +290,74 @@ const DownloadTaskStudent = () => {
                                         mx={20}
                                         key={indexTask}
                                     >
-                                        <Title my={5} order={3}>
-                                            {task.title}
-                                        </Title>
-                                        <Text my={5}>{task.description}</Text>
-                                        <Text my={5}>
-                                            Thời gian:{' '}
-                                            {moment(task.startDate).format(
-                                                'DD/MM/yyyy, hh:mm A'
-                                            )}{' '}
-                                            -{' '}
-                                            {moment(task.endDate).format(
-                                                'DD/MM/yyyy, hh:mm A'
-                                            )}
-                                        </Text>
-                                        <Badge
-                                            variant="outline"
-                                            color={
-                                                isCurrentDateInRange(
-                                                    task.startDate,
-                                                    task.endDate
-                                                )
-                                                    ? 'teal'
-                                                    : 'red'
-                                            }
-                                            size="lg"
-                                            mt={10}
-                                        >
-                                            {isCurrentDateInRange(
-                                                task.startDate,
-                                                task.endDate
-                                            )
-                                                ? 'Đang diễn ra'
-                                                : 'Đã kết thúc'}
-                                        </Badge>
-                                        <Text ta={'right'}>
-                                            <Button
-                                                variant="filled"
-                                                color="teal"
-                                                mt={5}
-                                                mb={10}
-                                                onClick={() => {
-                                                    handleOnClickDownloadFiles(
-                                                        task.className,
-                                                        task.title
+                                        <Grid>
+                                            <Grid.Col span={2} mt={17}>
+                                                <img
+                                                    src={logoTask}
+                                                    className="img-fluid p-0"
+                                                    alt="logo task"
+                                                />
+                                            </Grid.Col>
+                                            <Grid.Col span={9} ml={10} mt={5}>
+                                                <Title my={5} order={3}>
+                                                    {task.title}
+                                                </Title>
+                                                <Text my={5}>
+                                                    {task.description}
+                                                </Text>
+                                                <Text my={5}>
+                                                    Thời gian:{' '}
+                                                    {moment(
+                                                        task.startDate
+                                                    ).format(
+                                                        'DD/MM/yyyy, hh:mm A'
+                                                    )}{' '}
+                                                    -{' '}
+                                                    {moment(
+                                                        task.endDate
+                                                    ).format(
+                                                        'DD/MM/yyyy, hh:mm A'
+                                                    )}
+                                                </Text>
+                                                <Badge
+                                                    variant="outline"
+                                                    color={
+                                                        isCurrentDateInRange(
+                                                            task.startDate,
+                                                            task.endDate
+                                                        )
+                                                            ? 'teal'
+                                                            : 'red'
+                                                    }
+                                                    size="lg"
+                                                    mt={10}
+                                                >
+                                                    {isCurrentDateInRange(
+                                                        task.startDate,
+                                                        task.endDate
                                                     )
-                                                }}
-                                            >
-                                                <IconBookUpload /> Download
-                                            </Button>
-                                        </Text>
+                                                        ? 'Đang diễn ra'
+                                                        : 'Đã kết thúc'}
+                                                </Badge>
+                                                <Text ta={'right'}>
+                                                    <Button
+                                                        variant="filled"
+                                                        color="teal"
+                                                        mt={5}
+                                                        mb={10}
+                                                        onClick={() => {
+                                                            handleOnClickDownloadFiles(
+                                                                task.className,
+                                                                task.title
+                                                            )
+                                                        }}
+                                                    >
+                                                        <IconBookDownload />{' '}
+                                                        Download
+                                                    </Button>
+                                                </Text>
+                                            </Grid.Col>
+                                        </Grid>
                                     </Paper>
                                 ))}
                             </>

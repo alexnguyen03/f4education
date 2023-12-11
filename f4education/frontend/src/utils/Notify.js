@@ -90,6 +90,13 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        nullFile: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Bạn chưa chọn File!',
+                ...defaultOptions
+            }
+        },
         sendedMail: () => {
             return {
                 type: toast.TYPE.SUCCESS,

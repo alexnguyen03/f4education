@@ -145,20 +145,6 @@ const ClasssRoom = () => {
         setErrors({})
     }
 
-    const notification = (color, content) => {
-        toast[color](content, {
-            // className: `${styles["custom-toast"]}`, // Thêm lớp CSS cho thông báo
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light'
-        })
-    }
-
     // lấy tấc cả dữ liệu ClassRoom từ database (gọi api)
     const getDataClassRoom = async () => {
         try {
@@ -166,9 +152,7 @@ const ClasssRoom = () => {
             const resp = await classRoomApi.getAllClassRoom()
             if (resp.status === 200 && resp.data.length > 0) {
                 setClassRooms(resp.data)
-            } else if (resp.data.isEmpty) {
-                notification('warn', 'Chưa có phòng học !!!')
-            }
+            } 
         } catch (error) {
             console.log(error)
         } finally {
