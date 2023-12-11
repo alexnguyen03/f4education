@@ -94,6 +94,12 @@ function CourseClient() {
         }
     }
 
+    const [selectedRating, setSelectedRating] = useState(null)
+
+    const handleRatingChange = (event) => {
+        setSelectedRating(parseFloat(event.target.value))
+    }
+
     // lấy giá trị checkbox chủ đề
     const handleCheckboxChangeTopic = (event) => {
         const { value, checked } = event.target
@@ -168,10 +174,6 @@ function CourseClient() {
                 return durationB - durationA
             }
         })
-    }
-
-    const handleDeleteFilter = async () => {
-        getAllCourse()
     }
 
     const navigateToStudent = (e) => {
@@ -468,7 +470,9 @@ function CourseClient() {
                                             type="radio"
                                             name="exampleRadios"
                                             id="exampleRadios1"
-                                            value="option1"
+                                            value="4.0"
+                                            onChange={handleRatingChange}
+                                            checked={selectedRating === 4.0}
                                         />
                                         <label
                                             className="form-check-label"
@@ -509,7 +513,9 @@ function CourseClient() {
                                             type="radio"
                                             name="exampleRadios"
                                             id="exampleRadios2"
-                                            value="option2"
+                                            value="3.0"
+                                            onChange={handleRatingChange}
+                                            checked={selectedRating === 3.0}
                                         />
                                         <label
                                             className="form-check-label"
@@ -547,7 +553,9 @@ function CourseClient() {
                                             type="radio"
                                             name="exampleRadios"
                                             id="exampleRadios3"
-                                            value="option3"
+                                            value="2.0"
+                                            onChange={handleRatingChange}
+                                            checked={selectedRating === 2.0}
                                         />
                                         <label
                                             className="form-check-label"
