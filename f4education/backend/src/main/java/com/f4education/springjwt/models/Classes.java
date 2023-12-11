@@ -1,10 +1,6 @@
 package com.f4education.springjwt.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -63,8 +59,8 @@ public class Classes implements Serializable {
 	@JsonIgnore
 	private List<Point> points;
 
+	@Access(AccessType.PROPERTY)
 	@OneToMany(mappedBy = "classes")
-	@JsonManagedReference
 	private List<Attendance> attendances;
 
 	@ManyToOne
@@ -75,6 +71,38 @@ public class Classes implements Serializable {
 	@JoinColumn(name = "teacher_id")
 	@JsonIgnore
 	Teacher teacher;
+
+	public List<EvaluationTeacher> getEvaluationTeacher() {
+		return evaluationTeacher;
+	}
+
+	public void setEvaluationTeacher(List<EvaluationTeacher> evaluationTeacher) {
+		this.evaluationTeacher = evaluationTeacher;
+	}
+
+	public List<Examination> getExaminations() {
+		return examinations;
+	}
+
+	public void setExaminations(List<Examination> examinations) {
+		this.examinations = examinations;
+	}
+
+	public List<Point> getPoints() {
+		return points;
+	}
+
+	public void setPoints(List<Point> points) {
+		this.points = points;
+	}
+
+	public List<Attendance> getAttendances() {
+		return attendances;
+	}
+
+	public void setAttendances(List<Attendance> attendances) {
+		this.attendances = attendances;
+	}
 
 	@Override
 	public String toString() {

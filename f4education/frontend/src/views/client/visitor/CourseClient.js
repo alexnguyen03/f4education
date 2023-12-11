@@ -76,7 +76,7 @@ function CourseClient() {
     // lấy tất cả các khóa học
     const getAllCourse = async () => {
         try {
-            const resp = await courseApi.getAll(user.username)
+            const resp = await courseApi.getAllByStudentId(user.username)
             setCourses(resp.data.reverse())
             setLoading(false)
         } catch (error) {

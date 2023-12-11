@@ -6,7 +6,6 @@ import com.f4education.springjwt.interfaces.RegisterCourseService;
 import com.f4education.springjwt.interfaces.TeacherService;
 import com.f4education.springjwt.models.*;
 import com.f4education.springjwt.payload.HandleResponseDTO;
-import com.f4education.springjwt.payload.request.ClassDTO;
 import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.request.ScheduleCourseProgressDTO;
 import com.f4education.springjwt.payload.response.CourseProgressResponseDTO;
@@ -153,7 +152,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId,
-			RegisterCourseRequestDTO registerCourseRequestDTO) {
+																			 RegisterCourseRequestDTO registerCourseRequestDTO) {
 		Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
 		if (registerCourseOptional.isEmpty()) {
 			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
@@ -217,7 +216,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	}
 
 	private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO,
-			RegisterCourse registerCourse) {
+										RegisterCourse registerCourse) {
 		Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
 		Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
 		BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
@@ -256,13 +255,18 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		Classes newClasses = new Classes();
 
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
+
+		classRepository.save(foundClass);
+
 		List<EvaluationTeacher> lsEvaluationTeacher = foundClass.getEvaluationTeacher();
-		List<Attendance> lsAttendance = foundClass.getAttendances();
+		List<Attendance> lsAttendance = new ArrayList<>();
 
 		BeanUtils.copyProperties(foundClass, newClasses);
 		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
 		newClasses.setTeacher(foundTeacher);
 		newClasses.setEvaluationTeacher(lsEvaluationTeacher);
+		newClasses.setAttendances(lsAttendance);
+
 		newClasses.setStatus("Đang diễn ra");
 
 		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
@@ -272,7 +276,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 					.filter(registerCourse -> listRegisterCourseIdToAdd
 							.contains(registerCourse.getRegisterCourseId()))
 					.collect(Collectors.toList());
-			Classes classes = foundClass;
+			Classes classes = newClasses;
 			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
 				registerCourse.setClasses(classes);
 				Point point = new Point();
@@ -290,7 +294,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
 
 			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
-					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
+							registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
 				registerCourse.setClasses(null);
@@ -299,31 +303,13 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 		}
 		try {
-			classService.saveOneClass(newClasses);
-
+			registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
+			pointService.save(listPoint);
 		} catch (Exception e) {
 			e.printStackTrace();
-			try {
-
-				pointService.save(listPoint);
-			} catch (Exception e1) {
-
-				e1.printStackTrace();
-				try {
-
-					registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
-				} catch (Exception e2) {
-
-					e2.printStackTrace();
-					try {
-						registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
-					} catch (Exception e3) {
-
-						e3.printStackTrace();
-					}
-				}
-			}
 		}
+
 
 		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
 				.collect(Collectors.toList());

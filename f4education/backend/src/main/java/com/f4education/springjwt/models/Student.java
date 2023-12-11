@@ -1,16 +1,13 @@
 package com.f4education.springjwt.models;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -41,26 +38,31 @@ public class Student implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<Bill> bills;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<Evaluate> evaluates;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<Point> points;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<RegisterCourse> registerCourses;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<QuizResult> quizResults;
 
 	@OneToMany(mappedBy = "student")
-	@JsonManagedReference
+	@Access(AccessType.PROPERTY)
 	private List<Attendance> attendances;
 
 	@ManyToOne
@@ -74,13 +76,75 @@ public class Student implements Serializable {
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
 
-	public Student(String studentId, String fullname, Boolean gender, String address, String phone, String image) {
-		super();
-		this.studentId = studentId;
-		this.fullname = fullname;
-		this.gender = gender;
-		this.address = address;
-		this.phone = phone;
-		this.image = image;
+	public List<Bill> getBills() {
+		return new ArrayList<>(bills);
 	}
+
+	public void setBills(List<Bill> bills) {
+		this.bills = bills;
+	}
+
+	public List<Evaluate> getEvaluates() {
+		return new ArrayList<>(evaluates);
+	}
+
+	public void setEvaluates(List<Evaluate> evaluates) {
+		this.evaluates = evaluates;
+	}
+
+	public List<Point> getPoints() {
+		return new ArrayList<>(points);
+	}
+
+	public void setPoints(List<Point> points) {
+		this.points = points;
+	}
+
+	public List<RegisterCourse> getRegisterCourses() {
+		return new ArrayList<>(registerCourses);
+	}
+
+	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
+		this.registerCourses = registerCourses;
+	}
+
+	public List<QuizResult> getQuizResults() {
+		return new ArrayList<>(quizResults);
+	}
+
+	public void setQuizResults(List<QuizResult> quizResults) {
+		this.quizResults = quizResults;
+	}
+
+	public List<Attendance> getAttendances() {
+		return new ArrayList<>(attendances);
+	}
+
+	public void setAttendances(List<Attendance> attendances) {
+		this.attendances = attendances;
+	}
+//	public void setAttendances(List<Attendance> attendances) {
+//		this.attendances = new ArrayList<>(attendances);
+//	}
+//
+//	public void setEvaluates(List<Evaluate> evaluates) {
+//		this.evaluates = new ArrayList<>(evaluates);
+//	}
+//
+//	public void setPoint(List<Point> points) {
+//		this.points = new ArrayList<>(points);
+//	}
+//
+//	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
+//		this.registerCourses = new ArrayList<>(registerCourses);
+//	}
+//
+//	public void setQuizResults(List<QuizResult> quizResults) {
+//		this.quizResults = new ArrayList<>(quizResults);
+//	}
+//
+//	public void setBills(List<Bill> bills) {
+//		this.bills = new ArrayList<>(bills);
+//	}
+
 }
