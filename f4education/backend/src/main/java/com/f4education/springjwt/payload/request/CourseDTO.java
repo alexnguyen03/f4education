@@ -28,12 +28,6 @@ public class CourseDTO {
 
 	private Boolean status;
 
-	private Float rating;
-
-	private Integer reviewNumber;
-
-	private Integer totalStudent;
-
 	@Override
 	public String toString() {
 		return "CourseDTO [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice

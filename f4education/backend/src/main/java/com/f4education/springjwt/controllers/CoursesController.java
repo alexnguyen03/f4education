@@ -47,10 +47,10 @@ public class CoursesController {
 	@Autowired
 	FirebaseStorageService firebaseStorageService;
 
-	@GetMapping
+	@GetMapping("/get-all/{studentId}")
 	// @PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getAllCourse() {
-		List<CourseDTO> list = courseService.findAllCourseDTO();
+	public ResponseEntity<?> getAllCourse(@PathVariable String studentId) {
+		List<CourseResponse> list = courseService.findAllCourseDTO(studentId);
 		return ResponseEntity.ok(list);
 	}
 
@@ -145,7 +145,6 @@ public class CoursesController {
 	@GetMapping("/topic/{checkedSubjects}")
 	public ResponseEntity<?> findCoursesByCheckedSubjects(
 			@PathVariable("checkedSubjects") List<String> checkedSubjects) {
-		System.out.println(checkedSubjects);
 		List<CourseDTO> courseDTO = courseService.findBySubjectNames(checkedSubjects);
 		return ResponseEntity.ok(courseDTO);
 	}

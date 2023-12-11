@@ -14,6 +14,7 @@ import {
     Loader,
     Stack,
     Badge,
+    Image,
     Flex
 } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
@@ -37,6 +38,7 @@ import Notify from '../../../utils/Notify'
 
 import taskApi from 'api/taskApi'
 import resourceApi from 'api/resourceApi'
+import logoTask from '../../../assets/img/taskonlinetab.jpg'
 
 const user = JSON.parse(localStorage.getItem('user'))
 
@@ -146,28 +148,31 @@ const SubmitHomework = () => {
 
     const submitTask = async () => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
-
-        const formData = new FormData()
-        formData.append('className', className)
-        formData.append('taskName', taskName)
-        formData.append('studentName', user.id + ' - ' + user.fullName)
-        for (var i = 0; i < selectedFile.length; i++) {
-            formData.append('file', selectedFile[i])
-        }
-        console.log([...formData])
-        try {
-            const resp = await taskApi.submitTaskFile(formData)
-            if (resp.status === 200) {
-                setShowModal(false)
-                getAllFilesInFolderTaskStudent(
-                    className,
-                    taskName,
-                    user.id + ' - ' + user.fullName
-                )
-                toast.update(id, Notify.options.uploadFileSuccess())
+        if (selectedFile[0] === null) {
+            toast.update(id, Notify.options.nullFile())
+        } else {
+            const formData = new FormData()
+            formData.append('className', className)
+            formData.append('taskName', taskName)
+            formData.append('studentName', user.id + ' - ' + user.fullName)
+            for (var i = 0; i < selectedFile.length; i++) {
+                formData.append('file', selectedFile[i])
             }
-        } catch (error) {
-            console.log('Nộp bài thất bại', error)
+            console.log([...formData])
+            try {
+                const resp = await taskApi.submitTaskFile(formData)
+                if (resp.status === 200) {
+                    setShowModal(false)
+                    getAllFilesInFolderTaskStudent(
+                        className,
+                        taskName,
+                        user.id + ' - ' + user.fullName
+                    )
+                    toast.update(id, Notify.options.uploadFileSuccess())
+                }
+            } catch (error) {
+                console.log('Nộp bài thất bại', error)
+            }
         }
     }
 
@@ -332,7 +337,7 @@ const SubmitHomework = () => {
                                         color="success"
                                     />
                                     <Title order={2}>
-                                        {tasks[0].className}- Task
+                                        {tasks[0].className}- Bài tập
                                     </Title>
                                 </Group>
 
@@ -345,146 +350,181 @@ const SubmitHomework = () => {
                                         mx={20}
                                         key={indexTask}
                                     >
-                                        <Title my={5} order={3}>
-                                            {task.title}
-                                        </Title>
-                                        <Text my={5}>{task.description}</Text>
-                                        <Text my={5}>
-                                            Thời gian:{' '}
-                                            {moment(task.startDate).format(
-                                                'DD/MM/yyyy, h:mm:ss A'
-                                            )}{' '}
-                                            -{' '}
-                                            {moment(task.endDate).format(
-                                                'DD/MM/yyyy, h:mm:ss A'
-                                            )}
-                                        </Text>
-                                        <Text my={5}>
-                                            Giáo viên: {task.teacherName}
-                                        </Text>
-                                        <Badge
-                                            variant="outline"
-                                            color="teal"
-                                            size="lg"
-                                            mt={10}
-                                        >
-                                            {isCurrentDateInRange(
-                                                task.startDate,
-                                                task.endDate
-                                            )
-                                                ? 'Đang diễn ra'
-                                                : 'Đã kết thúc'}
-                                        </Badge>
-                                        <Text ta={'right'}>
-                                            <Button
-                                                variant="filled"
-                                                onClick={() => {
-                                                    toggle(indexTask)
-                                                    getAllFilesInFolderTaskStudent(
-                                                        task.className,
-                                                        task.title,
-                                                        user.id +
-                                                            ' - ' +
-                                                            user.fullName
-                                                    )
-                                                }}
-                                                mr={5}
-                                                mb={10}
-                                            >
-                                                <IconEye /> Xem file
-                                            </Button>
-                                            <Button
-                                                disabled={
-                                                    !isCurrentDateInRange(
+                                        <Grid>
+                                            <Grid.Col span={2} mt={17}>
+                                                <img
+                                                    src={logoTask}
+                                                    className="img-fluid p-0"
+                                                    alt="logo task"
+                                                />
+                                            </Grid.Col>
+                                            <Grid.Col span={9} ml={10} mt={5}>
+                                                <Title my={5} order={3}>
+                                                    {task.title}
+                                                </Title>
+                                                <Text my={5}>
+                                                    {task.description}
+                                                </Text>
+                                                <Text my={5}>
+                                                    Thời gian:{' '}
+                                                    {moment(
+                                                        task.startDate
+                                                    ).format(
+                                                        'DD/MM/yyyy, h:mm:ss A'
+                                                    )}{' '}
+                                                    -{' '}
+                                                    {moment(
+                                                        task.endDate
+                                                    ).format(
+                                                        'DD/MM/yyyy, h:mm:ss A'
+                                                    )}
+                                                </Text>
+                                                <Text my={5}>
+                                                    Giáo viên:{' '}
+                                                    {task.teacherName}
+                                                </Text>
+                                                <Badge
+                                                    variant="outline"
+                                                    color={
+                                                        isCurrentDateInRange(
+                                                            task.startDate,
+                                                            task.endDate
+                                                        )
+                                                            ? 'teal'
+                                                            : 'red'
+                                                    }
+                                                    size="lg"
+                                                    mt={10}
+                                                >
+                                                    {isCurrentDateInRange(
                                                         task.startDate,
                                                         task.endDate
                                                     )
-                                                }
-                                                variant="filled"
-                                                color="teal"
-                                                mt={5}
-                                                onClick={() => {
-                                                    setShowModal(true)
-                                                    setClassName(task.className)
-                                                    setTaskName(task.title)
-                                                }}
-                                            >
-                                                <IconBookUpload /> Nộp bài
-                                            </Button>
-                                        </Text>
-                                        <Collapse
-                                            in={openedIndexes.includes(
-                                                indexTask
-                                            )}
-                                            onEntered={() => toggle(indexTask)}
-                                        >
-                                            <Text fw={700}>
-                                                Bài tập của tôi
-                                            </Text>
-                                            <hr className="my-3" />
-                                            <MaterialReactTable
-                                                displayColumnDefOptions={{
-                                                    'mrt-row-actions': {
-                                                        header: 'Xóa',
-                                                        size: 80
-                                                    }
-                                                }}
-                                                enableRowNumbers
-                                                columns={columnFileTask}
-                                                data={
-                                                    allFilesInFolderTaskStudent
-                                                }
-                                                initialState={{
-                                                    columnVisibility: {
-                                                        id: false
-                                                    }
-                                                }}
-                                                positionActionsColumn="last"
-                                                state={{
-                                                    isLoading:
-                                                        loadingFileStudent
-                                                }}
-                                                enableRowActions={
-                                                    isCurrentDateInRange(
-                                                        task.startDate,
-                                                        task.endDate
-                                                    )
-                                                }
-                                                renderRowActions={({
-                                                    row,
-                                                    table
-                                                }) => (
-                                                    <Box
-                                                        sx={{
-                                                            display: 'flex',
-                                                            flexWrap: 'nowrap',
-                                                            gap: '5px'
+                                                        ? 'Đang diễn ra'
+                                                        : 'Đã kết thúc'}
+                                                </Badge>
+                                                <Text ta={'right'}>
+                                                    <Button
+                                                        variant="filled"
+                                                        onClick={() => {
+                                                            toggle(indexTask)
+                                                            getAllFilesInFolderTaskStudent(
+                                                                task.className,
+                                                                task.title,
+                                                                user.id +
+                                                                    ' - ' +
+                                                                    user.fullName
+                                                            )
+                                                        }}
+                                                        mr={5}
+                                                        mb={10}
+                                                    >
+                                                        <IconEye /> Xem file
+                                                    </Button>
+                                                    <Button
+                                                        disabled={
+                                                            !isCurrentDateInRange(
+                                                                task.startDate,
+                                                                task.endDate
+                                                            )
+                                                        }
+                                                        variant="filled"
+                                                        color="teal"
+                                                        mt={5}
+                                                        onClick={() => {
+                                                            setShowModal(true)
+                                                            setClassName(
+                                                                task.className
+                                                            )
+                                                            setTaskName(
+                                                                task.title
+                                                            )
                                                         }}
                                                     >
-                                                        <IconButton
-                                                            color="secondary"
-                                                            onClick={() => {
-                                                                setShowModalConfirm(
-                                                                    true
-                                                                )
-                                                                setIdFileStudent(
-                                                                    row.original
-                                                                        .id
-                                                                )
-                                                                setClassName(
-                                                                    task.className
-                                                                )
-                                                                setTaskName(
-                                                                    task.title
-                                                                )
-                                                            }}
-                                                        >
-                                                            <DeleteIcon />
-                                                        </IconButton>
-                                                    </Box>
-                                                )}
-                                            />
-                                        </Collapse>
+                                                        <IconBookUpload /> Nộp
+                                                        bài
+                                                    </Button>
+                                                </Text>
+                                            </Grid.Col>
+                                            <Grid.Col span={12}>
+                                                <Collapse
+                                                    in={openedIndexes.includes(
+                                                        indexTask
+                                                    )}
+                                                    onEntered={() =>
+                                                        toggle(indexTask)
+                                                    }
+                                                >
+                                                    <Text fw={700}>
+                                                        Bài tập của tôi
+                                                    </Text>
+                                                    <hr className="my-3" />
+                                                    <MaterialReactTable
+                                                        displayColumnDefOptions={{
+                                                            'mrt-row-actions': {
+                                                                header: 'Xóa',
+                                                                size: 80
+                                                            }
+                                                        }}
+                                                        enableRowNumbers
+                                                        columns={columnFileTask}
+                                                        data={
+                                                            allFilesInFolderTaskStudent
+                                                        }
+                                                        initialState={{
+                                                            columnVisibility: {
+                                                                id: false
+                                                            }
+                                                        }}
+                                                        positionActionsColumn="last"
+                                                        state={{
+                                                            isLoading:
+                                                                loadingFileStudent
+                                                        }}
+                                                        enableRowActions={isCurrentDateInRange(
+                                                            task.startDate,
+                                                            task.endDate
+                                                        )}
+                                                        renderRowActions={({
+                                                            row,
+                                                            table
+                                                        }) => (
+                                                            <Box
+                                                                sx={{
+                                                                    display:
+                                                                        'flex',
+                                                                    flexWrap:
+                                                                        'nowrap',
+                                                                    gap: '5px'
+                                                                }}
+                                                            >
+                                                                <IconButton
+                                                                    color="secondary"
+                                                                    onClick={() => {
+                                                                        setShowModalConfirm(
+                                                                            true
+                                                                        )
+                                                                        setIdFileStudent(
+                                                                            row
+                                                                                .original
+                                                                                .id
+                                                                        )
+                                                                        setClassName(
+                                                                            task.className
+                                                                        )
+                                                                        setTaskName(
+                                                                            task.title
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    <DeleteIcon />
+                                                                </IconButton>
+                                                            </Box>
+                                                        )}
+                                                    />
+                                                </Collapse>
+                                            </Grid.Col>
+                                        </Grid>
                                     </Paper>
                                 ))}
                             </>
@@ -565,6 +605,16 @@ const SubmitHomework = () => {
                             </div>
                         </Group>
                     </Dropzone>
+                    {selectedFile.length > 0 && (
+                        <div>
+                            <Text size="lg">File đã chọn:</Text>
+                            <ul>
+                                {selectedFile.map((file, index) => (
+                                    <li key={index}>{file && file.name}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
                 </div>
                 <div className="modal-footer">
                     <Button

@@ -21,7 +21,8 @@ import moment from 'moment'
 import Select from 'react-select'
 import { Link } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import Notify from '../../utils/Notify'
+import { IconRefresh } from '@tabler/icons-react'
 
 // gọi API từ resourceApi
 import resourceApi from 'api/resourceApi'
@@ -34,7 +35,7 @@ import classHistoryApi from 'api/classHistoryApi'
 import { formatDate } from '../../utils/formater'
 
 const Resource = () => {
-    const user = JSON.parse(localStorage.getItem('user') | '')
+    const user = JSON.parse(localStorage.getItem('user'))
     const [resources, setResources] = useState([])
     const [classHistories, setClassHistories] = useState([])
     const [classHistoryByClassId, setClassHistotyByClassId] = useState([])
@@ -129,6 +130,12 @@ const Resource = () => {
         if (resourceRequest.courseId === 0) {
             validationErrors.courseId = 'Vui lòng chọn khóa học !!!'
         }
+        if (rSelected === null) {
+            validationErrors.typeResource = 'Vui lòng chọn loại tài nguyên !!!'
+        }
+        if (file[0] === null) {
+            validationErrors.file = 'Bạn chưa chọn file !!!'
+        }
         return validationErrors
     }
 
@@ -147,14 +154,6 @@ const Resource = () => {
                 ...pre,
                 courseId: parseInt(selectedCourse.value)
             }))
-        }
-
-        const validationErrors = {}
-        if (selectedCourse != undefined) {
-            validationErrors.classroomName = ''
-        }
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors)
         }
     }
 
@@ -182,20 +181,6 @@ const Resource = () => {
         setShowFormClassHistory((pre) => !pre)
     }
 
-    const notification = (color, content) => {
-        toast[color](content, {
-            // className: `${styles["custom-toast"]}`, // Thêm lớp CSS cho thông báo
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light'
-        })
-    }
-
     // lấy tấc cả dữ liệu Resource từ database (gọi api)
     const getDataResource = async () => {
         try {
@@ -208,8 +193,6 @@ const Resource = () => {
             if (resp.status === 200 && resp.data.length > 0) {
                 setResources(resp.data)
                 setLoadingResource(false)
-            } else if (resp.data.isEmpty) {
-                notification('warn', 'Chưa có phòng học !!!')
             }
         } catch (error) {
             console.log(error)
@@ -220,6 +203,7 @@ const Resource = () => {
 
     const addResource = async (e) => {
         e.preventDefault()
+        var id = null
         const validationErrors = validateForm()
         if (Object.keys(validationErrors).length === 0) {
             const formData = new FormData()
@@ -232,27 +216,26 @@ const Resource = () => {
             if (rSelected === 1) {
                 formData.append('type', 'BÀI HỌC')
             } else if (rSelected === 2) {
-                formData.append('type', 'TÀI NGUYÊN')
+                formData.append('type', 'TÀI LIỆU')
             }
             console.log([...formData])
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 const resp = await resourceApi.createResource(formData)
                 if (resp.status === 200) {
                     if (rSelected === 1) {
-                        notification('success', 'Thêm bài học thành công !!!')
+                        toast.update(id, Notify.options.createSuccess())
                     } else if (rSelected === 2) {
-                        notification(
-                            'success',
-                            'Thêm tài nguyên thành công !!!'
-                        )
+                        toast.update(id, Notify.options.createSuccess())
                     }
-                    getDataResource()
                     handleResetForm()
+                    getDataResource()
                 } else {
-                    notification('error', 'Thêm thất bại !!!')
+                    toast.update(id, Notify.options.createError())
                 }
             } catch (error) {
                 console.log('Thêm thất bại', error)
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors(validationErrors)
@@ -391,7 +374,7 @@ const Resource = () => {
                 resourcesId: resourcesId,
                 link: link,
                 courseId: parseInt(selectedCourse.value),
-                adminId: 'namnguyen'
+                adminId: user.username
             })
         }
     }, [resource, selectedCourse])
@@ -404,6 +387,7 @@ const Resource = () => {
 
     return (
         <>
+            <ToastContainer />
             <ResourcesHeader />
             <Container className="mt--7" fluid>
                 <Card className="bg-secondary shadow">
@@ -444,14 +428,23 @@ const Resource = () => {
                                 data={resources}
                                 positionActionsColumn="last"
                                 renderTopToolbarCustomActions={() => (
-                                    <Button
-                                        onClick={() =>
-                                            setShowFormClass((pre) => !pre)
-                                        }
-                                        color="success"
-                                    >
-                                        Thêm tài nguyên
-                                    </Button>
+                                    <Box>
+                                        <Button
+                                            onClick={() =>
+                                                setShowFormClass((pre) => !pre)
+                                            }
+                                            color="success"
+                                        >
+                                            Thêm tài nguyên
+                                        </Button>
+                                        <Button
+                                            color="default"
+                                            onClick={() => getDataResource()}
+                                            variant="contained"
+                                        >
+                                            <IconRefresh />
+                                        </Button>
+                                    </Box>
                                 )}
                                 enableRowActions
                                 renderRowActions={({ row, table }) => (
@@ -601,9 +594,14 @@ const Resource = () => {
                                                     }
                                                     active={rSelected === 2}
                                                 >
-                                                    Tài nguyên
+                                                    Tài liệu
                                                 </Button>
                                             </ButtonGroup>
+                                            {errors.typeResource && (
+                                                <div className="text-danger mt-2">
+                                                    {errors.typeResource}
+                                                </div>
+                                            )}
                                         </FormGroup>
                                     </Col>
                                     <Col md={12}>
@@ -622,6 +620,11 @@ const Resource = () => {
                                                 className="form-control-alternative"
                                                 onChange={onChangeFile}
                                             />
+                                            {errors.file && (
+                                                <div className="text-danger mt-2">
+                                                    {errors.file}
+                                                </div>
+                                            )}
                                         </FormGroup>
                                     </Col>
                                 </Row>
@@ -682,19 +685,6 @@ const Resource = () => {
                     </div>
                 </Modal>
             </Container>
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
-            <ToastContainer />
         </>
     )
 }

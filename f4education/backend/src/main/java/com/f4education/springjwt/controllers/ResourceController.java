@@ -62,7 +62,6 @@ public class ResourceController {
 	@PostMapping(consumes = { MediaType.MULTIPART_FORM_DATA_VALUE }, produces = { MediaType.APPLICATION_JSON_VALUE })
 	public ResponseEntity<?> createResource(@RequestParam("file") MultipartFile[] file,
 			@RequestPart("resourceRequest") String resourceRequestClient, @RequestParam("type") String type) {
-
 		ObjectMapper mapper = new ObjectMapper();
 		ResourceRequest resourceRequest = new ResourceRequest();
 		try {

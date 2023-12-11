@@ -11,7 +11,7 @@ public interface ClassRoomService {
 
     List<Object[]> getClassByNotInScheduleBySessionId(Date startDate);
 
-    ClassRoomDTO createClass(ClassRoomDTO classRoomDTO);
+    ClassRoomDTO createClass(ClassRoomDTO classRoomDTO, String adminId);
 
     ClassRoomDTO updateClass(Integer classroomId, ClassRoomDTO classRoomDTO);
 }

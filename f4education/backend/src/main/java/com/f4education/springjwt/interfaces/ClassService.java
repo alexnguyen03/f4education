@@ -20,7 +20,7 @@ public interface ClassService {
 
 	List<Classes> getClassByStudentId(String studentId);
 
-	ClassDTO createClass(ClassDTO classDTO);
+	ClassDTO createClass(ClassDTO classDTO, String adminId);
 
 	ClassDTO updateClass(Integer classId, ClassDTO classDTO);
 
