@@ -136,7 +136,7 @@ function CourseClient() {
             const resp = await courseApi.findCoursesByCheckedSubjects(
                 checkedSubjects
             )
-            setCourses(resp.reverse())
+            setCourses(resp.data.reverse())
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -149,7 +149,7 @@ function CourseClient() {
             const resp = await courseApi.findCoursesByCheckedDurations(
                 checkedDurations
             )
-            setCourses(resp.reverse())
+            setCourses(resp.data.reverse())
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -210,7 +210,6 @@ function CourseClient() {
 
     const filteredCourses = courses.filter((course) => {
         const courseValues = Object.values(course)
-        const subjectName = course.subject.subjectName.toLowerCase()
         const lowerCaseSearchTerm = searchTerm.toLowerCase()
 
         for (let i = 0; i < courseValues.length; i++) {
@@ -221,14 +220,6 @@ function CourseClient() {
                 value.toString().toLowerCase().includes(lowerCaseSearchTerm)
             ) {
                 return true
-            } else if (
-                checkedSubjects.includes(
-                    course.subject.subjectName.toLowerCase()
-                )
-            ) {
-                checkedSubjects.includes(
-                    course.subject.subjectName.toLowerCase()
-                )
             }
         }
         return false
@@ -321,13 +312,12 @@ function CourseClient() {
         getAllSubject()
     }, [])
 
-    // useEffect(() => {
-    //     findCoursesByCheckedSubject(checkedSubjects)
-    //     if (checkedSubjects.length === 0) {
-    //         getAllCourse()
-    //         setActiveFilter(false)
-    //     }
-    // }, [checkedSubjects])
+    useEffect(() => {
+        findCoursesByCheckedSubject(checkedSubjects)
+        if (checkedSubjects.length === 0) {
+            getAllCourse()
+        }
+    }, [checkedSubjects])
 
     useEffect(() => {
         findCoursesByCheckedDuration(checkedDurations)

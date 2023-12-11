@@ -145,7 +145,6 @@ public class CoursesController {
 	@GetMapping("/topic/{checkedSubjects}")
 	public ResponseEntity<?> findCoursesByCheckedSubjects(
 			@PathVariable("checkedSubjects") List<String> checkedSubjects) {
-		System.out.println(checkedSubjects);
 		List<CourseDTO> courseDTO = courseService.findBySubjectNames(checkedSubjects);
 		return ResponseEntity.ok(courseDTO);
 	}
