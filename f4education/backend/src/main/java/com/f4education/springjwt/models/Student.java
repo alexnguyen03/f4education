@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -70,10 +71,8 @@ public class Student implements Serializable {
 	@JoinColumn(name = "account_id")
 	User user;
 
-	@Override
-	public String toString() {
-		return "Student [studentId=" + studentId + ", fullname=" + fullname + ", gender=" + gender + ", address="
-				+ address + ", phone=" + phone + ", image=" + image + "]";
+	public List<Attendance> getAttendances() {
+		return new ArrayList<>(attendances);
 	}
 
 	public List<Bill> getBills() {
@@ -116,35 +115,28 @@ public class Student implements Serializable {
 		this.quizResults = quizResults;
 	}
 
-	public List<Attendance> getAttendances() {
-		return new ArrayList<>(attendances);
-	}
-
 	public void setAttendances(List<Attendance> attendances) {
 		this.attendances = attendances;
 	}
-//	public void setAttendances(List<Attendance> attendances) {
-//		this.attendances = new ArrayList<>(attendances);
-//	}
-//
-//	public void setEvaluates(List<Evaluate> evaluates) {
-//		this.evaluates = new ArrayList<>(evaluates);
-//	}
-//
-//	public void setPoint(List<Point> points) {
-//		this.points = new ArrayList<>(points);
-//	}
-//
-//	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
-//		this.registerCourses = new ArrayList<>(registerCourses);
-//	}
-//
-//	public void setQuizResults(List<QuizResult> quizResults) {
-//		this.quizResults = new ArrayList<>(quizResults);
-//	}
-//
-//	public void setBills(List<Bill> bills) {
-//		this.bills = new ArrayList<>(bills);
-//	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Student student = (Student) o;
+		return Objects.equals(studentId, student.studentId) && Objects.equals(fullname, student.fullname) && Objects.equals(gender, student.gender) && Objects.equals(address, student.address) && Objects.equals(phone, student.phone) && Objects.equals(image, student.image) && Objects.equals(bills, student.bills) && Objects.equals(evaluates, student.evaluates) && Objects.equals(points, student.points) && Objects.equals(registerCourses, student.registerCourses) && Objects.equals(quizResults, student.quizResults) && Objects.equals(attendances, student.attendances) && Objects.equals(user, student.user);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(studentId, fullname, gender, address, phone, image, bills, evaluates, points, registerCourses, quizResults, attendances, user);
+	}
+
+	@Override
+	public String toString() {
+		return "Student [studentId=" + studentId + ", fullname=" + fullname + ", gender=" + gender + ", address="
+				+ address + ", phone=" + phone + ", image=" + image + "]";
+	}
+
 
 }

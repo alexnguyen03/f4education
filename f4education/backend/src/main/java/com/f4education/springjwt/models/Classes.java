@@ -32,10 +32,6 @@ public class Classes implements Serializable {
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
 	private List<ClassHistory> classHistories;
-	// @OneToMany(mappedBy = "classes")
-	// @JsonIgnore
-	// List<Comment> comments;
-
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
 	private List<Schedule> schedules;
@@ -59,7 +55,6 @@ public class Classes implements Serializable {
 	@JsonIgnore
 	private List<Point> points;
 
-	@Access(AccessType.PROPERTY)
 	@OneToMany(mappedBy = "classes")
 	private List<Attendance> attendances;
 
@@ -71,38 +66,6 @@ public class Classes implements Serializable {
 	@JoinColumn(name = "teacher_id")
 	@JsonIgnore
 	Teacher teacher;
-
-	public List<EvaluationTeacher> getEvaluationTeacher() {
-		return evaluationTeacher;
-	}
-
-	public void setEvaluationTeacher(List<EvaluationTeacher> evaluationTeacher) {
-		this.evaluationTeacher = evaluationTeacher;
-	}
-
-	public List<Examination> getExaminations() {
-		return examinations;
-	}
-
-	public void setExaminations(List<Examination> examinations) {
-		this.examinations = examinations;
-	}
-
-	public List<Point> getPoints() {
-		return points;
-	}
-
-	public void setPoints(List<Point> points) {
-		this.points = points;
-	}
-
-	public List<Attendance> getAttendances() {
-		return attendances;
-	}
-
-	public void setAttendances(List<Attendance> attendances) {
-		this.attendances = attendances;
-	}
 
 	@Override
 	public String toString() {

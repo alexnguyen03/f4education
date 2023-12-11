@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -241,6 +242,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	}
 
 	@Override
+	@Transactional
 	public List<RegisterCourseResponseDTO> updateRegisterCourseInClass(
 			RegisterCourseRequestDTO registerCourseRequestDTO) {
 
@@ -252,31 +254,21 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		List<Integer> listRegisterCourseIdToAdd = registerCourseRequestDTO.getListRegisterCourseIdToAdd();
 		List<Integer> listRegisterCourseIdToDelete = registerCourseRequestDTO.getListRegisterCourseIdToDelete();
 		List<Point> listPoint = new ArrayList<Point>();
-		Classes newClasses = new Classes();
-
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
-
-		classRepository.save(foundClass);
-
 		List<EvaluationTeacher> lsEvaluationTeacher = foundClass.getEvaluationTeacher();
 		List<Attendance> lsAttendance = new ArrayList<>();
-
-		BeanUtils.copyProperties(foundClass, newClasses);
 		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
-		newClasses.setTeacher(foundTeacher);
-		newClasses.setEvaluationTeacher(lsEvaluationTeacher);
-		newClasses.setAttendances(lsAttendance);
-
-		newClasses.setStatus("Đang diễn ra");
-
+		foundClass.setTeacher(foundTeacher);
+		foundClass.setEvaluationTeacher(lsEvaluationTeacher);
+		foundClass.setAttendances(lsAttendance);
+		foundClass.setStatus("Đang diễn ra");
 		List<RegisterCourse> filteredRegisterCoursesToAdd = new ArrayList<>();
 		if (!listRegisterCourseIdToAdd.isEmpty()) {
-
 			filteredRegisterCoursesToAdd = listRegisterCourse.stream()
 					.filter(registerCourse -> listRegisterCourseIdToAdd
 							.contains(registerCourse.getRegisterCourseId()))
 					.collect(Collectors.toList());
-			Classes classes = newClasses;
+			Classes classes = foundClass;
 			filteredRegisterCoursesToAdd.forEach(registerCourse -> {
 				registerCourse.setClasses(classes);
 				Point point = new Point();
@@ -287,29 +279,24 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 				point.setAveragePoint((double) 0);
 				point.setQuizzPoint((double) 0);
 				listPoint.add(point);
+				pointService.save(listPoint);
+				registerCourseRepository.save(registerCourse);
 			});
-
 		}
 		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
-
 			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
 							registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
 				registerCourse.setClasses(null);
-
 			});
-
 		}
 		try {
-			registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
 			registerCourseRepository.saveAll(filteredRegisterCoursesToDelete);
-			pointService.save(listPoint);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 
 		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
