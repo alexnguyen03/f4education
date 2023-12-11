@@ -393,7 +393,7 @@ const Resource = () => {
                                     role="tab"
                                 >
                                     <i className="ni ni-bell-55 mr-2" />
-                                    Tài nguyên
+                                    Tài liệu
                                 </NavLink>
                             </NavItem>
                         </Nav>
