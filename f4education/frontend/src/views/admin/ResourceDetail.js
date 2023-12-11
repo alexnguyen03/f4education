@@ -1,3 +1,4 @@
+import { Title, Button } from '@mantine/core'
 import { Delete as DeleteIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
 import classnames from 'classnames'
@@ -7,9 +8,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Select from 'react-select'
 import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import Notify from '../../utils/Notify'
 import {
-    Button,
     Card,
     CardBody,
     CardHeader,
@@ -35,7 +35,7 @@ import courseApi from 'api/courseApi'
 // gọi API từ classHistoryApi
 
 const Resource = () => {
-    const user = JSON.parse(localStorage.getItem('user') | '')
+    const user = JSON.parse(localStorage.getItem('user'))
     const [allFileByFolderLessonId, setAllFileByFolderLessonId] = useState([])
     const [allFileByFolderResourceId, setAllFileByFolderResourceId] = useState(
         []
@@ -53,6 +53,7 @@ const Resource = () => {
     const [tabs, setTabs] = useState(1)
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState({})
+    const [showModalConfirm, setShowModalConfirm] = useState(false)
 
     // khởi tạo Resource
     const [resource, setResource] = useState({
@@ -78,11 +79,12 @@ const Resource = () => {
     const handleDeleteRow = async (row) => {
         try {
             let fileId = row.original.id
-            const confirmed = window.confirm('Bạn có chắc chắn muốn xóa?')
-            if (confirmed) {
-                const resp = await resourceApi.deleteFileById(fileId)
-                alert('Xóa file thành công !!!')
-            }
+            // const confirmed = window.confirm('Bạn có chắc chắn muốn xóa?')
+            // if (confirmed) {
+            const resp = await resourceApi.deleteFileById(fileId)
+            getAllFileByFolderId(data.folderId)
+            setShowModalConfirm(false)
+            // }
         } catch (error) {
             console.log(error)
         }
@@ -138,6 +140,9 @@ const Resource = () => {
         if (resourceRequest.courseId === 0) {
             validationErrors.courseId = 'Vui lòng chọn khóa học !!!'
         }
+        if (file.length === 0) {
+            validationErrors.file = 'Bạn chưa chọn file !!!'
+        }
         return validationErrors
     }
 
@@ -157,14 +162,6 @@ const Resource = () => {
                 courseId: parseInt(selectedCourse.value)
             }))
         }
-
-        const validationErrors = {}
-        if (selectedCourse != undefined) {
-            validationErrors.classroomName = ''
-        }
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors)
-        }
     }
 
     function renderCellWithLink(row) {
@@ -179,22 +176,9 @@ const Resource = () => {
         )
     }
 
-    const notification = (color, content) => {
-        toast[color](content, {
-            // className: `${styles["custom-toast"]}`, // Thêm lớp CSS cho thông báo
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'light'
-        })
-    }
-
     const addResource = async (e) => {
         e.preventDefault()
+        var id = null
         const validationErrors = validateForm()
         if (Object.keys(validationErrors).length === 0) {
             const formData = new FormData()
@@ -210,23 +194,24 @@ const Resource = () => {
             }
             console.log([...formData])
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 const resp = await resourceApi.createResource(formData)
                 if (resp.status === 200) {
                     if (tabs === 1) {
-                        notification('success', 'Thêm bài học thành công !!!')
+                        toast.update(id, Notify.options.createSuccess())
                         handleResetFormResourceLesson()
+                        getAllFileByFolderId(data.folderId)
                     } else if (tabs === 2) {
-                        notification(
-                            'success',
-                            'Thêm tài nguyên thành công !!!'
-                        )
+                        toast.update(id, Notify.options.createSuccess())
                         handleResetFormResource()
+                        getAllFileByFolderId(data.folderId)
                     }
                 } else {
-                    notification('error', 'Thêm tài nguyên thất bại !!!')
+                    toast.update(id, Notify.options.createError())
                 }
             } catch (error) {
                 console.log('Thêm thất bại', error)
+                toast.update(id, Notify.options.createError())
             }
         } else {
             setErrors(validationErrors)
@@ -321,8 +306,6 @@ const Resource = () => {
                 setAllFileByFolderLessonId(lessonFiles)
                 setAllFileByFolderResourceId(resourceFiles)
                 setIsLoading(false) // Hoàn thành quá trình tải dữ liệu
-            } else if (resp.data.isEmpty) {
-                notification('warn', 'Chưa có tài nguyên !!!')
             }
         } catch (error) {
             console.log(error)
@@ -347,7 +330,7 @@ const Resource = () => {
                 resourcesId: resourcesId,
                 link: link,
                 courseId: parseInt(selectedCourse.value),
-                adminId: 'namnguyen'
+                adminId: user.username
             })
         }
     }, [resource, selectedCourse])
@@ -362,6 +345,7 @@ const Resource = () => {
 
     return (
         <>
+            <ToastContainer />
             <ResourceDetailHeader />
             <Container className="mt--7" fluid>
                 <Card className="bg-secondary shadow">
@@ -446,7 +430,7 @@ const Resource = () => {
                                                         (pre) => !pre
                                                     )
                                                 }
-                                                color="success"
+                                                color='blue'
                                             >
                                                 Thêm bài học
                                             </Button>
@@ -463,11 +447,78 @@ const Resource = () => {
                                                 <IconButton
                                                     color="secondary"
                                                     onClick={() => {
-                                                        handleDeleteRow(row)
+                                                        setShowModalConfirm(
+                                                            true
+                                                        )
                                                     }}
                                                 >
                                                     <DeleteIcon />
                                                 </IconButton>
+                                                <Modal
+                                                    className="modal-dialog-centered modal-lg"
+                                                    isOpen={showModalConfirm}
+                                                    backdrop={'static'}
+                                                >
+                                                    <div className="modal-header">
+                                                        <h1
+                                                            className="modal-title"
+                                                            id="modal-title-default"
+                                                        >
+                                                            Thông báo
+                                                        </h1>
+                                                        <button
+                                                            aria-label="Close"
+                                                            className="close"
+                                                            data-dismiss="modal"
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setShowModalConfirm(
+                                                                    false
+                                                                )
+                                                            }
+                                                        >
+                                                            <span
+                                                                aria-hidden={
+                                                                    true
+                                                                }
+                                                            >
+                                                                ×
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                    <div className="modal-body">
+                                                        <Title order={2}>
+                                                            Bạn có chắc chắn
+                                                            muốn xóa file ???
+                                                        </Title>
+                                                    </div>
+                                                    <div className="modal-footer">
+                                                        <Button
+                                                            color="default"
+                                                            outline
+                                                            data-dismiss="modal"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setShowModalConfirm(
+                                                                    false
+                                                                )
+                                                            }}
+                                                        >
+                                                            Hủy
+                                                        </Button>
+                                                        <Button
+                                                            color="red"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                handleDeleteRow(
+                                                                    row
+                                                                )
+                                                            }}
+                                                        >
+                                                            Xóa
+                                                        </Button>
+                                                    </div>
+                                                </Modal>
                                             </Box>
                                         )}
                                         muiTablePaginationProps={{
@@ -617,6 +668,11 @@ const Resource = () => {
                                                 className="form-control-alternative"
                                                 onChange={onChangeFile}
                                             />
+                                            {errors.file && (
+                                                <div className="text-danger mt-2">
+                                                    {errors.file}
+                                                </div>
+                                            )}
                                         </FormGroup>
                                     </Col>
                                 </Row>
@@ -738,19 +794,6 @@ const Resource = () => {
                     </div>
                 </Modal>
             </Container>
-            <ToastContainer
-                position="top-right"
-                autoClose={5000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-                theme="light"
-            />
-            <ToastContainer />
         </>
     )
 }

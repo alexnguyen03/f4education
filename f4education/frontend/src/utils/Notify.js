@@ -32,6 +32,13 @@ const Notify = {
         },
 
         //! toast SUCCESS ----------------------------------------------------------------
+        createSuccessParam: (msg) => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: msg,
+                ...defaultOptions
+            }
+        },
         changePasswordSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
@@ -53,13 +60,6 @@ const Notify = {
                 ...defaultOptions
             }
         },
-        createSuccessParam: (msg) => {
-            return {
-                type: toast.TYPE.SUCCESS,
-                render: msg,
-                ...defaultOptions
-            }
-        },
 
         deleteSuccess: () => {
             return {
@@ -75,7 +75,6 @@ const Notify = {
                 ...defaultOptions
             }
         },
-
         uploadFileSuccess: () => {
             return {
                 type: toast.TYPE.SUCCESS,
@@ -90,15 +89,29 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        nullFile: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Bạn chưa chọn File!',
+                ...defaultOptions
+            }
+        },
         sendedMail: () => {
             return {
                 type: toast.TYPE.SUCCESS,
-                render: 'Đã gửi OTP đến email của bạn!',
+                render: 'OTP sẽ được gửi trong giây lát!',
                 ...defaultOptions
             }
         },
 
         //! toast ERROR ----------------------------------------------------------------
+        createErrorParam: (message) => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: message,
+                ...defaultOptions
+            }
+        },
         undefinedAccount: () => {
             return {
                 type: toast.TYPE.ERROR,
@@ -156,13 +169,8 @@ const Notify = {
                 ...defaultOptions
             }
         },
-        createErrorParam: (message) => {
-            return {
-                type: toast.TYPE.ERROR,
-                render: message,
-                ...defaultOptions
-            }
-        },
+
+        //! toast WARNING ---------------------------------------------------------------------
         warningParam: (param) => {
             // loi chung thi dung ong nay
             return {

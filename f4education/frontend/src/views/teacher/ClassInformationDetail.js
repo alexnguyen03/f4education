@@ -573,7 +573,7 @@ const ClassInformationDetail = () => {
                                         handleShowTask(classInfor.classId)
                                     }}
                                 >
-                                    Download bài tập
+                                    Tải bài tập học viên
                                 </Button>
                                 <Button
                                     color="cyan"
@@ -583,7 +583,7 @@ const ClassInformationDetail = () => {
                                         open()
                                     }}
                                 >
-                                    Upload tài nguyên
+                                    Upload tài liệu
                                 </Button>
                             </Stack>
                         </Card>
@@ -750,6 +750,16 @@ const ClassInformationDetail = () => {
                         </div>
                     </Group>
                 </Dropzone>
+                {selectedFile.length > 0 && (
+                    <div>
+                        <Text size="lg">File đã chọn:</Text>
+                        <ul>
+                            {selectedFile.map((file, index) => (
+                                <li key={index}>{file && file.name}</li>
+                            ))}
+                        </ul>
+                    </div>
+                )}
                 <Flex
                     mt={30}
                     mih={50}

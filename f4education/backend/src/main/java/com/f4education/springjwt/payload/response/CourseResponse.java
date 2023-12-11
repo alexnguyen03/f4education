@@ -41,4 +41,13 @@ public class CourseResponse {
 	private Double totalRenueve;
 	
 	private Date createDate;
+
+	@Override
+	public String toString() {
+		return "CourseResponse [courseId=" + courseId + ", courseName=" + courseName + ", coursePrice=" + coursePrice
+				+ ", courseDuration=" + courseDuration + ", courseDescription=" + courseDescription + ", subject="
+				+ subject + ", image=" + image + ", registerCourseId=" + registerCourseId + ", isPurchase=" + isPurchase
+				+ ", rating=" + rating + ", reviewNumber=" + reviewNumber + ", totalStudent=" + totalStudent
+				+ ", totalRenueve=" + totalRenueve + ", createDate=" + createDate + "]";
+	}
 }

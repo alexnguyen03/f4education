@@ -61,7 +61,7 @@ public class GoogleDriveRepository {
 		DriveQuickstart driveQuickstart = new DriveQuickstart();
 
 		// Lấy danh sách file trong thư mục "BÀI HỌC"
-		String subFolderResourceId = searchFolderId(folderId, "TÀI NGUYÊN", driveQuickstart.getInstance());
+		String subFolderResourceId = searchFolderId(folderId, "TÀI LIỆU", driveQuickstart.getInstance());
 
 		List<File> allFiles = new ArrayList<>();
 		FileList result = driveQuickstart.getInstance().files().list().setQ("'" + subFolderResourceId + "' in parents")
@@ -100,13 +100,13 @@ public class GoogleDriveRepository {
 			if (null != file) {
 				// Tạo hai thư mục con
 				String subFolderLessonId = findOrCreateFolder(folderId, "BÀI HỌC", driveQuickstart.getInstance());
-				String subFolderResourceId = findOrCreateFolder(folderId, "TÀI NGUYÊN", driveQuickstart.getInstance());
+				String subFolderResourceId = findOrCreateFolder(folderId, "TÀI LIỆU", driveQuickstart.getInstance());
 
 				// Chọn một trong hai thư mục để tải lên
 				String selectedFolderId = "";
 				if (type.equals("BÀI HỌC")) {
 					selectedFolderId = subFolderLessonId;
-				} else if (type.equals("TÀI NGUYÊN")) {
+				} else if (type.equals("TÀI LIỆU")) {
 					selectedFolderId = subFolderResourceId;
 				}
 
@@ -148,6 +148,18 @@ public class GoogleDriveRepository {
 		Drive driveInstance = driveQuickstart.getInstance();
 		for (String name : folderNames) {
 			parentId = findOrCreateFolder(parentId, name, driveInstance);
+		}
+		return parentId;
+	}
+	
+	public String getFolderIdNoCreate(String folderName) throws Exception {
+		DriveQuickstart driveQuickstart = new DriveQuickstart();
+		String parentId = null;
+		String[] folderNames = folderName.split("/");
+
+		Drive driveInstance = driveQuickstart.getInstance();
+		for (String name : folderNames) {
+			parentId = searchFolderId(parentId, name, driveInstance);
 		}
 		return parentId;
 	}
@@ -504,7 +516,7 @@ public class GoogleDriveRepository {
 		try {
 			String subFolderLessonId = this.findOrCreateFolder(folderIdCreated, "BÀI HỌC",
 					driveQuickstart.getInstance());
-			String subFolderResourceId = this.findOrCreateFolder(folderIdCreated, "TÀI NGUYÊN",
+			String subFolderResourceId = this.findOrCreateFolder(folderIdCreated, "TÀI LIỆU",
 					driveQuickstart.getInstance());
 
 		} catch (Exception e) {

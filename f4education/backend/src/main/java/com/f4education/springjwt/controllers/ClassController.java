@@ -30,13 +30,15 @@ public class ClassController {
 	ClassService classService;
 
 	@GetMapping
-	public List<ClassDTO> getAll() {
-		return classService.findAll();
+	public ResponseEntity<?> getAll() {
+		List<ClassDTO> classDTOs = classService.findAll();
+		return ResponseEntity.ok(classDTOs);
 	}
 
 	@GetMapping("/{id}")
-	public ClassDTO findById(@PathVariable("id") Integer classId) {
-		return classService.getClassById(classId);
+	public ResponseEntity<?> findById(@PathVariable("id") Integer classId) {
+		ClassDTO classes = classService.getClassById(classId);
+		return ResponseEntity.ok(classes);
 	}
 
 	@GetMapping("/teacher/{teacherId}")
@@ -44,14 +46,16 @@ public class ClassController {
 		return classService.getAllClassesByTeacherId(teacherId);
 	}
 
-	@PostMapping
-	public ClassDTO createSubject(@RequestBody ClassDTO classDTO) {
-		return classService.createClass(classDTO);
+	@PostMapping("/{adminId}")
+	public ResponseEntity<?> createSubject(@RequestBody ClassDTO classDTO, @PathVariable("adminId") String adminId) {
+		ClassDTO classes = classService.createClass(classDTO, adminId);
+		return ResponseEntity.ok(classes);
 	}
 
 	@PutMapping("/{id}")
-	public ClassDTO updateSubject(@PathVariable("id") Integer classId, @RequestBody ClassDTO classDTO) {
-		return classService.updateClass(classId, classDTO);
+	public ResponseEntity<?> updateSubject(@PathVariable("id") Integer classId, @RequestBody ClassDTO classDTO) {
+		ClassDTO classes = classService.updateClass(classId, classDTO);
+		return ResponseEntity.ok(classes);
 	}
 
 	@GetMapping("/actived")
@@ -67,7 +71,7 @@ public class ClassController {
 	@GetMapping("/student/result/{studentId}")
 	public ResponseEntity<?> getLearningResult(@PathVariable("studentId") String studentId) {
 		List<LearningResultResponse> classes = classService.getAllClassLearningResult(studentId);
-		return ResponseEntity.ok(classes); 
+		return ResponseEntity.ok(classes);
 	}
 
 }

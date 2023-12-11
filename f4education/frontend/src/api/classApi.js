@@ -10,8 +10,8 @@ const classApi = {
         const url = '/classes'
         return axiosClient.get(url)
     },
-    createClass: (body) => {
-        const url = '/classes'
+    createClass: (body, adminId) => {
+        const url = `/classes/${adminId}`
         return axiosClient.post(url, body)
     },
     updateClass: (body, classId) => {

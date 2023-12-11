@@ -12,6 +12,8 @@ import { memo, useEffect, useMemo, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { useParams } from 'react-router-dom'
+import Notify from '../../../utils/Notify'
+import { Group, LoadingOverlay, PasswordInput, Stepper } from '@mantine/core'
 import React from 'react'
 import {
     Button,
@@ -40,9 +42,30 @@ const Register = () => {
     const [errors, setErrors] = useState({})
     const toastId = React.useRef(null)
     const { email } = useParams()
-    const emailDaMaHoa = atob(email)
+    const [codeOTP, setCodeOTP] = useState(0)
+    const [OTP2, setOTP2] = useState(1)
+
+    // const emailDaMaHoa = atob(email)
 
     // notification loading
+
+    const [active, setActive] = useState(0)
+    const nextStep = () =>
+        setActive((current) => (current < 3 ? current + 1 : current))
+    const prevStep = () =>
+        setActive((current) => (current > 0 ? current - 1 : current))
+
+    const [OTP, setOTP] = useState({
+        email: 'loinvpc045491@fpt.edu.vn',
+        codeOTP: '',
+        date: ''
+    })
+
+    const [OTPRequest, setOTPRequest] = useState({
+        email: '',
+        codeOTP: ''
+    })
+
     const notifi_loading = (mess) => {
         toastId.current = toast(mess, {
             type: toast.TYPE.LOADING,
@@ -109,7 +132,7 @@ const Register = () => {
         id: 0,
         username: '',
         password: '',
-        email: emailDaMaHoa,
+        email: '',
         roles: 1,
         status: true,
         student: {
@@ -155,6 +178,44 @@ const Register = () => {
     const handleSubmitForm = (e) => {
         e.preventDefault()
         create()
+    }
+
+    const handelOnChangeInputOTP = (e) => {
+        const { name, value } = e.target
+        setOTP((pre) => ({
+            ...pre,
+            [name]: value
+        }))
+    }
+
+    const handleCheckOTP = async (e) => {
+        e.preventDefault()
+
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        if (seconds > 0) {
+            try {
+                const resp = await accountApi.checkOTP(OTPRequest)
+                if (resp.status === 200) {
+                    toast.update(id, Notify.options.rightOTP())
+                    nextStep()
+                    setStudent({ ...student, email: resp.data.email })
+                } else {
+                    if (resp.data === 1) {
+                        toast.update(id, Notify.options.deadOTP())
+                    } else {
+                        if (resp.data === 2) {
+                            toast.update(id, Notify.options.wrongOTP())
+                        } else {
+                            toast.update(id, Notify.options.error())
+                        }
+                    }
+                }
+            } catch (error) {
+                toast.update(id, Notify.options.error())
+            }
+        } else {
+            toast.update(id, Notify.options.deadOTP())
+        }
     }
 
     const validateForm = () => {
@@ -260,6 +321,57 @@ const Register = () => {
         }))
     }
 
+    const senOTP = async (e) => {
+        e.preventDefault()
+
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        setOTP({ ...OTP, codeOTP: '' })
+        try {
+            const resp = await accountApi.checkMailForPassword(OTPRequest)
+            if (resp.status === 200) {
+                setOTP2(2)
+                handleReset()
+                setCodeOTP(resp.data.codeOTP)
+                toast.update(id, Notify.options.sendedMail())
+            } else {
+                if (resp.data === 1) {
+                    toast.update(id, Notify.options.undefinedAccount())
+                } else {
+                    toast.update(id, Notify.options.error())
+                }
+            }
+        } catch (error) {
+            toast.update(id, Notify.options.error())
+        }
+    }
+
+    const [seconds, setSeconds] = useState(0)
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setSeconds((prevSeconds) => {
+                if (prevSeconds <= 0) {
+                    return 0
+                }
+                if (prevSeconds === 46) {
+                    setOTP2(3)
+                }
+                return prevSeconds - 1
+            })
+        }, 1000)
+
+        return () => clearInterval(timer)
+    }, [])
+
+    const formatTime = (time) => (time < 10 ? `0${time}` : time)
+
+    const minutes = Math.floor(seconds / 60)
+    const remainingSeconds = seconds % 60
+
+    const handleReset = () => {
+        setSeconds(60)
+    }
+
     useEffect(() => {
         const {
             id,
@@ -287,266 +399,449 @@ const Register = () => {
         })
     }, [student])
 
+    useEffect(() => {
+        const { email, codeOTP } = { ...OTP }
+        setOTPRequest({
+            codeOTP: codeOTP,
+            email: email
+        })
+    }, [OTP])
+
     return (
         <>
             <ToastContainer />
-            <Container
-                className="mt--7"
-                fluid
-                style={{ paddingTop: '72px', width: '80%' }}
-            >
+            <Container fluid style={{ paddingTop: '72px', width: '60%' }}>
                 <CardBody>
-                    <Form
-                        onSubmit={handleSubmitForm}
-                        encType="multipart/form-data"
+                    <Stepper
+                        active={active}
+                        onStepClick={setActive}
+                        breakpoint="sm"
+                        allowNextStepsSelect={false}
                     >
-                        <div className="modal-body">
-                            <div className="px-lg-2">
-                                <Row>
-                                    <Col sm={6}>
-                                        <FormGroup>
-                                            <label
-                                                hidden={update}
-                                                className="form-control-label"
-                                                htmlFor="input-password"
-                                            >
-                                                Mật khẩu
-                                            </label>
+                        <Stepper.Step
+                            label="Xác minh"
+                            description="email của bạn"
+                        >
+                            <Form
+                                sm={6}
+                                className="mx-auto w-75"
+                                onSubmit={handleCheckOTP}
+                                encType="multipart/form-data"
+                                // isLoading="true"
+                            >
+                                <div className="modal-body shadow rounded">
+                                    <div className="px-lg-2">
+                                        <div>
+                                            {OTP2 != 1 ? (
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-OTP"
+                                                    >
+                                                        Nhập OTP
+                                                    </label>
 
-                                            <Input
-                                                className="form-control-alternative"
-                                                id="input-password"
-                                                placeholder="Nhập mật khẩu của bạn..."
-                                                type="password"
-                                                onChange={handelOnChangeInput}
-                                                name="password"
-                                                hidden={update}
-                                                value={student.password}
-                                            />
-                                            {errors.password && (
-                                                <div className="text-danger mt-1 font-italic font-weight-light">
-                                                    {errors.password}
-                                                </div>
-                                            )}
-                                        </FormGroup>
-                                    </Col>
-                                </Row>
-                                <hr />
-                                <Row>
-                                    <Col sm={6}>
-                                        <FormGroup>
-                                            <label
-                                                className="form-control-label"
-                                                htmlFor="input-email"
-                                            >
-                                                Họ và tên
-                                            </label>
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-OTP"
+                                                        placeholder="OTP gồm 4 chữ số..."
+                                                        type="text"
+                                                        maxLength={4}
+                                                        onKeyPress={(event) => {
+                                                            if (
+                                                                !/[0-9]/.test(
+                                                                    event.key
+                                                                )
+                                                            ) {
+                                                                event.preventDefault()
+                                                            }
+                                                        }}
+                                                        onChange={
+                                                            handelOnChangeInputOTP
+                                                        }
+                                                        name="codeOTP"
+                                                        value={OTP.codeOTP}
+                                                    />
 
-                                            <Input
-                                                className="form-control-alternative"
-                                                id="input-course-name"
-                                                placeholder="Họ và tên của bạn..."
-                                                type="text"
-                                                onChange={handelOnChangeInput}
-                                                name="fullname"
-                                                value={student.student.fullname}
-                                            />
-                                            {errors.fullname && (
-                                                <div className="text-danger mt-1 font-italic font-weight-light">
-                                                    {errors.fullname}
-                                                </div>
-                                            )}
-                                        </FormGroup>
-                                        <Row>
-                                            <Col md={12}>
+                                                    {seconds !== 0 ? (
+                                                        <div>
+                                                            <p className="text-danger">
+                                                                OTP sẽ hết hiệu
+                                                                lực trong:{' '}
+                                                                {formatTime(
+                                                                    minutes
+                                                                )}
+                                                                :
+                                                                {formatTime(
+                                                                    remainingSeconds
+                                                                )}
+                                                            </p>
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-danger">
+                                                            OTP đã hết hiệu lực!
+                                                        </p>
+                                                    )}
+                                                </FormGroup>
+                                            ) : (
                                                 <FormGroup>
                                                     <label
                                                         className="form-control-label"
                                                         htmlFor="input-email"
                                                     >
-                                                        Số điện thoại
+                                                        Nhập email của bạn
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-email"
+                                                        placeholder="Nhập vào email của bạn..."
+                                                        type="text"
+                                                        disabled={OTP2 !== 1}
+                                                        onChange={
+                                                            handelOnChangeInputOTP
+                                                        }
+                                                        name="email"
+                                                        value={OTP.email}
+                                                    />
+                                                    {errors.email && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.email}
+                                                        </div>
+                                                    )}
+                                                    {errors.success && (
+                                                        <div className="text-success mt-1 font-italic font-weight-light">
+                                                            {errors.success}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                            )}
+                                        </div>
+
+                                        <div className="">
+                                            <Button
+                                                className="form-control-alternative mx-auto w-50 d-flex justify-content-center"
+                                                onClick={senOTP}
+                                                color="primary"
+                                                type="submit"
+                                                disabled={OTP2 === 2}
+                                            >
+                                                {OTP2 === 1
+                                                    ? 'Gửi OTP'
+                                                    : 'Gửi lại'}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <hr className="my-4" />
+                                    <div className="modal-footer">
+                                        <a
+                                            href="https://mail.google.com/mail/u/0/?tab=rm&ogbl#inbox"
+                                            target="_blank"
+                                        >
+                                            Nhận OTP tại đây
+                                        </a>
+                                        <span>
+                                            <Button
+                                                color="primary"
+                                                type="submit"
+                                                className="px-5"
+                                                disabled={
+                                                    OTP2 == 1 || seconds == 0
+                                                }
+                                            >
+                                                Tiếp tục
+                                            </Button>
+                                        </span>
+                                    </div>
+                                </div>
+                            </Form>
+                        </Stepper.Step>
+
+                        <Stepper.Step
+                            label="Cập nhật"
+                            description="mật khẩu mới"
+                        >
+                            <Form
+                                className="mx-auto w-75"
+                                onSubmit={handleSubmitForm}
+                                encType="multipart/form-data"
+                            >
+                                <div className="modal-body shadow-lg rounded">
+                                    <div className="px-lg-2">
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        hidden={update}
+                                                        className="form-control-label"
+                                                        htmlFor="input-password"
+                                                    >
+                                                        Mật khẩu
+                                                    </label>
+
+                                                    <Input
+                                                        className="form-control-alternative"
+                                                        id="input-password"
+                                                        placeholder="Nhập mật khẩu của bạn..."
+                                                        type="password"
+                                                        onChange={
+                                                            handelOnChangeInput
+                                                        }
+                                                        name="password"
+                                                        hidden={update}
+                                                        value={student.password}
+                                                    />
+                                                    {errors.password && (
+                                                        <div className="text-danger mt-1 font-italic font-weight-light">
+                                                            {errors.password}
+                                                        </div>
+                                                    )}
+                                                </FormGroup>
+                                            </Col>
+                                        </Row>
+                                        <hr />
+                                        <Row>
+                                            <Col sm={6}>
+                                                <FormGroup>
+                                                    <label
+                                                        className="form-control-label"
+                                                        htmlFor="input-email"
+                                                    >
+                                                        Họ và tên
                                                     </label>
 
                                                     <Input
                                                         className="form-control-alternative"
                                                         id="input-course-name"
-                                                        placeholder="Số điện thoại..."
+                                                        placeholder="Họ và tên của bạn..."
                                                         type="text"
                                                         onChange={
                                                             handelOnChangeInput
                                                         }
-                                                        name="phone"
+                                                        name="fullname"
                                                         value={
                                                             student.student
-                                                                .phone
+                                                                .fullname
                                                         }
                                                     />
-                                                    {errors.phone && (
+                                                    {errors.fullname && (
                                                         <div className="text-danger mt-1 font-italic font-weight-light">
-                                                            {errors.phone}
-                                                        </div>
-                                                    )}
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-last-name"
-                                                    >
-                                                        Địa chỉ
-                                                    </label>
-                                                    <Input
-                                                        className="form-control-alternative"
-                                                        id="input-courseDescription"
-                                                        name="address"
-                                                        placeholder="Địa chỉ..."
-                                                        value={
-                                                            student.student
-                                                                .address
-                                                        }
-                                                        type="textarea"
-                                                        onChange={
-                                                            handelOnChangeInput
-                                                        }
-                                                    />
-                                                    {errors.address && (
-                                                        <div className="text-danger mt-1 font-italic font-weight-light">
-                                                            {errors.address}
+                                                            {errors.fullname}
                                                         </div>
                                                     )}
                                                 </FormGroup>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-email"
+                                                            >
+                                                                Số điện thoại
+                                                            </label>
+
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-course-name"
+                                                                placeholder="Số điện thoại..."
+                                                                type="text"
+                                                                onChange={
+                                                                    handelOnChangeInput
+                                                                }
+                                                                name="phone"
+                                                                value={
+                                                                    student
+                                                                        .student
+                                                                        .phone
+                                                                }
+                                                            />
+                                                            {errors.phone && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.phone
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Địa chỉ
+                                                            </label>
+                                                            <Input
+                                                                className="form-control-alternative"
+                                                                id="input-courseDescription"
+                                                                name="address"
+                                                                placeholder="Địa chỉ..."
+                                                                value={
+                                                                    student
+                                                                        .student
+                                                                        .address
+                                                                }
+                                                                type="textarea"
+                                                                onChange={
+                                                                    handelOnChangeInput
+                                                                }
+                                                            />
+                                                            {errors.address && (
+                                                                <div className="text-danger mt-1 font-italic font-weight-light">
+                                                                    {
+                                                                        errors.address
+                                                                    }
+                                                                </div>
+                                                            )}
+                                                        </FormGroup>
+                                                    </Col>
+                                                </Row>
                                             </Col>
-                                        </Row>
-                                    </Col>
-                                    <Col sm={6}>
-                                        <Row>
-                                            <Col md={12}>
-                                                <FormGroup>
-                                                    <label
-                                                        className="form-control-label"
-                                                        htmlFor="input-last-name"
-                                                    >
-                                                        Giới tính
-                                                    </label>
-                                                    <br />
-                                                    <ButtonGroup>
-                                                        <Button
-                                                            color="primary"
-                                                            outline
-                                                            onClick={() =>
-                                                                setGender(true)
-                                                            }
-                                                            active={
-                                                                student.student
-                                                                    .gender ===
-                                                                true
-                                                            }
-                                                        >
-                                                            Nam
-                                                        </Button>
-                                                        <Button
-                                                            color="primary"
-                                                            outline
-                                                            name="gender"
-                                                            onClick={() =>
-                                                                setGender(false)
-                                                            }
-                                                            active={
-                                                                student.student
-                                                                    .gender ===
-                                                                false
-                                                            }
-                                                        >
-                                                            Nữ
-                                                        </Button>
-                                                    </ButtonGroup>
-                                                    <br />
-                                                    <br />
-                                                    <Label
-                                                        htmlFor="exampleFile"
-                                                        className="form-control-label"
-                                                    >
-                                                        Ảnh đại diện
-                                                    </Label>
-                                                    <div className="custom-file">
-                                                        <input
-                                                            type="file"
-                                                            name="imageFile"
-                                                            accept="image/*"
-                                                            className="custom-file-input form-control-alternative"
-                                                            id="customFile"
-                                                            onChange={
-                                                                onChangePicture
-                                                            }
-                                                        />
-                                                        <label
-                                                            className="custom-file-label"
-                                                            htmlFor="customFile"
-                                                        >
-                                                            Chọn hình ảnh
-                                                        </label>
+                                            <Col sm={6}>
+                                                <Row>
+                                                    <Col md={12}>
+                                                        <FormGroup>
+                                                            <label
+                                                                className="form-control-label"
+                                                                htmlFor="input-last-name"
+                                                            >
+                                                                Giới tính
+                                                            </label>
+                                                            <br />
+                                                            <ButtonGroup>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    onClick={() =>
+                                                                        setGender(
+                                                                            true
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        student
+                                                                            .student
+                                                                            .gender ===
+                                                                        true
+                                                                    }
+                                                                >
+                                                                    Nam
+                                                                </Button>
+                                                                <Button
+                                                                    color="primary"
+                                                                    outline
+                                                                    name="gender"
+                                                                    onClick={() =>
+                                                                        setGender(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                    active={
+                                                                        student
+                                                                            .student
+                                                                            .gender ===
+                                                                        false
+                                                                    }
+                                                                >
+                                                                    Nữ
+                                                                </Button>
+                                                            </ButtonGroup>
+                                                            <br />
+                                                            <br />
+                                                            <Label
+                                                                htmlFor="exampleFile"
+                                                                className="form-control-label"
+                                                            >
+                                                                Ảnh đại diện
+                                                            </Label>
+                                                            <div className="custom-file">
+                                                                <input
+                                                                    type="file"
+                                                                    name="imageFile"
+                                                                    accept="image/*"
+                                                                    className="custom-file-input form-control-alternative"
+                                                                    id="customFile"
+                                                                    onChange={
+                                                                        onChangePicture
+                                                                    }
+                                                                />
+                                                                <label
+                                                                    className="custom-file-label"
+                                                                    htmlFor="customFile"
+                                                                >
+                                                                    Chọn hình
+                                                                    ảnh
+                                                                </label>
+                                                            </div>
+                                                        </FormGroup>
+                                                    </Col>
+                                                    <div className="previewProfilePic px-3">
+                                                        {imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className="playerProfilePic_home_tile"
+                                                                src={imgData}
+                                                            />
+                                                        )}
+                                                        {!imgData && (
+                                                            <img
+                                                                alt=""
+                                                                width={350}
+                                                                className=""
+                                                                src={
+                                                                    process.env
+                                                                        .REACT_APP_IMAGE_URL +
+                                                                    IMG_URL +
+                                                                    student
+                                                                        .student
+                                                                        .image
+                                                                }
+                                                            />
+                                                        )}
+                                                        {!student.student
+                                                            .image &&
+                                                            !imgData && (
+                                                                <img
+                                                                    alt=""
+                                                                    width={350}
+                                                                    className=""
+                                                                    src={
+                                                                        process
+                                                                            .env
+                                                                            .REACT_APP_IMAGE_URL +
+                                                                        IMG_URL +
+                                                                        'defaultImgUser.jpg'
+                                                                    }
+                                                                />
+                                                            )}
                                                     </div>
-                                                </FormGroup>
+                                                </Row>
                                             </Col>
-                                            <div className="previewProfilePic px-3">
-                                                {imgData && (
-                                                    <img
-                                                        alt=""
-                                                        width={350}
-                                                        className="playerProfilePic_home_tile"
-                                                        src={imgData}
-                                                    />
-                                                )}
-                                                {!imgData && (
-                                                    <img
-                                                        alt=""
-                                                        width={350}
-                                                        className=""
-                                                        src={
-                                                            process.env
-                                                                .REACT_APP_IMAGE_URL +
-                                                            IMG_URL +
-                                                            student.student
-                                                                .image
-                                                        }
-                                                    />
-                                                )}
-                                                {!student.student.image &&
-                                                    !imgData && (
-                                                        <img
-                                                            alt=""
-                                                            width={350}
-                                                            className=""
-                                                            src={
-                                                                process.env
-                                                                    .REACT_APP_IMAGE_URL +
-                                                                IMG_URL +
-                                                                'defaultImgUser.jpg'
-                                                            }
-                                                        />
-                                                    )}
-                                            </div>
                                         </Row>
-                                    </Col>
-                                </Row>
-                            </div>
-                            <hr className="my-4" />
-                        </div>
-                        <div className="modal-footer">
-                            {/* <Button
-                                color="secondary"
-                                data-dismiss="modal"
-                                type="button"
-                                onClick={handleResetForm}
-                            >
-                                Hủy
-                            </Button> */}
-                            <Button
-                                color="primary"
-                                type="submit"
-                                className="px-5"
-                            >
-                                Lưu
-                            </Button>
-                        </div>
-                    </Form>
+                                    </div>
+                                    <hr className="my-4" />
+                                    <div className="modal-footer">
+                                        <Button
+                                            color="primary"
+                                            type="submit"
+                                            className="px-5"
+                                        >
+                                            Lưu
+                                        </Button>
+                                    </div>
+                                </div>
+                            </Form>
+                        </Stepper.Step>
+                        <Stepper.Completed>
+                            <h3 className="d-flex justify-content-center">
+                                Chúc mừng bạn đã khôi phục mật khẩu thành công!
+                            </h3>
+                        </Stepper.Completed>
+                    </Stepper>
+
+                    <Group position="center" mt="xl">
+                        <Button variant="default" onClick={prevStep}>
+                            Back
+                        </Button>
+                        <Button onClick={nextStep}>Next step</Button>
+                    </Group>
                 </CardBody>
             </Container>
         </>

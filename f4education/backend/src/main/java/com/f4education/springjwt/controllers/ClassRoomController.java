@@ -86,14 +86,14 @@ public class ClassRoomController {
 		return ResponseEntity.ok(ls);
 	}
 
-	@PostMapping
-	public ResponseEntity<?> createSubject(@RequestBody ClassRoomDTO classRoomDTO) {
-		ClassRoomDTO createdClassRoom = classRoomService.createClass(classRoomDTO);
+	@PostMapping("/{adminId}")
+	public ResponseEntity<?> createClassRoom(@RequestBody ClassRoomDTO classRoomDTO, @PathVariable("adminId") String adminId) {
+		ClassRoomDTO createdClassRoom = classRoomService.createClass(classRoomDTO, adminId);
 		return ResponseEntity.ok(createdClassRoom);
 	}
 
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateSubject(@PathVariable("id") Integer classroomId,
+	public ResponseEntity<?> updateClassRoom(@PathVariable("id") Integer classroomId,
 			@RequestBody ClassRoomDTO classRoomDTO) {
 
 		ClassRoomDTO updateClassRoom = classRoomService.updateClass(classroomId, classRoomDTO);

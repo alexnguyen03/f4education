@@ -62,8 +62,24 @@ public class CourseServiceImpl implements CoursesService {
 	BillRepository billRepository;
 
 	@Override
-	public List<CourseDTO> findAllCourseDTO() {
-		return courseRepository.findAll().stream().map(this::convertEntityToDTO).collect(Collectors.toList());
+	public List<CourseResponse> findAllCourseDTO(String studentId) {
+		List<Course> courses = courseRepository.findAll();
+		List<CourseResponse> courseResponses = new ArrayList<>();
+
+		for (Course course : courses) {
+			Boolean isPurchase = false;
+
+			for (RegisterCourse rg : course.getRegisterCourses()) {
+				if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
+					isPurchase = true;
+					break;
+				}
+			}
+
+			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
+			courseResponses.add(courseResponse);
+		}
+		return courseResponses;
 	}
 
 	@Override
@@ -267,30 +283,6 @@ public class CourseServiceImpl implements CoursesService {
 	private CourseDTO convertEntityToDTO(Course course) {
 		CourseDTO courseDTO = new CourseDTO();
 		BeanUtils.copyProperties(course, courseDTO);
-
-		List<RegisterCourse> registerCourse = course.getRegisterCourses();
-
-		Float totalRating = (float) 0;
-		List<Evaluate> evaluateList = new ArrayList<>();
-		List<Student> studentList = new ArrayList<>();
-
-		for (RegisterCourse rg : registerCourse) {
-			for (Evaluate evaluate : rg.getEvaluates()) {
-				totalRating += evaluate.getRating();
-				evaluateList.add(evaluate);
-			}
-			studentList.add(rg.getStudent());
-		}
-
-		// Calculate value
-		Integer totalReview = evaluateList.size();
-		Integer totalStudent = studentList.size();
-		totalRating = totalRating / evaluateList.size();
-
-		courseDTO.setRating(totalRating);
-		courseDTO.setReviewNumber(totalReview);
-		courseDTO.setTotalStudent(totalStudent);
-
 		return courseDTO;
 	}
 
@@ -516,8 +508,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<String> getAllCourseContentByClassId(Integer classId) {
-		Integer courseId = registerCourseRepository.findAllByClasses_ClassId(classId).get(0).getCourse()
-				.getCourseId();
+		Integer courseId = registerCourseRepository.findAllByClasses_ClassId(classId).get(0).getCourse().getCourseId();
 		return courseRepository.getAllCourseContentByCourseId(courseId).stream().map(CourseDetail::getLessionTitle)
 				.collect(Collectors.toList());
 	}

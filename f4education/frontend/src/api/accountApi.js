@@ -14,6 +14,8 @@ const accountApi = {
         const url = '/accounts/checkEmail'
         return axiosClient.post(url, body)
     },
+
+    // Forgot Password--------------------------------------------------------------------------------
     checkMailForPassword: (body) => {
         const url = '/accounts/checkEmailForPassWord'
         return axiosClient.post(url, body)
@@ -22,10 +24,17 @@ const accountApi = {
         const url = '/accounts/changePassword'
         return axiosClient.post(url, body)
     },
-    checkOTPForPassword: (body) => {
-        const url = '/accounts/checkOTPForPassWord'
+    checkOTP: (body) => {
+        const url = '/accounts/checkOTP'
         return axiosClient.post(url, body)
     },
+
+    // Đăng ký tài khoản--------------------------------------------------------------------------------
+    checkMailForPassword: (body) => {
+        const url = '/accounts/checkEmailForRegsiter'
+        return axiosClient.post(url, body)
+    },
+
     addAccount: (body) => {
         const url = '/accounts'
         return axiosClient.post(url, body, {

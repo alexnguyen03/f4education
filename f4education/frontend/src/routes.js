@@ -239,7 +239,7 @@ export var routesClient = [
         layout: '/client'
     },
     {
-        path: '/client-register/:email',
+        path: '/client-register',
         name: 'Thông tin tài khoản',
         icon: 'ni ni-planet text-blue',
         component: <ClientRegister />,

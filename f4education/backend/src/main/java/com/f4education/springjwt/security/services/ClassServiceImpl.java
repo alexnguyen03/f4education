@@ -57,14 +57,15 @@ public class ClassServiceImpl implements ClassService {
 	}
 
 	@Override
-	public ClassDTO createClass(ClassDTO classDTO) {
+	public ClassDTO createClass(ClassDTO classDTO, String adminId) {
 		String action = "CREATE";
 		Classes classes = new Classes();
-		Admin admin = adminRepository.findById("namnguyen").get();
+		Admin admin = adminRepository.findById(adminId).get();
 		convertToEntity(classDTO, classes);
 		classes.setAdmin(admin);
 		classes.setStartDate(new Date());
 		classes.setEndDate(null);
+		classes.setStatus("Đang chờ");
 		Classes saveClasses = classRepository.save(classes);
 		this.saveClassHistory(saveClasses, action);
 		return convertToDto(saveClasses);
@@ -90,16 +91,21 @@ public class ClassServiceImpl implements ClassService {
 		classDTO.setRegisterCourses(classes.getRegisterCourses());
 		classDTO.setTeacher(classes.getTeacher());
 		classDTO.setHasSchedule(false);
-		System.out.println(classes.getSchedules().size());
-		if (!classes.getSchedules().isEmpty()) {
-			classDTO.setHasSchedule(true);
+		if (classes.getSchedules() != null) {
+			System.out.println(classes.getSchedules().size());
+			// Kiểm tra xem danh sách schedules có phần tử không
+			if (!classes.getSchedules().isEmpty()) {
+				classDTO.setHasSchedule(true);
+			}
 		}
-		if (classes.getRegisterCourses().size() > 0) {
-			List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
-					.collect(Collectors.toList());
-			classDTO.setStudents(lStudents);
-			classDTO.setCourseName(classes.getRegisterCourses().get(0).getCourse().getCourseName());
-			classDTO.setCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
+		if (classes.getRegisterCourses() != null) {
+			if (classes.getRegisterCourses().size() > 0) {
+				List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
+						.collect(Collectors.toList());
+				classDTO.setStudents(lStudents);
+				classDTO.setCourseName(classes.getRegisterCourses().get(0).getCourse().getCourseName());
+				classDTO.setCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
+			}
 		}
 		return classDTO;
 	}
