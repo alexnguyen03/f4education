@@ -8,12 +8,15 @@ import {
     Checkbox,
     Stack,
     Title,
-    Modal
+    Modal,
+    Center,
+    Alert
 } from '@mantine/core'
 import React, { useState, useEffect } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
+import { IconInfoCircle } from '@tabler/icons-react'
 
 import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
@@ -21,17 +24,9 @@ import quizzResultApi from 'api/quizzResultApi'
 const user = JSON.parse(localStorage.getItem('user'))
 
 function QuizzClient() {
+    const icon = <IconInfoCircle />
     const [searchParams, setSearchParams] = useSearchParams()
     let navigate = useNavigate()
-
-    const itemsBreadcum = [
-        { title: 'Trang chủ', href: '/' },
-        { title: 'Quizz', href: '/quizz' }
-    ].map((item, index) => (
-        <Anchor href={item.href} key={index} color="dimmed">
-            <Text fs="italic">{item.title}</Text>
-        </Anchor>
-    ))
 
     const [questionDetail, setQuestionDetail] = useState([
         {
@@ -234,21 +229,23 @@ function QuizzClient() {
         }
         console.log(quizzResultRequest)
         try {
-            const resp = await quizzResultApi.createQuizzResult(
-                quizzResultRequest
-            )
-            if (resp.status === 200) {
-                navigate({
-                    pathname: '/student/classes'
-                })
-                finishQuiz()
-            }
+            // const resp = await quizzResultApi.createQuizzResult(
+            //     quizzResultRequest
+            // )
+            // if (resp.status === 200) {
+            navigate({
+                pathname: '/student/classes'
+            })
+            finishQuiz()
+            localStorage.removeItem('countdown_start_time')
+            // }
         } catch (error) {
             console.log('Thêm lỗi', error)
         }
     }
 
     const [open, setOpen] = useState(false)
+    const [openNotification, setOpenNotification] = useState(false)
 
     const openModal = () => {
         setOpen(true)
@@ -258,29 +255,60 @@ function QuizzClient() {
         setOpen(false)
     }
 
+    const openModalNotification = () => {
+        setOpenNotification(true)
+    }
+
+    const closeModalNotification = () => {
+        setOpenNotification(false)
+    }
+
     useEffect(() => {
         getQuestionDetailsByClassId()
-        handleReset()
     }, [])
 
+    const [notificationCount, setNotificationCount] = useState(0)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                openModalNotification()
+                setNotificationCount((prevCount) => prevCount + 1)
+            }
+        }
+
+        document.addEventListener('visibilitychange', handleVisibilityChange)
+
+        return () => {
+            document.removeEventListener(
+                'visibilitychange',
+                handleVisibilityChange
+            )
+        }
+    }, [])
+
+    const startQuiz = () => {
+        document.documentElement.requestFullscreen().catch((err) => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`)
+        })
+    }
+
     const storedStartTime = localStorage.getItem('countdown_start_time')
-    const storedSeconds = localStorage.getItem('countdown_seconds')
+    console.log(storedStartTime)
     const [elapsedTime, setElapsedTime] = useState(0)
 
     const [startTime, setStartTime] = useState(
-        storedStartTime || Date.now().toString()
+        storedStartTime !== null ? storedStartTime : Date.now().toString()
     )
 
     const [seconds, setSeconds] = useState(
-        storedSeconds
+        storedStartTime !== null
             ? 90 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
             : 90
     )
 
     useEffect(() => {
         localStorage.setItem('countdown_start_time', startTime)
-        localStorage.setItem('countdown_seconds', seconds.toString())
-    }, [startTime, seconds])
+    }, [startTime])
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -303,6 +331,12 @@ function QuizzClient() {
         }
     }, [seconds])
 
+    useEffect(() => {
+        if (notificationCount >= 2) {
+            handleFinish()
+        }
+    }, [notificationCount])
+
     const finishQuiz = () => {
         document.exitFullscreen().catch((err) => {
             console.log(`Error attempting to exit fullscreen: ${err.message}`)
@@ -321,13 +355,6 @@ function QuizzClient() {
 
     return (
         <>
-            {/* BreadCums */}
-            <Breadcrumbs
-                className="my-5 p-3"
-                style={{ backgroundColor: '#ebebeb' }}
-            >
-                {itemsBreadcum}
-            </Breadcrumbs>
             {showQuestion === true ? (
                 <div className="container">
                     <div className="row">
@@ -507,6 +534,7 @@ function QuizzClient() {
                                     Nộp bài
                                 </Button>
                                 <Modal
+                                    size="sm"
                                     opened={open}
                                     onClose={closeModal}
                                     title="Thông báo"
@@ -563,6 +591,61 @@ function QuizzClient() {
                     </Title>
                 </Stack>
             )}
+            <Modal
+                size="xl"
+                opened={openNotification}
+                onClose={() => {
+                    closeModalNotification()
+                    startQuiz()
+                }}
+            >
+                <Center>
+                    <Title order={2}>Thông báo</Title>
+                </Center>
+                <Text size="xl" mt={10} ta="center">
+                    Chúng tôi đã phát hiện bạn có hành vi gian lận?
+                </Text>
+                <Center>
+                    <Alert
+                        mt={20}
+                        radius="lg"
+                        variant="filled"
+                        color="red"
+                        title="Cảnh báo"
+                        w={650}
+                        icon={icon}
+                    >
+                        <Text size="lg">
+                            - Bạn không được phép làm những điều sau trong lúc
+                            làm bài thi:
+                            <br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;1. Mở tab mới
+                            <br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;2. Chuyển tab
+                            <br />
+                            &nbsp;&nbsp;&nbsp;&nbsp;3. Dùng phím tắt để thoát
+                            chế độ toàn màn hình hay mở tab mới
+                            <br />- Nếu bạn còn quy phạm <b>một lần</b> nữa thì{' '}
+                            <b>hệ thống sẽ tự động nộp bài!</b>
+                        </Text>
+                    </Alert>
+                </Center>
+                <Center>
+                    <Button
+                        size="lg"
+                        radius="xl"
+                        onClick={() => {
+                            closeModalNotification()
+                            startQuiz()
+                        }}
+                        mt={30}
+                        mb={30}
+                        w={200}
+                    >
+                        Xác nhận
+                    </Button>
+                </Center>
+            </Modal>
         </>
     )
 }

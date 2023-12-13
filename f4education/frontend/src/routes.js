@@ -343,13 +343,6 @@ export const routesStudent = [
         layout: '/student'
     },
     {
-        path: '/quizz',
-        name: 'Thông tin bài kiểm tra',
-        icon: 'ni ni-planet text-blue',
-        component: <QuizzClient />,
-        layout: '/student'
-    },
-    {
         path: '/task',
         name: 'Nộp bài tập',
         icon: 'ni ni-planet text-blue',
@@ -409,4 +402,14 @@ export const routesEvaluation = [
         component: <EvaluateTeacherViewByTeacher />,
         layout: '/evaluation'
     }
+]
+
+export const routesQuiz = [
+    {
+        path: '/quizz',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <QuizzClient />,
+        layout: '/quiz'
+    },
 ]

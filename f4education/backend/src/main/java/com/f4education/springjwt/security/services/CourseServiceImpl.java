@@ -341,10 +341,24 @@ public class CourseServiceImpl implements CoursesService {
 	}
 
 	@Override
-	public List<CourseDTO> findBySubjectNames(List<String> checkedSubjects) {
-		List<CourseDTO> list = courseRepository.findBySubjectNames(checkedSubjects).stream()
-				.map(this::convertEntityToDTO).collect(Collectors.toList());
-		return list;
+	public List<CourseResponse> findBySubjectNames(List<String> checkedSubjects, String studentId) {
+		List<Course> courses = courseRepository.findBySubjectNames(checkedSubjects);
+		List<CourseResponse> courseResponses = new ArrayList<>();
+
+		for (Course course : courses) {
+			Boolean isPurchase = false;
+
+			for (RegisterCourse rg : course.getRegisterCourses()) {
+				if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
+					isPurchase = true;
+					break;
+				}
+			}
+
+			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
+			courseResponses.add(courseResponse);
+		}
+		return courseResponses;
 	}
 
 	@Override
@@ -511,6 +525,29 @@ public class CourseServiceImpl implements CoursesService {
 		Integer courseId = registerCourseRepository.findAllByClasses_ClassId(classId).get(0).getCourse().getCourseId();
 		return courseRepository.getAllCourseContentByCourseId(courseId).stream().map(CourseDetail::getLessionTitle)
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<CourseResponse> findByRating(Integer rating, String studentId) {
+		List<Course> courses = courseRepository.findAll();
+		List<CourseResponse> courseResponses = new ArrayList<>();
+
+		for (Course course : courses) {
+			Boolean isPurchase = false;
+
+			for (RegisterCourse rg : course.getRegisterCourses()) {
+				if (rg.getStudent().getStudentId().equalsIgnoreCase(studentId)) {
+					isPurchase = true;
+					break;
+				}
+			}
+
+			CourseResponse courseResponse = convertToResponseDTO(course, isPurchase, null);
+			if (courseResponse.getRating() != null && courseResponse.getRating() >= rating) {
+				courseResponses.add(courseResponse);
+			}
+		}
+		return courseResponses;
 	}
 
 }

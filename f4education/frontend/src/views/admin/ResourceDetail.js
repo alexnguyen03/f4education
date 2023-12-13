@@ -54,6 +54,8 @@ const Resource = () => {
     const [isLoading, setIsLoading] = useState(false)
     const [errors, setErrors] = useState({})
     const [showModalConfirm, setShowModalConfirm] = useState(false)
+    const [showModalConfirmDocument, setShowModalConfirmDocument] =
+        useState(false)
 
     // khởi tạo Resource
     const [resource, setResource] = useState({
@@ -84,6 +86,7 @@ const Resource = () => {
             const resp = await resourceApi.deleteFileById(fileId)
             getAllFileByFolderId(data.folderId)
             setShowModalConfirm(false)
+            setShowModalConfirmDocument(false)
             // }
         } catch (error) {
             console.log(error)
@@ -306,6 +309,8 @@ const Resource = () => {
                 setAllFileByFolderLessonId(lessonFiles)
                 setAllFileByFolderResourceId(resourceFiles)
                 setIsLoading(false) // Hoàn thành quá trình tải dữ liệu
+            } else {
+                setIsLoading(false)
             }
         } catch (error) {
             console.log(error)
@@ -430,7 +435,7 @@ const Resource = () => {
                                                         (pre) => !pre
                                                     )
                                                 }
-                                                color='blue'
+                                                color="blue"
                                             >
                                                 Thêm bài học
                                             </Button>
@@ -561,7 +566,7 @@ const Resource = () => {
                                                 }
                                                 color="success"
                                             >
-                                                Thêm tài nguyên
+                                                Thêm tài liệu
                                             </Button>
                                         )}
                                         enableRowActions
@@ -576,11 +581,80 @@ const Resource = () => {
                                                 <IconButton
                                                     color="secondary"
                                                     onClick={() => {
-                                                        handleDeleteRow(row)
+                                                        setShowModalConfirmDocument(
+                                                            true
+                                                        )
                                                     }}
                                                 >
                                                     <DeleteIcon />
                                                 </IconButton>
+                                                <Modal
+                                                    className="modal-dialog-centered modal-lg"
+                                                    isOpen={
+                                                        showModalConfirmDocument
+                                                    }
+                                                    backdrop={'static'}
+                                                >
+                                                    <div className="modal-header">
+                                                        <h1
+                                                            className="modal-title"
+                                                            id="modal-title-default"
+                                                        >
+                                                            Thông báo
+                                                        </h1>
+                                                        <button
+                                                            aria-label="Close"
+                                                            className="close"
+                                                            data-dismiss="modal"
+                                                            type="button"
+                                                            onClick={() =>
+                                                                setShowModalConfirmDocument(
+                                                                    false
+                                                                )
+                                                            }
+                                                        >
+                                                            <span
+                                                                aria-hidden={
+                                                                    true
+                                                                }
+                                                            >
+                                                                ×
+                                                            </span>
+                                                        </button>
+                                                    </div>
+                                                    <div className="modal-body">
+                                                        <Title order={2}>
+                                                            Bạn có chắc chắn
+                                                            muốn xóa file ???
+                                                        </Title>
+                                                    </div>
+                                                    <div className="modal-footer">
+                                                        <Button
+                                                            color="default"
+                                                            outline
+                                                            data-dismiss="modal"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setShowModalConfirmDocument(
+                                                                    false
+                                                                )
+                                                            }}
+                                                        >
+                                                            Hủy
+                                                        </Button>
+                                                        <Button
+                                                            color="red"
+                                                            type="button"
+                                                            onClick={() => {
+                                                                handleDeleteRow(
+                                                                    row
+                                                                )
+                                                            }}
+                                                        >
+                                                            Xóa
+                                                        </Button>
+                                                    </div>
+                                                </Modal>
                                             </Box>
                                         )}
                                         muiTablePaginationProps={{

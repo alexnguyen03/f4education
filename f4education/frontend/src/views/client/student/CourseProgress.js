@@ -321,7 +321,7 @@ const CourseProgress = () => {
     const handleShowQuestion = (classId) => {
         console.log(classId)
         navigate({
-            pathname: '/student/quizz',
+            pathname: '/quiz/quizz',
             search: `?${createSearchParams({
                 classId: classId
             })}`
