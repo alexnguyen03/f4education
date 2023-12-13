@@ -16,7 +16,7 @@ import { IconButton } from '@mui/material'
 import { MaterialReactTable } from 'material-react-table'
 import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Col, Form, FormGroup, Input, Row } from 'reactstrap'
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
@@ -58,6 +58,8 @@ const TaskTeacher = () => {
     const [visible, setVisible] = useState(false)
 
     const [schedulesFillter, setSchedulesFillter] = useState([])
+
+    const { classId } = useParams()
 
     //! useState chứa 1 buổi dạy của giảng viên
     const [schedule, setSchedule] = useState({
@@ -103,34 +105,17 @@ const TaskTeacher = () => {
         handlers.open()
     }
 
-    //! fetch lịch dạy của giảng viên
-    const fetchClassByTeacher = async () => {
-        try {
-            setLoading(true)
-            const resp = await scheduleApi.findAllScheduleTeacherByID(user.id)
-            if (resp.status === 200 && resp.data.length > 0) {
-                let data = resp.data
-                setSchedules(data)
-                let dataFilter = await filler(data, datepicker)
-                setSchedulesFillter([...dataFilter])
-            }
-            setLoading(false)
-        } catch (error) {
-            console.log(error)
-        }
-    }
-
     const getTasks = async () => {
         try {
             setLoading(true)
-            const resp = await taskTeacherApi.getAllTask(6)
+            const resp = await taskTeacherApi.getAllTask(classId)
             if (resp.status === 200 && resp.data.length > 0) {
                 let data = resp.data
                 console.log(
                     '🚀 ~ file: TaskTeacher.js:98 ~ getTasks ~ data:',
                     data
                 )
-                setTasks(data)
+                setTasks(data.reverse())
             }
             setLoading(false)
         } catch (error) {
@@ -163,7 +148,7 @@ const TaskTeacher = () => {
             },
             {
                 accessorKey: 'description',
-                header: 'Mô tả',
+                header: 'M tả',
                 size: 80
             },
             {
@@ -348,16 +333,26 @@ const TaskTeacher = () => {
         validate: {
             title: (value) => {
                 if (value === '') {
-                    return 'Không để trống tên gọi'
+                    return 'Không để trống tên bài tập'
                 }
                 return null
             },
             startDate: (value) =>
                 value === '' ? 'Vui lòng chọn thời gian bắt đầu' : null,
-            endDate: (value) =>
-                value === '' ? 'Vui lòng chọn thời gian kết thúc' : null,
+            endDate: (value, values) => {
+                if (value === '') {
+                    return 'Vui lòng chọn thời gian kết thúc'
+                }
+                const startDate = new Date(values.startDate)
+                const endDate = new Date(value)
+                const rangeTime = (endDate - startDate) / 1000
+                if (rangeTime < 3600) {
+                    return 'Thời gian giao bài tập tối thiểu là 1 tiếng'
+                }
+                return null
+            },
             description: (value) =>
-                value === '' ? 'Không để trống miêu tả' : null
+                value === '' ? 'Không để trống mô tả' : null
         }
     })
 
@@ -385,6 +380,7 @@ const TaskTeacher = () => {
                                     label="Thời gian bắt đầu"
                                     placeholder="Thời gian bắt đầu..."
                                     maw={400}
+                                    minDate={new Date()}
                                     maxDate={form.values.endDate}
                                     {...form.getInputProps('startDate')}
                                     mx="auto"
@@ -401,15 +397,15 @@ const TaskTeacher = () => {
                                 />
                                 <TextInput
                                     mt="sm"
-                                    label="Tên gọi"
+                                    label="Tên bài tập"
                                     placeholder="Tên gọi bài tập..."
                                     name="title"
                                     {...form.getInputProps('title')}
                                 />
                                 <Textarea
                                     mt="sm"
-                                    label="Miêu tả"
-                                    placeholder="Miêu tả bài tập..."
+                                    label="Mô tả"
+                                    placeholder="Mô tả bài tập..."
                                     {...form.getInputProps('description')}
                                 />
                                 <Button type="submit" mt="sm">
@@ -447,10 +443,19 @@ const TaskTeacher = () => {
                             enableColumnOrdering
                             enableStickyHeader
                             renderTopToolbarCustomActions={() => (
-                                <Button onClick={addTask} color="green">
-                                    <i className="bx bx-layer-plus"></i>
-                                    Thêm task mới
-                                </Button>
+                                <div>
+                                    <Button onClick={addTask} color="green">
+                                        <i className="bx bx-layer-plus"></i>
+                                        Giao thêm bài tập
+                                    </Button>
+                                    <Button
+                                        onClick={getTasks}
+                                        className="ml-2"
+                                        color="green"
+                                    >
+                                        <i class="fa-solid fa-arrows-rotate"></i>
+                                    </Button>
+                                </div>
                             )}
                             displayColumnDefOptions={{
                                 'mrt-row-numbers': {

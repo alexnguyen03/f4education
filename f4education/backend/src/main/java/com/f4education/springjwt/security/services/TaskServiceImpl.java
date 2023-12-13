@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.TaskService;
 import com.f4education.springjwt.models.Classes;
+import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Task;
 import com.f4education.springjwt.payload.request.TaskDTO;
 import com.f4education.springjwt.payload.request.TaskFileStudentDTO;
@@ -47,15 +48,15 @@ public class TaskServiceImpl implements TaskService {
         return tasks.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-	private TaskDTO convertToDto(Task task) {
-		TaskDTO taskDTO = new TaskDTO();
-		BeanUtils.copyProperties(task, taskDTO);
-		taskDTO.setStartDate(Date.from(task.getStartDate().toInstant()));
-		taskDTO.setEndDate(Date.from(task.getEndDate().toInstant()));
-		taskDTO.setClassName(task.getClasses().getClassName());
-		taskDTO.setTeacherName(task.getClasses().getTeacher().getFullname());
-		return taskDTO;
-	}
+    private TaskDTO convertToDto(Task task) {
+        TaskDTO taskDTO = new TaskDTO();
+        BeanUtils.copyProperties(task, taskDTO);
+        taskDTO.setStartDate(Date.from(task.getStartDate().toInstant()));
+        taskDTO.setEndDate(Date.from(task.getEndDate().toInstant()));
+        taskDTO.setClassName(task.getClasses().getClassName());
+        taskDTO.setTeacherName(task.getClasses().getTeacher().getFullname());
+        return taskDTO;
+    }
 
     @Override
     public void submitTaskFile(MultipartFile file, String className, String taskName, String studentName) {
@@ -110,7 +111,11 @@ public class TaskServiceImpl implements TaskService {
                 String linkFoler = "Tasks/" + task.getClasses().getClassName() + "/" + task.getTitle();
                 idFolder = googleDriveRepository.getFolderId(linkFoler);
                 List<String> mails = null;
-                // mails.add(accountDTO.getEmail());
+                List<RegisterCourse> listReg = new ArrayList<RegisterCourse>();
+                try {
+                    listReg = task.getClasses().getRegisterCourses();
+                } catch (Exception e) {
+                }
 
                 // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
 

@@ -289,7 +289,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/task',
+        path: '/task/:classId',
         name: 'Giao bài tập',
         icon: 'ni ni-collection text-blue',
         component: <TaskTeacher />,
