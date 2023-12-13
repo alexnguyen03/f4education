@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import java.time.temporal.ChronoUnit;
 
 import com.f4education.springjwt.interfaces.TaskService;
 import com.f4education.springjwt.models.Classes;
@@ -110,17 +111,29 @@ public class TaskServiceImpl implements TaskService {
             try {
                 String linkFoler = "Tasks/" + task.getClasses().getClassName() + "/" + task.getTitle();
                 idFolder = googleDriveRepository.getFolderId(linkFoler);
-                List<String> mails = null;
+                List<String> mails = new ArrayList<String>();
                 List<RegisterCourse> listReg = new ArrayList<RegisterCourse>();
                 try {
                     listReg = task.getClasses().getRegisterCourses();
                 } catch (Exception e) {
                 }
 
+                if (!listReg.isEmpty()) {
+                    for (RegisterCourse r : listReg) {
+                        mails.add(r.getStudent().getUser().getEmail());
+                    }
+                }
+                OffsetDateTime now = OffsetDateTime.now();
+
+                long secondsDiff = endDate.until(now, ChronoUnit.SECONDS);
+
+                Date date = Date.from(now.toInstant());
+                // if (
                 // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
 
                 // String[] mail = mails.toArray(new String[0]);
                 // mailer.queue(mail, "", "", null);
+                System.out.println();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -139,7 +152,6 @@ public class TaskServiceImpl implements TaskService {
                 }
             }
         }
-        // return null;
         return taskRepository.save(task);
     }
 }

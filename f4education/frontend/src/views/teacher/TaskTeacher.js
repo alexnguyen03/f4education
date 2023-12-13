@@ -358,6 +358,8 @@ const TaskTeacher = () => {
 
     useEffect(() => {
         getTasks()
+        const a = localStorage.getItem('hehe')
+        console.log('🚀 ~ file: TaskTeacher.js:362 ~ useEffect ~ a:', a)
     }, [])
 
     return (

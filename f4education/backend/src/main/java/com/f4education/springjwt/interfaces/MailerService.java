@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.List;
 
 import com.f4education.springjwt.models.MailInfo;
+import com.f4education.springjwt.models.Task;
 
 import jakarta.mail.MessagingException;
 
@@ -48,4 +49,8 @@ public interface MailerService {
 
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
+
+	void mailNewTask(String to, String subject, String body, Date date, Task task);
+
+	void mailUpdateTask(String to, String subject, String body, Date date, Task oldTask, Task newTask);
 }
