@@ -46,9 +46,6 @@ public class Classes implements Serializable {
     List<Comment> comments;
     @OneToMany(mappedBy = "classes")
     @JsonIgnore
-    List<Attendance> attendences;
-    @OneToMany(mappedBy = "classes")
-    @JsonIgnore
     List<Schedule> schedules;
     @OneToMany(mappedBy = "classes")
     @JsonIgnore

@@ -252,7 +252,7 @@ const CourseProgress = () => {
         // }
 
         setCertificate({
-            certificateName: `Chứng chỉ khóa học ${
+            certificateName: `Chứng chỉ xác nhận hoàn thành khóa học ${
                 course.course.courseName ? course.course.courseName : ''
             }`,
             startDate: course.startDate ? course.startDate : '',
@@ -313,6 +313,7 @@ const CourseProgress = () => {
         }
         setLoadingCheckExam(false)
     }
+
     const handleShowQuestion = (classId) => {
         console.log(classId)
         navigate({
@@ -322,10 +323,10 @@ const CourseProgress = () => {
             })}`
         })
     }
-    
+
     const handleCreateCertificate = async () => {
         try {
-            const resp = await certificateApi.createCertificate(certificate)
+            const resp = await certificateApi.createCertificate([certificate])
 
             if (resp.status === 201) {
                 return resp.data
@@ -1420,7 +1421,9 @@ const CourseProgress = () => {
                                                 <Text color="dimmed">
                                                     {course.rating === 'NaN'
                                                         ? 0
-                                                        : course.rating}
+                                                        : parseFloat(
+                                                              course.rating
+                                                          ).toFixed(1)}
                                                 </Text>
                                                 <Rating
                                                     value={
