@@ -72,8 +72,8 @@ const styles = StyleSheet.create({
         marginBottom: 60
     },
     viewer: {
-        width: window.innerWidth,
-        height: window.innerHeight
+        width: '100%',
+        height: '100%'
     },
     image: {
         width: 148,
@@ -91,62 +91,58 @@ const styles = StyleSheet.create({
     }
 })
 
-const CertificatePDF = () => {
+const CertificateDownload = ({ certificateId, awaitComplete }) => {
     // QR code
     const [qrCodeImage, setQrCodeImage] = useState('')
-
-    //  Route
-    // const [searchParams] = useSearchParams()
 
     // Main variable
     const [certificate, setCertificate] = useState({})
     const [courseName, setCourseName] = useState('')
     const [loading, setLoading] = useState(false)
 
+    const fetchData = async () => {
+        try {
+            setLoading(true)
+
+            const resp = await certificateApi.getAllCertificateByCertificateId(
+                certificateId
+            )
+
+            if (resp.status === 200) {
+                setCertificate(resp.data)
+
+                const str = resp.data.certificateName
+                const prefix = 'Chứng chỉ xác nhận hoàn thành khóa học'
+                const value = str
+                    .substring(str.indexOf(prefix) + prefix.length)
+                    .trim()
+                setCourseName(value)
+            }
+
+            // QR code
+            const url = window.location.href
+
+            // Generate QR code as an image
+            const qrCodeDataURL = await QRCode.toDataURL(url)
+
+            console.log(qrCodeDataURL)
+            setQrCodeImage(qrCodeDataURL)
+
+            setLoading(false)
+            let isComplete = true
+            awaitComplete(isComplete)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     // FETCH
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                setLoading(true)
-
-                const resp =
-                    await certificateApi.getAllCertificateByCertificateId(
-                        // searchParams.get('certificateId')
-                        18
-                        )
-
-                if (resp.status === 200) {
-                    setCertificate(resp.data)
-
-                    const str = resp.data.certificateName
-                    const prefix = 'Chứng chỉ xác nhận hoàn thành khóa học'
-                    const value = str
-                        .substring(str.indexOf(prefix) + prefix.length)
-                        .trim()
-                    setCourseName(value)
-                }
-
-                // QR code
-                const url = window.location.href
-
-                // Generate QR code as an image
-                const qrCodeDataURL = await QRCode.toDataURL(url)
-
-                console.log(qrCodeDataURL)
-                setQrCodeImage(qrCodeDataURL)
-
-                setLoading(false)
-            } catch (error) {
-                console.log(error)
-            }
-        }
-
-        Promise.all([fetchData()])
-    }, [])
+        fetchData()
+    }, [certificateId, awaitComplete])
 
     return (
-        <PDFViewer style={styles.viewer}>
-            {/* Start of the document*/}
+        <>
             <Document>
                 {/*render a single page*/}
                 <Page size="A4" style={styles.page} orientation="landscape">
@@ -328,8 +324,8 @@ const CertificatePDF = () => {
                     )}
                 </Page>
             </Document>
-        </PDFViewer>
+        </>
     )
 }
 
-export default CertificatePDF
+export default CertificateDownload

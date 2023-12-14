@@ -27,6 +27,8 @@ public interface MailerService {
 	 */
 	void send(String[] to, String subject, String body) throws MessagingException;
 
+	void sendMailWithAttachment(String[] to, String subject, String body, byte[] file) throws MessagingException;
+
 	/**
 	 * Xếp mail vào hàng đợi
 	 * 
@@ -49,6 +51,9 @@ public interface MailerService {
 
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
+
+	void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link,
+			byte[] pdfFile);
 
 	void mailNewTask(String to[], String subject, String body, Date date, Task task);
 

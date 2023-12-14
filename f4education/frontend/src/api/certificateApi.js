@@ -28,6 +28,12 @@ const certificateApi = {
     removeCertificate: (certificateId) => {
         const url = `/certificate/${certificateId}`
         return axiosClient.delete(url)
+    },
+    downloadCertificate: (formData) => {
+        const url = `/certificate/teacher/download`
+        return axiosClient.post(url, formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        })
     }
 }
 

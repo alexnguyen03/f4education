@@ -720,6 +720,19 @@ const ClientNavbar = () => {
                                                 </Menu.Item>
                                             </Link>
                                         )}
+                                        {checkRole === 'admin' && (
+                                            <Link to="/admin/index">
+                                                <Menu.Item
+                                                    icon={
+                                                        <IconLayoutDashboard
+                                                            size={14}
+                                                        />
+                                                    }
+                                                >
+                                                    Quản lý hệ thống
+                                                </Menu.Item>
+                                            </Link>
+                                        )}
 
                                         <Link to="/student/classes">
                                             <Menu.Item

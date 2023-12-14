@@ -140,14 +140,10 @@ function CourseDetailClient() {
         try {
             const resp = await courseApi.getCourseByCourseId(
                 params.courseId,
-                user !== null ? user.username : 'nouser'
+                user !== null ? user.username : ''
             )
-
-            console.log(resp.data)
             if (resp.status === 200) {
                 setCourse(resp.data)
-            } else if (resp.status === 204) {
-                console.log('no content')
             }
         } catch (error) {
             console.log(error)
@@ -162,7 +158,6 @@ function CourseDetailClient() {
 
             if (resp.status === 200) {
                 setNewstCourse(resp.data)
-                console.log(resp.data)
             } else if (resp.status === 204) {
                 console.log('no content')
             }
@@ -188,6 +183,20 @@ function CourseDetailClient() {
 
             if (resp.status === 200) {
                 setListEvaluate(resp.data)
+
+                resp.data.forEach((item) => {
+                    if (item.studentId === user.username) {
+                        setEvaluateRequest({
+                            evaluateId: item.evaluateId,
+                            content: item.content,
+                            rating: item.rating,
+                            studentId: item.studentId,
+                            registerCourseId: item.registerCourseId
+                        })
+                    } else {
+                        handleResetEvaluate()
+                    }
+                })
             }
         } catch (error) {
             console.log(error)
@@ -848,7 +857,7 @@ function CourseDetailClient() {
                                                     </>
                                                 )}
 
-                                                <Stack align="start" mb="sm">
+                                                <Stack align="start" p="sm">
                                                     <Text
                                                         color="dark"
                                                         fw={700}
