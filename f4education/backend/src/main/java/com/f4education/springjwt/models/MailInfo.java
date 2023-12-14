@@ -20,19 +20,27 @@ public class MailInfo {
     String[] bcc;
     String subject;
     String body;
+    String content;
     String[] attachments;
     Date date = null;
 
     public MailInfo(String[] to, String subject, String body, Date date) {
-        this.from = "FPT Polytechnic <poly@fpt.edu.vn>";
+        this.from = "F4Education";
         this.to = to;
         this.subject = subject;
         this.body = body;
         this.date = date;
     }
 
+    // public MailInfo(String subject, String[] to, String content) {
+    // this.from = "F4Education";
+    // this.to = to;
+    // this.subject = subject;
+    // this.content = content;
+    // }
+
     public MailInfo(String to, String subject, String body, Date date) {
-        this.from = "FPT Polytechnic <poly@fpt.edu.vn>";
+        this.from = "F4Education";
         String[] mail = { to };
         this.to = mail;
         this.subject = subject;
@@ -41,8 +49,16 @@ public class MailInfo {
     }
 
     public MailInfo(String[] to, String subject, String body) {
-        this.from = "FPT Polytechnic <poly@fpt.edu.vn>";
+        this.from = "F4Education";
         this.to = to;
+        this.subject = subject;
+        this.body = body;
+    }
+
+    public MailInfo(String[] to, String[] bcc, String subject, String body) {
+        this.from = "F4Education";
+        this.to = to;
+        this.bcc = bcc;
         this.subject = subject;
         this.body = body;
     }

@@ -275,9 +275,7 @@ const Checkout = () => {
         }))
 
         try {
-            await registerCourseApi.createRegisterCourse(
-                registerCourseRequest[0]
-            )
+            await billApi.createRegisterCourse(registerCourseRequest[0])
         } catch (error) {
             console.log('RegisterCourse: ' + error)
         }
@@ -589,7 +587,7 @@ const Checkout = () => {
                                                                 cart.course
                                                                     .reviewNumber
                                                             }{' '}
-                                                            đánh giá) - {' '}
+                                                            đánh giá) -{' '}
                                                             {
                                                                 cart.course
                                                                     .totalStudent

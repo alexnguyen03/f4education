@@ -1,20 +1,15 @@
 package com.f4education.springjwt.models;
 
-import java.io.Serializable;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -44,39 +39,98 @@ public class Student implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<Bill> bills;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<Evaluate> evaluates;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<Point> points;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<RegisterCourse> registerCourses;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
+	@Access(AccessType.PROPERTY)
 	List<QuizResult> quizResults;
 
-	// @JsonIgnore
 	@OneToMany(mappedBy = "student")
-	List<Attendance> attendances;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "student")
-	List<Attendance> attendences;
-	// @JsonIgnore
-	// @OneToMany(mappedBy = "student")
-	// List<Schedule> schedules;
+	@Access(AccessType.PROPERTY)
+	private List<Attendance> attendances;
 
 	@ManyToOne
 	@JsonIgnore
 	@JoinColumn(name = "account_id")
 	User user;
+
+	public List<Attendance> getAttendances() {
+		return new ArrayList<>(attendances);
+	}
+
+	public List<Bill> getBills() {
+		return new ArrayList<>(bills);
+	}
+
+	public void setBills(List<Bill> bills) {
+		this.bills = bills;
+	}
+
+	public List<Evaluate> getEvaluates() {
+		return new ArrayList<>(evaluates);
+	}
+
+	public void setEvaluates(List<Evaluate> evaluates) {
+		this.evaluates = evaluates;
+	}
+
+	public List<Point> getPoints() {
+		return new ArrayList<>(points);
+	}
+
+	public void setPoints(List<Point> points) {
+		this.points = points;
+	}
+
+	public List<RegisterCourse> getRegisterCourses() {
+		return new ArrayList<>(registerCourses);
+	}
+
+	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
+		this.registerCourses = registerCourses;
+	}
+
+	public List<QuizResult> getQuizResults() {
+		return new ArrayList<>(quizResults);
+	}
+
+	public void setQuizResults(List<QuizResult> quizResults) {
+		this.quizResults = quizResults;
+	}
+
+	public void setAttendances(List<Attendance> attendances) {
+		this.attendances = attendances;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Student student = (Student) o;
+		return Objects.equals(studentId, student.studentId) && Objects.equals(fullname, student.fullname) && Objects.equals(gender, student.gender) && Objects.equals(address, student.address) && Objects.equals(phone, student.phone) && Objects.equals(image, student.image) && Objects.equals(bills, student.bills) && Objects.equals(evaluates, student.evaluates) && Objects.equals(points, student.points) && Objects.equals(registerCourses, student.registerCourses) && Objects.equals(quizResults, student.quizResults) && Objects.equals(attendances, student.attendances) && Objects.equals(user, student.user);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(studentId, fullname, gender, address, phone, image, bills, evaluates, points, registerCourses, quizResults, attendances, user);
+	}
 
 	@Override
 	public String toString() {
@@ -84,13 +138,5 @@ public class Student implements Serializable {
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
 
-	public Student(String studentId, String fullname, Boolean gender, String address, String phone, String image) {
-		super();
-		this.studentId = studentId;
-		this.fullname = fullname;
-		this.gender = gender;
-		this.address = address;
-		this.phone = phone;
-		this.image = image;
-	}
+
 }

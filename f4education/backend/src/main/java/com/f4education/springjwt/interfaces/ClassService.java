@@ -29,4 +29,5 @@ public interface ClassService {
 	Classes findById(Integer classId);
 
 	List<LearningResultResponse> getAllClassLearningResult(String studentId);
+
 }

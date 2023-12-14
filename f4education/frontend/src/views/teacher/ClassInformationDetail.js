@@ -220,7 +220,7 @@ const ClassInformationDetail = () => {
     }
 
     const redirectTo = () => {
-        return navigate('/teacher/class-infor')
+        return navigate('/teacher/class-info')
     }
 
     // ********* Action Area

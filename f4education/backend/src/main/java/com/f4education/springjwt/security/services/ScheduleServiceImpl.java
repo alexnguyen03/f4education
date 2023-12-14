@@ -64,11 +64,12 @@ public class ScheduleServiceImpl implements ScheduleService {
 		if (classes.getStatus().equalsIgnoreCase("Đang chờ")) {
 			classes.setStatus("Đang diễn ra");
 		}
+
 		List<Schedule> listSchedulesAdded = this.convertRequestToListEntity(scheduleRequest);
 		try {
 			listSchedules = scheduleRepository.saveAll(listSchedulesAdded);
-			OffsetDateTime endDate = listSchedules.get(listSchedules.size() - 1).getStudyDate();
-			OffsetDateTime startDate = listSchedules.get(0).getStudyDate();
+			Date endDate = listSchedules.get(listSchedules.size() - 1).getStudyDate();
+			Date startDate = listSchedules.get(0).getStudyDate();
 			classes.setStartDate(Date.from(startDate.toInstant()));
 			classes.setEndDate(Date.from(endDate.toInstant()));
 
@@ -109,10 +110,11 @@ public class ScheduleServiceImpl implements ScheduleService {
 		ZoneOffset timeOffset = getTimeOffset();
 		// Xác định chênh lệch thời gian
 
-		OffsetDateTime synchronizedDateTime = schedule.getStudyDate().withOffsetSameInstant(timeOffset);
+		// OffsetDateTime synchronizedDateTime =
+		// schedule.getStudyDate().withOffsetSameInstant(timeOffset);
 		ScheduleDTO scheduleDTO = new ScheduleDTO();
 		scheduleDTO.setScheduleId(schedule.getScheduleId());
-		scheduleDTO.setStudyDate(synchronizedDateTime);
+		scheduleDTO.setStudyDate(schedule.getStudyDate());
 		scheduleDTO.setContent(schedule.getContents());
 		scheduleDTO.setIsPractice(schedule.getIsPractice());
 
@@ -166,7 +168,10 @@ public class ScheduleServiceImpl implements ScheduleService {
 		String formattedDate = studyDate.format(formatter);
 		OffsetDateTime formattedOffsetDateTime = OffsetDateTime.parse(formattedDate + "T00:00:00+00:00");
 
-		Schedule schedule = scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId, formattedOffsetDateTime);
+		// Schedule schedule =
+		// scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId,
+		// formattedOffsetDateTime);
+		Schedule schedule = scheduleRepository.findAllScheduleByClassIdAndStudyDate(classId, new Date());
 		if (schedule != null) {
 			// Get StartTime session
 			LocalTime startTime = schedule.getSessions().getStartTime().toLocalTime();
@@ -230,7 +235,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 			Schedule newData = new Schedule();
 
 			newData.setScheduleId((Integer) ob[0]);
-			newData.setStudyDate((OffsetDateTime) ob[1]);
+			newData.setStudyDate((Date) ob[1]);
 			newData.setIsPractice((Boolean) ob[2]);
 			newData.setClasses(classesRepository.findById((Integer) ob[3]).get());
 			newData.setSessions(sessionsRepository.findById((Integer) ob[4]).get());

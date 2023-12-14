@@ -27,7 +27,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
 
 	@Query("SELECT sc FROM Schedule sc WHERE sc.classes.classId = :classId AND sc.studyDate = :studyDate")
 	public Schedule findAllScheduleByClassIdAndStudyDate(@Param("classId") Integer classId,
-			@Param("studyDate") OffsetDateTime studyDate);
+			@Param("studyDate") Date studyDate);
 
 	@Query(value = "SELECT s.scheduleId, s.studyDate, s.isPractice, s.classes.classId, s.sessions.sessionId "
 			+ "FROM Schedule s " + "JOIN Classes c ON s.classes.classId = c.classId "

@@ -1,21 +1,13 @@
 package com.f4education.springjwt.models;
 
-import java.io.Serializable;
-import java.util.Date;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
+import java.util.Date;
 
 @Data
 @Entity
@@ -36,12 +28,14 @@ public class Attendance implements Serializable {
 	Classes classes;
 
 	@ManyToOne
+	@JsonIgnore
 	@JoinColumn(name = "student_id")
-	Student student;
+	private Student student;
 
 	@Override
 	public String toString() {
-		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" + attendanceDate + "]";
+		return "Attendance [attendanceId=" + attendanceId + ", attendanceDate=" +
+				attendanceDate + "]";
 	}
 
 }

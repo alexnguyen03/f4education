@@ -36,8 +36,8 @@ const Login = () => {
     const [loading, setLoading] = useState(false)
     const [account, setAccount] = useState({
         // username: 'johnpc03517', //teacher
-        // username: 'namnhpc03517', //admin
-        username: 'loinvpc04549', // student
+        username: 'namnhpc03517', //admin
+        // username: 'loinvpc04549', // student
         password: '123456789'
     })
     const [msgError, setMsgError] = useState({})

@@ -33,6 +33,10 @@ const courseDetailApi = {
             headers: { 'Content-Type': 'multipart/form-data' },
             responseType: 'arraybuffer'
         })
+    },
+    checkHasContents: (classId) => {
+        const url = `/courses-detail/schedule/check/${classId}`
+        return axiosClient.get(url)
     }
 }
 

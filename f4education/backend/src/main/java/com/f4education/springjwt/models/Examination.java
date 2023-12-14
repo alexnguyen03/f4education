@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import java.io.Serializable;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
@@ -19,7 +20,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @Table(name = "Examination")
-public class Examination {
+public class Examination implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exam_id")

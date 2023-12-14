@@ -108,7 +108,7 @@ public class CoursesDetailController {
 
 		return ResponseEntity.badRequest().body("CourseDetail not found");
 	}
-	
+
 	@PostMapping(value = "/upload-excel/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> createCourseDetailByExcelImport(@RequestParam("excelFile") Optional<MultipartFile> file,
 			@PathVariable Integer courseId) {
@@ -188,12 +188,12 @@ public class CoursesDetailController {
 
 	private Object getCellValue(Cell cell) {
 		switch (cell.getCellType()) {
-		case NUMERIC:
-			return cell.getNumericCellValue();
-		case STRING:
-			return cell.getStringCellValue();
-		default:
-			return null;
+			case NUMERIC:
+				return cell.getNumericCellValue();
+			case STRING:
+				return cell.getStringCellValue();
+			default:
+				return null;
 		}
 	}
 
@@ -222,4 +222,10 @@ public class CoursesDetailController {
 		// Return ResponseEntity with InputStreamResource and headers
 		return new ResponseEntity<>(inputStreamResource, headers, HttpStatus.SC_OK);
 	}
+
+	@GetMapping("/schedule/check/{classId}")
+	public ResponseEntity<Integer> checkCourseDetailsByClassId(@PathVariable("classId") Integer classId) {
+		return ResponseEntity.ok(courseService.countCourseDetailsByClassId(classId));
+	}
+
 }

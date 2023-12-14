@@ -1,6 +1,5 @@
 package com.f4education.springjwt.payload.request;
 
-import java.time.OffsetDateTime;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,7 +16,7 @@ public class ScheduleDTO {
 	private Integer scheduleId;
 
 	@JsonProperty("studyDate")
-	private OffsetDateTime studyDate;
+	private Date studyDate;
 
 	@JsonProperty("content")
 	private String content;

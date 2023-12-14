@@ -31,33 +31,29 @@ public class Classes implements Serializable {
 	private String status;
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<ClassHistory> classHistories;
-	// @OneToMany(mappedBy = "classes")
-	// @JsonIgnore
-	// List<Comment> comments;
+	private List<ClassHistory> classHistories;
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	private List<Schedule> schedules;
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	private List<Task> tasks;
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	private List<RegisterCourse> registerCourses;
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	private List<QuizResult> quizResults;
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	private List<EvaluationTeacher> evaluationTeacher;
+	@OneToMany(mappedBy = "classes")
+	@JsonIgnore
+	private List<Examination> examinations;
 
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
-	List<Schedule> schedules;
-	@OneToMany(mappedBy = "classes")
-	@JsonIgnore
-	List<Task> tasks;
-	@OneToMany(mappedBy = "classes")
-	@JsonIgnore
-	List<RegisterCourse> registerCourses;
-	@OneToMany(mappedBy = "classes")
-	@JsonIgnore
-	List<QuizResult> quizResults;
-	@OneToMany(mappedBy = "classes")
-	@JsonIgnore
-	List<EvaluationTeacher> evaluationTeacher;
-	@OneToMany(mappedBy = "classes")
-	@JsonIgnore
-	List<Examination> examinations;
-
-	@OneToMany(mappedBy = "classes")
-	@JsonIgnore
-	List<Point> points;
+	private List<Point> points;
 
 	@OneToMany(mappedBy = "classes")
 	private List<Attendance> attendances;
@@ -70,10 +66,6 @@ public class Classes implements Serializable {
 	@JoinColumn(name = "teacher_id")
 	@JsonIgnore
 	Teacher teacher;
-
-	@JsonIgnore
-	@OneToMany(mappedBy = "classes")
-	List<Attendance> attendences;
 
 	@Override
 	public String toString() {
