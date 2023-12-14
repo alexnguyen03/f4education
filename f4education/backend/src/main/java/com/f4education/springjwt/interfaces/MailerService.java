@@ -50,7 +50,7 @@ public interface MailerService {
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
 
-	void mailNewTask(String to, String subject, String body, Date date, Task task);
+	void mailNewTask(String to[], String subject, String body, Date date, Task task);
 
-	void mailUpdateTask(String to, String subject, String body, Date date, Task oldTask, Task newTask);
+	void mailUpdateTask(String to[], String subject, String body, Date date, Task oldTask, Task newTask);
 }
