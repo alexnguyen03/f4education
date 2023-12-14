@@ -100,7 +100,7 @@ const TaskTeacher = () => {
             startDate: startDate,
             endDate: endDate,
             description: row.original.description,
-            classesId: 6
+            classesId: row.original.classesId
         })
         handlers.open()
     }
@@ -326,7 +326,7 @@ const TaskTeacher = () => {
             description: '',
             startDate: '',
             endDate: '',
-            classesId: 6
+            classesId: classId
         },
 
         // functions will be used to validate values at corresponding key
@@ -382,6 +382,7 @@ const TaskTeacher = () => {
                                     label="Thời gian bắt đầu"
                                     placeholder="Thời gian bắt đầu..."
                                     maw={400}
+                                    clearable
                                     minDate={new Date()}
                                     maxDate={form.values.endDate}
                                     {...form.getInputProps('startDate')}
@@ -389,11 +390,14 @@ const TaskTeacher = () => {
                                 />
                                 <DateTimePicker
                                     mt="sm"
+                                    clearable
                                     valueFormat="DD/MM/YYYY HH:mm"
                                     label="Thời gian kết thúc"
                                     placeholder="Thời gian bắt đầu..."
                                     maw={400}
-                                    minDate={form.values.startDate}
+                                    minDate={
+                                        form.values.startDate || new Date()
+                                    }
                                     {...form.getInputProps('endDate')}
                                     mx="auto"
                                 />

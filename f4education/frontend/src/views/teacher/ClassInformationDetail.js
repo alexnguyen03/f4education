@@ -157,7 +157,7 @@ const ClassInformationDetail = () => {
             if (resp.status === 200) {
                 console.log(resp.data)
                 setClassStudyToday(true)
-            } else if (resp.status === 403) {
+            } else {
                 console.log('class dont study today')
                 setClassStudyToday(false)
             }
@@ -317,13 +317,25 @@ const ClassInformationDetail = () => {
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
 
-                    return (
+                    return classStudyToday ? (
                         <SegmentedControl
                             color="teal"
                             data={[
                                 { label: 'Có mặt', value: 'present' },
                                 { label: 'Vắng mặt', value: 'absent' }
                             ]}
+                            onClick={(e) => {
+                                handlCheckAttandance(e, row.studentId)
+                            }}
+                        />
+                    ) : (
+                        <SegmentedControl
+                            color="teal"
+                            data={[
+                                { label: 'Có mặt', value: 'present' },
+                                { label: 'Vắng mặt', value: 'absent' }
+                            ]}
+                            disabled
                             onClick={(e) => {
                                 handlCheckAttandance(e, row.studentId)
                             }}

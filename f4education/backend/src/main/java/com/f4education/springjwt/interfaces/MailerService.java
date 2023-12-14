@@ -32,6 +32,8 @@ public interface MailerService {
 
 	void sendToTeacherWhenClassSeted(String[] to, String className, String courseName);
 
+	void sendMailWithAttachment(String[] to, String subject, String body, byte[] file) throws MessagingException;
+
 	/**
 	 * Xếp mail vào hàng đợi
 	 * 
@@ -55,8 +57,10 @@ public interface MailerService {
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
 
-	void mailNewTask(String to, String subject, String body, Date date, Task task);
+	void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link,
+			byte[] pdfFile);
 
-	void mailUpdateTask(String to, String subject, String body, Date date, Task oldTask, Task newTask);
+	void mailNewTask(String to[], String subject, String body, Date date, Task task);
 
+	void mailUpdateTask(String to[], String subject, String body, Date date, Task oldTask, Task newTask);
 }

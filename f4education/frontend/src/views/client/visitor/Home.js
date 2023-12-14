@@ -6,7 +6,6 @@ import {
     Button,
     Card,
     Container,
-    Divider,
     Flex,
     getStylesRef,
     Grid,
@@ -48,8 +47,13 @@ import courseApi from '../../../api/courseApi'
 import evaluateApi from '../../../api/evaluateApi'
 
 import { toast, ToastContainer } from 'react-toastify'
+
+// SCSS
 import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
+
+// Utils
 import Notify from '../../../utils/Notify'
+import { formatCurrency } from '../../../utils/formater'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -302,7 +306,9 @@ const Home = () => {
                                     <Text>
                                         {learn.rating === 'NaN'
                                             ? 0
-                                            : learn.rating}
+                                            : parseFloat(learn.rating).toFixed(
+                                                  1
+                                              )}
                                     </Text>
                                     <Group position="center">
                                         <Rating
@@ -322,10 +328,7 @@ const Home = () => {
                             </Box>
                             <Box>
                                 <Text fw={500}>
-                                    {learn.coursePrice.toLocaleString('it-IT', {
-                                        style: 'currency',
-                                        currency: 'VND'
-                                    })}
+                                    {formatCurrency(learn.coursePrice)}
                                 </Text>
                             </Box>
                         </Box>
@@ -412,7 +415,9 @@ const Home = () => {
                     <Box>
                         <Flex justify="flex-start" gap="sm">
                             <Text>
-                                {learn.rating === 'NaN' ? 0 : learn.rating}
+                                {learn.rating === 'NaN'
+                                    ? 0
+                                    : parseFloat(learn.rating).toFixed(1)}
                             </Text>
                             <Group position="center">
                                 <Rating
@@ -430,10 +435,7 @@ const Home = () => {
                     </Box>
                     <Box>
                         <Text fw={500}>
-                            {learn.coursePrice.toLocaleString('it-IT', {
-                                style: 'currency',
-                                currency: 'VND'
-                            })}
+                            {formatCurrency(learn.coursePrice)}
                         </Text>
                     </Box>
                 </Box>
@@ -740,7 +742,7 @@ const Home = () => {
                     </SimpleGrid>
                 </Group>
 
-                {/* what learn nexxt */}
+                {/* newest course*/}
                 <Box mt={rem('1rem')}>
                     <Title order={1} mt="lg" fw={700} color="dark">
                         Những khóa học mới nhất

@@ -21,6 +21,7 @@ public class MailInfo {
     String subject;
     String body;
     String content;
+    byte[] pdfFile;
     String[] attachments;
     Date date = null;
 
@@ -61,6 +62,14 @@ public class MailInfo {
         this.bcc = bcc;
         this.subject = subject;
         this.body = body;
+    }
+
+    public MailInfo(String[] to, String subject, String body, byte[] pdfFile) {
+        this.from = "FPT Polytechnic <poly@fpt.edu.vn>";
+        this.to = to;
+        this.subject = subject;
+        this.body = body;
+        this.pdfFile = pdfFile;
     }
 
 }

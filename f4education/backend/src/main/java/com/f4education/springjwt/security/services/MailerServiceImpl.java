@@ -3,11 +3,12 @@ package com.f4education.springjwt.security.services;
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
-import java.util.Base64;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -55,6 +56,34 @@ public class MailerServiceImpl implements MailerService {
 			}
 		}
 
+		// if (mail.getPdfFile() != null) {
+		// try {
+		// // Tạo phần nội dung của email và thêm vào email
+		// MimeBodyPart messageBodyPart = new MimeBodyPart();
+		// Multipart multipart = new MimeMultipart();
+		// multipart.addBodyPart(messageBodyPart);
+		//
+		// // Tạo phần đính kèm từ mảng byte và thêm vào email
+		// MimeBodyPart attachmentBodyPart = new MimeBodyPart();
+		// attachmentBodyPart.setContent(mail.getPdfFile(), "application/pdf");
+		// attachmentBodyPart.setFileName("my_pdf.pdf");
+		// multipart.addBodyPart(attachmentBodyPart);
+		//
+		// message.setContent(multipart);
+		// } catch (Exception e) {
+		// e.printStackTrace();
+		// }
+		// }
+
+		// Attach the PDF file
+		if (mail.getPdfFile() != null) {
+			try {
+				helper.addAttachment("document.pdf", new ByteArrayResource(mail.getPdfFile()));
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+
 		// Gửi message đến SMTP server
 		sender.send(message);
 	}
@@ -62,6 +91,12 @@ public class MailerServiceImpl implements MailerService {
 	@Override
 	public void send(String[] to, String subject, String body) throws MessagingException {
 		this.send(new MailInfo(to, subject, body));
+	}
+
+	@Override
+	public void sendMailWithAttachment(String[] to, String subject, String body, byte[] pdfFile)
+			throws MessagingException {
+		this.send(new MailInfo(to, subject, body, pdfFile));
 	}
 
 	@Override
@@ -121,8 +156,7 @@ public class MailerServiceImpl implements MailerService {
 				+ "    </div>\n" + "    <p style=\"font-size:1.1em\">Xin chào,</p>\n"
 				+ "    <p>Cảm ơn bạn đã tin tưởng lựa chọn cửa hàng của chúng tôi</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
-				+ OTP + "</h2>\n"
-				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
+				+ OTP + "</h2>\n" + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
 				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
@@ -143,14 +177,37 @@ public class MailerServiceImpl implements MailerService {
 				+ "    </div>\n" + " <p>Cảnh báo bạn đã vắng điểm danh vào ngày " + formatDate(date) + "</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
 				+ "    Bạn đã vắng " + absentCount + "/" + totalCount + " buổi học</h2>\n"
-				+ "<p style=\"color:red;font-size:1.2em;\">"
-				+ isPassed + "</p>" + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
+				+ "<p style=\"color:red;font-size:1.2em;\">" + isPassed + "</p>"
+				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
 				+ "      <p>Team Bộ tứ siêu đẳng</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
 		subject = "Cảnh báo vắng điểm danh";
 		queue(new MailInfo(to, subject, body, date));
+	}
+
+	@Override
+	public void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link,
+			byte[] pdfFile) {
+		String href = link;
+		body = ""
+				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
+				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
+				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link//
+				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\n"
+				+ "    </div>\n" + " <p>Nhận chứng chỉ khóa học " + courseName + "</p>\n"
+				+ "<h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
+				+ "    <a href='" + href
+				+ "' style=\"color: #fff;text-decoration: none;\">Nhấn vào đây để nhận chứng chỉ</a></h2>\n"
+				+ "		<p style=\"color:#000;font-size:1em;\">Xin cảm ơn bạn đã đồng hành cùng chúng tôi!</p>"
+				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
+				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
+				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
+				+ "      <p>Team Bộ tứ siêu đẳng</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
+				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
+		subject = "Thư chúc mừng hoàn thành khóa học";
+		queue(new MailInfo(to, subject, body, pdfFile));
 	}
 
 	private String formatDate(Date date) {
@@ -192,12 +249,38 @@ public class MailerServiceImpl implements MailerService {
 	}
 
 	@Override
-	public void mailNewTask(String to, String subject, String body, Date date, Task task) {
+	public void mailNewTask(String to[], String subject, String body, Date date, Task task) {
 		// ! Xử lý gửi mail khi mới giao bài tập
+		String link = "http://localhost:3000/student/classes";
+		body = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\r\n"
+				+
+				"    <div style=\"margin:50px auto;width:70%;padding:20px 0\">\r\n" +
+				"        <div style=\"border-bottom:1px solid #eee\"> <a href=' link// ! Linh website'\r\n" + //
+				"                style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\r\n"
+				+
+				"        </div>\r\n" +
+				"        <p>Cảnh báo bạn đã vắng điểm danh vào ngày \" + formatDate(date) </p>\r\n" +
+				"        <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius:\r\n"
+				+
+				"            4px;\">\"\r\n" +
+				"            Bạn đã vắng \" + absentCount /\" + totalCount buổi học</h2>\r\n" +
+				"        <p style=\"color:red;font-size:1.2em;\">\"\r\n" +
+				"            + isPassed </p>\" <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\r\n" +
+				"        <hr style=\"border:none;border-top:1px solid #eee\" />\r\n" +
+				"        <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\r\n"
+				+
+				"            <p>Team Bộ tứ siêu đẳng</p>\r\n" +
+				"            <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\r\n" +
+				"            <p>Việt Nam</p>\r\n" +
+				"        </div>\r\n" +
+				"    </div>\r\n" +
+				"</div>";
+		subject = "Cảnh báo vắng điểm danh";
+		queue(new MailInfo(to, subject, body, date));
 	}
 
 	@Override
-	public void mailUpdateTask(String to, String subject, String body, Date date, Task oldTask, Task newTask) {
+	public void mailUpdateTask(String to[], String subject, String body, Date date, Task oldTask, Task newTask) {
 		// ! Xử lý gửi mail khi có sự thay đổi giao bài tập
 	}
 

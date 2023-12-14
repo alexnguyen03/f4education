@@ -20,15 +20,21 @@ public class Classes implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "class_id")
 	private Integer classId;
+
 	@Column(name = "class_name")
 	private String className;
+
 	@Column(name = "start_date")
 	private Date startDate;
+
 	@Column(name = "end_date")
 	private Date endDate;
+
 	@Column(name = "maximum_quantity")
 	private Integer maximumQuantity;
+
 	private String status;
+
 	@OneToMany(mappedBy = "classes")
 	@JsonIgnore
 	private List<ClassHistory> classHistories;
@@ -62,6 +68,7 @@ public class Classes implements Serializable {
 	@JoinColumn(name = "admin_id")
 	@JsonIgnore
 	Admin admin;
+
 	@ManyToOne
 	@JoinColumn(name = "teacher_id")
 	@JsonIgnore

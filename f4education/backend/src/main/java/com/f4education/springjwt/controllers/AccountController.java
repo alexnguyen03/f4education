@@ -265,9 +265,7 @@ public class AccountController {
                     try {
                         savedFile = firebaseStorageService.uploadImage(file.orElse(null),
                                 "accounts/", accountDTO.getUsername().trim());
-
                     } catch (IOException e) {
-                        // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
 

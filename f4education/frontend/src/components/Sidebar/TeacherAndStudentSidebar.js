@@ -37,13 +37,14 @@ const TeacherAndStudentSidebar = (props) => {
     // creates the links that appear in the left menu / TeacherAndStudentSidebar
     const createLinks = (routes) => {
         return routes.map((prop, key) => {
-            console.log(prop.path, prop.name)
+            // console.log(prop.path, prop.name)
             if (
                 prop.path !== '/class-info/:classId' &&
                 prop.path !== '/class-info/point/:classId' &&
                 prop.path !== '/quizz' &&
                 prop.path !== '/task' &&
-                prop.path !== '/classes/recources/:classId'
+                prop.path !== '/classes/recources/:classId' &&
+                prop.path !== '/download-task-student'
             ) {
                 return (
                     <NavItem key={key}>

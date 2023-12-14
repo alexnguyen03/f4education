@@ -1,10 +1,12 @@
 package com.f4education.springjwt.controllers;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,12 +16,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.interfaces.CertificateService;
+import com.f4education.springjwt.interfaces.MailerService;
+import com.f4education.springjwt.models.Certificate;
 import com.f4education.springjwt.payload.request.CertificateDTO;
 import com.f4education.springjwt.payload.response.CertificateResponse;
+import com.f4education.springjwt.repository.CertificateRepository;
 
 @CrossOrigin("*")
 @RestController
@@ -27,6 +33,12 @@ import com.f4education.springjwt.payload.response.CertificateResponse;
 public class CertificateController {
 	@Autowired
 	CertificateService certificateService;
+
+	@Autowired
+	CertificateRepository certificateRepository;
+
+	@Autowired
+	MailerService mailService;
 
 	@GetMapping
 	public ResponseEntity<?> findAll() {
@@ -62,22 +74,19 @@ public class CertificateController {
 	}
 
 	@PostMapping
-	public ResponseEntity<?> createCertificate(@RequestBody CertificateDTO certificateDTO) {
+	public ResponseEntity<?> createCertificate(@RequestBody List<CertificateDTO> certificateDTO) {
 		if (certificateDTO == null) {
 			return ResponseEntity.badRequest().body("Invalid request data");
 		}
 
-		CertificateResponse certificate = certificateService.createCertificatet(certificateDTO);
+		List<CertificateResponse> certificate = new ArrayList<>();
 
-		if (certificate == null) {
-			return ResponseEntity.badRequest().build();
-		}
+		certificateDTO.forEach(item -> {
+			System.out.println(item);
+			certificate.add(certificateService.createCertificatet(item));
+		});
 
-		// create URI
-		URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{certificateId}")
-				.buildAndExpand(certificate.getCertificateId()).toUri();
-
-		return ResponseEntity.created(uri).body(certificate);
+		return ResponseEntity.ok(certificate);
 	}
 
 	@DeleteMapping("/{certificateId}")
@@ -90,6 +99,43 @@ public class CertificateController {
 			certificateService.deleteCertificatet(certificateId);
 
 			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Certificate have been delete");
+		}
+	}
+
+	@PostMapping(value = "/teacher/download", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	public ResponseEntity<String> handleFileUpload(@RequestParam("files") List<MultipartFile> files,
+			@RequestParam List<Integer> certificateIds) {
+		try {
+
+			for (int i = 0; i < files.size(); i++) {
+				MultipartFile file = files.get(i);
+				Integer certificateId = certificateIds.get(i);
+				System.out.println(file);
+				System.out.println(certificateId);
+
+				Optional<Certificate> existCt = certificateRepository.findById(certificateId);
+
+				if (existCt.isPresent()) {
+					// for production
+//					String[] listMail = { existCt.get().getRegisterCourse().getStudent().getUser().getEmail() };
+
+					// for testing
+					String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+
+					byte[] fileBytes = file.getBytes();
+					mailService.queueCertificate(listMail, "", "", null,
+							existCt.get().getRegisterCourse().getCourse().getCourseName(),
+							"http://localhost:3000/pdf/certificate/download?certificateId="
+									+ existCt.get().getCertificateId(),
+							fileBytes);
+
+				}
+			}
+
+			return ResponseEntity.ok("File uploaded successfully!");
+		} catch (Exception e) {
+			e.printStackTrace();
+			return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
 		}
 	}
 

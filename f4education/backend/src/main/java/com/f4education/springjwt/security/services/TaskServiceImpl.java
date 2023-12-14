@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.beanutils.converters.DateConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -124,15 +125,21 @@ public class TaskServiceImpl implements TaskService {
                     }
                 }
                 OffsetDateTime now = OffsetDateTime.now();
-
                 long secondsDiff = endDate.until(now, ChronoUnit.SECONDS);
+                Date date = null;
 
-                Date date = Date.from(now.toInstant());
+                if (secondsDiff < 7200) {
+                    date = Date.from(now.toInstant());
+                } else {
+                    OffsetDateTime twoHoursAgo = now.minus(2, ChronoUnit.HOURS);
+                    date = Date.from(twoHoursAgo.toInstant());
+                }
+
                 // if (
                 // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
 
-                // String[] mail = mails.toArray(new String[0]);
-                // mailer.queue(mail, "", "", null);
+                String[] mail = mails.toArray(new String[0]);
+                mailer.mailNewTask(mail, "", "", date, task);
                 System.out.println();
 
             } catch (Exception e) {
