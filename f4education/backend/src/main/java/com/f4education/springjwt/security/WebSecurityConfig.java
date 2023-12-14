@@ -126,6 +126,7 @@ public class WebSecurityConfig { // extends WebSecurityConfigurerAdapter {
                                         "/api/question-detail/**",
                                         "/api/task/**",
                                         "/api/quizz-result/**",
+
                                         "/api/answers/**",
                                         "/api/cart/**",
                                         "/api/payment/**",

@@ -123,9 +123,13 @@ const StudentInformation = () => {
             ...preStudent,
             phone: evt.target.value
         }))
+        const vietnamesePhoneNumberRegex = /^(84|0[3|5|7|8|9])+([0-9]{8})\b/
         const validationErrors = {}
         if (evt.target.value.trim() === '') {
             validationErrors.phone = 'Vui lòng nhập số điện thoại !!!'
+        } else if (!vietnamesePhoneNumberRegex.test(evt.target.value.trim())) {
+            validationErrors.phone =
+                'Số điện thoại không hợp lệ. Vui lòng kiểm tra lại.'
         } else {
             validationErrors.phone = ''
             setValidated(true)

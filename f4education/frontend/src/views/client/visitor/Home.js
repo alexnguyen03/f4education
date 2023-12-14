@@ -690,7 +690,7 @@ const Home = () => {
                                     Xem khóa học
                                 </Button>
                             </Link>
-                            <Link to={'/check-mail'}>
+                            <Link to={'/client-register'}>
                                 <Button
                                     className={classHeroText.control}
                                     size="lg"

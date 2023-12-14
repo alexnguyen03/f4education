@@ -45,7 +45,7 @@ import subjectApi from '../../api/subjectApi'
 import Select from 'react-select'
 import { Typography } from '@material-ui/core'
 import { formatCurrency } from 'utils/formater'
-import { IconEyeSearch } from '@tabler/icons-react'
+import { IconEyeSearch, IconRefresh } from '@tabler/icons-react'
 import ReactLoading from 'react-loading'
 import { Timeline, Event } from 'react-timeline-scribble'
 import { Warning } from '@material-ui/icons'
@@ -511,6 +511,8 @@ const Courses = () => {
                     toast.update(id, Notify.options.createSuccess())
                     setCourses([resp.data, ...courses])
                     handleResetForm()
+                } else {
+                    toast.update(id, Notify.options.createError())
                 }
             } else {
                 setMsgError((prevErr) => ({
@@ -549,6 +551,8 @@ const Courses = () => {
                         return item
                     })
                 )
+            } else {
+                toast.update(Notify.options.updateError())
             }
         } catch (error) {
             toast.update(Notify.options.updateError())
@@ -644,14 +648,25 @@ const Courses = () => {
                                 columns={columnsCourses}
                                 data={courses}
                                 renderTopToolbarCustomActions={() => (
-                                    <Button
-                                        onClick={handleShowAddForm}
-                                        color="success"
-                                        variant="contained"
-                                    >
-                                        <i className="bx bx-layer-plus"></i>
-                                        Thêm khóa học
-                                    </Button>
+                                    <div>
+                                        <Button
+                                            onClick={handleShowAddForm}
+                                            color="success"
+                                            variant="contained"
+                                        >
+                                            <i className="bx bx-layer-plus"></i>
+                                            Thêm khóa học
+                                        </Button>
+                                        <Button
+                                            onClick={() => {
+                                                getAllCourse()
+                                            }}
+                                            color="info"
+                                            variant="contained"
+                                        >
+                                            <IconRefresh />
+                                        </Button>
+                                    </div>
                                 )}
                                 enableRowActions
                                 renderRowActions={({ row, table }) => (

@@ -76,7 +76,7 @@ function CourseClient() {
     // lấy tất cả các khóa học
     const getAllCourse = async () => {
         try {
-            const resp = await courseApi.getAll()
+            const resp = await courseApi.getAll(user.username)
             setCourses(resp.data.reverse())
             setLoading(false)
         } catch (error) {
@@ -92,6 +92,12 @@ function CourseClient() {
         } catch (error) {
             console.log('GetAllSubject', error)
         }
+    }
+
+    const [selectedRating, setSelectedRating] = useState(null)
+
+    const handleRatingChange = (event) => {
+        setSelectedRating(parseFloat(event.target.value))
     }
 
     // lấy giá trị checkbox chủ đề
@@ -136,7 +142,7 @@ function CourseClient() {
             const resp = await courseApi.findCoursesByCheckedSubjects(
                 checkedSubjects
             )
-            setCourses(resp.reverse())
+            setCourses(resp.data.reverse())
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -149,7 +155,7 @@ function CourseClient() {
             const resp = await courseApi.findCoursesByCheckedDurations(
                 checkedDurations
             )
-            setCourses(resp.reverse())
+            setCourses(resp.data.reverse())
             setLoading(false)
         } catch (error) {
             console.log(error)
@@ -170,8 +176,9 @@ function CourseClient() {
         })
     }
 
-    const handleDeleteFilter = async () => {
-        getAllCourse()
+    const navigateToStudent = (e) => {
+        e.preventDefault()
+        navigate('/student/classes')
     }
 
     // const filteredCourses = courses.filter((course) => {
@@ -205,7 +212,6 @@ function CourseClient() {
 
     const filteredCourses = courses.filter((course) => {
         const courseValues = Object.values(course)
-        const subjectName = course.subject.subjectName.toLowerCase()
         const lowerCaseSearchTerm = searchTerm.toLowerCase()
 
         for (let i = 0; i < courseValues.length; i++) {
@@ -216,14 +222,6 @@ function CourseClient() {
                 value.toString().toLowerCase().includes(lowerCaseSearchTerm)
             ) {
                 return true
-            } else if (
-                checkedSubjects.includes(
-                    course.subject.subjectName.toLowerCase()
-                )
-            ) {
-                checkedSubjects.includes(
-                    course.subject.subjectName.toLowerCase()
-                )
             }
         }
         return false
@@ -316,13 +314,12 @@ function CourseClient() {
         getAllSubject()
     }, [])
 
-    // useEffect(() => {
-    //     findCoursesByCheckedSubject(checkedSubjects)
-    //     if (checkedSubjects.length === 0) {
-    //         getAllCourse()
-    //         setActiveFilter(false)
-    //     }
-    // }, [checkedSubjects])
+    useEffect(() => {
+        findCoursesByCheckedSubject(checkedSubjects)
+        if (checkedSubjects.length === 0) {
+            getAllCourse()
+        }
+    }, [checkedSubjects])
 
     useEffect(() => {
         findCoursesByCheckedDuration(checkedDurations)
@@ -473,7 +470,9 @@ function CourseClient() {
                                             type="radio"
                                             name="exampleRadios"
                                             id="exampleRadios1"
-                                            value="option1"
+                                            value="4.0"
+                                            onChange={handleRatingChange}
+                                            checked={selectedRating === 4.0}
                                         />
                                         <label
                                             className="form-check-label"
@@ -514,7 +513,9 @@ function CourseClient() {
                                             type="radio"
                                             name="exampleRadios"
                                             id="exampleRadios2"
-                                            value="option2"
+                                            value="3.0"
+                                            onChange={handleRatingChange}
+                                            checked={selectedRating === 3.0}
                                         />
                                         <label
                                             className="form-check-label"
@@ -552,7 +553,9 @@ function CourseClient() {
                                             type="radio"
                                             name="exampleRadios"
                                             id="exampleRadios3"
-                                            value="option3"
+                                            value="2.0"
+                                            onChange={handleRatingChange}
+                                            checked={selectedRating === 2.0}
                                         />
                                         <label
                                             className="form-check-label"
@@ -801,30 +804,34 @@ function CourseClient() {
                                         <b>Chủ đề:</b>{' '}
                                         {course.subject.subjectName}
                                     </span>
-                                    <button
-                                        type="button"
-                                        class="btn"
-                                        style={{
-                                            backgroundColor: '#a435f0',
-                                            color: 'white',
-                                            fontWeight: 'bold',
-                                            borderRadius: 0,
-                                            float: 'right',
-                                            marginTop: 9
-                                        }}
-                                        onClick={(e) =>
-                                            handleAddCart(course, e)
-                                        }
-                                    >
-                                        Thêm vào giỏ hàng
-                                    </button>
+                                    {course.isPurchase === false && (
+                                        <>
+                                            <button
+                                                type="button"
+                                                class="btn"
+                                                style={{
+                                                    backgroundColor: '#a435f0',
+                                                    color: 'white',
+                                                    fontWeight: 'bold',
+                                                    borderRadius: 0,
+                                                    float: 'right',
+                                                    marginTop: 9
+                                                }}
+                                                onClick={(e) =>
+                                                    handleAddCart(course, e)
+                                                }
+                                            >
+                                                Thêm vào giỏ hàng
+                                            </button>
+                                        </>
+                                    )}
                                 </div>
                                 <div
                                     className="col-lg-2 mb-3 p-0"
                                     style={{ lineHeight: '0.7' }}
                                 >
                                     <div
-                                        class="d-flex align-items-start flex-column mt-1"
+                                        class="d-flex align-items-start flex-column mt-1 mb-3"
                                         style={{ height: 140 }}
                                     >
                                         <div class="mb-auto w-100">
@@ -834,22 +841,50 @@ function CourseClient() {
                                                 </h2>
                                             </b>
                                         </div>
-                                        <button
-                                            type="button"
-                                            class="btn w-100"
-                                            style={{
-                                                backgroundColor: '#172b4d',
-                                                color: 'white',
-                                                fontWeight: 'bold',
-                                                borderRadius: 0,
-                                                marginTop: 74
-                                            }}
-                                            onClick={(e) =>
-                                                handleCheckOutNow(course, e)
-                                            }
-                                        >
-                                            Đăng ký
-                                        </button>
+                                        {course.isPurchase ? (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    class="btn w-100"
+                                                    style={{
+                                                        backgroundColor:
+                                                            '#172b4d',
+                                                        color: 'white',
+                                                        fontWeight: 'bold',
+                                                        borderRadius: 0,
+                                                        marginTop: 74
+                                                    }}
+                                                    onClick={(e) =>
+                                                        navigateToStudent(e)
+                                                    }
+                                                >
+                                                    Đã đăng ký khóa học
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <>
+                                                <button
+                                                    type="button"
+                                                    class="btn w-100"
+                                                    style={{
+                                                        backgroundColor:
+                                                            '#172b4d',
+                                                        color: 'white',
+                                                        fontWeight: 'bold',
+                                                        borderRadius: 0,
+                                                        marginTop: 74
+                                                    }}
+                                                    onClick={(e) =>
+                                                        handleCheckOutNow(
+                                                            course,
+                                                            e
+                                                        )
+                                                    }
+                                                >
+                                                    Đăng ký
+                                                </button>
+                                            </>
+                                        )}
                                     </div>
                                 </div>
                             </div>

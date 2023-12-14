@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.MailerService;
 import com.f4education.springjwt.models.MailInfo;
+import com.f4education.springjwt.models.Task;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -244,6 +245,16 @@ public class MailerServiceImpl implements MailerService {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public void mailNewTask(String to, String subject, String body, Date date, Task task) {
+		// ! Xử lý gửi mail khi mới giao bài tập
+	}
+
+	@Override
+	public void mailUpdateTask(String to, String subject, String body, Date date, Task oldTask, Task newTask) {
+		// ! Xử lý gửi mail khi có sự thay đổi giao bài tập
 	}
 
 }

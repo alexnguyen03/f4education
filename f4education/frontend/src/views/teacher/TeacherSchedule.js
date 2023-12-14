@@ -146,7 +146,7 @@ const TeacherSchedule = () => {
                 size: 40
             },
             {
-                header: 'Thời gian',
+                header: 'Điểm danh',
                 accessorFn: (row) => row,
                 Cell: ({ cell }) => {
                     const row = cell.getValue()

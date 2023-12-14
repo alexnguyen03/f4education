@@ -1,7 +1,5 @@
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
 import {
     Button,
     ButtonGroup,
@@ -27,7 +25,8 @@ import {
     Text,
     Title
 } from '@mantine/core'
-import { IconUserCircle } from '@tabler/icons-react'
+import { ToastContainer, toast } from 'react-toastify'
+import Notify from '../../utils/Notify'
 import teacherApi from 'api/teacherApi'
 const IMG_URL = '/avatars/accounts/'
 
@@ -38,8 +37,6 @@ const Information = () => {
     const [showForm, setShowForm] = useState(false)
     const [rSelected, setRSelected] = useState(null) //radio button
     const [errors, setErrors] = useState({})
-    const [loading, setLoading] = useState(false)
-    const toastId = React.useRef(null)
 
     //Nhận data gửi lên từ server
     const [teacher, setTeacher] = useState({
@@ -122,7 +119,6 @@ const Information = () => {
 
     const getTeacher = async () => {
         try {
-            setLoading(true)
             // const resp = await teacherApi.getTeacher('johnpc03517')
             const resp = await teacherApi.getTeacher(user.username)
             if (resp.status === 200) {
@@ -132,7 +128,6 @@ const Information = () => {
         } catch (error) {
             console.log(error)
         } finally {
-            setLoading(false)
         }
     }
 
@@ -195,77 +190,31 @@ const Information = () => {
         return validationErrors
     }
 
-    // notification loading
-    const notifi_loading = () => {
-        toastId.current = toast('Đang cập nhật dữ liệu...', {
-            type: toast.TYPE.LOADING,
-            autoClose: false,
-            isLoading: true,
-            closeButton: false,
-            closeOnClick: true
-        })
-    }
-
-    //notifications fail
-    const update_fail = () => {
-        toast.update(toastId.current, {
-            type: toast.TYPE.ERROR,
-            render: 'Lỗi kết nối server',
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            closeButton: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'colored',
-            isLoading: false
-        })
-    }
-
-    //notifications success
-    const update_success = () => {
-        toast.update(toastId.current, {
-            type: toast.TYPE.SUCCESS,
-            render: 'Cập nhật dữ liệu thành công',
-            position: 'top-right',
-            autoClose: 5000,
-            hideProgressBar: false,
-            closeOnClick: true,
-            closeButton: true,
-            pauseOnHover: true,
-            draggable: true,
-            progress: undefined,
-            theme: 'colored',
-            isLoading: false
-        })
-    }
-
     const updateTeacher = async () => {
         const validationErrors = validateForm()
         console.log(Object.keys(validationErrors).length)
 
         if (Object.keys(validationErrors).length === 0) {
-            notifi_loading()
+            var id = null
             const formData = new FormData()
             formData.append('teacherRequest', JSON.stringify(teacherRequest))
             formData.append('file', image)
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 const resp = await teacherApi.updateTeacher(formData)
                 console.log(
                     '🚀 ~ file: Teachers.js:391 ~ updateTeacher ~ resp:',
                     resp
                 )
                 if (resp.status === 200) {
-                    getTeacher()
+                    toast.update(id, Notify.options.updateSuccess())
                     handleResetForm()
-                    update_success()
+                    getTeacher()
                 } else {
-                    update_fail()
+                    toast.update(id, Notify.options.updateError())
                 }
             } catch (error) {
-                update_fail()
+                toast.update(id, Notify.options.updateError())
             }
         } else {
             setErrors(validationErrors)
@@ -497,11 +446,11 @@ const Information = () => {
                                             name="fullname"
                                             value={teacher.fullname}
                                         />
-                                        {/* {errors.fullname && (
-                      <div className="text-danger mt-1 font-italic font-weight-light">
-                        {errors.fullname}
-                      </div>
-                    )} */}
+                                        {errors.fullname && (
+                                            <div className="text-danger mt-1 font-italic font-weight-light">
+                                                {errors.fullname}
+                                            </div>
+                                        )}
                                     </FormGroup>
                                     <Row>
                                         <Col md={12}>
@@ -554,11 +503,11 @@ const Information = () => {
                                                     name="levels"
                                                     value={teacher.levels}
                                                 />
-                                                {/* {errors.levels && (
-                          <div className="text-danger mt-1 font-italic font-weight-light">
-                            {errors.levels}
-                          </div>
-                        )} */}
+                                                {errors.levels && (
+                                                    <div className="text-danger mt-1 font-italic font-weight-light">
+                                                        {errors.levels}
+                                                    </div>
+                                                )}
                                                 <br></br>
                                                 <label
                                                     className="form-control-label"
@@ -578,11 +527,11 @@ const Information = () => {
                                                     name="phone"
                                                     value={teacher.phone}
                                                 />
-                                                {/* {errors.phone && (
-                          <div className="text-danger mt-1 font-italic font-weight-light">
-                            {errors.phone}
-                          </div>
-                        )} */}
+                                                {errors.phone && (
+                                                    <div className="text-danger mt-1 font-italic font-weight-light">
+                                                        {errors.phone}
+                                                    </div>
+                                                )}
                                                 <br></br>
                                                 <label
                                                     className="form-control-label"
@@ -604,11 +553,13 @@ const Information = () => {
                                                         teacher.citizenIdentification
                                                     }
                                                 />
-                                                {/* {errors.citizenIdentification && (
-                          <div className="text-danger mt-1 font-italic font-weight-light">
-                            {errors.citizenIdentification}
-                          </div>
-                        )} */}
+                                                {errors.citizenIdentification && (
+                                                    <div className="text-danger mt-1 font-italic font-weight-light">
+                                                        {
+                                                            errors.citizenIdentification
+                                                        }
+                                                    </div>
+                                                )}
                                                 <br></br>
                                                 <label
                                                     className="form-control-label"
@@ -655,11 +606,11 @@ const Information = () => {
                                                         handelOnChangeInput
                                                     }
                                                 />
-                                                {/* {errors.address && (
-                          <div className="text-danger mt-1 font-italic font-weight-light">
-                            {errors.address}
-                          </div>
-                        )} */}
+                                                {errors.address && (
+                                                    <div className="text-danger mt-1 font-italic font-weight-light">
+                                                        {errors.address}
+                                                    </div>
+                                                )}
                                                 <Label
                                                     htmlFor="exampleFile"
                                                     className="form-control-label"

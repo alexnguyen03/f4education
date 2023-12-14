@@ -64,11 +64,12 @@ const Questions = () => {
 
             if (resp.status === 200 && resp.data.length > 0) {
                 setQuestions(resp.data)
-                setQuestionLoading(false)
                 console.log(resp.data)
             }
+            setQuestionLoading(false)
             console.log('restarted application')
         } catch (error) {
+            setQuestionLoading(false)
             console.log(error)
         }
     }
@@ -97,9 +98,10 @@ const Questions = () => {
 
     // + API_AREA > CRUD
     const handleStoreQuestions = async () => {
+        const id = null
         if (validateForm()) {
-            const id = toast(Notify.msg.loading, Notify.options.loading())
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 setQuestionLoading(true)
                 const resp = await questionApi.createQuestion(question)
                 if (resp.status === 200 && resp.data.length > 0) {
@@ -113,8 +115,10 @@ const Questions = () => {
                 setShowModal(false)
                 fetchQuestions()
                 handleClearForm()
+                toast.update(id, Notify.options.createError())
             }
         } else {
+            toast.update(id, Notify.options.createError())
             console.log('error in validate')
         }
     }

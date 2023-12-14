@@ -116,8 +116,8 @@ export var routes = [
         layout: '/admin'
     },
     {
-        path: '/class-detail/:classIdParam',
-        name: 'Lớp học',
+        path: '/classs/class-detail/:classIdParam',
+        name: 'Lớp học chi tiết',
         icon: 'ni ni-single-02 text-yellow',
         component: <ClassDetail />,
         layout: '/admin'
@@ -239,7 +239,7 @@ export var routesClient = [
         layout: '/client'
     },
     {
-        path: '/client-register/:email',
+        path: '/client-register',
         name: 'Thông tin tài khoản',
         icon: 'ni ni-planet text-blue',
         component: <ClientRegister />,
@@ -289,7 +289,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/task',
+        path: '/task/:classId',
         name: 'Giao bài tập',
         icon: 'ni ni-collection text-blue',
         component: <TaskTeacher />,

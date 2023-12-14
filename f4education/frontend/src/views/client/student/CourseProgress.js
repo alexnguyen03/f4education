@@ -59,6 +59,11 @@ import Notify from '../../../utils/Notify'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
+    const startQuiz = () => {
+        document.documentElement.requestFullscreen().catch((err) => {
+            console.log(`Error attempting to enable fullscreen: ${err.message}`)
+        })
+    }
     const today = new Date('2024-01-04').toDateString().substring(4, 16)
 
     const [downloadRecource, downloadRecourceHandlers] = useDisclosure(false, {
@@ -752,12 +757,13 @@ const CourseProgress = () => {
                                             color="teal"
                                             loading={loadingCheckExam}
                                             disabled={!enableExam}
-                                            onClick={() =>
+                                            onClick={() => {
                                                 handleShowQuestion(
                                                     selectedCourse.classes
                                                         .classId
                                                 )
-                                            }
+                                                startQuiz()
+                                            }}
                                         >
                                             Làm kiểm tra
                                         </Button>

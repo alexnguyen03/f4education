@@ -18,7 +18,6 @@ import { MaterialReactTable } from 'material-react-table'
 import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
 import { Box, IconButton, MenuItem } from '@mui/material'
 import moment from 'moment'
-import { notifications } from '@mantine/notifications'
 
 // gọi API từ classApi
 import classApi from 'api/classApi'
@@ -29,8 +28,10 @@ import { Link } from 'react-router-dom'
 import { formatDate } from '../../utils/formater'
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
+import { IconRefresh } from '@tabler/icons-react'
 
 const Classs = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
     const [classses, setClassses] = useState([])
     const [loading, setLoading] = useState(false)
     const [classHistories, setClassHistories] = useState([])
@@ -52,6 +53,13 @@ const Classs = () => {
         status: 'Đang chờ'
     })
 
+    const isClassNameExists = (newClassName) => {
+        // Kiểm tra xem tên lớp mới đã tồn tại trong đối tượng classs hay chưa
+        return Object.values(classses).some(
+            (cls) => cls.className === newClassName
+        )
+    }
+
     // bắt lỗi form
     const validateForm = () => {
         let validationErrors = {}
@@ -65,6 +73,9 @@ const Classs = () => {
         if (classs.maximumQuantity >= 50) {
             validationErrors.maximumQuantity =
                 'Số lượng tối đa không được lớn hơn 50 !!!'
+        }
+        if (isClassNameExists(classs.className) && update) {
+            validationErrors.className = 'Tên lớp học đã tồn tại !!!'
         }
         return validationErrors
     }
@@ -201,11 +212,14 @@ const Classs = () => {
 
             try {
                 id = toast(Notify.msg.loading, Notify.options.loading())
-
-                const resp = await classApi.createClass(classs)
-                toast.update(id, Notify.options.createSuccess())
-
-                handleResetForm()
+                const resp = await classApi.createClass(classs, user.username)
+                if (resp.status === 200) {
+                    toast.update(id, Notify.options.createSuccess())
+                    handleResetForm()
+                    getDataClass()
+                } else {
+                    toast.update(id, Notify.options.createError())
+                }
             } catch (error) {
                 console.log('Thêm thất bại', error)
                 toast.update(id, Notify.options.createError())
@@ -218,9 +232,11 @@ const Classs = () => {
     // cập nhật class
     const updateClass = async (e) => {
         e.preventDefault()
+        var id = null
         const validationErrors = validateForm()
         if (Object.keys(validationErrors).length === 0) {
             try {
+                id = toast(Notify.msg.loading, Notify.options.loading())
                 console.log(classs)
                 const body = classs
                 if (
@@ -232,10 +248,14 @@ const Classs = () => {
                     body.endDate = new Date()
                 }
                 const resp = await classApi.updateClass(body, classs.classId)
-                alert('Cập nhật thành công')
-                handleResetForm()
+                if (resp.status === 200) {
+                    toast.update(id, Notify.options.updateSuccess())
+                    handleResetForm()
+                    getDataClass()
+                }
             } catch (error) {
                 console.log('Cập nhật thất bại', error)
+                toast.update(id, Notify.options.updateError())
             }
         } else {
             setErrors(validationErrors)
@@ -282,7 +302,7 @@ const Classs = () => {
             },
             {
                 accessorKey: 'admin.fullname',
-                header: 'Người tạo',
+                header: 'Tên người tạo',
                 size: 95
             },
             {
@@ -411,6 +431,7 @@ const Classs = () => {
 
     return (
         <>
+            <ToastContainer />
             <ClasssHeader />
             <Container className="mt--7" fluid>
                 <Card className="bg-secondary shadow">
@@ -450,14 +471,23 @@ const Classs = () => {
                                 data={classses}
                                 positionActionsColumn="last"
                                 renderTopToolbarCustomActions={() => (
-                                    <Button
-                                        onClick={() =>
-                                            setShowFormClass((pre) => !pre)
-                                        }
-                                        color="success"
-                                    >
-                                        Thêm lớp học
-                                    </Button>
+                                    <Box>
+                                        <Button
+                                            onClick={() =>
+                                                setShowFormClass((pre) => !pre)
+                                            }
+                                            color="success"
+                                        >
+                                            Thêm lớp học
+                                        </Button>
+                                        <Button
+                                            color="default"
+                                            onClick={() => getDataClass()}
+                                            variant="contained"
+                                        >
+                                            <IconRefresh />
+                                        </Button>
+                                    </Box>
                                 )}
                                 initialState={{
                                     columnVisibility: { classId: false }
@@ -491,7 +521,7 @@ const Classs = () => {
                                         onClick={() => console.info('Delete')}
                                     >
                                         <Link
-                                            to={`/admin/class-detail/${row.row.original.classId}`}
+                                            to={`/admin/classs/class-detail/${row.row.original.classId}`}
                                             className="text-dark"
                                         >
                                             <IconButton color="primary">
@@ -590,42 +620,6 @@ const Classs = () => {
                                         </div>
                                     )}
                                 </FormGroup>
-                                {/* <Row>
-									<Col md={12}>
-										<FormGroup>
-											<label
-												className='form-control-label'
-												htmlFor='input-start-date'>
-												Ngày bắt đầu
-											</label>
-											<Input
-												className='form-control-alternative'
-												id='input-start-date'
-												type='date'
-												value={classs.startDate}
-												name='startDate'
-												onChange={handelOnChangeInput}
-											/>
-										</FormGroup>
-									</Col>
-									<Col md={12}>
-										<FormGroup>
-											<label
-												className='form-control-label'
-												htmlFor='input-end-date'>
-												Ngày kết thúc
-											</label>
-											<Input
-												className='form-control-alternative'
-												id='input-end-date'
-												type='date'
-												value={classs.endDate}
-												name='endDate'
-												onChange={handelOnChangeInput}
-											/>
-										</FormGroup>
-									</Col>
-								</Row> */}
                                 <Row>
                                     <Col md={12}>
                                         <FormGroup>
@@ -673,24 +667,16 @@ const Classs = () => {
                                                 }
                                                 value={classs.status}
                                             >
-                                                {(classs.status ===
-                                                    'Đang chờ' ||
-                                                    classs.status ===
-                                                        'Đang diễn ra' ||
-                                                    classs.status ===
-                                                        'Kết thúc') &&
-                                                    (update ? (
-                                                        <option
-                                                            data-value="Đang chờ"
-                                                            value="Đang chờ"
-                                                        >
-                                                            Đang chờ
-                                                        </option>
-                                                    ) : (
-                                                        renderSelect(
-                                                            selectedStatus
-                                                        )
-                                                    ))}
+                                                {update ? (
+                                                    <option
+                                                        data-value="Đang chờ"
+                                                        value="Đang chờ"
+                                                    >
+                                                        Đang chờ
+                                                    </option>
+                                                ) : (
+                                                    renderSelect(selectedStatus)
+                                                )}
                                             </Input>
                                         </FormGroup>
                                     </Col>
