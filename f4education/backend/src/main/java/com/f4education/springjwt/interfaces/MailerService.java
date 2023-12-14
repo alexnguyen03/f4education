@@ -26,6 +26,11 @@ public interface MailerService {
 	 */
 	void send(String[] to, String subject, String body) throws MessagingException;
 
+	void sendWhenClassSeted(String[] to, String className, String courseName, String teacherName,
+			String teacherId);
+
+	void sendToTeacherWhenClassSeted(String[] to, String className, String courseName);
+
 	/**
 	 * Xếp mail vào hàng đợi
 	 * 
@@ -48,4 +53,5 @@ public interface MailerService {
 
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
+
 }

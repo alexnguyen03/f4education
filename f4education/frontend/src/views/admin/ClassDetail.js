@@ -13,7 +13,15 @@ import {
     Row
 } from 'reactstrap'
 
-import { Avatar, Group, Loader, Text, TransferList } from '@mantine/core'
+import {
+    Avatar,
+    Box,
+    Center,
+    Group,
+    Loader,
+    Text,
+    TransferList
+} from '@mantine/core'
 import Checkbox from '@material-ui/core/Checkbox'
 
 import { useRef } from 'react'
@@ -35,14 +43,20 @@ import {
 import { IconPlus } from '@tabler/icons-react'
 import { IconCircleMinus } from '@tabler/icons-react'
 const IMG_TEACHER_URL = process.env.REACT_APP_IMAGE_URL + '/teachers/'
-const ClassDetail = () => {
+const ClassDetail = (props) => {
     let { classIdParam } = useParams()
     const [listTeacher, setListTeacher] = useState([])
     const [loadingTransfer, setLoadingTransfer] = useState(true)
+    const [showSelectRegisterCourse, setShowSelectRegisterCourse] =
+        useState(false)
     const [showConfirmModal, setShowConfirmModal] = useState(false)
     const [loadingGetClassDetail, setLoadingGetClassDetail] = useState(true)
     const [allRegisterCourses, setAllRegisterCourse] = useState([])
     const [searchParams, setSearchParams] = useSearchParams()
+    const [errors, setErrors] = useState({
+        maximumQuantityErr: '',
+        minimumQuantityErr: ''
+    })
     const [registed, setRegisted] = useState(false) // lớp đã có khóa học hay chưa
     const [addListRegisterId, setAddListRegisterId] = useState([])
     const [deleteListRegisterId, setDeleteListRegisterId] = useState([])
@@ -74,6 +88,9 @@ const ClassDetail = () => {
         }
     })
 
+    const callFunctionInB = () => {
+        console.log('Hàm được gọi từ A')
+    }
     const [selectedTeacher, setSelectedTeacher] = useState({
         fullname: '',
         teacherId: ''
@@ -117,9 +134,10 @@ const ClassDetail = () => {
             )
             if (resp.status === 200) {
                 toast.update(id, Notify.options.createSuccess())
+                checkRegisterCourseHasClass()
             }
         } catch (error) {
-            // toast.update(id, Notify.options.updateError())
+            toast.update(id, Notify.options.updateError())
             console.log(
                 '🚀 ~ file: ClassDetail.js:94 ~ handleSave ~ error:',
                 error
@@ -129,7 +147,45 @@ const ClassDetail = () => {
 
     const handleOnChangeTransferList = (dataInList) => {
         setShowConfirmModal(true)
+        const maximumQuantity =
+            classDetail.maximumQuantity - dataInList[1].length
+        const minimumQuantity = dataInList[1].length
+        console.log(
+            '🚀 ~ file: ClassDetail.js:153 ~ handleOnChangeTransferList ~ minimumQuantity:',
+            minimumQuantity
+        )
+        if (maximumQuantity < 0) {
+            setErrors((prev) => ({
+                ...prev,
+                maximumQuantityErr:
+                    'Đã đạt số lượng tối đa, vui lòng kiểm tra lại!'
+            }))
+            return
+        } else {
+            setErrors((prev) => ({
+                ...prev,
+                maximumQuantityErr: ''
+            }))
+        }
+        if (minimumQuantity <= 0) {
+            setErrors((prev) => ({
+                ...prev,
+                minimumQuantityErr:
+                    'Bạn không thể xóa toàn bộ học viên khỏi lớp, vui lòng kiểm tra lại!'
+            }))
+            return
+        } else {
+            setErrors((prev) => ({
+                ...prev,
+                minimumQuantityErr: ''
+            }))
+        }
         setDataTransfer(dataInList)
+        console.log(
+            'classDetail.maximumQuantity ',
+            classDetail.maximumQuantity - dataInList[1].length
+        )
+
         let tempAddElement = dataInList[1].filter(
             (item1) =>
                 !listStudentInClass
@@ -171,7 +227,8 @@ const ClassDetail = () => {
 
         setClassDetail((prev) => ({
             ...prev,
-            registerCourseId: val.value
+            registerCourseId: val.value,
+            courseName: val.label
         }))
 
         const studentInClass = allRegisterCourses.filter((item) => {
@@ -216,6 +273,9 @@ const ClassDetail = () => {
             )
             if (!resp.data) {
                 getRegisterCourse()
+                setShowSelectRegisterCourse(true)
+            } else {
+                setShowSelectRegisterCourse(false)
             }
         } catch (error) {
             console.log(
@@ -469,33 +529,57 @@ const ClassDetail = () => {
             )
         }
         return (
-            <TransferList
-                className="mt-2"
-                value={dataTransfer}
-                itemComponent={React.memo(({ data, selected }) => (
-                    <TransferListItem data={data} selected={selected} />
-                ))}
-                onChange={handleOnChangeTransferList}
-                searchPlaceholder={[
-                    'Tìm kiếm học viên để thêm vào lớp',
-                    'Tìm kiếm học viên trong lớp'
-                ]}
-                nothingFound={'Danh sách học viên trống'}
-                titles={[
-                    `Học viên đã đăng ký: ${dataTransfer[0].length}`,
-                    `Học viên trong lớp: ${dataTransfer[1].length}`
-                ]}
-                showTransferAll={false}
-                placeholder={[
-                    'Không còn học viên nào đã đăng ký',
-                    'Không còn học viên nào trong lớp'
-                ]}
-                transferAllMatchingFilter={true}
-                listHeight={450}
-                transferIcon={({ reversed }) => {
-                    return reversed ? <IconCircleMinus /> : <IconCirclePlus />
-                }}
-            />
+            <Box pos={'relative'}>
+                <Text
+                    pos={'absolute'}
+                    top={0}
+                    right={'55%'}
+                    translate=""
+                    className="text-danger text-center"
+                >
+                    {errors.maximumQuantityErr}
+                </Text>
+                <Text
+                    pos={'absolute'}
+                    top={0}
+                    left={'65%'}
+                    translate=""
+                    className="text-danger text-center"
+                >
+                    {errors.minimumQuantityErr}
+                </Text>
+                <TransferList
+                    className="mt-2"
+                    value={dataTransfer}
+                    itemComponent={React.memo(({ data, selected }) => (
+                        <TransferListItem data={data} selected={selected} />
+                    ))}
+                    onChange={handleOnChangeTransferList}
+                    searchPlaceholder={[
+                        'Tìm kiếm học viên để thêm vào lớp',
+                        'Tìm kiếm học viên trong lớp'
+                    ]}
+                    nothingFound={'Danh sách học viên trống'}
+                    titles={[
+                        `Học viên đã đăng ký: ${dataTransfer[0].length}`,
+                        `Học viên trong lớp: ${dataTransfer[1].length}`
+                    ]}
+                    // showTransferAll={false}
+                    placeholder={[
+                        'Không còn học viên nào đã đăng ký',
+                        'Không còn học viên nào trong lớp'
+                    ]}
+                    transferAllMatchingFilter={true}
+                    listHeight={450}
+                    transferIcon={({ reversed }) => {
+                        return reversed ? (
+                            <IconCircleMinus color="red" />
+                        ) : (
+                            <IconCirclePlus color="green" />
+                        )
+                    }}
+                />
+            </Box>
         )
     }
     useEffect(() => {
@@ -522,12 +606,16 @@ const ClassDetail = () => {
     return (
         <>
             <ToastContainer />
-            <ClasssDetailHeader />
+            <ClasssDetailHeader
+                courseName={classDetail.courseName}
+                className={classDetail.className}
+            />
+
             <Container className="mt--7" fluid>
                 <Card>
                     <CardHeader>
                         <Row className=" d-flex justify-content-between">
-                            {listCourse.length === 0 ? null : (
+                            {!showSelectRegisterCourse ? null : (
                                 <Col md={4}>
                                     <Label>Chọn khóa học</Label>
                                     <Select
@@ -565,6 +653,10 @@ const ClassDetail = () => {
                                     className="btn-icon ml-auto btn-3"
                                     color="primary"
                                     type="button"
+                                    disabled={
+                                        selectedTeacher.teacherId === '' ||
+                                        classDetail.registerCourseId === 0
+                                    }
                                     onClick={handleSave}
                                 >
                                     <i className="fa-solid fa-floppy-disk"></i>

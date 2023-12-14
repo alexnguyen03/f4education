@@ -29,6 +29,8 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	@Autowired
 	private RegisterCourseRepository registerCourseRepository;
 	@Autowired
+	MailerServiceImpl mailer;
+	@Autowired
 	private CourseRepository courseRepository;
 	@Autowired
 	private StudentRepository studentRepository;
@@ -153,7 +155,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 
 	@Override
 	public HandleResponseDTO<RegisterCourseResponseDTO> updateRegisterCourse(Integer registerCourseId,
-																			 RegisterCourseRequestDTO registerCourseRequestDTO) {
+			RegisterCourseRequestDTO registerCourseRequestDTO) {
 		Optional<RegisterCourse> registerCourseOptional = registerCourseRepository.findById(registerCourseId);
 		if (registerCourseOptional.isEmpty()) {
 			return new HandleResponseDTO<>(HttpStatus.BAD_REQUEST.value(), "RegisterCourse ID cannot be found", null);
@@ -217,7 +219,7 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 	}
 
 	private void convertRequestToEntity(RegisterCourseRequestDTO registerCourseRequestDTO,
-										RegisterCourse registerCourse) {
+			RegisterCourse registerCourse) {
 		Student student = studentRepository.findById(registerCourseRequestDTO.getStudentId()).orElse(null);
 		Course course = courseRepository.findById(registerCourseRequestDTO.getCourseId()).orElse(null);
 		BeanUtils.copyProperties(registerCourseRequestDTO, registerCourse);
@@ -257,6 +259,15 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
 		List<EvaluationTeacher> lsEvaluationTeacher = foundClass.getEvaluationTeacher();
 		List<Attendance> lsAttendance = new ArrayList<>();
+		if (registerCourseRequestDTO.getTeacherId() != foundClass.getTeacher().getTeacherId()) {
+			String[] teacherMail = { registerCourseRequestDTO.getTeacherId() +
+					"@gmail.com" };
+			mailer.sendToTeacherWhenClassSeted(
+					teacherMail,
+					foundClass.getClassName(),
+					registerCourseFound.getCourse().getCourseName());
+
+		}
 		Teacher foundTeacher = teacherRepository.findById(registerCourseRequestDTO.getTeacherId()).get();
 		foundClass.setTeacher(foundTeacher);
 		foundClass.setEvaluationTeacher(lsEvaluationTeacher);
@@ -286,10 +297,10 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
 			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
-							registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
+					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
-				registerCourse.setClasses(null);
+				registerCourse.setClasses(new Classes());
 			});
 		}
 		try {
@@ -298,7 +309,29 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 			e.printStackTrace();
 		}
 
-		return registerCourseRepository.saveAll(filteredRegisterCoursesToAdd).stream().map(this::convertToResponseDTO)
+		List<RegisterCourse> lsRegisterCourseAdded = registerCourseRepository.saveAll(filteredRegisterCoursesToAdd);
+
+		String[] studentIds = lsRegisterCourseAdded.stream()
+				.map(registerCourse -> String.valueOf(registerCourse.getStudent().getStudentId()))
+				.toArray(String[]::new);
+
+		for (int i = 0; i < studentIds.length; i++) {
+			studentIds[i] = studentIds[i] + "@gmail.com";
+		}
+		// for students
+		if (studentIds.length > 0) {
+
+			mailer.sendWhenClassSeted(studentIds,
+					foundClass.getClassName(),
+					registerCourseFound.getCourse().getCourseName(),
+					foundTeacher.getFullname(),
+					foundTeacher.getTeacherId());
+
+		}
+
+		return lsRegisterCourseAdded
+				.stream()
+				.map(this::convertToResponseDTO)
 				.collect(Collectors.toList());
 
 	}

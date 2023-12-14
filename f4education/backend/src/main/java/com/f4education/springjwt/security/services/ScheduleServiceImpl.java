@@ -64,6 +64,7 @@ public class ScheduleServiceImpl implements ScheduleService {
 		if (classes.getStatus().equalsIgnoreCase("Đang chờ")) {
 			classes.setStatus("Đang diễn ra");
 		}
+
 		List<Schedule> listSchedulesAdded = this.convertRequestToListEntity(scheduleRequest);
 		try {
 			listSchedules = scheduleRepository.saveAll(listSchedulesAdded);

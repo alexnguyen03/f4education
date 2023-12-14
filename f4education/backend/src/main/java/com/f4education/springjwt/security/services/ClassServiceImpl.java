@@ -63,7 +63,7 @@ public class ClassServiceImpl implements ClassService {
 		Admin admin = adminRepository.findById(adminId).get();
 		convertToEntity(classDTO, classes);
 		classes.setAdmin(admin);
-		classes.setStartDate(new Date());
+		classes.setStartDate(null);
 		classes.setEndDate(null);
 		classes.setStatus("Đang chờ");
 		Classes saveClasses = classRepository.save(classes);

@@ -50,7 +50,7 @@ public class RegisterCourse implements Serializable {
 	@JsonIgnore
 	@Access(AccessType.PROPERTY)
 	@OneToMany(mappedBy = "registerCourse")
-	List<Certificate> certificate;
+	List<Certificate> certificates;
 
 	@OneToMany(mappedBy = "registerCourse")
 	@JsonIgnore
@@ -72,16 +72,16 @@ public class RegisterCourse implements Serializable {
 	@JsonIgnore
 	Classes classes;
 
-	public List<Certificate> getCertificate() {
-		return new ArrayList<>(certificate);
+	public List<Certificate> getCertificates() {
+		return certificates;
 	}
 
-	public void setCertificate(List<Certificate> certificate) {
-		this.certificate = certificate;
+	public void setCertificate(List<Certificate> certificates) {
+		this.certificates = certificates;
 	}
 
 	public List<Evaluate> getEvaluates() {
-		return new ArrayList<>(evaluates);
+		return evaluates;
 	}
 
 	public void setEvaluates(List<Evaluate> evaluates) {
@@ -90,15 +90,25 @@ public class RegisterCourse implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		RegisterCourse that = (RegisterCourse) o;
-		return Objects.equals(registerCourseId, that.registerCourseId) && Objects.equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate) && Objects.equals(coursePrice, that.coursePrice) && Objects.equals(courseDuration, that.courseDuration) && Objects.equals(courseDescription, that.courseDescription) && Objects.equals(registrationDate, that.registrationDate) && Objects.equals(status, that.status) && Objects.equals(image, that.image) && Objects.equals(certificate, that.certificate) && Objects.equals(evaluates, that.evaluates) && Objects.equals(student, that.student) && Objects.equals(course, that.course) && Objects.equals(classes, that.classes);
+		return Objects.equals(registerCourseId, that.registerCourseId) && Objects.equals(startDate, that.startDate)
+				&& Objects.equals(endDate, that.endDate) && Objects.equals(coursePrice, that.coursePrice)
+				&& Objects.equals(courseDuration, that.courseDuration)
+				&& Objects.equals(courseDescription, that.courseDescription)
+				&& Objects.equals(registrationDate, that.registrationDate) && Objects.equals(status, that.status)
+				&& Objects.equals(image, that.image) && Objects.equals(certificates, that.certificates)
+				&& Objects.equals(evaluates, that.evaluates) && Objects.equals(student, that.student)
+				&& Objects.equals(course, that.course) && Objects.equals(classes, that.classes);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(registerCourseId, startDate, endDate, coursePrice, courseDuration, courseDescription, registrationDate, status, image, certificate, evaluates, student, course, classes);
+		return Objects.hash(registerCourseId, startDate, endDate, coursePrice, courseDuration, courseDescription,
+				registrationDate, status, image, certificates, evaluates, student, course, classes);
 	}
 
 	@Override

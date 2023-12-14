@@ -19,12 +19,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.f4education.springjwt.payload.HandleResponseDTO;
 import com.f4education.springjwt.payload.request.BillInformation;
 import com.f4education.springjwt.payload.request.BillRequestDTO;
 import com.f4education.springjwt.payload.request.GoogleDriveFileDTO;
+import com.f4education.springjwt.payload.request.RegisterCourseRequestDTO;
 import com.f4education.springjwt.payload.response.BillResponseDTO;
+import com.f4education.springjwt.payload.response.RegisterCourseResponseDTO;
 import com.f4education.springjwt.security.services.BillInformationServiceImp;
 import com.f4education.springjwt.security.services.BillServiceImp;
+import com.f4education.springjwt.security.services.RegisterCourseServiceImp;
 
 @CrossOrigin("*")
 @RestController
@@ -34,6 +38,9 @@ public class BillController {
 	BillServiceImp billService;
 	@Autowired
 	BillInformationServiceImp billInformationServiceImp;
+
+	@Autowired
+	RegisterCourseServiceImp registerCourseService;
 
 	@GetMapping
 	public ResponseEntity<?> findAll() {
@@ -93,10 +100,16 @@ public class BillController {
 			return ResponseEntity.ok(bill);
 		}
 	}
-	
+
 	@GetMapping("/bill-history/{studentId}")
 	public ResponseEntity<?> getAllByBillInformation(@PathVariable("studentId") String studentId) {
 		List<BillInformation> billInformation = billInformationServiceImp.getAllByBillInformation(studentId);
 		return ResponseEntity.ok(billInformation);
+	}
+
+	@PostMapping("/create-register-course")
+	public HandleResponseDTO<RegisterCourseResponseDTO> createRegisterCourse(
+			@RequestBody RegisterCourseRequestDTO registerCourseRequestDTO) {
+		return registerCourseService.createRegisterCourse(registerCourseRequestDTO);
 	}
 }
