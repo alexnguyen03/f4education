@@ -1,6 +1,6 @@
 package com.f4education.springjwt.payload.request;
 
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 public class ScheduleCourseProgressDTO {
 	private Integer scheduleId;
 
-	private OffsetDateTime studyDate;
+	private Date studyDate;
 
 	private Integer classId;
 }

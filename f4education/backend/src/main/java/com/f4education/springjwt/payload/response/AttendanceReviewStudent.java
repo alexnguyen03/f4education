@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class AttendanceReviewStudent {
 	private Integer scheduleId;
-	private OffsetDateTime studyDate;
+	private Date studyDate;
 	private Boolean isPratice;
 	private Classes classes;
 	private Sessions sessions;

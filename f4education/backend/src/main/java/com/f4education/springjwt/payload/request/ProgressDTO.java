@@ -14,32 +14,35 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ProgressDTO {
-	Student student;
+    Student student;
     Integer soBuoiVang = 0;
     Integer tongSoBuoi = 0;
 
     public ProgressDTO(RegisterCourse registerCourse) {
-        
+
         try {
             this.student = registerCourse.getStudent();
         } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
             this.tongSoBuoi = registerCourse.getClasses().getSchedules().size();
         } catch (Exception e) {
+            e.printStackTrace();
         }
         try {
             int vang = 0;
             List<Attendance> attendances = registerCourse.getStudent().getAttendances();
-            if(!attendances.isEmpty()) {
-                for(Attendance attendance : attendances) {
-                    if(attendance.getStudent().getStudentId() == registerCourse.getStudent().getStudentId()) {
+            if (!attendances.isEmpty()) {
+                for (Attendance attendance : attendances) {
+                    if (attendance.getStudent().getStudentId() == registerCourse.getStudent().getStudentId()) {
                         vang++;
                     }
                 }
             }
             this.soBuoiVang = vang;
         } catch (Exception e) {
+            e.printStackTrace();
         }
 
     }

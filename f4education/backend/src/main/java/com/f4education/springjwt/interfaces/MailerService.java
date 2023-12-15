@@ -27,6 +27,11 @@ public interface MailerService {
 	 */
 	void send(String[] to, String subject, String body) throws MessagingException;
 
+	void sendWhenClassSeted(String[] to, String className, String courseName, String teacherName,
+			String teacherId);
+
+	void sendToTeacherWhenClassSeted(String[] to, String className, String courseName);
+
 	void sendMailWithAttachment(String[] to, String subject, String body, byte[] file) throws MessagingException;
 
 	/**

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.f4education.springjwt.interfaces.ClassService;
 import com.f4education.springjwt.models.Admin;
@@ -62,7 +63,7 @@ public class ClassServiceImpl implements ClassService {
 		Admin admin = adminRepository.findById(adminId).get();
 		convertToEntity(classDTO, classes);
 		classes.setAdmin(admin);
-		classes.setStartDate(new Date());
+		classes.setStartDate(null);
 		classes.setEndDate(null);
 		classes.setStatus("Đang chờ");
 		Classes saveClasses = classRepository.save(classes);
@@ -220,4 +221,5 @@ public class ClassServiceImpl implements ClassService {
 
 		return classResponse;
 	}
+
 }

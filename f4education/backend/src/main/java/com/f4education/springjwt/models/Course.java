@@ -1,5 +1,6 @@
 package com.f4education.springjwt.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,8 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.List;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -35,8 +35,6 @@ public class Course implements Serializable {
 	@Column(name = "course_description")
 	private String courseDescription;
 
-	// @Column(name = "number_session")
-	// private Integer numberSession;
 
 	private String image;
 
@@ -81,13 +79,34 @@ public class Course implements Serializable {
 	List<CourseDetail> courseDetail;
 
 	public Course(String courseName, Float coursePrice, Integer courseDuration, String courseDescription,
-			String image) {
+				  String image) {
 		this.courseName = courseName;
 		this.coursePrice = coursePrice;
 		this.courseDuration = courseDuration;
 		this.courseDescription = courseDescription;
 		// this.numberSession = numberSession;
 		this.image = image;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Course course = (Course) o;
+		return Objects.equals(courseId, course.courseId) && Objects.equals(courseName, course.courseName) && Objects.equals(coursePrice, course.coursePrice) && Objects.equals(courseDuration, course.courseDuration) && Objects.equals(courseDescription, course.courseDescription) && Objects.equals(image, course.image) && Objects.equals(status, course.status) && Objects.equals(courseHistories, course.courseHistories) && Objects.equals(questions, course.questions) && Objects.equals(registerCourses, course.registerCourses) && Objects.equals(resources, course.resources) && Objects.equals(quizResults, course.quizResults) && Objects.equals(subject, course.subject) && Objects.equals(admin, course.admin) && Objects.equals(bill, course.bill) && Objects.equals(courseDetail, course.courseDetail);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(courseId, courseName, coursePrice, courseDuration, courseDescription, image, status, courseHistories, questions, registerCourses, resources, quizResults, subject, admin, bill, courseDetail);
+	}
+
+	public Integer getCourseId() {
+		return courseId;
+	}
+
+	public void setCourseId(Integer courseId) {
+		this.courseId = courseId;
 	}
 
 	@Override

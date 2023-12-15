@@ -513,4 +513,12 @@ public class CourseServiceImpl implements CoursesService {
 				.collect(Collectors.toList());
 	}
 
+	@Override
+	public List<CourseDTO> findAllCourses() {
+		return courseRepository.findAll()
+				.stream()
+				.map(this::convertEntityToDTO)
+				.collect(Collectors.toList());
+	}
+
 }

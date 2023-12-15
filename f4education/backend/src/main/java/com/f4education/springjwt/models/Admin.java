@@ -1,20 +1,15 @@
 package com.f4education.springjwt.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import jakarta.persistence.*;
-
 import lombok.AllArgsConstructor;
-
 import lombok.Data;
-
 import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
-
 import java.util.Date;
-
 import java.util.List;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -23,9 +18,6 @@ import java.util.List;
 @Table(name = "Admin")
 public class Admin implements Serializable {
 
-	// @OneToMany(mappedBy = "admin")
-	// @JsonIgnore
-	// private List<Bill> bill;
 
 	@OneToMany(mappedBy = "admin")
 	@JsonIgnore
@@ -88,6 +80,19 @@ public class Admin implements Serializable {
 	@JsonIgnore
 	@JoinColumn(name = "account_id")
 	User user;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Admin admin = (Admin) o;
+		return Objects.equals(schedules, admin.schedules) && Objects.equals(subject, admin.subject) && Objects.equals(course, admin.course) && Objects.equals(adminId, admin.adminId) && Objects.equals(fullname, admin.fullname) && Objects.equals(gender, admin.gender) && Objects.equals(dateOfBirth, admin.dateOfBirth) && Objects.equals(citizenIdentification, admin.citizenIdentification) && Objects.equals(levels, admin.levels) && Objects.equals(address, admin.address) && Objects.equals(phone, admin.phone) && Objects.equals(image, admin.image) && Objects.equals(classes, admin.classes) && Objects.equals(classRooms, admin.classRooms) && Objects.equals(courses, admin.courses) && Objects.equals(questions, admin.questions) && Objects.equals(resources, admin.resources) && Objects.equals(user, admin.user);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(schedules, subject, course, adminId, fullname, gender, dateOfBirth, citizenIdentification, levels, address, phone, image, classes, classRooms, courses, questions, resources, user);
+	}
 
 	@Override
 	public String toString() {

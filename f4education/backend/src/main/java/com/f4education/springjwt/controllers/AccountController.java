@@ -29,12 +29,14 @@ import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Teacher;
 import com.f4education.springjwt.models.User;
 import com.f4education.springjwt.payload.request.AccountDTO;
+import com.f4education.springjwt.payload.request.CourseRequest;
 import com.f4education.springjwt.payload.request.OTP;
 import com.f4education.springjwt.payload.response.MessageResponse;
 import com.f4education.springjwt.security.services.FirebaseStorageService;
 import com.f4education.springjwt.security.services.MailerServiceImpl;
 import com.f4education.springjwt.ultils.XFile;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
@@ -202,15 +204,25 @@ public class AccountController {
     // @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createAccount(@RequestPart("request") String teacherRequestString,
             @RequestParam("file") Optional<MultipartFile> file) {
-        AccountDTO accountDTO = changeImg(teacherRequestString, file, true);
-        Boolean checkEmailExit = accountService.existsByEmail(accountDTO.getEmail().trim());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        AccountDTO accountDTOMapped = new AccountDTO();
+        try {
+            accountDTOMapped = mapper.readValue(teacherRequestString, AccountDTO.class);
+        } catch (JsonMappingException e) {
+            e.printStackTrace();
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        Boolean checkEmailExit = accountService.existsByEmail(accountDTOMapped.getEmail().trim());
 
         if (checkEmailExit) {
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("1"));
         }
-        // return ResponseEntity.ok(null);
+        AccountDTO accountDTO = changeImg(teacherRequestString, file, true);
         return ResponseEntity.ok(accountService.createAccount(accountDTO));
     }
 

@@ -2,8 +2,12 @@ import axiosClient from './axiosClient'
 
 // api/courseApi.js
 const courseApi = {
-    getAll: (studentId) => {
+    getAllByStudentId: (studentId) => {
         const url = `/courses/get-all/${studentId}`
+        return axiosClient.get(url)
+    },
+    getAll: () => {
+        const url = '/courses'
         return axiosClient.get(url)
     },
     getAllCourseHistory: () => {

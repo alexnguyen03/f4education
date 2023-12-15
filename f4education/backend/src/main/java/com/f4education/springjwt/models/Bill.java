@@ -1,21 +1,13 @@
 package com.f4education.springjwt.models;
 
-import java.util.Date;
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.util.Date;
+import java.util.Objects;
 
 @Data
 @Entity
@@ -54,6 +46,19 @@ public class Bill {
 	@JoinColumn(name = "payment_method_id")
 	@JsonIgnore
 	PaymentMethod paymentMethod;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		Bill bill = (Bill) o;
+		return Objects.equals(billId, bill.billId) && Objects.equals(createDate, bill.createDate) && Objects.equals(totalPrice, bill.totalPrice) && Objects.equals(status, bill.status) && Objects.equals(note, bill.note) && Objects.equals(course, bill.course) && Objects.equals(student, bill.student) && Objects.equals(paymentMethod, bill.paymentMethod);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(billId, createDate, totalPrice, status, note, course, student, paymentMethod);
+	}
 
 	@Override
 	public String toString() {
