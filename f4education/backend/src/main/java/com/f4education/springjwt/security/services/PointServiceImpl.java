@@ -82,7 +82,7 @@ public class PointServiceImpl implements PointService {
 				point.setQuizzPoint((double) matchingQuiz.getQuizPoint());
 			}
 			point.setAveragePoint(
-					point.getAttendancePoint() * 0.1 + point.getExercisePoint() * 0.5 + point.getQuizzPoint() * 0.4);
+					(point.getAttendancePoint() * 0.1 + point.getExercisePoint() * 0.5 + point.getQuizzPoint() * 0.4));
 		});
 		// In ra danh sách Point sau khi cập nhật attendancePoint
 		listPoint.forEach(System.out::println);

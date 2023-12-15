@@ -515,7 +515,7 @@ public class CourseServiceImpl implements CoursesService {
 
 	@Override
 	public List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate() {
-		List<ReportCourseCountStudentCertificateDTO> list = courseRepository.getCoursesWithStudentCountCertificate();
+		List<ReportCourseCountStudentCertificateDTO> list = courseRepository.getCoursesWithStudentCountCertificate(5.0);
 		System.out.println(list);
 		return list;
 	}

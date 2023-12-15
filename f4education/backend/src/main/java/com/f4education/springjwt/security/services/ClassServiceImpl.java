@@ -15,6 +15,7 @@ import com.f4education.springjwt.models.ClassHistory;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Student;
+import com.f4education.springjwt.models.Task;
 import com.f4education.springjwt.payload.request.AdminDTO;
 import com.f4education.springjwt.payload.request.ClassDTO;
 import com.f4education.springjwt.payload.response.ClassesByTeacherResponse;
@@ -22,6 +23,7 @@ import com.f4education.springjwt.payload.response.LearningResultResponse;
 import com.f4education.springjwt.repository.AdminRepository;
 import com.f4education.springjwt.repository.ClassHistoryRepository;
 import com.f4education.springjwt.repository.ClassRepository;
+import com.f4education.springjwt.repository.GoogleDriveRepository;
 import com.f4education.springjwt.repository.RegisterCourseRepository;
 
 @Service
@@ -36,6 +38,9 @@ public class ClassServiceImpl implements ClassService {
 	RegisterCourseRepository registerCourseRepository;
 	@Autowired
 	private AdminRepository adminRepository;
+
+	@Autowired
+	GoogleDriveRepository googleDriveRepository;
 
 	@Override
 	public List<ClassDTO> findAll() {
@@ -74,7 +79,24 @@ public class ClassServiceImpl implements ClassService {
 	public ClassDTO updateClass(Integer classId, ClassDTO classDTO) {
 		String action = "UPDATE";
 		Classes classes = classRepository.findById(classId).get();
+		String oldName = classes.getClassName();
+		String newName = classDTO.getClassName();
 		convertToEntity(classDTO, classes);
+		if (!oldName.equals(newName)) {
+			String linkFoler = "Tasks/" + oldName;
+			try {
+				String idFolder = googleDriveRepository.getFolderIdNoCreate(linkFoler);
+				System.out.println(idFolder);
+				if (idFolder != null) {
+					googleDriveRepository.renameFolderById(idFolder, newName);
+				} else {
+					System.out.println("Folder does not exist: " + idFolder);
+				}
+			} catch (Exception e) {
+				System.out.println(e);
+			}
+		}
+
 		Classes updateClasses = classRepository.save(classes);
 		this.saveClassHistory(updateClasses, action);
 		return convertToDto(updateClasses);

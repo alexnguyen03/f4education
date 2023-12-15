@@ -12,7 +12,7 @@ import {
     Center,
     Alert
 } from '@mantine/core'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import QuizIcon from '@mui/icons-material/Quiz'
 import QuestionMarkIcon from '@mui/icons-material/QuestionMark'
 import { Link, useSearchParams, useNavigate } from 'react-router-dom'
@@ -22,6 +22,7 @@ import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
 
 const user = JSON.parse(localStorage.getItem('user'))
+const totalTime = 30
 
 function QuizzClient() {
     const icon = <IconInfoCircle />
@@ -66,7 +67,16 @@ function QuizzClient() {
         }
     }
 
-    const [selectedAnswers, setSelectedAnswers] = useState([])
+    // const [selectedAnswers, setSelectedAnswers] = useState([])
+
+    const storedAnswers =
+        JSON.parse(localStorage.getItem('selectedAnswers')) || []
+    const [selectedAnswers, setSelectedAnswers] = useState(storedAnswers)
+
+    // Lưu trạng thái các đáp án đã chọn vào localStorage mỗi khi nó thay đổi
+    useEffect(() => {
+        localStorage.setItem('selectedAnswers', JSON.stringify(selectedAnswers))
+    }, [selectedAnswers])
 
     const handleAnswerSelect = (questionId, answerId, type) => {
         if (type === 'checkbox') {
@@ -133,7 +143,6 @@ function QuizzClient() {
     const [showQuestion, setShowQuestion] = useState(false)
     const startTimer = () => {
         setShowQuestion(true)
-        setElapsedTime(0)
     }
 
     const handleFinish = () => {
@@ -182,7 +191,7 @@ function QuizzClient() {
                     selectedCorrectAnswers.length ===
                         selectedAnswers.answerId.length
                 ) {
-                    totalScoreCheckbox += 0.5
+                    totalScoreCheckbox += 0.2
                 }
             } else {
                 const foundQuestionDetail = findAnswer(
@@ -192,14 +201,22 @@ function QuizzClient() {
                 console.log(foundQuestionDetail)
 
                 if (foundQuestionDetail.isCorrect === true) {
-                    totalScoreRadio += 0.5
+                    totalScoreRadio += 0.2
                 }
             }
         })
 
         console.log(`Tổng điểm số radio: ${totalScoreRadio}`)
         console.log(`Tổng điểm số checkbox: ${totalScoreCheckbox}`)
-        addQuizzResult(elapsedTime, totalScoreCheckbox + totalScoreRadio)
+
+        const currentTime = Date.now()
+        const storedStartTime = localStorage.getItem('countdown_start_time')
+        const timeDifference = currentTime - storedStartTime
+
+        addQuizzResult(
+            Math.round(timeDifference / 1000),
+            totalScoreCheckbox + totalScoreRadio
+        )
     }
 
     const findAnswer = (questionDetailId, answerId) => {
@@ -229,16 +246,17 @@ function QuizzClient() {
         }
         console.log(quizzResultRequest)
         try {
-            // const resp = await quizzResultApi.createQuizzResult(
-            //     quizzResultRequest
-            // )
-            // if (resp.status === 200) {
-            navigate({
-                pathname: '/student/classes'
-            })
-            finishQuiz()
-            localStorage.removeItem('countdown_start_time')
-            // }
+            const resp = await quizzResultApi.createQuizzResult(
+                quizzResultRequest
+            )
+            if (resp.status === 200) {
+                navigate({
+                    pathname: '/student/classes'
+                })
+                finishQuiz()
+                localStorage.removeItem('countdown_start_time')
+                localStorage.removeItem('selectedAnswers')
+            }
         } catch (error) {
             console.log('Thêm lỗi', error)
         }
@@ -275,14 +293,19 @@ function QuizzClient() {
                 setNotificationCount((prevCount) => prevCount + 1)
             }
         }
+        const handleUnload = () => {
+            setNotificationCount((prevCount) => prevCount + 1)
+        }
 
         document.addEventListener('visibilitychange', handleVisibilityChange)
+        window.addEventListener('beforeunload', handleUnload)
 
         return () => {
             document.removeEventListener(
                 'visibilitychange',
                 handleVisibilityChange
             )
+            window.removeEventListener('beforeunload', handleUnload)
         }
     }, [])
 
@@ -293,8 +316,6 @@ function QuizzClient() {
     }
 
     const storedStartTime = localStorage.getItem('countdown_start_time')
-    console.log(storedStartTime)
-    const [elapsedTime, setElapsedTime] = useState(0)
 
     const [startTime, setStartTime] = useState(
         storedStartTime !== null ? storedStartTime : Date.now().toString()
@@ -302,8 +323,9 @@ function QuizzClient() {
 
     const [seconds, setSeconds] = useState(
         storedStartTime !== null
-            ? 90 - Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
-            : 90
+            ? totalTime -
+                  Math.floor((Date.now() - parseInt(storedStartTime)) / 1000)
+            : totalTime
     )
 
     useEffect(() => {
@@ -316,9 +338,8 @@ function QuizzClient() {
                 if (prevSeconds <= 0) {
                     return 0
                 } else {
-                    setElapsedTime((prevSeconds) => prevSeconds + 1)
+                    return prevSeconds - 1
                 }
-                return prevSeconds - 1
             })
         }, 1000)
 
@@ -348,72 +369,52 @@ function QuizzClient() {
     const minutes = Math.floor(seconds / 60)
     const remainingSeconds = seconds % 60
 
-    const handleReset = () => {
-        setStartTime(Date.now().toString())
-        setSeconds(90)
-    }
-
     return (
         <>
             {showQuestion === true ? (
-                <div className="container">
+                <div
+                    className="container-fluid"
+                    style={{
+                        backgroundColor: '#ebebeb'
+                    }}
+                >
                     <div className="row">
-                        <div className="col-lg-12 mx-auto rounded">
-                            <div class="d-flex justify-content-between">
-                                <QuizIcon
-                                    className="rounded-circle p-3"
+                        <div className="col-lg-12 mx-auto">
+                            <div class="d-flex justify-content-center mt-5">
+                                <p
+                                    className="text-center p-2"
                                     style={{
-                                        backgroundColor: 'white',
-                                        fontSize: 100,
-                                        color: '#34A633',
-                                        marginLeft: 100
-                                    }}
-                                />
-                                <div
-                                    style={{
-                                        width: 250,
-                                        margin: 'auto',
-                                        backgroundColor: 'white',
-                                        marginLeft: 220,
-                                        borderRadius: '10px'
+                                        color: '#00B14F',
+                                        fontWeight: 600
                                     }}
                                 >
-                                    <p className="text-center text-success p-2">
-                                        <span className="display-4">
-                                            Thời gian còn lại
-                                        </span>
-                                        <br />
-                                        <span className="display-2">
-                                            {formatTime(minutes)}
-                                        </span>
-                                        <span className="display-2">
-                                            :{formatTime(remainingSeconds)}
-                                        </span>
-                                    </p>
-                                </div>
-                                <QuestionMarkIcon
-                                    className="rounded-circle p-3"
-                                    style={{
-                                        backgroundColor: 'white',
-                                        fontSize: 100,
-                                        color: '#34A633',
-                                        marginRight: 100
-                                    }}
-                                />
+                                    <span className="display-3">
+                                        Thời gian còn lại
+                                    </span>
+                                    <br />
+                                    <span className="display-2">
+                                        {formatTime(minutes)}
+                                    </span>
+                                    <span className="display-2">
+                                        :{formatTime(remainingSeconds)}
+                                    </span>
+                                </p>
                             </div>
-                            <div className="container">
-                                <div
-                                    className="row my-4"
-                                    style={{
-                                        minHeight: 300,
-                                        backgroundColor: '#ebebeb',
-                                        borderRadius: '10px',
-                                        marginLeft: 2,
-                                        marginRight: 2
-                                    }}
-                                >
-                                    <h1 className="display-2 text-dark mx-auto mt-3">
-                                        BÀI KIỂM TRA TRẮC NGHIỆM
+                            <div
+                                className="container mb-5"
+                                style={{
+                                    backgroundColor: 'white'
+                                }}
+                            >
+                                <div className="row">
+                                    <h1
+                                        className="display-2 mx-auto mt-5 mb-5"
+                                        style={{
+                                            color: '#00B14F',
+                                            fontWeight: 600
+                                        }}
+                                    >
+                                        Bài thi trắc nghiệm cuối khóa học
                                     </h1>
                                     {questionDetail.map(
                                         (question, indexQuestion) => (
@@ -421,9 +422,14 @@ function QuizzClient() {
                                                 className="col-lg-12"
                                                 key={question.questionDetailId}
                                             >
-                                                <div className="d-flex bd-highlight p-3">
+                                                <div className="d-flex bd-highlight pl-3">
                                                     <div className="p-2 w-100">
-                                                        <h2 className="text-dark mt-3">
+                                                        <h2
+                                                            className="text-dark mt-3"
+                                                            style={{
+                                                                fontWeight: 700
+                                                            }}
+                                                        >
                                                             {indexQuestion + 1}.{' '}
                                                             {
                                                                 question.questionTitle
@@ -441,7 +447,7 @@ function QuizzClient() {
                                                         </h4>
                                                     </div>
                                                 </div>
-                                                <div className="container mt-2 mb-3">
+                                                <div className="container">
                                                     <div className="row">
                                                         {question.answer.map(
                                                             (
@@ -463,7 +469,7 @@ function QuizzClient() {
                                                                     ).length >=
                                                                     2 ? (
                                                                         <Checkbox
-                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
+                                                                            className="bg-white p-2 pl-3"
                                                                             id={
                                                                                 answer.answerId
                                                                             }
@@ -476,17 +482,27 @@ function QuizzClient() {
                                                                             label={
                                                                                 answer.answerContent
                                                                             }
-                                                                            onChange={() =>
+                                                                            onChange={() => {
                                                                                 handleAnswerSelect(
                                                                                     question.questionDetailId,
                                                                                     answer.answerId,
                                                                                     'checkbox'
                                                                                 )
-                                                                            }
+                                                                            }}
+                                                                            checked={selectedAnswers.some(
+                                                                                (
+                                                                                    answerObj
+                                                                                ) =>
+                                                                                    answerObj.questionId ===
+                                                                                        question.questionDetailId &&
+                                                                                    answerObj.answerId.includes(
+                                                                                        answer.answerId
+                                                                                    )
+                                                                            )}
                                                                         />
                                                                     ) : (
                                                                         <Radio
-                                                                            className="bg-white mb-3 p-2 pt-3 pl-3"
+                                                                            className="bg-white p-2 pl-3"
                                                                             id={
                                                                                 answer.answerId
                                                                             }
@@ -499,13 +515,22 @@ function QuizzClient() {
                                                                             label={
                                                                                 answer.answerContent
                                                                             }
-                                                                            onChange={() =>
+                                                                            onChange={() => {
                                                                                 handleAnswerSelect(
                                                                                     question.questionDetailId,
                                                                                     answer.answerId,
                                                                                     'radio'
                                                                                 )
-                                                                            }
+                                                                            }}
+                                                                            checked={selectedAnswers.some(
+                                                                                (
+                                                                                    answerObj
+                                                                                ) =>
+                                                                                    answerObj.questionId ===
+                                                                                        question.questionDetailId &&
+                                                                                    answerObj.answerId ===
+                                                                                        answer.answerId
+                                                                            )}
                                                                         />
                                                                     )}
                                                                 </div>
@@ -517,22 +542,21 @@ function QuizzClient() {
                                         )
                                     )}
                                 </div>
-                                <Button
-                                    variant="gradient"
-                                    gradient={{
-                                        from: 'blue',
-                                        to: 'violet',
-                                        deg: 90
-                                    }}
-                                    w={200}
-                                    size="md"
-                                    fw={'bold'}
-                                    mb={50}
-                                    fz={'lg'}
-                                    onClick={openModal}
-                                >
-                                    Nộp bài
-                                </Button>
+                                <Center>
+                                    <Button
+                                        variant="filled"
+                                        color="green"
+                                        w={200}
+                                        size="md"
+                                        fw={'bolder'}
+                                        mb={50}
+                                        mt={70}
+                                        fz={'lg'}
+                                        onClick={openModal}
+                                    >
+                                        Nộp bài
+                                    </Button>
+                                </Center>
                                 <Modal
                                     size="sm"
                                     opened={open}
@@ -593,6 +617,7 @@ function QuizzClient() {
             )}
             <Modal
                 size="xl"
+                radius="lg"
                 opened={openNotification}
                 onClose={() => {
                     closeModalNotification()

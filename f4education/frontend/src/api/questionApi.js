@@ -47,6 +47,12 @@ const questionApi = {
         return axiosClient.post(url)
     },
 
+    updateExamination: (classId) => {
+        const url = `exam/${classId}`
+        return axiosClient.put(url)
+    },
+
+
     checkActivedExam: (classId) => {
         const url = `exam/${classId}`
         return axiosClient.get(url)

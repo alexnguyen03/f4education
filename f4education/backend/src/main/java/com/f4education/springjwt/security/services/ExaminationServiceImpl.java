@@ -54,4 +54,9 @@ public class ExaminationServiceImpl implements ExaminationService {
         return rs == 1 ? true : false;
     }
 
+	@Override
+	public Examination getByClassId(Integer classId) {
+		return examinationRepository.getByClassId(classId);
+	}
+
 }

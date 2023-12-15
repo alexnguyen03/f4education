@@ -13,4 +13,6 @@ public interface ExaminationService {
     public Boolean isActivedExam(Integer classId);
 
     public Boolean isActivedExamByTodayAndClassId(Integer classId);
+    
+    public Examination getByClassId(Integer classId);
 }
