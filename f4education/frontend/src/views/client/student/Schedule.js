@@ -337,13 +337,13 @@ const Schedule = () => {
                                 <div>
                                     <Alert
                                         icon={<IconAlertCircle size="1rem" />}
-                                        title="Chú ý !"
+                                        title="Thông báo!"
                                         color=""
                                         gray
                                     >
                                         <Text weight={500}>
-                                            Vui lòng chọn lớp học để xem thời
-                                            khóa biểu !!
+                                            Bạn chưa có thời khóa biểu cho lớp
+                                            này!
                                         </Text>
                                     </Alert>
                                 </div>

@@ -38,7 +38,7 @@ import {
 var ps
 
 const Sidebar = (props) => {
-    const [collapseOpen, setCollapseOpen] = useState()
+    const [collapseOpen, setCollapseOpen] = useState(false)
     // verifies if routeName is the one active (in browser input)
     const activeRoute = (routeName) => {
         return props.location.pathname.indexOf(routeName) > -1 ? 'active' : ''
@@ -61,6 +61,7 @@ const Sidebar = (props) => {
                 prop.path !== '/question-detail/:courseName' &&
                 prop.path !== '/class-detail/:classIdParam' &&
                 prop.path !== '/courses-detail/:courseId' &&
+                prop.path !== '/classs/class-detail/:classIdParam' &&
                 prop.path !== '/resourceDetail/:courseName/:folderId' &&
                 prop.path !== '/question-detail/:questionId'
             ) {

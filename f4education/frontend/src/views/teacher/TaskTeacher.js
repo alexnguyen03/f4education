@@ -291,10 +291,6 @@ const TaskTeacher = () => {
     }
 
     const handelOnChangeInput = (e) => {
-        console.log(
-            '🚀 ~ file: TaskTeacher.js:259 ~ handelOnChangeInput ~ e.target:',
-            e.target
-        )
         const { name, value } = e.target
 
         // Xử lý cho các trường input khác (không phải ngày tháng)
@@ -306,11 +302,6 @@ const TaskTeacher = () => {
     }
 
     const handelOnChangeInputDate = (date) => {
-        console.log(
-            '🚀 ~ file: TaskTeacher.js:259 ~ handelOnChangeInput ~ e.target:',
-            date
-        )
-
         // Chuyển đổi giá trị ngày tháng sang đối tượng ngày JavaScript
         setTask((preTask) => ({
             ...preTask,

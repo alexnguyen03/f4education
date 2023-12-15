@@ -28,7 +28,7 @@ import {
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
 import teacherApi from 'api/teacherApi'
-const IMG_URL = '/avatars/accounts/'
+const IMG_URL = '/avatars/teachers/'
 
 const Information = () => {
     const user = JSON.parse(localStorage.getItem('user'))
@@ -87,10 +87,6 @@ const Information = () => {
             [e.target.name]: e.target.value,
             numberSession: 0
         })
-        console.log(
-            '🚀 ~ file: Teachers.js:74 ~ handelOnChangeInput ~ teacher:',
-            e.target.value
-        )
     }
 
     const setGender = (gender) => {

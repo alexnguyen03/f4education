@@ -154,10 +154,6 @@ const Teachers = () => {
             [e.target.name]: e.target.value,
             numberSession: 0
         })
-        console.log(
-            '🚀 ~ file: Teachers.js:74 ~ handelOnChangeInput ~ teacher:',
-            e.target.value
-        )
     }
 
     // Cập nhật hình ảnh

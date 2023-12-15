@@ -98,12 +98,16 @@ const Questions = () => {
 
     // + API_AREA > CRUD
     const handleStoreQuestions = async () => {
-        const id = null
+        let id = null
         if (validateForm()) {
             try {
                 id = toast(Notify.msg.loading, Notify.options.loading())
                 setQuestionLoading(true)
                 const resp = await questionApi.createQuestion(question)
+                console.log(
+                    '🚀 ~ file: Questions.js:107 ~ handleStoreQuestions ~ resp:',
+                    resp
+                )
                 if (resp.status === 200 && resp.data.length > 0) {
                     toast.update(id, Notify.options.createSuccess())
                 }

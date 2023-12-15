@@ -536,7 +536,7 @@ const ReportEvaluationTeacher = () => {
                         {dataArray[3].title}
                     </Text>
                 </Tooltip>
-                <Bar data={dataInChart} options={options} />
+                {/* <Bar data={dataInChart} options={options} /> */}
             </>
         )
     }
@@ -560,7 +560,7 @@ const ReportEvaluationTeacher = () => {
                         {dataArray[0].title}
                     </Text>
                 </Tooltip>
-                <Bar data={dataInChart} options={options} />
+                {/* <Bar data={dataInChart} options={options} /> */}
             </>
         )
     }
@@ -584,7 +584,7 @@ const ReportEvaluationTeacher = () => {
                         {dataArray[1].title}
                     </Text>
                 </Tooltip>
-                <Bar data={dataInChart} options={options} />
+                {/* <Bar data={dataInChart} options={options} /> */}
             </>
         )
     }
@@ -608,7 +608,7 @@ const ReportEvaluationTeacher = () => {
                         {dataArray[2].title}
                     </Text>
                 </Tooltip>
-                <Bar data={dataInChart} options={options} />
+                {/* <Bar data={dataInChart} options={options} /> */}
             </>
         )
     }
@@ -647,7 +647,7 @@ const ReportEvaluationTeacher = () => {
             ) : null}
             {loadingChart || notHasReport ? null : (
                 <>
-                    <Row className="py-5">
+                    {/* <Row className="py-5">
                         <Col>
                             <div className="chart border p-3 rounded">
                                 {renderEvaluationTeacherByTime()}
@@ -671,7 +671,7 @@ const ReportEvaluationTeacher = () => {
                                 {renderEvaluationTeacherByFairness()}
                             </div>
                         </Col>
-                    </Row>
+                    </Row> */}
                 </>
             )}
         </>
