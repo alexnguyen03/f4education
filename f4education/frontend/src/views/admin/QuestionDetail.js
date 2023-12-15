@@ -32,7 +32,7 @@ import {
     Row
 } from 'reactstrap'
 
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
 // API
@@ -41,13 +41,12 @@ import {
     IconBookDownload,
     IconBookUpload,
     IconFile3d,
-    IconPhoto,
+    IconRefresh,
     IconUpload,
     IconX
 } from '@tabler/icons-react'
 import answersApi from '../../api/answersApi'
 import questionApi from '../../api/questionApi'
-import { useRef } from 'react'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -186,9 +185,9 @@ const QuestionDetail = () => {
     // *************** FORM AREA ACTION - START
     // ====================== QUESTION ======================
     const handleStoreNewQuestions = async () => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
         if (validateForm()) {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
             try {
                 questionRequest.questionTitle = questionTitle
                 questionRequest.answers = handleDataTranferAnswers()
@@ -599,34 +598,27 @@ const QuestionDetail = () => {
     }
 
     const validateForm = () => {
+        let isValid = true
         if (questionTitle === '') {
             setMsgError((preErr) => ({
                 ...preErr,
                 msg: 'Không để trống tên câu hỏi'
             }))
+            isValid = false
         } else {
             setMsgError((prev) => ({ ...prev, msg: '' }))
         }
 
-        let hasError = false
         createNewAnswergroups.forEach((group, index) => {
             if (group.inputValue === '') {
-                hasError = true
+                isValid = false
                 const updatedGroups = [...createNewAnswergroups]
                 updatedGroups[index].error = 'Không được để trống câu trả lời'
                 setCreateNewAnswergroups(updatedGroups)
             }
         })
 
-        if (hasError) {
-            return false
-        }
-
-        if (msgError.msg !== '') {
-            return false
-        }
-
-        return true
+        return isValid
     }
     // *************** FORM AREA ACTION - END
 
@@ -1116,10 +1108,6 @@ const QuestionDetail = () => {
         fetchQuestionPrev()
     }, [])
 
-    // useEffect(() => {
-    //     setEditQuestionId(editQuestionId)
-    // }, [editQuestionId])
-
     return (
         <>
             <ToastContainer />
@@ -1231,6 +1219,13 @@ const QuestionDetail = () => {
                                     </>
                                 ) : (
                                     <>
+                                        <Button
+                                            color="default"
+                                            onClick={() => fetchQuestionDetail()}
+                                            variant="contained"
+                                        >
+                                            <IconRefresh />
+                                        </Button>
                                         <Button
                                             color={
                                                 isUpdate ? 'primary' : 'success'
@@ -1403,7 +1398,11 @@ const QuestionDetail = () => {
 
                                         <div>
                                             {selectedFile !== null ? (
-                                                <Text size="xl" inline color={'lime'}>
+                                                <Text
+                                                    size="xl"
+                                                    inline
+                                                    color={'lime'}
+                                                >
                                                     {selectedFile.name}
                                                 </Text>
                                             ) : (

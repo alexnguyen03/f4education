@@ -145,10 +145,10 @@ const ClassInformation = () => {
                         <Title order={3} fw={500} mt="md">
                             Tên Lớp: {c.classes.className}
                         </Title>
-                        <Text size="lg" mt="sm" c="dimmed" lineClamp={2}>
-                            Khóa học: {c.courseName[0]}
+                        <Text size="lg" mt="sm" c="dimmed" lineClamp={1}>
+                            Khóa học: <strong>{c.courseName[0]}</strong>
                         </Text>
-                        <Text size="lg" mt="sm" c="dimmed">
+                        <Text size="lg" mt="sm" c="dimmed" lineClamp={1}>
                             Thời gian dạy:{' '}
                             <strong>
                                 {moment(c.classes.startDate).format(
@@ -177,7 +177,14 @@ const ClassInformation = () => {
                             <Text size="lg" mt="sm" c="dimmed">
                                 Trạng thái lớp:
                             </Text>
-                            <Badge color="indigo" mt={12}>
+                            <Badge
+                                color={
+                                    c.classes.status === 'Đang diễn ra'
+                                        ? 'indigo'
+                                        : 'yellow'
+                                }
+                                mt={12}
+                            >
                                 {c.classes.status}
                             </Badge>
                         </Flex>

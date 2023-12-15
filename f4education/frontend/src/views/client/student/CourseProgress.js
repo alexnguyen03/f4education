@@ -329,11 +329,11 @@ const CourseProgress = () => {
         })
     }
 
-    const handleCreateCertificate = async () => {
+    const handleCreateCertificate = async (certificate) => {
         try {
             const resp = await certificateApi.createCertificate([certificate])
 
-            if (resp.status === 201) {
+            if (resp.status === 200) {
                 return resp.data
             }
         } catch (error) {
@@ -356,9 +356,10 @@ const CourseProgress = () => {
 
             if (resp.status === 204) {
                 console.log('Tạo mới')
-                const existCertificate = await handleCreateCertificate(
+                const newCertificate = await handleCreateCertificate(
                     certificate
                 )
+                console.log(newCertificate)
                 toast.update(
                     id,
                     Notify.options.createSuccessParam(
@@ -368,7 +369,7 @@ const CourseProgress = () => {
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
-                        certificateId: existCertificate.certificateId
+                        certificateId: newCertificate[0].certificateId
                     })}`
                 })
             } else if (resp.status === 200) {
@@ -1112,11 +1113,7 @@ const CourseProgress = () => {
                                                                                     học.
                                                                                 </Text>
 
-                                                                                <Stack
-                                                                                    mt={
-                                                                                        8
-                                                                                    }
-                                                                                >
+                                                                                <Stack>
                                                                                     <Text
                                                                                         fw={
                                                                                             'bolder'

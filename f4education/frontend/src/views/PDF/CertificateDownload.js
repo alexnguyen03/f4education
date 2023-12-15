@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
 
 import {
     Document,
@@ -76,8 +75,8 @@ const styles = StyleSheet.create({
         height: '100%'
     },
     image: {
-        width: 148,
-        height: 43,
+        width: '148px',
+        height: '43px',
         objectFit: 'cover'
     },
     textLg: {
@@ -91,7 +90,7 @@ const styles = StyleSheet.create({
     }
 })
 
-const CertificateDownload = ({ certificateId, awaitComplete }) => {
+const CertificateDownload = ({ certificateId }) => {
     // QR code
     const [qrCodeImage, setQrCodeImage] = useState('')
 
@@ -125,12 +124,9 @@ const CertificateDownload = ({ certificateId, awaitComplete }) => {
             // Generate QR code as an image
             const qrCodeDataURL = await QRCode.toDataURL(url)
 
-            console.log(qrCodeDataURL)
             setQrCodeImage(qrCodeDataURL)
 
             setLoading(false)
-            let isComplete = true
-            awaitComplete(isComplete)
         } catch (error) {
             console.log(error)
         }
@@ -139,7 +135,7 @@ const CertificateDownload = ({ certificateId, awaitComplete }) => {
     // FETCH
     useEffect(() => {
         fetchData()
-    }, [certificateId, awaitComplete])
+    }, [certificateId])
 
     return (
         <>
@@ -148,7 +144,12 @@ const CertificateDownload = ({ certificateId, awaitComplete }) => {
                 <Page size="A4" style={styles.page} orientation="landscape">
                     {/* Header */}
                     <View style={styles.flexSection}>
-                        <Image style={styles.image} src={logo} />
+                        {loading ? (
+                            <></>
+                        ) : (
+                            <Image style={styles.image} source={logo} />
+                        )}
+
                         <View
                             style={{
                                 flexDirection: 'column',
@@ -283,46 +284,51 @@ const CertificateDownload = ({ certificateId, awaitComplete }) => {
                     </View>
 
                     {/* Overflow image */}
-                    <Image
-                        style={{
-                            position: 'absolute',
-                            bottom: 0,
-                            right: -100,
-                            width: 300,
-                            height: 300,
-                            zIndex: -1
-                        }}
-                        src={rectangle}
-                    />
-
-                    <Image
-                        style={{
-                            position: 'absolute',
-                            bottom: 110,
-                            right: -60,
-                            width: 300,
-                            height: 300,
-                            zIndex: -1000
-                        }}
-                        src={rectangle2}
-                    />
-
-                    {/* Use Image component to include QR code in the PDF */}
                     {loading ? (
                         <></>
                     ) : (
-                        <Image
-                            style={{
-                                width: 100,
-                                height: 100,
-                                position: 'absolute',
-                                bottom: 35,
-                                right: 240
-                            }}
-                            src={loading !== true && qrCodeImage}
-                        />
+                        <>
+                            <Image
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 0,
+                                    right: -100,
+                                    width: '300px',
+                                    height: '300px',
+                                    zIndex: -1
+                                }}
+                                source={rectangle}
+                            />
+
+                            <Image
+                                style={{
+                                    position: 'absolute',
+                                    bottom: 110,
+                                    right: -60,
+                                    width: '300px',
+                                    height: '300px',
+                                    zIndex: -1000
+                                }}
+                                source={rectangle2}
+                            />
+                        </>
                     )}
                 </Page>
+                {/* Use Image component to include QR code in the PDF */}
+                {loading ? (
+                    <></>
+                ) : (
+                    <Image
+                        style={{
+                            width: '100px',
+                            height: 100,
+                            position: 'absolute',
+                            bottom: 35,
+                            right: 240
+                        }}
+                        source={loading === false && qrCodeImage}
+                    />
+                )}
             </Document>
         </>
     )

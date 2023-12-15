@@ -40,6 +40,7 @@ import Dots from '../../../utils/Dots'
 // scss import
 import classes from '../../../assets/scss/custom-module-scss/client-custom/home/FeaturesAsymmetrical.module.scss'
 import classHeroText from '../../../assets/scss/custom-module-scss/client-custom/home/HeroText.module.scss'
+import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
 
 // API
 import { Link, useNavigate } from 'react-router-dom'
@@ -48,8 +49,8 @@ import evaluateApi from '../../../api/evaluateApi'
 
 import { toast, ToastContainer } from 'react-toastify'
 
-// SCSS
-import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
+// Component import
+import ClientModal from '../../../components/modals/ClientModal'
 
 // Utils
 import Notify from '../../../utils/Notify'
@@ -119,6 +120,7 @@ const Home = () => {
     const [listEvaluate, SetListEvaluate] = useState([])
     const [loading, setLoading] = useState(false)
     const [scroll, scrollTo] = useWindowScroll()
+    const [modalLogin, setModalLogin] = useState(false)
 
     const fetchNewestCourse = async () => {
         setLoading(true)
@@ -251,18 +253,19 @@ const Home = () => {
 
     const handleCheckOutNow = async (course, e) => {
         e.preventDefault()
-        const id = toast(Notify.msg.loading, Notify.options.loading())
 
         if (user === null) {
-            toast.update(
-                id,
-                Notify.options.createErrorParam(
-                    'Vui lòng đăng nhập trước khi thanh toán'
-                )
-            )
+            // toast.update(
+            //     id,
+            //     Notify.options.createErrorParam(
+            //         'Vui lòng đăng nhập trước khi thanh toán'
+            //     )
+            // )
+            setModalLogin(true)
             return
         }
 
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         try {
             const selectedCart = await handleAddCart(course, e)
 
@@ -273,6 +276,10 @@ const Home = () => {
             toast.update(id, Notify.options.createError())
             console.log(error)
         }
+    }
+
+    const handleCloseModal = (isOpen) => {
+        isOpen === true && setModalLogin(false)
     }
 
     const navigateToStudent = (e) => {
@@ -621,6 +628,12 @@ const Home = () => {
     return (
         <>
             <ToastContainer />
+
+            {/* Modal login */}
+            <ClientModal
+                isOpen={modalLogin}
+                handleCloseModal={handleCloseModal}
+            />
 
             <Container size="xl">
                 {/* Hero section */}

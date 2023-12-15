@@ -33,6 +33,10 @@ const classApi = {
     getLearningResult: (studentId) => {
         const url = `/classes/student/result/${studentId}`
         return axiosClient.get(url)
+    },
+    endClass: (classId) => {
+        const url = `/classes/teacher/point?classId=${classId}`
+        return axiosClient.post(url)
     }
 }
 
