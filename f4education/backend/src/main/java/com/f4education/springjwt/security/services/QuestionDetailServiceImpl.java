@@ -40,22 +40,32 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 	@Autowired
 	AnswerReposotory answerReposotory;
 
+	private List<QuestionDetail> cachedRandomQuestions = null;
+
 	@Override
 	public List<QuestionDetailClientDTO> getQuestionDetailsByStudentId(Integer classId, String studentId) {
-		List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(classId);
 		List<QuizResult> quizResults = quizResultRepository.getAllByClassIdAndStudenId(classId, studentId);
-		List<QuestionDetail> randomQuestions = new ArrayList<>();
-		if (quizResults.size() < 1) {
-			System.out.println(questionDetail);
-			// Xáo trộn các phần tử trong danh sách
-			Collections.shuffle(questionDetail);
+		if (cachedRandomQuestions == null) {
+			// Khối này chỉ thực thi trong lần gọi đầu tiên, xáo trộn và lưu trữ câu hỏi vào cache
+			List<QuestionDetail> questionDetail = questionDetailReposotory.findQuestionDetailByStudentId(classId);
+			if (quizResults.size() < 1) {
+				if (questionDetail.size() > 0) {
+					// Xáo trộn câu hỏi chỉ nếu có câu hỏi
+					Collections.shuffle(questionDetail);
+					// Lấy 50 câu hỏi đầu tiên hoặc tất cả câu hỏi nếu ít hơn 50
+					cachedRandomQuestions = questionDetail.subList(0, Math.min(questionDetail.size(), 50));
+				} else {
+					cachedRandomQuestions = new ArrayList<>();
+				}
 
-			// Lấy 20 phần tử đầu tiên
-			randomQuestions = questionDetail.subList(0, Math.min(questionDetail.size(), 20));
+				System.out.println(cachedRandomQuestions);
+			}
 		}
-		System.out.println(randomQuestions);
 
-		return randomQuestions.stream().map(this::convertToDto).collect(Collectors.toList());
+		if (quizResults.size() < 1) {
+			return cachedRandomQuestions.stream().map(this::convertToDto).collect(Collectors.toList());
+		}
+		return null;
 	}
 
 	private QuestionDetailClientDTO convertToDto(QuestionDetail questionDetail) {
@@ -99,7 +109,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 				answerReposotory.save(as);
 			}
 		}
-
+		cachedRandomQuestions = null;
 		return convertToQuestionDetailResponse(saveQuestionDetail);
 	}
 
@@ -125,7 +135,8 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 			// }
 
 			QuestionDetail updateQuestionDetail = questionDetailReposotory.save(exitQuestionDetail);
-
+			
+			cachedRandomQuestions = null;
 			return convertToQuestionDetailResponse(updateQuestionDetail);
 		}
 		return null;
@@ -140,6 +151,7 @@ public class QuestionDetailServiceImpl implements QuestionDetailService {
 		}
 
 		questionDetailReposotory.deleteById(questionDetailId);
+		cachedRandomQuestions = null;
 		return this.convertToQuestionDetailResponse(questionDetail);
 	}
 
