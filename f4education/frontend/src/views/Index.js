@@ -494,6 +494,11 @@ const Index = () => {
         setYearFilter(null)
     }
 
+    const handleResetFilterCourse = () => {
+        setStartDateCourse(null)
+        setEndDateCourse(null)
+    }
+
     // Use Effect
     useEffect(() => {
         fetchRevenue()
@@ -592,9 +597,16 @@ const Index = () => {
                 (date) => new Date(date)
             )
 
+            const certificateDate = new Date(course.certificateDate)
+            const isDateInRange = (certificateDate, start, end) =>
+                (!start || certificateDate >= start) &&
+                (!end || certificateDate <= end)
+
             // Kiểm tra xem có ít nhất một ngày trong khoảng không
             return registrationDates.some(
-                (date) => (!start || date >= start) && (!end || date <= end)
+                (date) =>
+                    ((!start || date >= start) && (!end || date <= end)) ||
+                    isDateInRange(certificateDate, start, end)
             )
         })
     }
@@ -611,7 +623,8 @@ const Index = () => {
                     studentCount: course.studentCount,
                     certificateCount:
                         matchingCertificateCourse.certificateCount,
-                    registrationDates: course.registrationDates
+                    registrationDates: course.registrationDates,
+                    certificateDate: matchingCertificateCourse.certificateDate
                 }
             }
 
@@ -649,7 +662,10 @@ const Index = () => {
 
     useEffect(() => {
         // Lọc dữ liệu dựa trên ngày bắt đầu và kết thúc
-        const filteredData = filterDataByDateRange(startDate, endDate)
+        const filteredData = filterDataByDateRange(
+            startDateCourse,
+            endDateCourse
+        )
         console.log(filteredData)
 
         // Chắc chắn rằng sortedData không null hoặc undefined
@@ -673,7 +689,7 @@ const Index = () => {
                             backgroundColor: '#00CCCC'
                         },
                         {
-                            label: 'Tổng số học viên đã nhận chứng chỉ',
+                            label: 'Tổng số học viên đã nhận chứng nhận',
                             data: sortedData.map(
                                 (course) => course.certificateCount
                             ),
@@ -686,7 +702,7 @@ const Index = () => {
                     plugins: {
                         title: {
                             display: true,
-                            text: 'Thống kê khóa học',
+                            text: 'Thống kê số học viên đã đăng ký Khóa học và đã nhận chứng nhận',
                             color: 'black'
                         }
                     },
@@ -702,7 +718,7 @@ const Index = () => {
         } else {
             console.error("Element with id 'revenueChart' not found")
         }
-    }, [data, startDate, endDate])
+    }, [data, startDateCourse, endDateCourse])
 
     return (
         <>
@@ -1065,16 +1081,30 @@ const Index = () => {
                                         <Container className="mt--7" fluid>
                                             <Row className="mt-5">
                                                 <Col className="mt-5">
-                                                    <div className="d-flex justify-content-end align-items-center my-5">
+                                                    <div className="mt-3 mb-5">
                                                         <h5 className="text-uppercase text-dark mr-4 mt-2 ls-1 mb-2">
                                                             Bộ lọc khóa học theo
                                                             ngày tháng năm:
                                                         </h5>
                                                         <div className="d-flex justify-content-start">
+                                                            <Button
+                                                                onClick={() => {
+                                                                    handleResetFilterCourse()
+                                                                }}
+                                                                style={{
+                                                                    cursor: 'pointer'
+                                                                }}
+                                                            >
+                                                                <IconRefresh
+                                                                    size={15}
+                                                                />
+                                                            </Button>
                                                             <DateInput
                                                                 placeholder="Ngày bắt đầu"
                                                                 variant="filled"
                                                                 mr={10}
+                                                                ml={10}
+                                                                size={'md'}
                                                                 clearable
                                                                 w={320}
                                                                 value={
@@ -1093,6 +1123,7 @@ const Index = () => {
                                                                 placeholder="Ngày kết thúc"
                                                                 variant="filled"
                                                                 clearable
+                                                                size={'md'}
                                                                 w={320}
                                                                 value={
                                                                     endDateCourse

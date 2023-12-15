@@ -65,6 +65,9 @@ public class Student implements Serializable {
 	@OneToMany(mappedBy = "student")
 	@Access(AccessType.PROPERTY)
 	private List<Attendance> attendances;
+	@JsonIgnore
+	@OneToMany(mappedBy = "student")
+	private List<EvaluationTeacher> EvaluationTeachers;
 
 	@ManyToOne
 	@JsonIgnore
@@ -121,15 +124,24 @@ public class Student implements Serializable {
 
 	@Override
 	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		Student student = (Student) o;
-		return Objects.equals(studentId, student.studentId) && Objects.equals(fullname, student.fullname) && Objects.equals(gender, student.gender) && Objects.equals(address, student.address) && Objects.equals(phone, student.phone) && Objects.equals(image, student.image) && Objects.equals(bills, student.bills) && Objects.equals(evaluates, student.evaluates) && Objects.equals(points, student.points) && Objects.equals(registerCourses, student.registerCourses) && Objects.equals(quizResults, student.quizResults) && Objects.equals(attendances, student.attendances) && Objects.equals(user, student.user);
+		return Objects.equals(studentId, student.studentId) && Objects.equals(fullname, student.fullname)
+				&& Objects.equals(gender, student.gender) && Objects.equals(address, student.address)
+				&& Objects.equals(phone, student.phone) && Objects.equals(image, student.image)
+				&& Objects.equals(bills, student.bills) && Objects.equals(evaluates, student.evaluates)
+				&& Objects.equals(points, student.points) && Objects.equals(registerCourses, student.registerCourses)
+				&& Objects.equals(quizResults, student.quizResults) && Objects.equals(attendances, student.attendances)
+				&& Objects.equals(user, student.user);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(studentId, fullname, gender, address, phone, image, bills, evaluates, points, registerCourses, quizResults, attendances, user);
+		return Objects.hash(studentId, fullname, gender, address, phone, image, bills, evaluates, points,
+				registerCourses, quizResults, attendances, user);
 	}
 
 	@Override
@@ -137,6 +149,5 @@ public class Student implements Serializable {
 		return "Student [studentId=" + studentId + ", fullname=" + fullname + ", gender=" + gender + ", address="
 				+ address + ", phone=" + phone + ", image=" + image + "]";
 	}
-
 
 }

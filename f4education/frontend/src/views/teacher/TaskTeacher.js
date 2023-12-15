@@ -148,7 +148,7 @@ const TaskTeacher = () => {
             },
             {
                 accessorKey: 'description',
-                header: 'M tả',
+                header: 'Mô tả',
                 size: 80
             },
             {
@@ -326,16 +326,35 @@ const TaskTeacher = () => {
                 if (value === '') {
                     return 'Không để trống tên bài tập'
                 }
+
                 return null
             },
-            startDate: (value) =>
-                value === '' ? 'Vui lòng chọn thời gian bắt đầu' : null,
+            startDate: (value) => {
+                if (value === '') {
+                    return 'Vui lòng chọn thời gian bắt đầu'
+                }
+                const now = new Date()
+                const startDate = new Date(value)
+                const rangeTime = (startDate - now) / 1000
+                if (rangeTime < 0) {
+                    return 'Thời gian bắt đầu ít nhất từ thời điểm hiện tại'
+                }
+                return null
+            },
+
             endDate: (value, values) => {
                 if (value === '') {
                     return 'Vui lòng chọn thời gian kết thúc'
                 }
-                const startDate = new Date(values.startDate)
+
+                const now = new Date()
                 const endDate = new Date(value)
+                const rangeTime_now = (endDate - now) / 1000
+                if (rangeTime_now < 3600) {
+                    return 'Thời gian kết thúc ít nhất 1 giờ từ thời điểm hiện tại'
+                }
+                const startDate = new Date(values.startDate)
+
                 const rangeTime = (endDate - startDate) / 1000
                 if (rangeTime < 3600) {
                     return 'Thời gian giao bài tập tối thiểu là 1 tiếng'

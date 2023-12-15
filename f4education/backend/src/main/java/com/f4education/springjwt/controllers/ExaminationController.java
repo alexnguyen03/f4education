@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,36 +27,44 @@ import com.f4education.springjwt.security.services.QuestionServiceImpl;
 @CrossOrigin("*")
 @RequestMapping("/api/exam")
 public class ExaminationController {
-    @Autowired
-    ExaminationServiceImpl examinationService;
+	@Autowired
+	ExaminationServiceImpl examinationService;
 
-    @Autowired
-    QuestionServiceImpl questionService;
+	@Autowired
+	QuestionServiceImpl questionService;
 
-    @Autowired
-    ClassServiceImpl classService;
+	@Autowired
+	ClassServiceImpl classService;
 
-    @PostMapping("/{classId}")
-    public ResponseEntity<?> createExam(@PathVariable("classId") Integer classId) {
-        Classes classes = classService.findById(classId);
+	@PostMapping("/{classId}")
+	public ResponseEntity<?> createExam(@PathVariable("classId") Integer classId) {
+		Classes classes = classService.findById(classId);
 
-        Examination newExamination = new Examination();
-        Integer courseId = classes.getRegisterCourses().get(0).getCourse().getCourseId();
-        Question question = questionService.getQuestionByCourseId(courseId);
-        newExamination.setQuestion(question);
-        newExamination.setClasses(classes);
-        newExamination.setFinishDate(new Date());
-        Examination listExaminationSaved = examinationService.saveExamination(newExamination);
-        return ResponseEntity.ok(listExaminationSaved);
-    }
+		Examination newExamination = new Examination();
+		Integer courseId = classes.getRegisterCourses().get(0).getCourse().getCourseId();
+		Question question = questionService.getQuestionByCourseId(courseId);
+		newExamination.setQuestion(question);
+		newExamination.setClasses(classes);
+		newExamination.setFinishDate(new Date());
+		Examination listExaminationSaved = examinationService.saveExamination(newExamination);
+		return ResponseEntity.ok(listExaminationSaved);
+	}
 
-    @GetMapping("/{classId}")
-    public ResponseEntity<?> checkActivedExam(@PathVariable("classId") Integer classId) {
-        return ResponseEntity.ok(examinationService.isActivedExam(classId));
-    }
+	@PutMapping("/{classId}")
+	public ResponseEntity<?> updateExam(@PathVariable("classId") Integer classId) {
+		Examination examination = examinationService.getByClassId(classId);
+		examination.setFinishDate(new Date());
+		Examination listExaminationSaved = examinationService.saveExamination(examination);
+		return ResponseEntity.ok(listExaminationSaved);
+	}
 
-    @GetMapping("/student/{classId}")
-    public ResponseEntity<?> checkActivedExamByDateAndClassId(@PathVariable("classId") Integer classId) {
-        return ResponseEntity.ok(examinationService.isActivedExamByTodayAndClassId(classId));
-    }
+	@GetMapping("/{classId}")
+	public ResponseEntity<?> checkActivedExam(@PathVariable("classId") Integer classId) {
+		return ResponseEntity.ok(examinationService.isActivedExam(classId));
+	}
+
+	@GetMapping("/student/{classId}")
+	public ResponseEntity<?> checkActivedExamByDateAndClassId(@PathVariable("classId") Integer classId) {
+		return ResponseEntity.ok(examinationService.isActivedExamByTodayAndClassId(classId));
+	}
 }

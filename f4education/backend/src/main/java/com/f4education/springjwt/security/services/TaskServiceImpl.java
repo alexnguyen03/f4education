@@ -1,18 +1,15 @@
 package com.f4education.springjwt.security.services;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.apache.commons.beanutils.converters.DateConverter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.time.temporal.ChronoUnit;
 
 import com.f4education.springjwt.interfaces.TaskService;
 import com.f4education.springjwt.models.Classes;
@@ -98,13 +95,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public Task save(Task task) {
         Classes classes = classRepository.findById(task.getClassesId()).get();
-        ZoneOffset timeOffset = scheduleServiceImpl.getTimeOffsetToServer();
-
-        OffsetDateTime starDate = task.getStartDate().withOffsetSameInstant(timeOffset);
-        OffsetDateTime endDate = task.getEndDate().withOffsetSameInstant(timeOffset);
-
-        task.setStartDate(starDate);
-        task.setEndDate(endDate);
         task.setClasses(classes);
 
         if (task.getTaskId() == null) {
@@ -112,6 +102,8 @@ public class TaskServiceImpl implements TaskService {
             try {
                 String linkFoler = "Tasks/" + task.getClasses().getClassName() + "/" + task.getTitle();
                 idFolder = googleDriveRepository.getFolderId(linkFoler);
+
+                // ! Tiến hành gửi mails--start
                 List<String> mails = new ArrayList<String>();
                 List<RegisterCourse> listReg = new ArrayList<RegisterCourse>();
                 try {
@@ -119,28 +111,30 @@ public class TaskServiceImpl implements TaskService {
                 } catch (Exception e) {
                 }
 
-                if (!listReg.isEmpty()) {
+                if (!listReg.isEmpty()) { // ! Lớp học đã có học viên thì mới gửi mails
                     for (RegisterCourse r : listReg) {
                         mails.add(r.getStudent().getUser().getEmail());
                     }
+
+                    Date now = new Date();
+                    Date endDate = task.getEndDate();
+                    long secondsDiff = (endDate.getTime() - now.getTime()) / 1000;
+                    Date date = null;
+
+                    if (secondsDiff >= 7200) {
+                        Calendar cal = Calendar.getInstance();
+                        cal.setTime(endDate);
+                        cal.add(Calendar.HOUR_OF_DAY, -2);
+                        date = cal.getTime();
+                    }
+
+                    // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
+
+                    String[] mail = mails.toArray(new String[0]);
+                    mailer.mailNewTask(mail, "", "", date, task);
+                    System.out.println();
                 }
-                OffsetDateTime now = OffsetDateTime.now();
-                long secondsDiff = endDate.until(now, ChronoUnit.SECONDS);
-                Date date = null;
-
-                if (secondsDiff < 7200) {
-                    date = Date.from(now.toInstant());
-                } else {
-                    OffsetDateTime twoHoursAgo = now.minus(2, ChronoUnit.HOURS);
-                    date = Date.from(twoHoursAgo.toInstant());
-                }
-
-                // if (
-                // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
-
-                String[] mail = mails.toArray(new String[0]);
-                mailer.mailNewTask(mail, "", "", date, task);
-                System.out.println();
+                // ! Tiến hành gửi mails--end
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -158,6 +152,38 @@ public class TaskServiceImpl implements TaskService {
                 } catch (Exception e) {
                 }
             }
+
+            // ! Tiến hành gửi mails--start
+            List<String> mails = new ArrayList<String>();
+            List<RegisterCourse> listReg = new ArrayList<RegisterCourse>();
+            try {
+                listReg = task.getClasses().getRegisterCourses();
+            } catch (Exception e) {
+            }
+
+            if (!listReg.isEmpty()) { // ! Lớp học đã có học viên thì mới gửi mails
+                for (RegisterCourse r : listReg) {
+                    mails.add(r.getStudent().getUser().getEmail());
+                }
+
+                Date now = new Date();
+                Date endDate = task.getEndDate();
+                long secondsDiff = (endDate.getTime() - now.getTime()) / 1000;
+                Date date = null;
+
+                if (secondsDiff >= 7200) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.setTime(endDate);
+                    cal.add(Calendar.HOUR_OF_DAY, -2);
+                    date = cal.getTime();
+                }
+
+                // ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
+
+                String[] mail = mails.toArray(new String[0]);
+                mailer.mailUpdateTask(mail, null, null, date, taskOld, task);
+            }
+            // ! Tiến hành gửi mails--end
         }
         return taskRepository.save(task);
     }

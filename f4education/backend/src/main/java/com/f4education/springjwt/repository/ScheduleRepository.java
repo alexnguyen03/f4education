@@ -1,6 +1,5 @@
 package com.f4education.springjwt.repository;
 
-import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.List;
 

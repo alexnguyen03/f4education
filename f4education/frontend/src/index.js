@@ -13,6 +13,7 @@ import Teacher from './layouts/Teacher'
 import Student from './layouts/Student'
 import PDFLayout from './layouts/PDF'
 import Evaluation from './layouts/Evaluation'
+import Quiz from 'layouts/Quiz'
 
 const root = ReactDOM.createRoot(document.getElementById('root'))
 
@@ -68,6 +69,8 @@ root.render(
             {/* Evaluation Route */}
             <Route path="/evaluation/*" element={<Evaluation />} />
             <Route path="/*/student/:classId/*" element={<Evaluation />} />
+
+            <Route path="/quiz/*" element={<Quiz />} />
         </Routes>
     </BrowserRouter>
 )

@@ -1,7 +1,6 @@
 package com.f4education.springjwt.payload.request;
 
 import java.sql.Time;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 

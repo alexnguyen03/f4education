@@ -34,4 +34,11 @@ public class EvaluationTeacherController {
 
 	}
 
+	@GetMapping("/check-has-evaluated")
+	public ResponseEntity<?> checkStudentHasEvaluated(@RequestParam("classId") Integer classId,
+			@RequestParam("studentId") String studentId) {
+		return ResponseEntity.ok(evaluationTeacherService.checkStudentHasEvaluated(classId, studentId));
+
+	}
+
 }
