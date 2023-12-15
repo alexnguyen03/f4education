@@ -54,10 +54,10 @@ public class CoursesController {
 		return ResponseEntity.ok(list);
 	}
 
-	@GetMapping("/get-all/{studentId}")
-	// @PreAuthorize("hasRole('ADMIN')")
-	public ResponseEntity<?> getAllCourseByStudentId(@PathVariable String studentId) {
-		List<CourseResponse> list = courseService.findAllCourseDTO(studentId);
+	@GetMapping("/get-all")
+	public ResponseEntity<?> getAllCourse(@RequestParam(value = "studentId") Optional<String> studentId) {
+		List<CourseResponse> list = courseService.findAllCourseDTO(studentId.get());
+		System.out.println(list);
 		return ResponseEntity.ok(list);
 	}
 
@@ -96,8 +96,8 @@ public class CoursesController {
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
-				String imageURL = firebaseStorageService.uploadImage(file.get(),
-						"courses/", courseRequest.getCourseName().trim());
+				String imageURL = firebaseStorageService.uploadImage(file.get(), "courses/",
+						courseRequest.getCourseName().trim());
 				System.out.println(imageURL + "========================");
 				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
@@ -121,8 +121,8 @@ public class CoursesController {
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
-				String imageURL = firebaseStorageService.uploadImage(file.get(),
-						"courses/", courseRequest.getCourseName().trim());
+				String imageURL = firebaseStorageService.uploadImage(file.get(), "courses/",
+						courseRequest.getCourseName().trim());
 				firebaseStorageService.isUpdatedNoCahe("courses/");
 				System.out.println(imageURL + "========================");
 				// File savedFile = xfileService.save(file.orElse(null), "/courses");
@@ -150,9 +150,16 @@ public class CoursesController {
 	}
 
 	@GetMapping("/topic/{checkedSubjects}")
-	public ResponseEntity<?> findCoursesByCheckedSubjects(
-			@PathVariable("checkedSubjects") List<String> checkedSubjects) {
-		List<CourseDTO> courseDTO = courseService.findBySubjectNames(checkedSubjects);
+	public ResponseEntity<?> findCoursesByCheckedSubjects(@PathVariable("checkedSubjects") List<String> checkedSubjects,
+			@RequestParam(value = "studentId") Optional<String> studentId) {
+		List<CourseResponse> courseDTO = courseService.findBySubjectNames(checkedSubjects, studentId.get());
+		return ResponseEntity.ok(courseDTO);
+	}
+
+	@GetMapping("/rating/{star}")
+	public ResponseEntity<?> findCoursesByRating(@PathVariable("star") Integer star,
+			@RequestParam(value = "studentId") Optional<String> studentId) {
+		List<CourseResponse> courseDTO = courseService.findByRating(star, studentId.get());
 		return ResponseEntity.ok(courseDTO);
 	}
 

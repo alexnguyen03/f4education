@@ -86,8 +86,7 @@ const DownloadTaskStudent = () => {
         try {
             setLoading(true)
             const resp = await taskApi.getAllTaskByClassId(
-                6
-                // searchParams.get('classId')
+                searchParams.get('classId')
             )
             if (resp.status === 200 && resp.data.length > 0) {
                 setTasks(resp.data)

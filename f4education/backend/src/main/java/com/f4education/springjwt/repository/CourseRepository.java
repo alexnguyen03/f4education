@@ -69,11 +69,11 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "GROUP BY c")
 	List<Course> getAll();
 
-	@Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO(c.courseName, COUNT(p.student.studentId)) "
+	@Query("SELECT new com.f4education.springjwt.payload.request.ReportCourseCountStudentCertificateDTO(c.courseName, COUNT(DISTINCT p.student.studentId), cl.endDate) "
 			+ "FROM Course c " + "JOIN RegisterCourse rc ON c.courseId = rc.course.courseId "
 			+ "JOIN Classes cl ON cl.classId = rc.classes.classId " + "JOIN Point p ON p.classes.classId = cl.classId "
-			+ "WHERE p.averagePoint >= 5.0 " + "GROUP BY c.courseId, c.courseName")
-	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate();
+			+ "WHERE p.averagePoint >= :mark " + "GROUP BY c.courseName, cl.endDate")
+	List<ReportCourseCountStudentCertificateDTO> getCoursesWithStudentCountCertificate(@Param("mark") Double mark);
 
 	List<Course> findAllBySubject_SubjectName(String subjectName);// using DSL syntax
 	// @Query("SELECT c.courseDetail FROM Course c where

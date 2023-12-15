@@ -31,6 +31,8 @@ public interface CoursesService {
 
 	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
 
+	List<CourseResponse> findByRating(Integer rating, String studentId);
+
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);
 
 	List<CourseDTO> findAllCourseDTOByStudentId(String studentId);
