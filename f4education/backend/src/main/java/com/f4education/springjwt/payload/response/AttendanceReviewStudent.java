@@ -1,6 +1,5 @@
 package com.f4education.springjwt.payload.response;
 
-import java.time.OffsetDateTime;
 import java.util.Date;
 
 import com.f4education.springjwt.models.Classes;

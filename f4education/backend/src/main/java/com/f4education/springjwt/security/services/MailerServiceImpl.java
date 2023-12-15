@@ -275,13 +275,39 @@ public class MailerServiceImpl implements MailerService {
 				"        </div>\r\n" +
 				"    </div>\r\n" +
 				"</div>";
-		subject = "Cảnh báo vắng điểm danh";
+		subject = "Bạn vừa được giao bài tập mới";
 		queue(new MailInfo(to, subject, body, date));
 	}
 
 	@Override
 	public void mailUpdateTask(String to[], String subject, String body, Date date, Task oldTask, Task newTask) {
 		// ! Xử lý gửi mail khi có sự thay đổi giao bài tập
+		String link = "http://localhost:3000/student/classes";
+		body = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\r\n"
+				+
+				"    <div style=\"margin:50px auto;width:70%;padding:20px 0\">\r\n" +
+				"        <div style=\"border-bottom:1px solid #eee\"> <a href=' link// ! Linh website'\r\n" + //
+				"                style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\r\n"
+				+
+				"        </div>\r\n" +
+				"        <p>Cảnh báo bạn đã vắng điểm danh vào ngày \" + formatDate(date) </p>\r\n" +
+				"        <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius:\r\n"
+				+
+				"            4px;\">\"\r\n" +
+				"            Bạn đã vắng \" + absentCount /\" + totalCount buổi học</h2>\r\n" +
+				"        <p style=\"color:red;font-size:1.2em;\">\"\r\n" +
+				"            + isPassed </p>\" <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\r\n" +
+				"        <hr style=\"border:none;border-top:1px solid #eee\" />\r\n" +
+				"        <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\r\n"
+				+
+				"            <p>Team Bộ tứ siêu đẳng</p>\r\n" +
+				"            <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\r\n" +
+				"            <p>Việt Nam</p>\r\n" +
+				"        </div>\r\n" +
+				"    </div>\r\n" +
+				"</div>";
+		subject = "Có sự thay đổi bài tập được giao";
+		queue(new MailInfo(to, subject, body, date));
 	}
 
 	@Override

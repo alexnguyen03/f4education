@@ -1,7 +1,7 @@
 package com.f4education.springjwt.models;
 
 import java.io.Serializable;
-import java.time.OffsetDateTime;
+import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -34,10 +34,10 @@ public class Task implements Serializable {
 	private String description;
 
 	@Column(name = "start_date")
-	private OffsetDateTime startDate;
+	private Date startDate;
 
 	@Column(name = "end_date")
-	private OffsetDateTime endDate;
+	private Date endDate;
 
 	@JsonIgnore
 	@ManyToOne
