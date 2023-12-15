@@ -29,7 +29,7 @@ public interface CoursesService {
 
 	List<CourseDTO> findAllCourses();
 
-	List<CourseDTO> findBySubjectNames(List<String> subjectNames);
+	List<CourseResponse> findBySubjectNames(List<String> subjectNames, String studentId);
 
 	List<CourseResponse> findByRating(Integer rating, String studentId);
 
