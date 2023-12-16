@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <style>
+        a {
+            text-decoration: none;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 650px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #f5f3f3;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        p,
+        .footer {
+            color: #666;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 6px 12px;
+            border: none;
+            background-color: #228be6;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        /* CSS cho bảng */
+        table {
+            width: 100%;
+            margin-bottom: 1rem;
+            color: #212529;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            vertical-align: top;
+            border-top: 1px solid #dee2e6;
+            text-align: center;
+        }
+
+        thead {
+            background-color: #e9ecef;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        tbody tr:nth-of-type(even) {
+            background-color: #f8f9fa;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(0, 0, 0, 0.075);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Thông báo: lớp học [tên lớp học] đã được bổ sung thời khóa biểu</h2>
+        <p>Kính gửi các bạn học viên của lớp [tên lớp học].</p>
+        <p>Thời khóa biểu của lớp đã được bổ sung trên hệ thống! Buổi học đầu tiên sẽ bắt đầu vào ngày: [buổi học đầu
+            tiên]</p>
+        <p>Thông tin chi tiết về thời khóa biểu, vui lòng xem thông tin: <a
+                href="http://localhost:3000/student/classes?classId=[classId]" class="button">Xem thông tin thời khóa
+                biểu</a>.
+        </p>
+        <p>Xin vui lòng kiểm tra lại thông tin chi tiết trên hệ thống và chuẩn bị cho việc học tập.</p>
+        <p>Chúc các bạn học viên có một khóa học tốt lành!</p>
+        <hr>
+        <p>Trân trọng,</p>
+        <p>Đội ngũ Quản lý Học viên</p>
+        <div class="footer">
+            Trung tâm đào tạo kháo học lập trình ngắn hạn - F4Education.
+        </div>
+        <div style="padding: 20px 0;">
+            <img src="https://storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png" alt="">
+        </div>
+    </div>
+</body>
+
+</html>

@@ -14,6 +14,8 @@ import lombok.ToString;
 @AllArgsConstructor
 @ToString
 public class ScheduleRequest {
+    @JsonProperty("isUpdate")
+    private boolean isUpdate;
     @JsonProperty("classId")
     private Integer classId;
     @JsonProperty("classroomId")

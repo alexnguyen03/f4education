@@ -6,6 +6,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ import com.f4education.springjwt.interfaces.ScheduleService;
 import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.ClassRoom;
 import com.f4education.springjwt.models.Classes;
+import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.models.Sessions;
 import com.f4education.springjwt.payload.request.ScheduleDTO;
@@ -49,6 +51,9 @@ public class ScheduleServiceImpl implements ScheduleService {
 	@Autowired
 	SessionsRepository sessionsRepository;
 
+	@Autowired
+	MailerServiceImpl mailer;
+
 	@Override
 	public List<ScheduleTeacherDTO> findAllScheduleTeacherByID(Integer id) {
 		return scheduleRepository.findAllScheduleTeacherByID(id);
@@ -75,7 +80,35 @@ public class ScheduleServiceImpl implements ScheduleService {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+		sendMail(classes, scheduleRequest.isUpdate());
+
 		return listSchedules;
+	}
+
+	private void sendMail(Classes classes, boolean isUpdate) {
+		List<String> mails = new ArrayList<String>();
+		List<RegisterCourse> listReg = new ArrayList<RegisterCourse>();
+		try {
+			listReg = classes.getRegisterCourses();
+		} catch (Exception e) {
+		}
+
+		if (!listReg.isEmpty()) { // ! Lớp học đã có học viên thì mới gửi mails
+			for (RegisterCourse r : listReg) {
+				mails.add(r.getStudent().getUser().getEmail());
+			}
+
+			// ! bỏ mail vào hàng chờ kèm với thời gian gửi mail
+
+			String[] mail = mails.toArray(new String[0]);
+			if (isUpdate) {
+				// ! Mail thời khóa biểu mới
+				mailer.mailNewSchedule(mail, null, null, null, classes);
+			} else {
+				// ! Mail thời khóa biểu mới
+				mailer.mailUpdateSchedule(mail, null, null, null, classes);
+			}
+		}
 	}
 
 	private List<Schedule> convertRequestToListEntity(ScheduleRequest scheduleRequest) {

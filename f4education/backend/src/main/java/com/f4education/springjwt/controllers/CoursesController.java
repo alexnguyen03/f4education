@@ -57,7 +57,7 @@ public class CoursesController {
 	@GetMapping("/get-all")
 	public ResponseEntity<?> getAllCourse(@RequestParam(value = "studentId") Optional<String> studentId) {
 		List<CourseResponse> list = courseService.findAllCourseDTO(studentId.get());
-		System.out.println(list);
+		// System.out.println(list);
 		return ResponseEntity.ok(list);
 	}
 

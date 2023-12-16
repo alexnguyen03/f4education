@@ -49,6 +49,7 @@ const Schedule = () => {
             .format('dddd, DD/MM/yyyy')
         return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
     }
+    
     const columnsSchedule = useMemo(
         () => [
             {

@@ -61,6 +61,7 @@ public class Classes implements Serializable {
 	@JsonIgnore
 	private List<Point> points;
 
+	@JsonIgnore
 	@OneToMany(mappedBy = "classes")
 	private List<Attendance> attendances;
 

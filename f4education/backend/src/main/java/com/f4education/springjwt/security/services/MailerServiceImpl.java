@@ -15,8 +15,10 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.f4education.springjwt.interfaces.MailerService;
+import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.MailInfo;
 import com.f4education.springjwt.models.Task;
+import com.f4education.springjwt.repository.ClassRepository;
 
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.InternetAddress;
@@ -28,6 +30,9 @@ public class MailerServiceImpl implements MailerService {
 
 	@Autowired
 	JavaMailSender sender;
+
+	@Autowired
+	ClassRepository classesRepository;
 
 	@Override
 	public void send(MailInfo mail) throws MessagingException {
@@ -174,7 +179,7 @@ public class MailerServiceImpl implements MailerService {
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
 				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link// ! Linh website
 				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\n"
-				+ "    </div>\n" + " <p>Cảnh báo bạn đã vắng điểm danh vào ngày " + formatDate(date) + "</p>\n"
+				+ "    </div>\n" + " <p>Cảnh báo bạn đã vắng điểm danh vào ngày " + formatDateTime(date) + "</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
 				+ "    Bạn đã vắng " + absentCount + "/" + totalCount + " buổi học</h2>\n"
 				+ "<p style=\"color:red;font-size:1.2em;\">" + isPassed + "</p>"
@@ -210,8 +215,14 @@ public class MailerServiceImpl implements MailerService {
 		queue(new MailInfo(to, subject, body, pdfFile));
 	}
 
-	private String formatDate(Date date) {
+	private String formatDateTime(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+		String formattedDate = sdf.format(date);
+		return formattedDate;
+	}
+
+	private String formatDate(Date date) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
 		String formattedDate = sdf.format(date);
 		return formattedDate;
 	}
@@ -259,7 +270,7 @@ public class MailerServiceImpl implements MailerService {
 				"                style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\r\n"
 				+
 				"        </div>\r\n" +
-				"        <p>Cảnh báo bạn đã vắng điểm danh vào ngày \" + formatDate(date) </p>\r\n" +
+				"        <p>Cảnh báo bạn đã vắng điểm danh vào ngày \" + formatDateTime(date) </p>\r\n" +
 				"        <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius:\r\n"
 				+
 				"            4px;\">\"\r\n" +
@@ -290,7 +301,7 @@ public class MailerServiceImpl implements MailerService {
 				"                style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\r\n"
 				+
 				"        </div>\r\n" +
-				"        <p>Cảnh báo bạn đã vắng điểm danh vào ngày \" + formatDate(date) </p>\r\n" +
+				"        <p>Cảnh báo bạn đã vắng điểm danh vào ngày \" + formatDateTime(date) </p>\r\n" +
 				"        <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius:\r\n"
 				+
 				"            4px;\">\"\r\n" +
@@ -571,4 +582,136 @@ public class MailerServiceImpl implements MailerService {
 		System.out.println("Email đã được gửi thành công!");
 	}
 
+	@Override
+	public void mailNewSchedule(String[] to, String subject, String body, Date date, Classes classes) {
+		// ! Mails khi mới bổ sung thời khóa biểu
+		Date studyDate = null;
+		try {
+			studyDate = classes.getSchedules().get(0).getStudyDate();
+		} catch (Exception e) {
+		}
+		String htmlBody = "<!DOCTYPE html>\r\n" + //
+				"<html>\r\n" + //
+				"\r\n" + //
+				"<head>\r\n" + //
+				"    <style>\r\n" + //
+				"        a {\r\n" + //
+				"            text-decoration: none;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        body {\r\n" + //
+				"            font-family: Arial, sans-serif;\r\n" + //
+				"            line-height: 1.6;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        .container {\r\n" + //
+				"            max-width: 650px;\r\n" + //
+				"            margin: 0 auto;\r\n" + //
+				"            padding: 20px;\r\n" + //
+				"            border: 1px solid #f5f3f3;\r\n" + //
+				"            border-radius: 5px;\r\n" + //
+				"            background-color: #f9f9f9;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        h1 {\r\n" + //
+				"            color: #333;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        p,\r\n" + //
+				"        .footer {\r\n" + //
+				"            color: #666;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        .button {\r\n" + //
+				"            display: inline-block;\r\n" + //
+				"            padding: 6px 12px;\r\n" + //
+				"            border: none;\r\n" + //
+				"            background-color: #228be6;\r\n" + //
+				"            color: #fff;\r\n" + //
+				"            font-size: 16px;\r\n" + //
+				"            font-weight: 600;\r\n" + //
+				"            text-align: center;\r\n" + //
+				"            text-decoration: none;\r\n" + //
+				"            cursor: pointer;\r\n" + //
+				"            border-radius: 4px;\r\n" + //
+				"            transition: background-color 0.3s ease;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        /* CSS cho bảng */\r\n" + //
+				"        table {\r\n" + //
+				"            width: 100%;\r\n" + //
+				"            margin-bottom: 1rem;\r\n" + //
+				"            color: #212529;\r\n" + //
+				"            border-collapse: collapse;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        th,\r\n" + //
+				"        td {\r\n" + //
+				"            padding: 0.75rem;\r\n" + //
+				"            vertical-align: top;\r\n" + //
+				"            border-top: 1px solid #dee2e6;\r\n" + //
+				"            text-align: center;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        thead {\r\n" + //
+				"            background-color: #e9ecef;\r\n" + //
+				"            border-bottom: 2px solid #dee2e6;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        tbody tr:nth-of-type(even) {\r\n" + //
+				"            background-color: #f8f9fa;\r\n" + //
+				"        }\r\n" + //
+				"\r\n" + //
+				"        tbody tr:hover {\r\n" + //
+				"            background-color: rgba(0, 0, 0, 0.075);\r\n" + //
+				"        }\r\n" + //
+				"    </style>\r\n" + //
+				"</head>\r\n" + //
+				"\r\n" + //
+				"<body>\r\n" + //
+				"    <div class=\"container\">\r\n" + //
+				"        <h2>Thông báo: lớp học " + classes.getClassName() + " đã được bổ sung thời khóa biểu</h2>\r\n"
+				+ //
+				"        <p>Kính gửi các bạn học viên của lớp " + classes.getClassName() + ".</p>\r\n" + //
+				"        <p>Thời khóa biểu của lớp đã được bổ sung trên hệ thống! Buổi học đầu tiên sẽ bắt đầu vào ngày: "
+				+ formatDate(studyDate) + "</p>\r\n" + //
+
+				"        <p>Thông tin chi tiết về thời khóa biểu, vui lòng xem thông tin: <a\r\n" + //
+				"                href=\"http://localhost:3000/student/classes?classId=" + classes.getClassId()
+				+ "\" class=\"button\">Xem thông tin thời khóa\r\n"
+				+ //
+				"                biểu</a>.\r\n" + //
+				"        </p>\r\n" + //
+				"        <p>Xin vui lòng kiểm tra lại thông tin chi tiết trên hệ thống và chuẩn bị cho việc học tập.</p>\r\n"
+				+ //
+				"        <p>Chúc các bạn học viên có một khóa học tốt lành!</p>\r\n" + //
+				"        <hr>\r\n" + //
+				"        <p>Trân trọng,</p>\r\n" + //
+				"        <p>Đội ngũ Quản lý Học viên</p>\r\n" + //
+				"        <div class=\"footer\">\r\n" + //
+				"            Trung tâm đào tạo kháo học lập trình ngắn hạn - F4Education.\r\n" + //
+				"        </div>\r\n" + //
+				"        <div style=\"padding: 20px 0;\">\r\n" + //
+				"            <img src=\"https://storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
+				+ //
+				"        </div>\r\n" + //
+				"    </div>\r\n" + //
+				"</body>\r\n" + //
+				"\r\n" + //
+				"</html>";
+		queue(new MailInfo(to, to, subject, htmlBody));
+		System.out.println("Email đã được gửi thành công!");
+	}
+
+	@Override
+	public void mailUpdateSchedule(String[] to, String subject, String body, Date date, Classes classes) {
+		// ! Mails khi cập nhật thời khóa biểu mới
+	}
+
+	// public static void main(String[] args) {
+	// MailerServiceImpl ml = new MailerServiceImpl();
+	// String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+	// Classes cl = new Classes();
+	// ml.mailNewSchedule(listMail, "", "", new Date(), cl);
+	// }
 }

@@ -3,6 +3,7 @@ package com.f4education.springjwt.interfaces;
 import java.util.Date;
 import java.util.List;
 
+import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.MailInfo;
 import com.f4education.springjwt.models.Task;
 
@@ -63,4 +64,8 @@ public interface MailerService {
 	void mailNewTask(String to[], String subject, String body, Date date, Task task);
 
 	void mailUpdateTask(String to[], String subject, String body, Date date, Task oldTask, Task newTask);
+
+	void mailNewSchedule(String to[], String subject, String body, Date date, Classes classes);
+
+	void mailUpdateSchedule(String to[], String subject, String body, Date date, Classes classes);
 }
