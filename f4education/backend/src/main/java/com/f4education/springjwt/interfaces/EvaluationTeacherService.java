@@ -16,4 +16,6 @@ public interface EvaluationTeacherService {
     public List<ReportEvaluationTeacher> getAllReportEvaluationTeacher();
 
     public EvaluationTeacher saveEvaluation(EvaluationTeacherRequest evaluationTeacherRequest);
+
+    public Boolean checkStudentHasEvaluated(Integer classId, String studentId);
 }

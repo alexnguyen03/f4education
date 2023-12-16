@@ -47,6 +47,7 @@ public class PointController {
 	public ResponseEntity<?> findPointByStudentAndClass(@RequestParam("studentId") String studentId,
 			@RequestParam("classId") Integer classId) {
 		List<PointDTO> lst = pointService.getAllPointByStudentIdAndClassId(studentId, classId);
+		System.out.println(lst);
 		return ResponseEntity.ok(lst);
 	}
 

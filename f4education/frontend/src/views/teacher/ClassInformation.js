@@ -117,69 +117,86 @@ const ClassInformation = () => {
                     <Skeleton width={'100%'} height={rem('1rem')} mb="sm" />
                 </>
             ) : (
-                <Paper
-                    withBorder
-                    radius="md"
-                    p={6}
-                    className={styles.card}
-                    onClick={() =>
-                        navigateToClassInformationDetail(c.classes.classId)
-                    }
-                >
-                    <Flex justify={'space-between'} align="center" mt="md">
-                        <ThemeIcon
-                            size="xl"
-                            radius="md"
-                            variant="gradient"
-                            gradient={{
-                                deg: 0,
-                                from: 'pink',
-                                to: 'violet'
-                            }}
-                        >
-                            <IconColorSwatch
-                                style={{ width: rem(28), height: rem(28) }}
-                                stroke={1.5}
-                            />
-                        </ThemeIcon>
-                        <Tooltip label="Tổng số sinh viên" position="top">
-                            <Alert color="indigo">
-                                {`Tổng số sinh viên: ${c.students.length}`}
-                            </Alert>
-                        </Tooltip>
-                    </Flex>
-                    <Title order={3} fw={500} mt="md">
-                        Tên Lớp: <strong>{c.classes.className}</strong>
-                    </Title>
-                    <Text size="lg" mt="sm" c="dimmed" lineClamp={2}>
-                        Khóa học: <strong> {c.courseName[0]}</strong>
-                    </Text>
-                    <Text size="lg" mt="sm" c="dimmed">
-                        Thời gian dạy:{' '}
-                        <strong>
-                            {formatDate(c.classes.startDate) === 'Invalid date'
-                                ? 'Chưa có ngày khả dụng'
-                                : formatDate(c.classes.startDate)}{' '}
-                            -{' '}
-                            {formatDate(c.classes.endDate) === 'Invalid date'
-                                ? 'Chưa có ngày khả dụng'
-                                : formatDate(c.classes.endDate)}
-                        </strong>
-                    </Text>
-                    <Flex
-                        justify="space-between"
-                        align="center"
-                        gap={5}
-                        mb={10}
+                <>
+                    <Paper
+                        withBorder
+                        radius="md"
+                        p={6}
+                        className={styles.card}
+                        onClick={() =>
+                            navigateToClassInformationDetail(c.classes.classId)
+                        }
                     >
-                        <Text size="lg" mt="sm" c="dimmed">
-                            Trạng thái lớp:
+                        <Flex justify={'space-between'} align="center" mt="md">
+                            <ThemeIcon
+                                size="xl"
+                                radius="md"
+                                variant="gradient"
+                                gradient={{
+                                    deg: 0,
+                                    from: 'pink',
+                                    to: 'violet'
+                                }}
+                            >
+                                <IconColorSwatch
+                                    style={{ width: rem(28), height: rem(28) }}
+                                    stroke={1.5}
+                                />
+                            </ThemeIcon>
+                            <Tooltip label="Tổng số sinh viên" position="top">
+                                <Alert color="indigo">
+                                    {`Tổng số sinh viên: ${c.students.length}`}
+                                </Alert>
+                            </Tooltip>
+                        </Flex>
+                        <Title order={3} fw={500} mt="md">
+                            Tên Lớp: {c.classes.className}
+                        </Title>
+                        <Text size="lg" mt="sm" c="dimmed" lineClamp={1}>
+                            Khóa học: <strong>{c.courseName[0]}</strong>
                         </Text>
-                        <Badge color="indigo" mt={12}>
-                            {c.classes.status}
-                        </Badge>
-                    </Flex>
-                </Paper>
+                        <Text size="lg" mt="sm" c="dimmed" lineClamp={1}>
+                            Thời gian dạy:{' '}
+                            <strong>
+                                {moment(c.classes.startDate).format(
+                                    'DD/mm/yyyy'
+                                ) === 'Invalid date'
+                                    ? 'Chưa có ngày khả dụng'
+                                    : moment(c.classes.startDate).format(
+                                          'DD/mm/yyyy'
+                                      )}{' '}
+                                -{' '}
+                                {moment(c.classes.endDate).format(
+                                    'DD/mm/yyyy'
+                                ) === 'Invalid date'
+                                    ? 'Chưa có ngày khả dụng'
+                                    : moment(c.classes.endDate).format(
+                                          'DD/mm/yyyy'
+                                      )}
+                            </strong>
+                        </Text>
+                        <Flex
+                            justify="space-between"
+                            align="center"
+                            gap={5}
+                            mb={10}
+                        >
+                            <Text size="lg" mt="sm" c="dimmed">
+                                Trạng thái lớp:
+                            </Text>
+                            <Badge
+                                color={
+                                    c.classes.status === 'Đang diễn ra'
+                                        ? 'indigo'
+                                        : 'yellow'
+                                }
+                                mt={12}
+                            >
+                                {c.classes.status}
+                            </Badge>
+                        </Flex>
+                    </Paper>
+                </>
             )}
         </Grid.Col>
     ))
@@ -234,6 +251,15 @@ const ClassInformation = () => {
                                     <Title order={2} fw={700} color="dark">
                                         Danh sách lớp học
                                     </Title>
+                                    <Button
+                                        color="green"
+                                        size="md"
+                                        onClick={() =>
+                                            navigate('/evaluation/teacher')
+                                        }
+                                    >
+                                        Xem đánh giá của học viên
+                                    </Button>
                                     <MediaQuery
                                         query="max-width: (780px)"
                                         styles={{ width: '100%' }}

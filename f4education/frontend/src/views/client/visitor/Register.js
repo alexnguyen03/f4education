@@ -33,7 +33,7 @@ import {
 import { create } from 'nouislider'
 const IMG_URL = '/courses/'
 const Register = () => {
-    const user = JSON.parse(localStorage.getItem('user') ?? '')
+    // const user = JSON.parse(localStorage.getItem('user') ?? '')
     const [imgData, setImgData] = useState(null)
     const [students, setStudents] = useState([])
     const [rSelected, setRSelected] = useState(null) //radio button

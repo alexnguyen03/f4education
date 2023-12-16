@@ -3,6 +3,7 @@ package com.f4education.springjwt.security.services;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
@@ -244,4 +245,18 @@ public class ClassServiceImpl implements ClassService {
 		return classResponse;
 	}
 
+	@Override
+	public Classes overClassByStatus(Integer classId) {
+		Optional<Classes> classes = classRepository.findById(classId);
+
+		if (classes.isPresent()) {
+			classes.get().setStatus("kết thúc");
+
+			System.out.println(classes.get());
+			Classes newClasses = classRepository.save(classes.get());
+			return newClasses;
+		}
+
+		return null;
+	}
 }

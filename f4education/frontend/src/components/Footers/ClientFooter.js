@@ -48,7 +48,7 @@ const ClientFooter = () => {
                                     href="mailTo:tronghientran18@gmail.com"
                                     className="text-white font-weight-300 ml-2"
                                 >
-                                    f4education@gmail.com
+                                    f4education.sp@gmail.com
                                 </a>
                             </p>
                             <p className="mt-0">

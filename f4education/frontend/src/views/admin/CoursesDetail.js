@@ -1,4 +1,4 @@
-import { Edit as EditIcon, Delete as DeleteIcon } from '@mui/icons-material'
+import { Delete as DeleteIcon, Edit as EditIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
 import { Box } from '@mui/system'
 import { MaterialReactTable } from 'material-react-table'
@@ -24,22 +24,21 @@ import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import {
     IconBookDownload,
     IconBookUpload,
-    IconFile3d,
-    IconPhoto,
+    IconFile3d, IconRefresh,
     IconUpload,
     IconX
 } from '@tabler/icons-react'
 import CoursesHeader from 'components/Headers/CoursesHeader'
 
-import { useEffect, useMemo, useState } from 'react'
 import moment from 'moment/moment'
+import { useEffect, useMemo, useState } from 'react'
 
 // API
-import courseDetailApi from '../../api/courseDetailApi'
 import courseApi from '../../api/courseApi'
+import courseDetailApi from '../../api/courseDetailApi'
 
 // Utils
-import { ToastContainer, toast } from 'react-toastify'
+import { toast, ToastContainer } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
 const CoursesDetail = () => {
@@ -57,7 +56,6 @@ const CoursesDetail = () => {
     const [showModalDelete, setShowModalDelete] = useState(false)
     const [upLoadExcel, setUploadExcel] = useState(false)
     const [isUpdate, setIsUpdate] = useState(false)
-    const [deleteId, setDeleteId] = useState('')
     const [loading, setLoading] = useState(false)
     const [loadingDropZone, setLoadingDropZone] = useState(false)
 
@@ -99,7 +97,7 @@ const CoursesDetail = () => {
         } catch (error) {
             console.error('Failed to upload file.', error)
         }
-    }
+    } 
 
     // ACTION AREA
     const handleExcelFileUpload = async () => {
@@ -116,11 +114,15 @@ const CoursesDetail = () => {
             )
 
             if (resp.status === 204) {
-                toast.update(id, Notify.options.createError())
+                toast.update(
+                    id,
+                    Notify.options.createErrorParam('Không tìm thấy file')
+                )
                 return
             }
 
-            if (resp.status === 400) {
+            if (resp.status === 403) {
+                console.log(resp.data)
                 const str = resp.data
                 const parts = str.split('_')
                 let number = 0
@@ -199,23 +201,26 @@ const CoursesDetail = () => {
         }
     }
 
-    const handleConfirmDelete = (course) => {
-        setDeleteId(course.courseDetailId)
-    }
+    // const handleConfirmDelete = (course) => {
+    //     setDeleteId(course.courseDetailId)
+    // }
 
-    const handleDeleteCourseDetail = async () => {
+    const handleDeleteCourseDetail = async (course) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
         try {
             const updatedCourseDetailList = [...courseDetail]
             const indexToDelete = updatedCourseDetailList.findIndex(
-                (courseDetail) => courseDetail.courseDetailId === deleteId
+                (courseDetail) =>
+                    courseDetail.courseDetailId === course.courseDetailId
             )
             if (indexToDelete !== -1) {
                 updatedCourseDetailList.splice(indexToDelete, 1)
             }
             setCourseDetail(updatedCourseDetailList)
 
-            const resp = await courseDetailApi.deleteCourseDetail(deleteId)
+            const resp = await courseDetailApi.deleteCourseDetail(
+                course.courseDetailId
+            )
             if (resp.status === 204) {
                 setUploadExcel(false)
                 toast.update(id, Notify.options.deleteSuccess())
@@ -227,6 +232,28 @@ const CoursesDetail = () => {
             console.error('Failed to upload file.', error)
         }
     }
+
+    // const handleDeleteAll = async () => {
+    //     const id = toast(Notify.msg.loading, Notify.options.loading())
+    //     const listCourseId = courseDetail.map((item) => item.courseDetailId)
+
+    //     console.log(listCourseId)
+    //     try {
+    //         console.log(courseDetailRequest)
+    //         const resp = await courseDetailApi.deleteAll(listCourseId)
+
+    //         if (resp.status === 204) {
+    //             setUploadExcel(false)
+    //             setShowModal(false)
+    //             toast.update(id, Notify.options.deleteSuccess())
+    //             fetchCourseDetail()
+    //             console.log('delete successfully.')
+    //         }
+    //     } catch (error) {
+    //         toast.update(id, Notify.options.deleteErrorr())
+    //         console.error('Failed delete.', error)
+    //     }
+    // }
 
     const handleDataTranfer = () => {
         const newCourseDetail = createCourseDetail.map((group) => ({
@@ -409,7 +436,7 @@ const CoursesDetail = () => {
                 </FormGroup>
             </Col>
         ))
-    }
+    } 
 
     // USE EFECT AREA
     useEffect(() => {
@@ -507,6 +534,23 @@ const CoursesDetail = () => {
                                     >
                                         <IconBookDownload /> Tải về file mẫu
                                     </Button>
+                                    {/* <Button
+                                        color="danger"
+                                        variant="contained"
+                                        onClick={() => {
+                                            handleDeleteAll()
+                                        }}
+                                    >
+                                        <DeleteIcon />
+                                        Xóa tất cả
+                                    </Button> */}
+                                    <Button
+                                        color="default"
+                                        onClick={() => fetchCourseDetail()}
+                                        variant="contained"
+                                    >
+                                        <IconRefresh />
+                                    </Button>
                                 </Box>
                             )}
                             enableRowActions
@@ -531,8 +575,9 @@ const CoursesDetail = () => {
                                     <IconButton
                                         color="danger"
                                         onClick={() => {
-                                            setShowModalDelete(true)
-                                            handleConfirmDelete(row.original)
+                                            handleDeleteCourseDetail(
+                                                row.original
+                                            )
                                         }}
                                     >
                                         <DeleteIcon className="text-danger" />
@@ -634,7 +679,7 @@ const CoursesDetail = () => {
                                             }
                                         />
                                     </Dropzone.Reject>
-                                    
+
                                     <Dropzone.Idle>
                                         <IconFile3d size="3rem" stroke={1.5} />
                                     </Dropzone.Idle>

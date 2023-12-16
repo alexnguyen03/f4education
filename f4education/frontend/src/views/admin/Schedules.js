@@ -372,7 +372,16 @@ function Schedules() {
                             ) === i
                         )
                     })
-                setListSession(uniqueSessions)
+
+                console.log(
+                    '🚀 ~ file: Schedules.js:387 ~ handleSetDate ~ uniqueSessions:',
+                    uniqueSessions
+                )
+                setListSession(
+                    uniqueSessions.sort((a, b) =>
+                        a.sessionName.localeCompare(b.sessionName)
+                    )
+                )
                 setListClassroomAndSession(resp.data)
             }
         } catch (error) {
@@ -877,7 +886,7 @@ function Schedules() {
                                                 'classroomId',
                                                 'classroomName'
                                             )}
-                                            placeholder="Chọn phòng học học"
+                                            placeholder="Chọn phòng học"
                                             onChange={(val) => {
                                                 setClassroomSelected(val)
                                             }}

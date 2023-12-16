@@ -21,6 +21,10 @@ const courseDetailApi = {
         const url = `/courses-detail/${courseDetailId}`
         return axiosClient.delete(url)
     },
+    // deleteAll: (courseDetailId) => {
+    //     const url = `/courses-detail/deleteAll`
+    //     return axiosClient.delete(url, courseDetailId)
+    // },
     uploadExcel: (file, courseId) => {
         const url = `/courses-detail/upload-excel/${courseId}`
         return axiosClient.post(url, file, {

@@ -7,6 +7,7 @@ import com.f4education.springjwt.models.AttendanceInfo;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.EvaluationTeacher;
 import com.f4education.springjwt.models.EvaluationTeacherDetail;
+import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.payload.request.EvaluationDetailInRequest;
 import com.f4education.springjwt.payload.request.EvaluationTeacherRequest;
 import com.f4education.springjwt.payload.response.EvaluationTeacherResponse;
@@ -26,6 +27,8 @@ public class EvaluationTeacherServiceImpl implements EvaluationTeacherService {
 	@Autowired(required = true)
 	EvaluationTeacherRepository evaluationTeacherRepository;
 
+	@Autowired
+	StudentServiceImpl studentService;
 	@Autowired(required = true)
 	ClassService classService;
 
@@ -43,6 +46,8 @@ public class EvaluationTeacherServiceImpl implements EvaluationTeacherService {
 	public EvaluationTeacher saveEvaluation(EvaluationTeacherRequest evaluationTeacherRequest) {
 		Classes foundClasses = classService.findById(evaluationTeacherRequest.getClassId());
 		EvaluationTeacher evaluationTeacher = new EvaluationTeacher();
+		Student foundStudent = studentService.findById(evaluationTeacherRequest.getStudentId());
+		evaluationTeacher.setStudent(foundStudent);
 		evaluationTeacher.setClasses(foundClasses);
 		evaluationTeacher.setCompleteDate(new Date());
 		EvaluationTeacher savedEvaluationTeacher = evaluationTeacherRepository.save(evaluationTeacher);
@@ -71,5 +76,10 @@ public class EvaluationTeacherServiceImpl implements EvaluationTeacherService {
 				.map(obj -> new ReportEvaluationTeacher((String) obj[0], (String) obj[1], (Integer) obj[2],
 						(Integer) obj[3], (Integer) obj[4]))
 				.collect(Collectors.toList());
+	}
+
+	@Override
+	public Boolean checkStudentHasEvaluated(Integer classId, String studentId) {
+		return evaluationTeacherRepository.checkStudentHasEvaluated(classId, studentId) > 0;
 	}
 }

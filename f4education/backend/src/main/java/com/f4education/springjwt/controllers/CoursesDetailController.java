@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -67,6 +66,7 @@ public class CoursesDetailController {
 	@GetMapping("/{courseId}")
 	public ResponseEntity<?> getAllByCourseId(@PathVariable Integer courseId) {
 		List<CourseDetailDTO> list = courseService.getAllCourseDetailByCourseId(courseId);
+		System.out.println(list);
 		return ResponseEntity.ok(list);
 	}
 
@@ -109,15 +109,31 @@ public class CoursesDetailController {
 		return ResponseEntity.badRequest().body("CourseDetail not found");
 	}
 
+	@DeleteMapping("/deleteAll")
+	public ResponseEntity<?> deleteAllCourseDetail(@RequestBody List<Integer> courseDetailId) {
+
+		courseDetailId.forEach(item -> {
+			System.out.println(courseDetailId);
+		});
+
+//		Optional<CourseDetail> existingCourse = courseDetailRepository.findById(courseDetailId);
+//		if (existingCourse.isPresent()) {
+//			courseService.deleteCourseDetail(courseDetailId);
+//			return ResponseEntity.noContent().build();
+//		}
+
+		return ResponseEntity.badRequest().body("CourseDetail not found");
+	}
+
 	@PostMapping(value = "/upload-excel/{courseId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	public ResponseEntity<?> createCourseDetailByExcelImport(@RequestParam("excelFile") Optional<MultipartFile> file,
 			@PathVariable Integer courseId) {
+
+		if (file.isEmpty()) {
+			return ResponseEntity.notFound().build();
+		}
+
 		try {
-
-			if (file.isEmpty()) {
-				return ResponseEntity.notFound().build();
-			}
-
 			// Get the file from the MultipartFile object
 			File excelFile = convertMultipartFileToFile(file.get());
 
@@ -133,46 +149,56 @@ public class CoursesDetailController {
 			// Create a list to store the data from the Excel file
 			List<List<Object>> dataList = new ArrayList<>();
 
-			// Iterate through each row in the sheet
-			for (Row row : sheet) {
+			int lastRowNum = sheet.getLastRowNum();
+			for (int i = 0; i <= lastRowNum; i++) {
+				Row row = sheet.getRow(i);
+				if (row == null) {
+					continue;
+				}
+
 				List<Object> rowData = new ArrayList<>();
+				boolean isRowEmpty = true;
 
 				// Iterate through each cell in the row
 				for (Cell cell : row) {
-					Object cellValue = getCellValue(cell);
-					rowData.add(cellValue);
+					if (cell != null) {
+						Object cellValue = getCellValue(cell);
+						rowData.add(cellValue);
+						isRowEmpty = false;
+					}
 				}
 
-				dataList.add(rowData);
+				if (!isRowEmpty) {
+					dataList.add(rowData);
+				} else {
+					System.out.println("Skipping empty row");
+				}
 			}
 
 			// Closing file input stream
 			fis.close();
 
 			// Convert data from dataList to courseDetailList
-			List<CourseDetailDTO> courseDetailList = new ArrayList<>();
-			// List saved CourseDetail
 			List<CourseDetailDTO> saveList = new ArrayList<>();
 
 			Course course = courseRepository.findById(courseId).get();
-			Integer courseDeration = (Integer) Math.round(course.getCourseDuration() / 4);
-			System.out.println(courseDeration);
-			if (dataList.size() <= (courseDeration - 1)) {
-				System.out.println(dataList.size());
-				return ResponseEntity.badRequest().body("CourseDuration_ " + (courseDeration - 1));
+			Integer courseDuration = (Integer) Math.round(course.getCourseDuration() / 4);
+
+			System.out.println(lastRowNum);
+			System.out.println(courseDuration);
+			System.out.println(dataList.size());
+
+			if (dataList.size() < (courseDuration - 1)) {
+				return ResponseEntity.status(403).body("CourseDuration_ " + courseDuration);
 			} else {
 				for (List<Object> rowData : dataList) {
-					CourseDetailDTO courseDetail = new CourseDetailDTO();
-					courseDetail.setLessionTitle((String) rowData.get(0));
-					courseDetail.setLessionContent((String) rowData.get(1));
-					courseDetail.setCourseId(courseId);
-					courseDetailList.add(courseDetail);
-				}
-
-				if (!courseDetailList.isEmpty()) {
-					courseDetailList.remove(0);
-					for (CourseDetailDTO c : courseDetailList) {
-						saveList.add(courseService.createCourseDetail(c));
+					if (rowData.size() > 2) {
+						CourseDetailDTO courseDetail = new CourseDetailDTO();
+						courseDetail.setLessionTitle((String) rowData.get(0));
+						courseDetail.setLessionContent((String) rowData.get(1));
+						courseDetail.setCourseId(courseId);
+						System.out.println(courseDetail);
+						saveList.add(courseService.createCourseDetail(courseDetail));
 					}
 				}
 			}

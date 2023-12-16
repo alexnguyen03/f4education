@@ -38,6 +38,10 @@ const evaluateApi = {
     getAllReportEvaluationTeacher: () => {
         const url = `/evaluation/report`
         return axiosClient.get(url)
+    },
+    checkStudentHasEvaluated: (classId, studentId) => {
+        const url = `/evaluation/check-has-evaluated?classId=${classId}&studentId=${studentId}`
+        return axiosClient.get(url)
     }
 }
 

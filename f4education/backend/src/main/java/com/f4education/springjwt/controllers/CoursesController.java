@@ -96,9 +96,8 @@ public class CoursesController {
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
-				String imageURL = firebaseStorageService.uploadImage(file.get(), "courses/",
-						courseRequest.getCourseName().trim());
-				System.out.println(imageURL + "========================");
+				String imageURL = firebaseStorageService.uploadImage(file.get(),
+						"courses/", courseRequest.getCourseName().trim());
 				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
 		} catch (JsonProcessingException e) {
@@ -124,8 +123,6 @@ public class CoursesController {
 				String imageURL = firebaseStorageService.uploadImage(file.get(), "courses/",
 						courseRequest.getCourseName().trim());
 				firebaseStorageService.isUpdatedNoCahe("courses/");
-				System.out.println(imageURL + "========================");
-				// File savedFile = xfileService.save(file.orElse(null), "/courses");
 				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
 		} catch (JsonProcessingException e) {

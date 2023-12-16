@@ -112,7 +112,7 @@ const Courses = () => {
         })
     }
     const hasSpecialCharacters = (inputString) => {
-        const regex = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/
+        const regex = /[!@$%^&*()_\-=\[\]{};':"\\|,.<>\?]/
         return regex.test(inputString)
     }
     const validate = () => {
