@@ -47,6 +47,13 @@ public class CoursesController {
 	@Autowired
 	FirebaseStorageService firebaseStorageService;
 
+	@GetMapping("")
+	// @PreAuthorize("hasRole('ADMIN')")
+	public ResponseEntity<?> getAllCourse() {
+		List<CourseDTO> list = courseService.findAllCourses();
+		return ResponseEntity.ok(list);
+	}
+
 	@GetMapping("/get-all")
 	public ResponseEntity<?> getAllCourse(@RequestParam(value = "studentId") Optional<String> studentId) {
 		List<CourseResponse> list = courseService.findAllCourseDTO(studentId.get());
@@ -89,9 +96,8 @@ public class CoursesController {
 		try {
 			courseRequest = mapper.readValue(courseRequestString, CourseRequest.class);
 			if (!file.isEmpty()) {
-				String imageURL = firebaseStorageService.uploadImage(file.get(), "courses/",
-						courseRequest.getCourseName().trim());
-				System.out.println(imageURL + "========================");
+				String imageURL = firebaseStorageService.uploadImage(file.get(),
+						"courses/", courseRequest.getCourseName().trim());
 				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
 		} catch (JsonProcessingException e) {
@@ -117,8 +123,6 @@ public class CoursesController {
 				String imageURL = firebaseStorageService.uploadImage(file.get(), "courses/",
 						courseRequest.getCourseName().trim());
 				firebaseStorageService.isUpdatedNoCahe("courses/");
-				System.out.println(imageURL + "========================");
-				// File savedFile = xfileService.save(file.orElse(null), "/courses");
 				courseRequest.setImage(courseRequest.getCourseName().trim());
 			}
 		} catch (JsonProcessingException e) {

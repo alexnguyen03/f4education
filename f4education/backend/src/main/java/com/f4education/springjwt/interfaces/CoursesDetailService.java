@@ -12,6 +12,8 @@ public interface CoursesDetailService {
 	CourseDetailDTO createCourseDetail(CourseDetailDTO courseDetailDTO);
 
 	CourseDetailDTO updateCourseDetail(Integer courseDetailId, CourseDetailDTO courseDetailDTO);
-	
+
 	void deleteCourseDetail(Integer courseDetailId);
+
+	Integer countCourseDetailsByClassId(Integer classId);
 }

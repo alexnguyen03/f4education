@@ -21,6 +21,10 @@ const billApi = {
     getAllByBillInformation: (studentId) => {
         const url = `/bills/bill-history/${studentId}`
         return axiosClient.get(url)
+    },
+    createRegisterCourse: (body) => {
+        const url = '/bills/create-register-course'
+        return axiosClient.post(url, body)
     }
 }
 

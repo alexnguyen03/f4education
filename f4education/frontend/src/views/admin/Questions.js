@@ -96,15 +96,15 @@ const Questions = () => {
         }
     }
 
-    // + API_AREA > CRUD
+    // API_AREA > CRUD
     const handleStoreQuestions = async () => {
-        const id = null
+        let id = null
         if (validateForm()) {
+            id = toast(Notify.msg.loading, Notify.options.loading())
             try {
-                id = toast(Notify.msg.loading, Notify.options.loading())
                 setQuestionLoading(true)
                 const resp = await questionApi.createQuestion(question)
-                if (resp.status === 200 && resp.data.length > 0) {
+                if (resp.status === 200) {
                     toast.update(id, Notify.options.createSuccess())
                 }
             } catch (error) {
@@ -115,10 +115,8 @@ const Questions = () => {
                 setShowModal(false)
                 fetchQuestions()
                 handleClearForm()
-                toast.update(id, Notify.options.createError())
             }
         } else {
-            toast.update(id, Notify.options.createError())
             console.log('error in validate')
         }
     }
@@ -130,13 +128,15 @@ const Questions = () => {
 
     // *************** Validation area
     const validateForm = () => {
+        let isValid = true
         if (selectedSubjectId === null) {
             setMsgForm((preErr) => ({
                 ...preErr,
                 subjectNameError: 'Vui lòng chọn môn học'
             }))
+            isValid = false
         } else {
-            setMsgForm((preErr) => ({ ...preErr, subjectNameError: '' }))
+            setMsgForm((prevErr) => ({ ...prevErr, subjectNameError: '' }))
         }
 
         if (selectedCourseId === null) {
@@ -144,14 +144,12 @@ const Questions = () => {
                 ...preErr,
                 courseNameErr: 'Vui lòng chọn khóa học'
             }))
+            isValid = false
         } else {
-            setMsgForm((preErr) => ({ ...preErr, courseNameErr: '' }))
+            setMsgForm((prevErr) => ({ ...prevErr, courseNameErr: '' }))
         }
 
-        if (msgForm.courseNameErr !== '' || msgForm.subjectNameError !== '') {
-            return false
-        }
-        return true
+        return isValid
     }
 
     // *************** React Data table area

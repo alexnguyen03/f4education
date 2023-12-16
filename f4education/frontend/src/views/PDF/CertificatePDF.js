@@ -92,8 +92,6 @@ const styles = StyleSheet.create({
 })
 
 const CertificatePDF = () => {
-    const user = JSON.parse(localStorage.getItem('user'))
-
     // QR code
     const [qrCodeImage, setQrCodeImage] = useState('')
 
@@ -120,7 +118,7 @@ const CertificatePDF = () => {
                     setCertificate(resp.data)
 
                     const str = resp.data.certificateName
-                    const prefix = 'Chứng chỉ khóa học'
+                    const prefix = 'Chứng chỉ xác nhận hoàn thành khóa học'
                     const value = str
                         .substring(str.indexOf(prefix) + prefix.length)
                         .trim()

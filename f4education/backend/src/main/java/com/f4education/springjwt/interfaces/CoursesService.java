@@ -27,8 +27,10 @@ public interface CoursesService {
 
 	List<CourseDTO> findAllByAdminId(String adminId);
 
+	List<CourseDTO> findAllCourses();
+
 	List<CourseResponse> findBySubjectNames(List<String> subjectNames, String studentId);
-	
+
 	List<CourseResponse> findByRating(Integer rating, String studentId);
 
 	List<CourseDTO> findByThoiLuongInRange(List<String> checkedDurations);

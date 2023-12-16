@@ -275,9 +275,7 @@ const Checkout = () => {
         }))
 
         try {
-            await registerCourseApi.createRegisterCourse(
-                registerCourseRequest[0]
-            )
+            await billApi.createRegisterCourse(registerCourseRequest[0])
         } catch (error) {
             console.log('RegisterCourse: ' + error)
         }
@@ -345,7 +343,7 @@ const Checkout = () => {
             setCount((prevCount) => prevCount - 1)
         }, 1000)
         return () => clearTimeout(timer)
-    }, [count, handlePaymentPayPalComplete])
+    }, [count, checkoutComplete, handlePaymentPayPalComplete])
 
     useEffect(() => {
         const timeoutRedirect = setTimeout(() => {
@@ -589,7 +587,7 @@ const Checkout = () => {
                                                                 cart.course
                                                                     .reviewNumber
                                                             }{' '}
-                                                            đánh giá) - {' '}
+                                                            đánh giá) -{' '}
                                                             {
                                                                 cart.course
                                                                     .totalStudent
@@ -928,7 +926,8 @@ const Checkout = () => {
                                                     checkoutComplete.status ===
                                                     'success'
                                                 ) {
-                                                    navigate('/cart', {
+                                                    navigate({
+                                                        pathname: '/cart',
                                                         search: `?${createSearchParams(
                                                             {
                                                                 checkoutComplete: true

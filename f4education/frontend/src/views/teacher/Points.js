@@ -1,7 +1,7 @@
 import {
-    Box,
     Button,
     Center,
+    Flex,
     Group,
     Modal,
     NumberInput,
@@ -12,17 +12,30 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { Edit as EditIcon } from '@mui/icons-material'
-import { IconButton } from '@mui/material'
+import { Box, IconButton } from '@mui/material'
+import { pdf, usePDF } from '@react-pdf/renderer'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import MaterialReactTable from 'material-react-table'
-import { useEffect, useMemo, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import moment from 'moment/moment'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { toast, ToastContainer } from 'react-toastify'
+
+// API
+import certificateApi from '../../api/certificateApi'
 import pointApi from '../../api/pointApi'
+import classApi from '../../api/classApi'
+import scheduleApi from '../../api/scheduleApi'
+
+// Utils
 import Notify from '../../utils/Notify'
-import { ToastContainer, toast } from 'react-toastify'
+
+// component Import
+import CertificateDownload from '../PDF/CertificateDownload'
 
 const Points = () => {
     const params = useParams()
+    let navigate = useNavigate()
     const [listPoint, setListPoint] = useState({
         pointId: 0,
         studentName: '',
@@ -48,6 +61,11 @@ const Points = () => {
         averagePoint: 0
     })
     const [loadingGetAllPoint, setLoadingGetAllPoint] = useState(false)
+
+    // certificate variable
+    const [classIsFinish, setClassIsFinish] = useState(false)
+    const certificateIdRef = useRef()
+
     const getAllPointsByClassId = async () => {
         try {
             setLoadingGetAllPoint(true)
@@ -62,7 +80,9 @@ const Points = () => {
                             quizzPoint,
                             attendancePoint,
                             studentName,
-                            studentId
+                            studentId,
+                            registerCourseId,
+                            courseName
                         } = { ...item }
 
                         return {
@@ -72,7 +92,9 @@ const Points = () => {
                             quizzPoint: quizzPoint,
                             attendancePoint: attendancePoint,
                             exercisePoint: exercisePoint,
-                            averagePoint: averagePoint
+                            averagePoint: averagePoint,
+                            registerCourseId: registerCourseId,
+                            courseName: courseName
                         }
                     })
                 )
@@ -95,6 +117,7 @@ const Points = () => {
         handlersEditModal.open()
         setEditPoint({ ...point })
     }
+
     const handleOnChangeExercisePoint = (val) => {
         console.log(typeof val)
         if (val === '') {
@@ -112,6 +135,7 @@ const Points = () => {
             }))
         }
     }
+
     const handleAgreeEditPoint = () => {
         handlersEditModal.close()
 
@@ -152,6 +176,7 @@ const Points = () => {
             setListEditedPoint([...listEditedPoint, editPoint])
         }
     }
+
     const handleSavePoint = async () => {
         try {
             toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
@@ -172,6 +197,7 @@ const Points = () => {
             )
         }
     }
+
     const renderAveragePoint = () => {
         const avgPoint =
             editPoint.attendancePoint * 0.1 +
@@ -179,6 +205,7 @@ const Points = () => {
             editPoint.quizzPoint * 0.5
         return avgPoint.toFixed(2)
     }
+
     //! KIEM TRA LAI DIEM CHUYEN CAN VA DIEM QUIZZ
     const columnsPoints = useMemo(
         () => [
@@ -236,12 +263,177 @@ const Points = () => {
         []
     )
 
+    // Check for certificateId and end class
+    const handleCheckIfClassIsClose = async () => {
+        try {
+            const resp = await scheduleApi.getScheduleByClassId(params.classId)
+            console.log(resp.data)
+
+            if (resp.status === 200) {
+                const respData = resp.data
+                const today = moment(new Date())
+                const lastItem =
+                    respData.listSchedules[respData.listSchedules.length - 1]
+
+                if (today.isAfter(moment(lastItem.studyDate))) {
+                    setClassIsFinish(true)
+                    return console.log('class is Done')
+                } else {
+                    setClassIsFinish(false)
+                    return console.log('class is studying')
+                }
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    const [instance, updateInstance] = usePDF({
+        document: (
+            <CertificateDownload
+                certificateId={
+                    parseInt(certificateIdRef.current)
+                        ? parseInt(certificateIdRef.current)
+                        : 18
+                }
+            />
+        )
+    })
+
+    const awaitComplete = (isComplete) => {
+        return isComplete ? true : false
+    }
+
+    const handleEndClassAndSendCertificate = async () => {
+        const filterData = listPoint.filter((item) => item.averagePoint > 5)
+
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        const listCertificate = filterData.map((item) => {
+            return {
+                certificateName: `Chứng chỉ xác nhận hoàn thành khóa học ${item.courseName}`,
+                registerCourseId: item.registerCourseId
+            }
+        })
+
+        if (filterData.length > 0) {
+            try {
+                const resp = await certificateApi.createCertificate(
+                    listCertificate
+                )
+                if (resp.status === 200) {
+                    console.log(resp.data)
+
+                    const updatedListCertificateDownload = []
+
+                    for (let i = 0; i < resp.data.length; i++) {
+                        const item = resp.data[i]
+                        certificateIdRef.current = item.certificateId
+
+                        // await Promise.all([
+                        //     updateInstance(
+                        //         <CertificateDownload
+                        //             certificateId={parseInt(
+                        //                 certificateIdRef.current
+                        //             )}
+                        //             awaitComplete={awaitComplete}
+                        //         />
+                        //     )
+                        // ])
+
+                        const blob = await pdf(
+                            <CertificateDownload
+                                certificateId={parseInt(
+                                    certificateIdRef.current
+                                )}
+                            />
+                        ).toBlob()
+
+                        console.log(blob)
+
+                        updatedListCertificateDownload.push({
+                            blob: blob,
+                            certificateId: item.certificateId
+                        })
+                    }
+
+                    await handleDownloadAndSendMail(
+                        updatedListCertificateDownload
+                    )
+
+                    await handleEndClass(params.classId)
+
+                    toast.update(
+                        id,
+                        Notify.options.createSuccessParam(
+                            'Gửi chứng nhận và kết thúc lớp học thành công'
+                        )
+                    )
+                }
+            } catch (error) {
+                console.log(error)
+            }
+        } else {
+            console.log('filter null')
+        }
+    }
+
     useEffect(() => {
         getAllPointsByClassId()
+        handleCheckIfClassIsClose()
     }, [])
+
+    const handleDownloadAndSendMail = async (
+        updatedListCertificateDownload
+    ) => {
+        try {
+            const formData = new FormData()
+
+            const listBlob = updatedListCertificateDownload.map(
+                (item) => item.blob
+            )
+            const listCertoficates = updatedListCertificateDownload.map(
+                (item) => item.certificateId
+            )
+            console.log(listBlob)
+            console.log(listCertoficates)
+
+            for (const blob of listBlob) {
+                formData.append('files', blob)
+            }
+            for (const certificateId of listCertoficates) {
+                formData.append('certificateIds', certificateId)
+            }
+            // formData.append('files', ...listBlob)
+            // formData.append('certificateIds', ...listCertoficates)
+
+            for (const pair of formData.entries()) {
+                console.log(pair[0], pair[1])
+            }
+
+            const response = await certificateApi.downloadCertificate(formData)
+            console.log(response.data)
+        } catch (error) {
+            console.error('Error uploading files:', error)
+        }
+    }
+
+    const handleEndClass = async (classId) => {
+        try {
+            const resp = await classApi.endClass(classId)
+
+            if (resp.status === 200) {
+                console.log('close class')
+                navigate('/teacher/class-infor')
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <div>
-            <ToastContainer />{' '}
+            <ToastContainer />
+
             <MaterialReactTable
                 muiTableBodyProps={{
                     sx: {
@@ -270,14 +462,26 @@ const Points = () => {
                 columns={columnsPoints}
                 data={listPoint}
                 renderTopToolbarCustomActions={() => (
-                    <Button
-                        onClick={() => {
-                            handleSavePoint()
-                        }}
-                        color="blue"
-                    >
-                        <IconDeviceFloppy /> Lưu thay đổi
-                    </Button>
+                    <Flex justify="left" gap={10} align="center">
+                        <Button
+                            onClick={() => {
+                                handleSavePoint()
+                            }}
+                            color="blue"
+                        >
+                            <IconDeviceFloppy /> Lưu thay đổi
+                        </Button>
+                        {classIsFinish && (
+                            <Button
+                                onClick={() => {
+                                    handleEndClassAndSendCertificate()
+                                }}
+                                color="violet"
+                            >
+                                Kết thúc khóa học
+                            </Button>
+                        )}
+                    </Flex>
                 )}
                 enableRowActions
                 renderRowActions={({ row, table }) => (
@@ -306,6 +510,7 @@ const Points = () => {
                     showLastButton: true
                 }}
             />
+
             {/* Modals */}
             <Modal.Root
                 opened={editModal}

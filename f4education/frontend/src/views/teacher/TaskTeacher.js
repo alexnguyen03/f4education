@@ -16,7 +16,7 @@ import { IconButton } from '@mui/material'
 import { MaterialReactTable } from 'material-react-table'
 import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { Col, Form, FormGroup, Input, Row } from 'reactstrap'
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
@@ -59,6 +59,8 @@ const TaskTeacher = () => {
 
     const [schedulesFillter, setSchedulesFillter] = useState([])
 
+    const { classId } = useParams()
+
     //! useState chứa 1 buổi dạy của giảng viên
     const [schedule, setSchedule] = useState({
         date: '',
@@ -98,39 +100,22 @@ const TaskTeacher = () => {
             startDate: startDate,
             endDate: endDate,
             description: row.original.description,
-            classesId: 6
+            classesId: row.original.classesId
         })
         handlers.open()
-    }
-
-    //! fetch lịch dạy của giảng viên
-    const fetchClassByTeacher = async () => {
-        try {
-            setLoading(true)
-            const resp = await scheduleApi.findAllScheduleTeacherByID(user.id)
-            if (resp.status === 200 && resp.data.length > 0) {
-                let data = resp.data
-                setSchedules(data)
-                let dataFilter = await filler(data, datepicker)
-                setSchedulesFillter([...dataFilter])
-            }
-            setLoading(false)
-        } catch (error) {
-            console.log(error)
-        }
     }
 
     const getTasks = async () => {
         try {
             setLoading(true)
-            const resp = await taskTeacherApi.getAllTask(6)
+            const resp = await taskTeacherApi.getAllTask(classId)
             if (resp.status === 200 && resp.data.length > 0) {
                 let data = resp.data
                 console.log(
                     '🚀 ~ file: TaskTeacher.js:98 ~ getTasks ~ data:',
                     data
                 )
-                setTasks(data)
+                setTasks(data.reverse())
             }
             setLoading(false)
         } catch (error) {
@@ -306,10 +291,6 @@ const TaskTeacher = () => {
     }
 
     const handelOnChangeInput = (e) => {
-        console.log(
-            '🚀 ~ file: TaskTeacher.js:259 ~ handelOnChangeInput ~ e.target:',
-            e.target
-        )
         const { name, value } = e.target
 
         // Xử lý cho các trường input khác (không phải ngày tháng)
@@ -321,11 +302,6 @@ const TaskTeacher = () => {
     }
 
     const handelOnChangeInputDate = (date) => {
-        console.log(
-            '🚀 ~ file: TaskTeacher.js:259 ~ handelOnChangeInput ~ e.target:',
-            date
-        )
-
         // Chuyển đổi giá trị ngày tháng sang đối tượng ngày JavaScript
         setTask((preTask) => ({
             ...preTask,
@@ -341,28 +317,59 @@ const TaskTeacher = () => {
             description: '',
             startDate: '',
             endDate: '',
-            classesId: 6
+            classesId: classId
         },
 
         // functions will be used to validate values at corresponding key
         validate: {
             title: (value) => {
                 if (value === '') {
-                    return 'Không để trống tên gọi'
+                    return 'Không để trống tên bài tập'
+                }
+
+                return null
+            },
+            startDate: (value) => {
+                if (value === '') {
+                    return 'Vui lòng chọn thời gian bắt đầu'
+                }
+                const now = new Date()
+                const startDate = new Date(value)
+                const rangeTime = (startDate - now) / 1000
+                if (rangeTime < 0) {
+                    return 'Thời gian bắt đầu ít nhất từ thời điểm hiện tại'
                 }
                 return null
             },
-            startDate: (value) =>
-                value === '' ? 'Vui lòng chọn thời gian bắt đầu' : null,
-            endDate: (value) =>
-                value === '' ? 'Vui lòng chọn thời gian kết thúc' : null,
+
+            endDate: (value, values) => {
+                if (value === '') {
+                    return 'Vui lòng chọn thời gian kết thúc'
+                }
+
+                const now = new Date()
+                const endDate = new Date(value)
+                const rangeTime_now = (endDate - now) / 1000
+                if (rangeTime_now < 3600) {
+                    return 'Thời gian kết thúc ít nhất 1 giờ từ thời điểm hiện tại'
+                }
+                const startDate = new Date(values.startDate)
+
+                const rangeTime = (endDate - startDate) / 1000
+                if (rangeTime < 3600) {
+                    return 'Thời gian giao bài tập tối thiểu là 1 tiếng'
+                }
+                return null
+            },
             description: (value) =>
-                value === '' ? 'Không để trống miêu tả' : null
+                value === '' ? 'Không để trống mô tả' : null
         }
     })
 
     useEffect(() => {
         getTasks()
+        const a = localStorage.getItem('hehe')
+        console.log('🚀 ~ file: TaskTeacher.js:362 ~ useEffect ~ a:', a)
     }, [])
 
     return (
@@ -385,31 +392,36 @@ const TaskTeacher = () => {
                                     label="Thời gian bắt đầu"
                                     placeholder="Thời gian bắt đầu..."
                                     maw={400}
+                                    clearable
+                                    minDate={new Date()}
                                     maxDate={form.values.endDate}
                                     {...form.getInputProps('startDate')}
                                     mx="auto"
                                 />
                                 <DateTimePicker
                                     mt="sm"
+                                    clearable
                                     valueFormat="DD/MM/YYYY HH:mm"
                                     label="Thời gian kết thúc"
                                     placeholder="Thời gian bắt đầu..."
                                     maw={400}
-                                    minDate={form.values.startDate}
+                                    minDate={
+                                        form.values.startDate || new Date()
+                                    }
                                     {...form.getInputProps('endDate')}
                                     mx="auto"
                                 />
                                 <TextInput
                                     mt="sm"
-                                    label="Tên gọi"
+                                    label="Tên bài tập"
                                     placeholder="Tên gọi bài tập..."
                                     name="title"
                                     {...form.getInputProps('title')}
                                 />
                                 <Textarea
                                     mt="sm"
-                                    label="Miêu tả"
-                                    placeholder="Miêu tả bài tập..."
+                                    label="Mô tả"
+                                    placeholder="Mô tả bài tập..."
                                     {...form.getInputProps('description')}
                                 />
                                 <Button type="submit" mt="sm">
@@ -447,10 +459,19 @@ const TaskTeacher = () => {
                             enableColumnOrdering
                             enableStickyHeader
                             renderTopToolbarCustomActions={() => (
-                                <Button onClick={addTask} color="green">
-                                    <i className="bx bx-layer-plus"></i>
-                                    Thêm task mới
-                                </Button>
+                                <div>
+                                    <Button onClick={addTask} color="green">
+                                        <i className="bx bx-layer-plus"></i>
+                                        Giao thêm bài tập
+                                    </Button>
+                                    <Button
+                                        onClick={getTasks}
+                                        className="ml-2"
+                                        color="green"
+                                    >
+                                        <i class="fa-solid fa-arrows-rotate"></i>
+                                    </Button>
+                                </div>
                             )}
                             displayColumnDefOptions={{
                                 'mrt-row-numbers': {

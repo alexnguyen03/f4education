@@ -6,6 +6,10 @@ const courseApi = {
         const url = `/courses/get-all?studentId=${studentId}`
         return axiosClient.get(url)
     },
+    getAll: () => {
+        const url = '/courses'
+        return axiosClient.get(url)
+    },
     getAllCourseHistory: () => {
         const url = '/courses-history'
         return axiosClient.get(url)

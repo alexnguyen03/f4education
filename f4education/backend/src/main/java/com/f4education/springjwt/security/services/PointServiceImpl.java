@@ -15,11 +15,13 @@ import com.f4education.springjwt.models.AttendanceInfo;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.Point;
 import com.f4education.springjwt.models.QuizResultInfo;
+import com.f4education.springjwt.models.RegisterCourse;
 import com.f4education.springjwt.payload.response.PointDTO;
 import com.f4education.springjwt.payload.response.PointResponse;
 import com.f4education.springjwt.payload.response.TeacherResultOfStudentResponse;
 import com.f4education.springjwt.repository.ClassRepository;
 import com.f4education.springjwt.repository.PointRepository;
+import com.f4education.springjwt.repository.RegisterCourseRepository;
 
 @Service
 public class PointServiceImpl implements PointService {
@@ -32,9 +34,12 @@ public class PointServiceImpl implements PointService {
 
 	@Autowired(required = true)
 	AttendanceService attendanceService;
-	
+
 	@Autowired()
 	ClassRepository classRepository;
+
+	@Autowired
+	RegisterCourseRepository registerCourseRepository;
 
 	@Override
 	public PointDTO findAllByPointId(Integer pointId) {
@@ -98,8 +103,8 @@ public class PointServiceImpl implements PointService {
 	}
 
 	public PointDTO convertEntityToDTO(Point entity) {
-
 		PointDTO pointDTO = new PointDTO();
+
 		pointDTO.setPointId(entity.getPointId());
 		pointDTO.setAttendancePoint((double) entity.getAttendancePoint());
 		pointDTO.setQuizzPoint(entity.getQuizzPoint());
@@ -108,6 +113,18 @@ public class PointServiceImpl implements PointService {
 		pointDTO.setExercisePoint(entity.getExercisePoint());
 		pointDTO.setStudentName(entity.getStudent().getFullname());
 		pointDTO.setStudentImage(entity.getStudent().getImage());
+		List<RegisterCourse> list = registerCourseRepository.findAllByClasses_ClassId(entity.getClasses().getClassId());
+
+		if (list.size() > 0) {
+			list.forEach(item -> {
+				if (item.getStudent().getStudentId().equals(entity.getStudent().getStudentId())) {
+					System.out.println(item.getStudent().getStudentId());
+					pointDTO.setRegisterCourseId(item.getRegisterCourseId());
+					pointDTO.setCourseName(item.getCourse().getCourseName());
+				}
+			});
+		}
+
 		return pointDTO;
 	}
 
@@ -124,7 +141,7 @@ public class PointServiceImpl implements PointService {
 
 		return pointDTO;
 	}
-	
+
 	private List<TeacherResultOfStudentResponse> convertToTeacherResultOfStudentResponse(Classes classes,
 			Integer classId) {
 		List<TeacherResultOfStudentResponse> resultList = new ArrayList<>();
@@ -132,7 +149,7 @@ public class PointServiceImpl implements PointService {
 		if (classes.getClassId().equals(classId)) {
 			for (Point po : classes.getPoints()) {
 				TeacherResultOfStudentResponse result = new TeacherResultOfStudentResponse();
-				
+
 //				result.setClasses(classes);
 				result.setStudentId(po.getStudent().getStudentId());
 				result.setStudentName(po.getStudent().getFullname());
@@ -157,5 +174,3 @@ public class PointServiceImpl implements PointService {
 				.collect(Collectors.toList());
 	}
 }
-
-

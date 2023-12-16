@@ -51,6 +51,7 @@ import styles from '../../../assets/scss/custom-module-scss/client-custom/course
 import courseDetailApi from '../../../api/courseDetailApi'
 import courseApi from '../../../api/courseApi'
 import evaluateApi from '../../../api/evaluateApi'
+import ClientModal from 'components/modals/ClientModal'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -113,6 +114,7 @@ function CourseDetailClient() {
         registerCourseId: ''
     })
     const [isUpdateEvaluate, setIsUpdateEvaluate] = useState(false)
+    const [modalLogin, setModalLogin] = useState(false)
 
     // PAGINATION
     const [currentPage, setCurrentPage] = useState(1)
@@ -140,14 +142,10 @@ function CourseDetailClient() {
         try {
             const resp = await courseApi.getCourseByCourseId(
                 params.courseId,
-                user !== null ? user.username : 'nouser'
+                user !== null ? user.username : ''
             )
-
-            console.log(resp.data)
             if (resp.status === 200) {
                 setCourse(resp.data)
-            } else if (resp.status === 204) {
-                console.log('no content')
             }
         } catch (error) {
             console.log(error)
@@ -162,7 +160,6 @@ function CourseDetailClient() {
 
             if (resp.status === 200) {
                 setNewstCourse(resp.data)
-                console.log(resp.data)
             } else if (resp.status === 204) {
                 console.log('no content')
             }
@@ -188,6 +185,20 @@ function CourseDetailClient() {
 
             if (resp.status === 200) {
                 setListEvaluate(resp.data)
+
+                resp.data.forEach((item) => {
+                    if (item.studentId === user.username) {
+                        setEvaluateRequest({
+                            evaluateId: item.evaluateId,
+                            content: item.content,
+                            rating: item.rating,
+                            studentId: item.studentId,
+                            registerCourseId: item.registerCourseId
+                        })
+                    } else {
+                        handleResetEvaluate()
+                    }
+                })
             }
         } catch (error) {
             console.log(error)
@@ -382,18 +393,20 @@ function CourseDetailClient() {
     }
 
     const handleCheckOut = async (course) => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
+        
         if (user === null) {
-            toast.update(
-                id,
-                Notify.options.createErrorParam(
-                    'Vui lòng đăng nhập trước khi thanh toán'
-                )
-            )
+            // toast.update(
+            //     id,
+            //     Notify.options.createErrorParam(
+            //         'Vui lòng đăng nhập trước khi thanh toán'
+            //     )
+            // )
+            setModalLogin(true)
             return
         }
-
+        
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        
         try {
             const selectedCart = await handleAddCart(course)
 
@@ -460,9 +473,19 @@ function CourseDetailClient() {
         }
     }
 
+    const handleCloseModal = (isOpen) => {
+        isOpen === true && setModalLogin(false)
+    }
+
     return (
         <>
             <ToastContainer />
+
+           {/* Modal login */}
+            <ClientModal
+                isOpen={modalLogin}
+                handleCloseModal={handleCloseModal}
+            />
 
             {/* Top banner */}
             <Box mt={rem('2rem')} bg="#2d2f31">
@@ -848,7 +871,7 @@ function CourseDetailClient() {
                                                     </>
                                                 )}
 
-                                                <Stack align="start" mb="sm">
+                                                <Stack align="start" p="sm">
                                                     <Text
                                                         color="dark"
                                                         fw={700}
@@ -1298,7 +1321,7 @@ function CourseDetailClient() {
                                 niệm cơ bản cũng như:
                                 <List withPadding>
                                     <List.Item>
-                                        rút trích nội dung trang web
+                                        Rút trích nội dung trang web
                                     </List.Item>
                                     <List.Item>
                                         Phân tích cú pháp bảng tính PDF và Excel

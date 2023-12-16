@@ -6,7 +6,6 @@ import {
     Button,
     Card,
     Container,
-    Divider,
     Flex,
     getStylesRef,
     Grid,
@@ -41,6 +40,7 @@ import Dots from '../../../utils/Dots'
 // scss import
 import classes from '../../../assets/scss/custom-module-scss/client-custom/home/FeaturesAsymmetrical.module.scss'
 import classHeroText from '../../../assets/scss/custom-module-scss/client-custom/home/HeroText.module.scss'
+import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
 
 // API
 import { Link, useNavigate } from 'react-router-dom'
@@ -48,8 +48,13 @@ import courseApi from '../../../api/courseApi'
 import evaluateApi from '../../../api/evaluateApi'
 
 import { toast, ToastContainer } from 'react-toastify'
-import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
+
+// Component import
+import ClientModal from '../../../components/modals/ClientModal'
+
+// Utils
 import Notify from '../../../utils/Notify'
+import { formatCurrency } from '../../../utils/formater'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -115,6 +120,7 @@ const Home = () => {
     const [listEvaluate, SetListEvaluate] = useState([])
     const [loading, setLoading] = useState(false)
     const [scroll, scrollTo] = useWindowScroll()
+    const [modalLogin, setModalLogin] = useState(false)
 
     const fetchNewestCourse = async () => {
         setLoading(true)
@@ -247,18 +253,19 @@ const Home = () => {
 
     const handleCheckOutNow = async (course, e) => {
         e.preventDefault()
-        const id = toast(Notify.msg.loading, Notify.options.loading())
 
         if (user === null) {
-            toast.update(
-                id,
-                Notify.options.createErrorParam(
-                    'Vui lòng đăng nhập trước khi thanh toán'
-                )
-            )
+            // toast.update(
+            //     id,
+            //     Notify.options.createErrorParam(
+            //         'Vui lòng đăng nhập trước khi thanh toán'
+            //     )
+            // )
+            setModalLogin(true)
             return
         }
 
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         try {
             const selectedCart = await handleAddCart(course, e)
 
@@ -269,6 +276,10 @@ const Home = () => {
             toast.update(id, Notify.options.createError())
             console.log(error)
         }
+    }
+
+    const handleCloseModal = (isOpen) => {
+        isOpen === true && setModalLogin(false)
     }
 
     const navigateToStudent = (e) => {
@@ -302,7 +313,9 @@ const Home = () => {
                                     <Text>
                                         {learn.rating === 'NaN'
                                             ? 0
-                                            : learn.rating}
+                                            : parseFloat(learn.rating).toFixed(
+                                                  1
+                                              )}
                                     </Text>
                                     <Group position="center">
                                         <Rating
@@ -322,10 +335,7 @@ const Home = () => {
                             </Box>
                             <Box>
                                 <Text fw={500}>
-                                    {learn.coursePrice.toLocaleString('it-IT', {
-                                        style: 'currency',
-                                        currency: 'VND'
-                                    })}
+                                    {formatCurrency(learn.coursePrice)}
                                 </Text>
                             </Box>
                         </Box>
@@ -412,7 +422,9 @@ const Home = () => {
                     <Box>
                         <Flex justify="flex-start" gap="sm">
                             <Text>
-                                {learn.rating === 'NaN' ? 0 : learn.rating}
+                                {learn.rating === 'NaN'
+                                    ? 0
+                                    : parseFloat(learn.rating).toFixed(1)}
                             </Text>
                             <Group position="center">
                                 <Rating
@@ -430,10 +442,7 @@ const Home = () => {
                     </Box>
                     <Box>
                         <Text fw={500}>
-                            {learn.coursePrice.toLocaleString('it-IT', {
-                                style: 'currency',
-                                currency: 'VND'
-                            })}
+                            {formatCurrency(learn.coursePrice)}
                         </Text>
                     </Box>
                 </Box>
@@ -620,6 +629,12 @@ const Home = () => {
         <>
             <ToastContainer />
 
+            {/* Modal login */}
+            <ClientModal
+                isOpen={modalLogin}
+                handleCloseModal={handleCloseModal}
+            />
+
             <Container size="xl">
                 {/* Hero section */}
                 <Group className={classHeroText.wrapper} size={1400}>
@@ -740,7 +755,7 @@ const Home = () => {
                     </SimpleGrid>
                 </Group>
 
-                {/* what learn nexxt */}
+                {/* newest course*/}
                 <Box mt={rem('1rem')}>
                     <Title order={1} mt="lg" fw={700} color="dark">
                         Những khóa học mới nhất

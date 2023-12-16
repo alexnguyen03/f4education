@@ -7,10 +7,6 @@ const classRoomApi = {
         return axiosClient.get(url)
     },
     getAllClassRoomAvailblBySessionId: (startDate) => {
-        console.log(
-            '🚀 ~ file: classRoomApi.js:22 ~ classRoomApi.startDate:',
-            classRoomApi.startDate
-        )
         const url = `/classroom/session`
         return axiosClient.post(url, startDate)
     },

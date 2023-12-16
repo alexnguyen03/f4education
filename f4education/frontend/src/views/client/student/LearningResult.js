@@ -58,12 +58,24 @@ const LearningResult = () => {
                         classes.classId
                     )
 
+                    console.log(pointData)
+
                     const newClassesData = {
                         ...classes,
-                        averagePoint: pointData.averagePoint,
-                        attendancePoint: pointData.attendancePoint,
-                        exercisePoint: pointData.exercisePoint,
-                        quizzPoint: pointData.quizzPoint
+                        averagePoint:
+                            pointData !== undefined
+                                ? pointData.averagePoint
+                                : 0,
+                        attendancePoint:
+                            pointData !== undefined
+                                ? pointData.attendancePoint
+                                : 0,
+                        exercisePoint:
+                            pointData !== undefined
+                                ? pointData.exercisePoint
+                                : 0,
+                        quizzPoint:
+                            pointData !== undefined ? pointData.quizzPoint : 0
                     }
 
                     resultClass.push(newClassesData)

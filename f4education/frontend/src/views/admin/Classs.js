@@ -192,7 +192,7 @@ const Classs = () => {
         try {
             setLoading(true)
             const resp = await classApi.getAllClass()
-
+            console.log('🚀 ~ file: Classs.js:195 ~ getDataClass ~ resp:', resp)
             if (resp.status === 200) {
                 setLoading(false)
                 setClassses(resp.data)
@@ -276,9 +276,39 @@ const Classs = () => {
                 size: 100
             },
             {
+                accessorKey: 'teacher.fullname',
+                header: 'Giáo viên',
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row === undefined)
+                        return <Badge color="warning">Chưa có giáo viên</Badge>
+                    else return row
+                },
+                size: 100
+            },
+            {
+                accessorKey: 'courseName',
+                header: 'Tên khóa học',
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row === null)
+                        return <Badge color="warning">Chưa có khóa học</Badge>
+                    else return row
+                },
+                size: 100
+            },
+            {
                 accessorKey: 'startDate',
                 accessorFn: (row) => formatDate(row.startDate),
                 header: 'Ngày bắt đầu',
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row.startDate !== null) {
+                        return <span>{formatDate(row.startDate)}</span>
+                    } else {
+                        return <span>Chưa bắt đầu</span>
+                    }
+                },
                 size: 90
             },
             {
@@ -308,6 +338,16 @@ const Classs = () => {
             {
                 accessorKey: 'status',
                 header: 'Trạng thái',
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    if (row === 'Đang diễn ra') {
+                        return <Badge color="info">{row}</Badge>
+                    } else if (row === 'Đang chờ') {
+                        return <Badge color="primary">{row}</Badge>
+                    } else if (row === 'Kết thúc') {
+                        return <Badge color="success">{row}</Badge>
+                    }
+                },
                 size: 95
             }
         ],
@@ -334,6 +374,7 @@ const Classs = () => {
             {
                 accessorKey: 'className',
                 header: 'Tên lớp học',
+
                 size: 100
             },
             {
@@ -463,7 +504,7 @@ const Classs = () => {
                                         size: 100
                                     }
                                 }}
-                                enableColumnResizing
+                                // enableColumnResizing
                                 enableGrouping
                                 enableStickyHeader
                                 enableStickyFooter

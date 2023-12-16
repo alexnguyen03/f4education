@@ -25,6 +25,9 @@ public class CertificateServiceImp implements CertificateService {
 	@Autowired
 	private RegisterCourseRepository registerCourseRepository;
 
+	@Autowired
+	MailerServiceImpl mailer;
+
 	@Override
 	public List<CertificateResponse> getAllCertificate() {
 		return certificateRepository.findAll().stream().map(this::convertToReponseDTO).collect(Collectors.toList());
@@ -38,7 +41,8 @@ public class CertificateServiceImp implements CertificateService {
 
 	@Override
 	public CertificateResponse findCertificateByRegisterCourseAndStudentId(Integer registerCourseId, String studentId) {
-		Certificate certificate = certificateRepository.findAllByRegisterCourseIdAndStudenId(registerCourseId, studentId);
+		Certificate certificate = certificateRepository.findAllByRegisterCourseIdAndStudenId(registerCourseId,
+				studentId);
 
 		if (certificate != null) {
 			return this.convertToReponseDTO(certificate);
@@ -61,8 +65,19 @@ public class CertificateServiceImp implements CertificateService {
 	public CertificateResponse createCertificatet(CertificateDTO certificateDTO) {
 		Certificate certificate = this.convertRequestToEntity(certificateDTO);
 		certificate.setCreateDate(new Date());
-		
+		certificate.setStartDate(new Date());
+		certificate.setEndDate(new Date());
+
 		Certificate newCertificate = certificateRepository.save(certificate);
+
+//		For production
+//		String[] listMail = { student.get().getUser().getEmail() };
+
+//		For testing
+//		String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+
+//		mailer.queueCertificate(listMail, "", "", null, newCertificate.getRegisterCourse().getCourse().getCourseName(),
+//				"http://localhost:3000/pdf/certificate/download?certificateId=" + newCertificate.getCertificateId());
 
 		return this.convertToReponseDTO(newCertificate);
 	}
@@ -97,6 +112,7 @@ public class CertificateServiceImp implements CertificateService {
 		BeanUtils.copyProperties(certificateDTO, certificate);
 
 		certificate.setRegisterCourse(registerCourse);
+		certificate.setCertificateName(certificateDTO.getCertificateName());
 
 		return certificate;
 	}

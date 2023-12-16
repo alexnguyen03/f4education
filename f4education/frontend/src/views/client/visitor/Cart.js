@@ -32,6 +32,7 @@ import courseApi from '../../../api/courseApi'
 import cartEmptyimage from '../../../assets/img/cart-empty.png'
 import cartStyle from '../../../assets/scss/custom-module-scss/client-custom/cart/cart.module.scss'
 import { IconTrash } from '@tabler/icons-react'
+import ClientModal from 'components/modals/ClientModal'
 
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
@@ -58,6 +59,7 @@ function Cart() {
     const [selectedCart, setSelectedCart] = useState({
         course: ''
     })
+    const [modalLogin, setModalLogin] = useState(false)
 
     // *************** Logic UI Variable
     const [totalPrice, setTotalPrice] = useState(0)
@@ -141,18 +143,18 @@ function Cart() {
 
     // *************** Action && Logic UI
     const handleCheckOut = async () => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
         if (user === null) {
-            toast.update(
-                id,
-                Notify.options.createErrorParam(
-                    'Vui lòng đăng nhập trước khi thanh toán'
-                )
-            )
+            // toast.update(
+            //     id,
+            //     Notify.options.createErrorParam(
+            //         'Vui lòng đăng nhập trước khi thanh toán'
+            //     )
+            // )
+            setModalLogin(true)
             return
         }
 
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         if (selectedItem === null) {
             toast.update(
                 id,
@@ -220,17 +222,18 @@ function Cart() {
 
     const handleCheckOutNow = async (course, e) => {
         e.preventDefault()
-        const id = toast(Notify.msg.loading, Notify.options.loading())
 
         if (user === null) {
-            toast.update(
-                id,
-                Notify.options.createErrorParam(
-                    'Vui lòng đăng nhập trước khi thanh toán'
-                )
-            )
+            // toast.update(
+            //     id,
+            //     Notify.options.createErrorParam(
+            //         'Vui lòng đăng nhập trước khi thanh toán'
+            //     )
+            // )
+            setModalLogin(true)
             return
         }
+        const id = toast(Notify.msg.loading, Notify.options.loading())
 
         try {
             const selectedCart = await handleAddCart(course, e)
@@ -431,9 +434,19 @@ function Cart() {
         fetchCart()
     }, [searchParams.get('checkoutComplete'), listCart.length])
 
+    const handleCloseModal = (isOpen) => {
+        isOpen === true && setModalLogin(false)
+    }
+
     return (
         <>
             <ToastContainer />
+
+            {/* Modal login */}
+            <ClientModal
+                isOpen={modalLogin}
+                handleCloseModal={handleCloseModal}
+            />
 
             <Container size="xl">
                 {/* BreadCums */}

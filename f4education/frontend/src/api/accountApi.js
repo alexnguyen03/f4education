@@ -30,7 +30,7 @@ const accountApi = {
     },
 
     // Đăng ký tài khoản--------------------------------------------------------------------------------
-    checkMailForPassword: (body) => {
+    checkEmailForRegsiter: (body) => {
         const url = '/accounts/checkEmailForRegsiter'
         return axiosClient.post(url, body)
     },

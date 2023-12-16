@@ -50,7 +50,7 @@ const ForgotPassword = () => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
         if (seconds > 0) {
             try {
-                const resp = await accountApi.checkOTPForPassword(OTPRequest)
+                const resp = await accountApi.checkOTP(OTPRequest)
                 if (resp.status === 200) {
                     toast.update(id, Notify.options.rightOTP())
                     nextStep()
@@ -152,6 +152,13 @@ const ForgotPassword = () => {
         }
     }
 
+    const validatePassword = (value) => {
+        if (value.length < 6 || value.length > 16) {
+            return 'Mật khẩu phải từ 6 đến 16 kí tự'
+        }
+        return null
+    }
+
     const form = useForm({
         initialValues: {
             password: '',
@@ -160,10 +167,7 @@ const ForgotPassword = () => {
 
         // functions will be used to validate values at corresponding key
         validate: {
-            password: hasLength(
-                { min: 6, max: 16 },
-                'Mật khẩu từ 6 đến 16 kí tự!'
-            ),
+            password: (value) => validatePassword(value),
             confirmPassword: (value, values) =>
                 value !== values.password
                     ? 'Xác nhận mật khẩu không khớp'
@@ -329,10 +333,6 @@ const ForgotPassword = () => {
                             <div sm={6} className="mx-auto w-75">
                                 <div className="modal-body shadow rounded">
                                     <Box>
-                                        {/* <LoadingOverlay
-                                            visible={true}
-                                            overlayBlur={2}
-                                        /> */}
                                         <form onSubmit={form.onSubmit(submit)}>
                                             <PasswordInput
                                                 label="Mật khẩu mới"

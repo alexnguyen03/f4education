@@ -29,4 +29,6 @@ public interface ClassService {
 	Classes findById(Integer classId);
 
 	List<LearningResultResponse> getAllClassLearningResult(String studentId);
+
+	Classes overClassByStatus(Integer classId);
 }

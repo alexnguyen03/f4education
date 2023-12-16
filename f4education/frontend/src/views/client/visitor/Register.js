@@ -33,7 +33,7 @@ import {
 import { create } from 'nouislider'
 const IMG_URL = '/courses/'
 const Register = () => {
-    const user = JSON.parse(localStorage.getItem('user') ?? '')
+    // const user = JSON.parse(localStorage.getItem('user') ?? '')
     const [imgData, setImgData] = useState(null)
     const [students, setStudents] = useState([])
     const [rSelected, setRSelected] = useState(null) //radio button
@@ -327,7 +327,7 @@ const Register = () => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
         setOTP({ ...OTP, codeOTP: '' })
         try {
-            const resp = await accountApi.checkMailForPassword(OTPRequest)
+            const resp = await accountApi.checkEmailForRegsiter(OTPRequest)
             if (resp.status === 200) {
                 setOTP2(2)
                 handleReset()
@@ -335,7 +335,7 @@ const Register = () => {
                 toast.update(id, Notify.options.sendedMail())
             } else {
                 if (resp.data === 1) {
-                    toast.update(id, Notify.options.undefinedAccount())
+                    toast.update(id, Notify.options.usedEmail())
                 } else {
                     toast.update(id, Notify.options.error())
                 }
