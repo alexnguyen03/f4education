@@ -201,7 +201,8 @@ public class CoursesDetailController {
 						System.out.println(courseDetail);
 						saveList.add(courseService.createCourseDetail(courseDetail));
 					} else {
-						System.out.println("null content");
+						// System.out.println("null content");
+						break;
 					}
 				}
 			}

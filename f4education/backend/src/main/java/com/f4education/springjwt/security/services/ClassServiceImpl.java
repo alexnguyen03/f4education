@@ -64,6 +64,7 @@ public class ClassServiceImpl implements ClassService {
 
 	@Override
 	public ClassDTO createClass(ClassDTO classDTO, String adminId) {
+		System.out.println(classDTO);
 		String action = "CREATE";
 		Classes classes = new Classes();
 		Admin admin = adminRepository.findById(adminId).get();
@@ -71,6 +72,7 @@ public class ClassServiceImpl implements ClassService {
 		classes.setAdmin(admin);
 		classes.setStartDate(null);
 		classes.setEndDate(null);
+		classes.setAdmin(admin);
 		classes.setStatus("Đang chờ");
 		Classes saveClasses = classRepository.save(classes);
 		this.saveClassHistory(saveClasses, action);
@@ -143,6 +145,7 @@ public class ClassServiceImpl implements ClassService {
 		classHistory.setClasses(classes);
 		classHistory.setModifyDate(new Date());
 		classHistory.setAction(action);
+		classHistory.setStartDate(new Date());
 		classHistory.setAdminId(classes.getAdmin().getAdminId());
 		classHistoryRepository.save(classHistory);
 	}

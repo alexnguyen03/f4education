@@ -66,8 +66,9 @@ public class Student implements Serializable {
 	@Access(AccessType.PROPERTY)
 	private List<Attendance> attendances;
 	@JsonIgnore
+	@Access(AccessType.PROPERTY)
 	@OneToMany(mappedBy = "student")
-	private List<EvaluationTeacher> EvaluationTeachers;
+	private List<EvaluationTeacher> evaluationTeachers;
 
 	@ManyToOne
 	@JsonIgnore
@@ -84,6 +85,14 @@ public class Student implements Serializable {
 
 	public void setBills(List<Bill> bills) {
 		this.bills = bills;
+	}
+
+	public List<EvaluationTeacher> getEvaluationTeachers() {
+		return new ArrayList<>(evaluationTeachers);
+	}
+
+	public void setEvaluationTeachers(List<EvaluationTeacher> evaluationTeachers) {
+		this.evaluationTeachers = evaluationTeachers;
 	}
 
 	public List<Evaluate> getEvaluates() {

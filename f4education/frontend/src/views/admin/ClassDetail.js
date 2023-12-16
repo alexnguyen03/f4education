@@ -134,6 +134,7 @@ const ClassDetail = (props) => {
             )
             if (resp.status === 200) {
                 toast.update(id, Notify.options.createSuccess())
+                setClassDetail((prev) => ({ ...prev, status: 'Đang diễn ra' }))
                 checkRegisterCourseHasClass()
             }
         } catch (error) {

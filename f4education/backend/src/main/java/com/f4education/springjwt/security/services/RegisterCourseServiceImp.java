@@ -259,9 +259,11 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 		Classes foundClass = classRepository.findById(registerCourseRequestDTO.getClassId()).get();
 		List<EvaluationTeacher> lsEvaluationTeacher = foundClass.getEvaluationTeacher();
 		List<Attendance> lsAttendance = new ArrayList<>();
-		if (registerCourseRequestDTO.getTeacherId() != foundClass.getTeacher().getTeacherId()) {
-			String[] teacherMail = { registerCourseRequestDTO.getTeacherId() +
-					"@gmail.com" };
+
+		if (foundClass.getTeacher() == null
+				|| registerCourseRequestDTO.getTeacherId() != foundClass.getTeacher().getTeacherId()) {
+			String[] teacherMail = { registerCourseRequestDTO.getTeacherId() + "@gmail.com" };
+
 			mailer.sendToTeacherWhenClassSeted(
 					teacherMail,
 					foundClass.getClassName(),
