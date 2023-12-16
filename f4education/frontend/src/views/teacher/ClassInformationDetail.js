@@ -373,6 +373,18 @@ const ClassInformationDetail = () => {
         })
     }
 
+    const handleClassProgress = (classId) => {
+        navigate({
+            pathname: '/teacher/class-progress/' + classId
+        })
+    }
+
+    const handleCreateTask = (classId) => {
+        navigate({
+            pathname: '/teacher/task/' + classId
+        })
+    }
+
     const uploadResource = async (courseName) => {
         const id = toast(Notify.msg.loading, Notify.options.loading())
 
@@ -573,6 +585,17 @@ const ClassInformationDetail = () => {
                                         Trở về
                                     </Button> */}
                                 <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    onClick={() => {
+                                        handleClassProgress(classInfor.classId)
+                                    }}
+                                    disabled={classInfor.status === 'kết thúc'}
+                                >
+                                    Xem điều kiện dự thi
+                                </Button>
+                                <Button
                                     onClick={handlers.open}
                                     color="cyan"
                                     size="md"
@@ -590,7 +613,7 @@ const ClassInformationDetail = () => {
                                     size="md"
                                     mb="md"
                                 >
-                                   Mở lại bài thi
+                                    Mở lại bài thi
                                 </Button>
                                 <Button
                                     color="indigo"
@@ -611,6 +634,9 @@ const ClassInformationDetail = () => {
                                     size="md"
                                     mb="md"
                                     disabled={classInfor.status === 'kết thúc'}
+                                    onClick={() => {
+                                        handleCreateTask(classInfor.classId)
+                                    }}
                                 >
                                     Giao bài tập
                                 </Button>
@@ -742,7 +768,11 @@ const ClassInformationDetail = () => {
                 </Modal.Content>
             </Modal.Root>
             {/* Modal again */}
-            <Modal.Root opened={examOpenedAgain} onClose={handlersAgain.close} centered>
+            <Modal.Root
+                opened={examOpenedAgain}
+                onClose={handlersAgain.close}
+                centered
+            >
                 <Modal.Overlay />
                 <Modal.Content>
                     <Modal.Header>
@@ -755,7 +785,9 @@ const ClassInformationDetail = () => {
                             {classInfor.className} không ?{' '}
                         </Title>
                         <Group grow mt={'lg'}>
-                            <Button color="red" onClick={handlersAgain.close}>Không, để sau</Button>
+                            <Button color="red" onClick={handlersAgain.close}>
+                                Không, để sau
+                            </Button>
                             <Button onClick={updateExamination} color="teal">
                                 Có, mở lại ngay
                             </Button>

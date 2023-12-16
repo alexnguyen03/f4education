@@ -44,7 +44,9 @@ const TeacherAndStudentSidebar = (props) => {
                 prop.path !== '/quizz' &&
                 prop.path !== '/task' &&
                 prop.path !== '/classes/recources/:classId' &&
-                prop.path !== '/download-task-student'
+                prop.path !== '/download-task-student' &&
+                prop.path !== '/task/:classId' &&
+                prop.path !== '/class-progress/:classId'
             ) {
                 return (
                     <NavItem key={key}>

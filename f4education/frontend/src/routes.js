@@ -290,8 +290,6 @@ export const routesTeacher = [
     },
     {
         path: '/task/:classId',
-        name: 'Giao bài tập',
-        icon: 'fa-solid fa-list-check text-danger',
         component: <TaskTeacher />,
         layout: '/teacher'
     },
@@ -319,9 +317,7 @@ export const routesTeacher = [
         layout: '/teacher'
     },
     {
-        path: '/class-progress',
-        name: 'Tiến độ lớp học',
-        icon: 'fa-solid fa-bars-progress text-success',
+        path: '/class-progress/:classId',
         component: <ClassProgress />,
         layout: '/teacher'
     }
@@ -411,5 +407,5 @@ export const routesQuiz = [
         icon: 'ni ni-planet text-blue',
         component: <QuizzClient />,
         layout: '/quiz'
-    },
+    }
 ]

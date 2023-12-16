@@ -1,10 +1,10 @@
-import { Box, Flex, Grid, Group, Image, Skeleton, Text } from '@mantine/core'
+import { Box, Flex, Grid, Image, Skeleton } from '@mantine/core'
+import { Typography } from '@material-ui/core'
 import { MaterialReactTable } from 'material-react-table'
 import React, { useEffect, useMemo, useState } from 'react'
+import { useParams } from 'react-router-dom'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { Button } from 'reactstrap'
-import { Typography } from '@material-ui/core'
 
 // API
 import progressApi from 'api/progressApi'
@@ -19,6 +19,7 @@ const ClassProgress = () => {
     const toastId = React.useRef(null)
     const [progress, setProgress] = useState([])
     const [loading, setLoading] = useState(false)
+    const { classId } = useParams()
 
     const columnStudent = useMemo(
         () => [
@@ -86,7 +87,7 @@ const ClassProgress = () => {
     const getProgress = async () => {
         try {
             setLoading(true)
-            const resp = await progressApi.getAllProgress(1)
+            const resp = await progressApi.getAllProgress(classId)
             if (resp.status === 200) {
                 setProgress(resp.data)
                 setLoading(false)
