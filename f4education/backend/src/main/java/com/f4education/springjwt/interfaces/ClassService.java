@@ -30,4 +30,5 @@ public interface ClassService {
 
 	List<LearningResultResponse> getAllClassLearningResult(String studentId);
 
+	Classes overClassByStatus(Integer classId);
 }

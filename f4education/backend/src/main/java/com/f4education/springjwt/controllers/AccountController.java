@@ -315,4 +315,8 @@ public class AccountController {
         }
         return accountDTO;
     }
+    
+    public static void main(String[] args) {
+		System.out.println("hêllo");
+	}
 }

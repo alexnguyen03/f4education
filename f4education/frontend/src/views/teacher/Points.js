@@ -13,23 +13,29 @@ import {
 import { useDisclosure } from '@mantine/hooks'
 import { Edit as EditIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
-import { usePDF } from '@react-pdf/renderer'
+import { pdf, usePDF } from '@react-pdf/renderer'
 import { IconDeviceFloppy } from '@tabler/icons-react'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment/moment'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { toast, ToastContainer } from 'react-toastify'
+
+// API
 import certificateApi from '../../api/certificateApi'
 import pointApi from '../../api/pointApi'
+import classApi from '../../api/classApi'
 import scheduleApi from '../../api/scheduleApi'
+
+// Utils
 import Notify from '../../utils/Notify'
 
-//
+// component Import
 import CertificateDownload from '../PDF/CertificateDownload'
 
 const Points = () => {
     const params = useParams()
+    let navigate = useNavigate()
     const [listPoint, setListPoint] = useState({
         pointId: 0,
         studentName: '',
@@ -58,9 +64,7 @@ const Points = () => {
 
     // certificate variable
     const [classIsFinish, setClassIsFinish] = useState(false)
-    const [listCertificateDownload, setListCertificateDownload] = useState([])
     const certificateIdRef = useRef()
-    const [loadingCertificate, setLoadingCertificate] = useState(false)
 
     const getAllPointsByClassId = async () => {
         try {
@@ -303,6 +307,7 @@ const Points = () => {
     const handleEndClassAndSendCertificate = async () => {
         const filterData = listPoint.filter((item) => item.averagePoint > 5)
 
+        const id = toast(Notify.msg.loading, Notify.options.loading())
         const listCertificate = filterData.map((item) => {
             return {
                 certificateName: `Chứng chỉ xác nhận hoàn thành khóa học ${item.courseName}`,
@@ -316,7 +321,6 @@ const Points = () => {
                     listCertificate
                 )
                 if (resp.status === 200) {
-                    setLoadingCertificate(true)
                     console.log(resp.data)
 
                     const updatedListCertificateDownload = []
@@ -325,31 +329,45 @@ const Points = () => {
                         const item = resp.data[i]
                         certificateIdRef.current = item.certificateId
 
-                        await Promise.all([
-                            updateInstance(
-                                <CertificateDownload
-                                    certificateId={parseInt(
-                                        certificateIdRef.current
-                                    )}
-                                    awaitComplete={awaitComplete}
-                                />
-                            )
-                        ])
+                        // await Promise.all([
+                        //     updateInstance(
+                        //         <CertificateDownload
+                        //             certificateId={parseInt(
+                        //                 certificateIdRef.current
+                        //             )}
+                        //             awaitComplete={awaitComplete}
+                        //         />
+                        //     )
+                        // ])
 
-                        console.log(instance)
-                        console.log(certificateIdRef.current)
+                        const blob = await pdf(
+                            <CertificateDownload
+                                certificateId={parseInt(
+                                    certificateIdRef.current
+                                )}
+                            />
+                        ).toBlob()
+
+                        console.log(blob)
+
                         updatedListCertificateDownload.push({
-                            blob: instance.blob,
+                            blob: blob,
                             certificateId: item.certificateId
                         })
                     }
 
-                    setListCertificateDownload(updatedListCertificateDownload)
                     await handleDownloadAndSendMail(
                         updatedListCertificateDownload
                     )
 
-                    setLoadingCertificate(true)
+                    await handleEndClass(params.classId)
+
+                    toast.update(
+                        id,
+                        Notify.options.createSuccessParam(
+                            'Gửi chứng nhận và kết thúc lớp học thành công'
+                        )
+                    )
                 }
             } catch (error) {
                 console.log(error)
@@ -363,10 +381,6 @@ const Points = () => {
         getAllPointsByClassId()
         handleCheckIfClassIsClose()
     }, [])
-
-    useEffect(() => {
-        console.log(listCertificateDownload)
-    }, [listCertificateDownload, listCertificateDownload.length])
 
     const handleDownloadAndSendMail = async (
         updatedListCertificateDownload
@@ -400,6 +414,19 @@ const Points = () => {
             console.log(response.data)
         } catch (error) {
             console.error('Error uploading files:', error)
+        }
+    }
+
+    const handleEndClass = async (classId) => {
+        try {
+            const resp = await classApi.endClass(classId)
+
+            if (resp.status === 200) {
+                console.log('close class')
+                navigate('/teacher/class-infor')
+            }
+        } catch (error) {
+            console.log(error)
         }
     }
 

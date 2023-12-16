@@ -343,25 +343,14 @@ const ClassInformationDetail = () => {
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
 
-                    return classStudyToday ? (
+                    return (
                         <SegmentedControl
                             color="teal"
                             data={[
                                 { label: 'Có mặt', value: 'present' },
                                 { label: 'Vắng mặt', value: 'absent' }
                             ]}
-                            onClick={(e) => {
-                                handlCheckAttandance(e, row.studentId)
-                            }}
-                        />
-                    ) : (
-                        <SegmentedControl
-                            color="teal"
-                            data={[
-                                { label: 'Có mặt', value: 'present' },
-                                { label: 'Vắng mặt', value: 'absent' }
-                            ]}
-                            disabled
+                            disabled={classStudyToday === false}
                             onClick={(e) => {
                                 handlCheckAttandance(e, row.studentId)
                             }}
@@ -486,7 +475,6 @@ const ClassInformationDetail = () => {
                         </Card>
                     ) : (
                         <Card
-                            // padding="xl"
                             shadow="sm"
                             padding="lg"
                             radius="md"
@@ -496,15 +484,12 @@ const ClassInformationDetail = () => {
                                 h={200}
                                 style={{
                                     backgroundImage:
-                                        'url(https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=500&q=80)'
+                                        'url(https://images.pexels.com/photos/247839/pexels-photo-247839.jpeg?auto=compress&cs=tinysrgb&w=600)',
+                                    backgroundRepeat: 'no-repeat',
+                                    backgroundPosition: 'center',
+                                    objectFit: 'cover'
                                 }}
                             />
-                            {/* <Image
-                                    src="https://images.unsplash.com/photo-1527004013197-933c4bb611b3?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=720&q=80"
-                                    height={160}
-                                    alt="Norway"
-                                    className={styles.avatar}
-                                /> */}
 
                             <Avatar
                                 src="https://th.bing.com/th/id/OIP.0MP14fOr1ykZDCnNZ5grFwHaGZ?pid=ImgDet&rs=1"
@@ -519,16 +504,17 @@ const ClassInformationDetail = () => {
                             </Title>
                             <Text
                                 ta="center"
-                                fz="lg"
-                                mt={'md'}
+                                size="lg"
+                                mt="md"
                                 c="dimmed"
+                                fw={500}
                                 align="center"
                             >
                                 {courseName}
                             </Text>
                             <Text
                                 c="dimmed"
-                                mt="md"
+                                mt="sm"
                                 fz="md"
                                 align="center"
                                 gap={30}
@@ -553,7 +539,7 @@ const ClassInformationDetail = () => {
                             <Flex
                                 align={'center'}
                                 justify="space-between"
-                                mt="lg"
+                                mt="sm"
                             >
                                 <Text
                                     ta="center"
@@ -563,7 +549,15 @@ const ClassInformationDetail = () => {
                                 >
                                     Trạng thái:
                                 </Text>
-                                <Badge color="indigo" radius="sm" mt={rem(3)}>
+                                <Badge
+                                    color={
+                                        classInfor.status === 'Đang diễn ra'
+                                            ? 'indigo'
+                                            : 'yellow'
+                                    }
+                                    radius="sm"
+                                    mt={rem(3)}
+                                >
                                     {classInfor.status}
                                 </Badge>
                             </Flex>
@@ -583,7 +577,10 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
-                                    disabled={activedExam}
+                                    disabled={
+                                        activedExam &&
+                                        classInfor.status === 'kết thúc'
+                                    }
                                 >
                                     Tạo quiz
                                 </Button>
@@ -605,10 +602,16 @@ const ClassInformationDetail = () => {
                                                 classInfor.classId
                                         )
                                     }}
+                                    disabled={classInfor.status === 'kết thúc'}
                                 >
                                     Nhập điểm
                                 </Button>
-                                <Button color="cyan" size="md" mb="md">
+                                <Button
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                    disabled={classInfor.status === 'kết thúc'}
+                                >
                                     Giao bài tập
                                 </Button>
                                 <Button
@@ -618,6 +621,7 @@ const ClassInformationDetail = () => {
                                     onClick={() => {
                                         handleShowTask(classInfor.classId)
                                     }}
+                                    disabled={classInfor.status === 'kết thúc'}
                                 >
                                     Tải bài tập học viên
                                 </Button>
@@ -628,6 +632,7 @@ const ClassInformationDetail = () => {
                                     onClick={() => {
                                         open()
                                     }}
+                                    disabled={classInfor.status === 'kết thúc'}
                                 >
                                     Upload tài liệu
                                 </Button>

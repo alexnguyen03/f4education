@@ -74,4 +74,10 @@ public class ClassController {
 		return ResponseEntity.ok(classes);
 	}
 
+	@PostMapping("/teacher/point")
+	public ResponseEntity<?> handleEndClass(@RequestParam("classId") Integer classId) {
+		Classes classes = classService.overClassByStatus(classId);
+		return ResponseEntity.ok(classes);
+	}
+
 }

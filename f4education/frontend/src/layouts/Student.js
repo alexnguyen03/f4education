@@ -59,11 +59,11 @@ const Student = (props) => {
                 ref={mainContent}
                 fluid
             >
-                <Container fluid pos={'relative'} px={0} py={'xl'} my={'xl'}>
+                <Container fluid pos={'relative'} px={0} pt={'xl'}>
                     <Button
-                        left={`${showSideBar ? 225 : 10}`}
-                        top={10}
-                        pos={'fixed'}
+                        left={`${showSideBar ? -45 : 0}`}
+                        top={20}
+                        pos={'absolute'}
                         onClick={() => {
                             setShowSideBar((prev) => !prev)
                         }}

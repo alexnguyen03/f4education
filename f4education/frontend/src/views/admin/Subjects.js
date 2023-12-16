@@ -234,7 +234,6 @@ const Subjects = () => {
         setShowModal(false)
         setUpdate(false)
 
-        fetchSubjects()
         resetForm()
     }
 

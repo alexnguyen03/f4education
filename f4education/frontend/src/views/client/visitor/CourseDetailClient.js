@@ -51,6 +51,7 @@ import styles from '../../../assets/scss/custom-module-scss/client-custom/course
 import courseDetailApi from '../../../api/courseDetailApi'
 import courseApi from '../../../api/courseApi'
 import evaluateApi from '../../../api/evaluateApi'
+import ClientModal from 'components/modals/ClientModal'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
@@ -113,6 +114,7 @@ function CourseDetailClient() {
         registerCourseId: ''
     })
     const [isUpdateEvaluate, setIsUpdateEvaluate] = useState(false)
+    const [modalLogin, setModalLogin] = useState(false)
 
     // PAGINATION
     const [currentPage, setCurrentPage] = useState(1)
@@ -391,18 +393,20 @@ function CourseDetailClient() {
     }
 
     const handleCheckOut = async (course) => {
-        const id = toast(Notify.msg.loading, Notify.options.loading())
-
+        
         if (user === null) {
-            toast.update(
-                id,
-                Notify.options.createErrorParam(
-                    'Vui lòng đăng nhập trước khi thanh toán'
-                )
-            )
+            // toast.update(
+            //     id,
+            //     Notify.options.createErrorParam(
+            //         'Vui lòng đăng nhập trước khi thanh toán'
+            //     )
+            // )
+            setModalLogin(true)
             return
         }
-
+        
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+        
         try {
             const selectedCart = await handleAddCart(course)
 
@@ -469,9 +473,19 @@ function CourseDetailClient() {
         }
     }
 
+    const handleCloseModal = (isOpen) => {
+        isOpen === true && setModalLogin(false)
+    }
+
     return (
         <>
             <ToastContainer />
+
+           {/* Modal login */}
+            <ClientModal
+                isOpen={modalLogin}
+                handleCloseModal={handleCloseModal}
+            />
 
             {/* Top banner */}
             <Box mt={rem('2rem')} bg="#2d2f31">

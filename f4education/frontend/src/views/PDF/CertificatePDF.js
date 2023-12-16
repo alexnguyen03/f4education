@@ -96,7 +96,7 @@ const CertificatePDF = () => {
     const [qrCodeImage, setQrCodeImage] = useState('')
 
     //  Route
-    // const [searchParams] = useSearchParams()
+    const [searchParams] = useSearchParams()
 
     // Main variable
     const [certificate, setCertificate] = useState({})
@@ -111,9 +111,8 @@ const CertificatePDF = () => {
 
                 const resp =
                     await certificateApi.getAllCertificateByCertificateId(
-                        // searchParams.get('certificateId')
-                        18
-                        )
+                        searchParams.get('certificateId')
+                    )
 
                 if (resp.status === 200) {
                     setCertificate(resp.data)
@@ -142,7 +141,7 @@ const CertificatePDF = () => {
         }
 
         Promise.all([fetchData()])
-    }, [])
+    }, [searchParams])
 
     return (
         <PDFViewer style={styles.viewer}>
