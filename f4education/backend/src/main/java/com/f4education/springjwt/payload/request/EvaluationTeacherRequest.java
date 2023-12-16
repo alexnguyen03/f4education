@@ -14,6 +14,8 @@ import lombok.NoArgsConstructor;
 public class EvaluationTeacherRequest {
     @JsonProperty("classId")
     private Integer classId;
+    @JsonProperty("studentId")
+    private String studentId;
     @JsonProperty("listEvaluationDetailInRequest")
     List<EvaluationDetailInRequest> listEvaluationDetailInRequest;
 }

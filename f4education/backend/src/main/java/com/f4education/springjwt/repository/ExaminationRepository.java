@@ -16,5 +16,7 @@ public interface ExaminationRepository extends JpaRepository<Examination, Intege
 
     @Query(value = "SELECT  CASE  WHEN  COUNT(Examination.exam_id)> 0 THEN   1 ELSE 0  END  FROM  Examination   WHERE  class_id = :classId AND CONVERT(DATE,  Examination.finish_date ) = :today", nativeQuery = true)
     public Integer isActivedExamByTodayAndClassId(@Param("classId") Integer classId, @Param("today") String today);
-
+    
+    @Query(value = "SELECT * FROM Examination WHERE class_id = :classId", nativeQuery = true)
+    public Examination getByClassId(@Param("classId") Integer classId);
 }

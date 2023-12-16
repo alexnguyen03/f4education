@@ -1,8 +1,5 @@
 package com.f4education.springjwt.controllers;
 
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,9 +52,9 @@ public class ScheduleController {
 	@GetMapping("/classes")
 	public ResponseEntity<?> checkIfClassStudyToday(@RequestParam("classId") Integer classId) {
 		Schedule scheduleResponse = scheduleService.findScheduleByClassAndStudyDate(classId);
-		
+
 		System.out.println(scheduleResponse);
-		
+
 		if (scheduleResponse == null) {
 			return ResponseEntity.noContent().build();
 		}

@@ -36,10 +36,11 @@ const Login = () => {
     const [loading, setLoading] = useState(false)
     const [account, setAccount] = useState({
         // username: 'johnpc03517', //teacher
-        // username: 'namnhpc03517', //admin
-        username: 'loinvpc04549', // student
+        username: 'namnhpc03517', //admin
+        // username: 'loinvpc04549', // student
         password: '123456789'
     })
+
     const [msgError, setMsgError] = useState({})
     const handleLogin = async () => {
         validate()
@@ -305,9 +306,9 @@ const Login = () => {
                                 )}
                             </FormGroup>
 
-                            <div className="text-center">
+                            <div className="d-flex justify-content-center">
                                 <Button
-                                    className="my-4"
+                                    className="w-100 mt-2 mb-3"
                                     color="primary"
                                     type="button"
                                     onClick={handleLogin}
@@ -315,16 +316,19 @@ const Login = () => {
                                     Đăng nhập
                                 </Button>
                             </div>
+                            <div className="d-flex justify-content-center">
+                                <Button
+                                    className="w-100  mb-3 btn-outline-success"
+                                    color="success"
+                                    type="button"
+                                    onClick={() => {
+                                        navigate('/client-register')
+                                    }}
+                                >
+                                    Tạo tài khoản
+                                </Button>
+                            </div>
                         </Form>
-                        <div className="text-center">
-                            <a
-                                className="text-light"
-                                href="#pablo"
-                                onClick={(e) => e.preventDefault()}
-                            >
-                                <small>Quên mật khẩu ?</small>
-                            </a>
-                        </div>
                     </CardBody>
                 </Card>
             </Box>

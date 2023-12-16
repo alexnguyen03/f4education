@@ -33,6 +33,7 @@ import {
     createSearchParams,
     Link,
     useNavigate,
+    useParams,
     useSearchParams
 } from 'react-router-dom'
 
@@ -54,11 +55,18 @@ import Schedule from './Schedule'
 // Notification
 import { toast, ToastContainer } from 'react-toastify'
 import Notify from '../../../utils/Notify'
+import scheduleApi from 'api/scheduleApi'
+import evaluateApi from 'api/evaluateApi'
 
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
+    const [evaluated, setEvaluated] = useState(false)
+
+    const params = useParams()
+    const [classIsFinish, setClassIsFinish] = useState(false)
+
     const startQuiz = () => {
         document.documentElement.requestFullscreen().catch((err) => {
             console.log(`Error attempting to enable fullscreen: ${err.message}`)
@@ -131,7 +139,7 @@ const CourseProgress = () => {
 
                 const pointGreaterThanFive = await checkIfCourseProgressIsDone(
                     element.classes.classId,
-                    element.registerCourseId
+                    element.registerCourseId 
                 )
 
                 // Tinh toan progress cua khoa
@@ -224,6 +232,10 @@ const CourseProgress = () => {
     const fetchNewestCourse = async () => {
         try {
             const resp = await courseApi.getNewestCourse('')
+            console.log(
+                '🚀 ~ file: CourseProgress.js:235 ~ fetchNewestCourse ~ resp:',
+                resp
+            )
 
             if (resp.status === 200 && resp.data.length > 0) {
                 setNewestCourse(resp.data)
@@ -322,7 +334,7 @@ const CourseProgress = () => {
     const handleShowQuestion = (classId) => {
         console.log(classId)
         navigate({
-            pathname: '/student/quizz',
+            pathname: '/quiz/quizz',
             search: `?${createSearchParams({
                 classId: classId
             })}`
@@ -335,6 +347,34 @@ const CourseProgress = () => {
 
             if (resp.status === 200) {
                 return resp.data
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
+    // kiểm tra xem khóa học đã kết thúc chưa
+    const handleCheckIfClassIsClose = async () => {
+        try {
+            const resp = await scheduleApi.getScheduleByClassId(
+                searchParams.get('classId')
+            )
+            console.log(resp.data)
+            console.log(searchParams.get('classId'))
+
+            if (resp.status === 200) {
+                const respData = resp.data
+                const today = moment(new Date())
+                const lastItem =
+                    respData.listSchedules[respData.listSchedules.length - 1]
+
+                if (today.isAfter(moment(lastItem.studyDate))) {
+                    setClassIsFinish(true)
+                    return console.log('class is Done')
+                } else {
+                    setClassIsFinish(false)
+                    return console.log('class is studying')
+                }
             }
         } catch (error) {
             console.log(error)
@@ -393,6 +433,23 @@ const CourseProgress = () => {
         }
     }
 
+    const checkStudentHasEvaluated = async () => {
+        try {
+            const resp = await evaluateApi.checkStudentHasEvaluated(
+                searchParams.get('classId'),
+                user.username
+            )
+            console.log(
+                '🚀 ~ file: EvaluateTeacher.js:202 ~ checkStudentHasEvaluated ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                setEvaluated(resp.data)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
     // ************ USE EFECT AREA
     useEffect(() => {
         setSelectedCourse(selectedCourse)
@@ -405,6 +462,8 @@ const CourseProgress = () => {
     useEffect(() => {
         if (searchParams.get('classId') !== null) {
             checkActivedExamByTodayAndClassId()
+            handleCheckIfClassIsClose()
+            checkStudentHasEvaluated()
         }
     }, [searchParams])
 
@@ -445,7 +504,6 @@ const CourseProgress = () => {
                         Tiến độ học tập
                     </Title>
                 </Box>
-
                 {/* Hero banner */}
                 <Box
                     pos={'relative'}
@@ -895,7 +953,6 @@ const CourseProgress = () => {
                         </Box>
                     )}
                 </Box>
-
                 {/* Toolbar */}
                 <Box>
                     {showingDetail && <Schedule />}
@@ -920,7 +977,6 @@ const CourseProgress = () => {
                         <></>
                     )}
                 </Box>
-
                 {/* In Progress Course */}
                 <Box mt={rem('10rem')}>
                     <Group position="left" mb={'lg'}>
@@ -1335,7 +1391,6 @@ const CourseProgress = () => {
                         </>
                     )}
                 </Box>
-
                 {/* Relation course in progress */}
                 <Box mt={rem('8rem')}>
                     <Group position="apart" mb={'lg'}>
@@ -1449,7 +1504,6 @@ const CourseProgress = () => {
                         </>
                     )}
                 </Box>
-
                 {/* complete course */}
                 <Box mt={rem('8rem')} pb={rem('2rem')}>
                     <Group position="apart" mb={'lg'}>
@@ -1848,7 +1902,46 @@ const CourseProgress = () => {
                         )}
                     </Box>
                 </Box>
-
+                // modal show Evaluation Teacher
+                <Modal.Root
+                    opened={classIsFinish && !evaluated}
+                    // onClose={downloadRecourceHandlers.close}
+                    centered
+                    closeOnClickOutside={false}
+                    closeOnEscape={false}
+                >
+                    <Modal.Overlay />
+                    <Modal.Content>
+                        <Modal.Header>
+                            <Modal.Title>
+                                <Text fz="lg">
+                                    Thông báo đánh giá giảng viên
+                                </Text>
+                            </Modal.Title>
+                            <Modal.CloseButton />
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Text fz="lg">
+                                {' '}
+                                Vui lòng đánh giá giáo viên giúp trung tâm cải
+                                thiện chất lượng giảng dạy của minh.
+                            </Text>
+                            <Group grow mt={'md'}>
+                                <Button
+                                    onClick={() =>
+                                        navigate(
+                                            '/evaluation/student/' +
+                                                searchParams.get('classId')
+                                        )
+                                    }
+                                    color="teal"
+                                >
+                                    Đánh giá ngay!
+                                </Button>
+                            </Group>
+                        </Modal.Body>
+                    </Modal.Content>
+                </Modal.Root>
                 <Modal.Root
                     opened={downloadRecource}
                     onClose={downloadRecourceHandlers.close}

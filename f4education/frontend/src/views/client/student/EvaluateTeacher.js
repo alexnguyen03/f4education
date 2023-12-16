@@ -15,14 +15,21 @@ import {
 } from '@mantine/core'
 import { IconAlertCircle, IconNotes } from '@tabler/icons-react'
 import evaluateApi from '../../../api/evaluateApi'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
+import classApi from 'api/classApi'
 
 const EvaluateTeacher = () => {
     let { classIdParam } = useParams()
+    const [evaluationInfo, setEvaluationInfo] = useState({
+        className: '',
+        teacherName: ''
+    })
+    const user = JSON.parse(localStorage.getItem('user'))
     const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
     const [completed, setCompleted] = useState(false)
+
     const [evaluations, setEvaluations] = useState([])
     const data = [
         {
@@ -136,6 +143,7 @@ const EvaluateTeacher = () => {
 
         const evaluationRequest = {
             classId: parseInt(classIdParam),
+            studentId: user.username,
             listEvaluationDetailInRequest: listEvaluationDetailInRequest
         }
         console.log(
@@ -165,6 +173,26 @@ const EvaluateTeacher = () => {
 
         console.log(evaluations)
     }
+
+    const getClassByClassId = async () => {
+        try {
+            const resp = await classApi.getByClassId(classIdParam)
+            console.log(
+                '🚀 ~ file: ClassDetail.js:267 ~ getClassByClassId ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                const { className, teacher } = { ...resp.data }
+                setEvaluationInfo({
+                    className: className,
+                    teacherName: teacher.fullname
+                })
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     const renderEvaluationForm = () => {
         return (
             <>
@@ -231,6 +259,10 @@ const EvaluateTeacher = () => {
             </Paper>
         )
     }
+
+    useEffect(() => {
+        getClassByClassId()
+    }, [])
     return (
         <Container mt={'md'}>
             <Center>
@@ -243,7 +275,7 @@ const EvaluateTeacher = () => {
                             variant="gradient"
                             gradient={{ from: 'indigo', to: 'cyan' }}
                         >
-                            Giáo viên: Tên Giáo viên ở đây
+                            Giáo viên: {evaluationInfo.teacherName}
                         </Badge>
                     </Center>
                     <Center>
@@ -251,7 +283,7 @@ const EvaluateTeacher = () => {
                             variant="gradient"
                             gradient={{ from: 'cyan', to: 'indigo' }}
                         >
-                            Lớp: Tên lớp ở đây
+                            Lớp: {evaluationInfo.className}
                         </Badge>
                     </Center>
                 </Group>

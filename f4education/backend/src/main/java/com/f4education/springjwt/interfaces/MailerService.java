@@ -27,6 +27,11 @@ public interface MailerService {
 	 */
 	void send(String[] to, String subject, String body) throws MessagingException;
 
+	void sendWhenClassSeted(String[] to, String className, String courseName, String teacherName,
+			String teacherId);
+
+	void sendToTeacherWhenClassSeted(String[] to, String className, String courseName);
+
 	void sendMailWithAttachment(String[] to, String subject, String body, byte[] file) throws MessagingException;
 
 	/**
@@ -52,9 +57,10 @@ public interface MailerService {
 	void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date);
 
-	void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link, byte[] pdfFile);
+	void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link,
+			byte[] pdfFile);
 
-	void mailNewTask(String to, String subject, String body, Date date, Task task);
+	void mailNewTask(String to[], String subject, String body, Date date, Task task);
 
-	void mailUpdateTask(String to, String subject, String body, Date date, Task oldTask, Task newTask);
+	void mailUpdateTask(String to[], String subject, String body, Date date, Task oldTask, Task newTask);
 }

@@ -107,4 +107,9 @@ public class CourseDetailServiceImpl implements CoursesDetailService {
 		courseDetail.setLessionTitle(courseDetailDTO.getLessionTitle());
 		courseDetail.setLessionContent(courseDetailDTO.getLessionContent());
 	}
+
+	@Override
+	public Integer countCourseDetailsByClassId(Integer classId) {
+		return courseDetailRepository.countCourseDetailsByClassId(classId);
+	}
 }

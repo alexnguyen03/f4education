@@ -173,7 +173,7 @@ export var routesClient = [
     {
         path: '/',
         name: 'Trang chủ',
-        icon: 'ni ni-tv-2 text-primary',
+        icon: 'fa-solid fa-house text-info',
         component: <Home />,
         layout: '/client'
     },
@@ -220,7 +220,7 @@ export var routesClient = [
     {
         path: '/student-information',
         name: 'Thông tin học viên',
-        icon: 'ni ni-planet text-blue',
+        icon: 'fa-solid fa-user-pen',
         component: <StudentInformation />,
         layout: '/client'
     },
@@ -263,35 +263,35 @@ export const routesTeacher = [
     {
         path: '/information',
         name: 'Thông tin tài khoản',
-        icon: 'ni ni-tv-2 text-primary',
+        icon: 'fa-solid fa-user-pen text-success',
         component: <InformationTeacher />,
         layout: '/teacher'
     },
     {
         path: '/class-info',
         name: 'Danh sách lớp học',
-        icon: 'ni ni-collection text-blue',
+        icon: 'fa-solid fa-clipboard-list text-info',
         component: <ClassInformation />,
         layout: '/teacher'
     },
     {
         path: '/resources',
         name: 'Tài nguyên',
-        icon: 'ni ni-collection text-blue',
+        icon: 'fa-solid fa-layer-group text-success',
         component: <TeacherResources />,
         layout: '/teacher'
     },
     {
         path: '/schedule',
         name: 'Lịch dạy',
-        icon: 'ni ni-collection text-blue',
+        icon: 'fa-solid fa-calendar-days text-warning',
         component: <TeacherSchedule />,
         layout: '/teacher'
     },
     {
         path: '/task/:classId',
         name: 'Giao bài tập',
-        icon: 'ni ni-collection text-blue',
+        icon: 'fa-solid fa-list-check text-danger',
         component: <TaskTeacher />,
         layout: '/teacher'
     },
@@ -307,21 +307,21 @@ export const routesTeacher = [
     },
     {
         path: '/class-info/point/:classId',
-        icon: 'ni ni-planet text-blue',
+        icon: 'fa-solid fa-square-poll-vertical ',
         component: <Points />,
         layout: '/teacher'
     },
     {
         path: '/class-result',
         name: 'Kết quả lớp học',
-        icon: 'ni ni-planet text-blue',
+        icon: 'fa-solid fa-square-poll-vertical text-primary',
         component: <ClassResult />,
         layout: '/teacher'
     },
     {
         path: '/class-progress',
         name: 'Tiến độ lớp học',
-        icon: 'ni ni-planet text-blue',
+        icon: 'fa-solid fa-bars-progress text-success',
         component: <ClassProgress />,
         layout: '/teacher'
     }
@@ -331,22 +331,15 @@ export const routesStudent = [
     {
         path: '/classes',
         name: 'Trang chủ',
-        icon: 'ni ni-planet text-blue',
+        icon: 'fa-solid fa-house text-info',
         component: <StudentHome />,
         layout: '/student'
     },
     {
         path: '/student-information',
         name: 'Thông tin học viên',
-        icon: 'ni ni-planet text-blue',
+        icon: 'fa-solid fa-user-pen text-success',
         component: <StudentInformation />,
-        layout: '/student'
-    },
-    {
-        path: '/quizz',
-        name: 'Thông tin bài kiểm tra',
-        icon: 'ni ni-planet text-blue',
-        component: <QuizzClient />,
         layout: '/student'
     },
     {
@@ -366,21 +359,21 @@ export const routesStudent = [
     {
         path: '/result',
         name: 'Kết quả học tập',
-        icon: 'ni ni-planet text-primary',
+        icon: 'fa-solid fa-square-poll-vertical text-primary',
         component: <LearningResult />,
         layout: '/student'
     },
     {
         path: '/payment-history',
         name: 'Lịch sử thanh toán',
-        icon: 'ni ni-planet text-primary',
+        icon: 'fa-solid fa-file-invoice text-primary',
         component: <PaymentHistory />,
         layout: '/student'
     },
     {
         path: '/attendance-review',
         name: 'Điểm danh',
-        icon: 'ni ni-planet text-primary',
+        icon: 'fa-regular fa-clock text-danger',
         component: <Attendance />,
         layout: '/student'
     }
@@ -409,4 +402,14 @@ export const routesEvaluation = [
         component: <EvaluateTeacherViewByTeacher />,
         layout: '/evaluation'
     }
+]
+
+export const routesQuiz = [
+    {
+        path: '/quizz',
+        name: 'Thông tin bài kiểm tra',
+        icon: 'ni ni-planet text-blue',
+        component: <QuizzClient />,
+        layout: '/quiz'
+    },
 ]

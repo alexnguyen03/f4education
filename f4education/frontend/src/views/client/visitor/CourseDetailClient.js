@@ -1321,7 +1321,7 @@ function CourseDetailClient() {
                                 niệm cơ bản cũng như:
                                 <List withPadding>
                                     <List.Item>
-                                        rút trích nội dung trang web
+                                        Rút trích nội dung trang web
                                     </List.Item>
                                     <List.Item>
                                         Phân tích cú pháp bảng tính PDF và Excel

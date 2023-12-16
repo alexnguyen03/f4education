@@ -93,6 +93,13 @@ const ClassInformation = () => {
         )
     })
 
+    const formatDate = (date) => {
+        const formattedDate = moment(new Date(date))
+            // .locale('vi')
+            .format(' DD/MM/yyyy')
+        return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
+    }
+
     // ************** Render UI
     const classInformationList = filteredClasses.map((c) => (
         <Grid.Col xl={3} lg={3} md={4} sm={6} key={c.classes.classId}>
@@ -244,6 +251,15 @@ const ClassInformation = () => {
                                     <Title order={2} fw={700} color="dark">
                                         Danh sách lớp học
                                     </Title>
+                                    <Button
+                                        color="green"
+                                        size="md"
+                                        onClick={() =>
+                                            navigate('/evaluation/teacher')
+                                        }
+                                    >
+                                        Xem đánh giá của học viên
+                                    </Button>
                                     <MediaQuery
                                         query="max-width: (780px)"
                                         styles={{ width: '100%' }}

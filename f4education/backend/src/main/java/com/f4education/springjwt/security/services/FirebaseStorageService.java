@@ -90,63 +90,14 @@ public class FirebaseStorageService {
                 return isUpdated;
         }
 
-        // public static String createUsername(String fullName) {
-        // String processedName = Normalizer.normalize(fullName, Form.NFD)
-        // .replaceAll("\\p{InCombiningDiacriticalMarks}+", "").replaceAll("đ", "d")
-        // .replaceAll("Đ", "D");
-
-        // String result = createNewString(processedName.toLowerCase());
-        // return result;
-        // }
-
-        // public static String createNewString(String input) {
-        // String[] words = input.split(" ");
-        // StringBuilder newString = new StringBuilder();
-
-        // if (words.length > 0) {
-        // newString.append(words[words.length - 1]); // Thêm từ cuối đầu tiên vào chuỗi
-        // mới
-
-        // // Thêm từng ký tự đầu của các từ còn lại vào chuỗi mới
-        // for (int i = 0; i < words.length - 1; i++) {
-        // if (!words[i].isEmpty()) {
-        // newString.append(words[i].charAt(0)); // Thêm ký tự đầu của từ
-        // }
-        // }
-        // }
-
-        // return newString.toString();
-        // }
-
         // public static void main(String[] args) {
-        // ArrayList<String> danhSachTenVaGioiTinh = new ArrayList<>();
-
-        // // Thêm thông tin vào ArrayList
-        // danhSachTenVaGioiTinh.add(new String("Nguyễn Văn An"));
-        // danhSachTenVaGioiTinh.add(new String("Trần Thị Bình"));
-        // danhSachTenVaGioiTinh.add(new String("Lê Văn Chiến"));
-        // danhSachTenVaGioiTinh.add(new String("Phạm Thị Dung"));
-        // danhSachTenVaGioiTinh.add(new String("Hoàng Văn Em"));
-        // danhSachTenVaGioiTinh.add(new String("Vũ Thị Phương"));
-        // danhSachTenVaGioiTinh.add(new String("Đặng Văn Giang"));
-        // danhSachTenVaGioiTinh.add(new String("Bùi Thị Hoa"));
-        // danhSachTenVaGioiTinh.add(new String("Đỗ Văn Ích"));
-        // danhSachTenVaGioiTinh.add(new String("Ngô Thị Khanh"));
-        // danhSachTenVaGioiTinh.add(new String("Hồ Văn Long"));
-        // danhSachTenVaGioiTinh.add(new String("Dương Thị Mai"));
-        // danhSachTenVaGioiTinh.add(new String("Mai Văn Nam"));
-        // danhSachTenVaGioiTinh.add(new String("Lý Thị Phượng"));
-        // danhSachTenVaGioiTinh.add(new String("Trịnh Văn Quân"));
-        // danhSachTenVaGioiTinh.add(new String("Phan Thị Linh"));
-        // danhSachTenVaGioiTinh.add(new String("Đinh Văn Sơn"));
-        // danhSachTenVaGioiTinh.add(new String("Trương Thị Thảo"));
-        // danhSachTenVaGioiTinh.add(new String("Võ Văn Uyên"));
-        // danhSachTenVaGioiTinh.add(new String("Đào Thị Vy"));
-
-        // // In danh sách tên và giới tính từ ArrayList
-        // for (String string : danhSachTenVaGioiTinh) {
-        // System.out.println(createUsername(string));
-
-        // }
+        // MailerServiceImpl mailer = new MailerServiceImpl();
+        // String[] toMail = { "nguyenhoainam121n@gmail.com" };
+        // mailer.sendWhenClassSeted(
+        // toMail,
+        // "foundClass.getClassName()",
+        // "foundClass.getClassName()",
+        // "foundClass.getClassName()",
+        // "registerCourseFound.getCourse().getCourseName()");
         // }
 }

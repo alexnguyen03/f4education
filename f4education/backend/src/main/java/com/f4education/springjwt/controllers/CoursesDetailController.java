@@ -66,6 +66,7 @@ public class CoursesDetailController {
 	@GetMapping("/{courseId}")
 	public ResponseEntity<?> getAllByCourseId(@PathVariable Integer courseId) {
 		List<CourseDetailDTO> list = courseService.getAllCourseDetailByCourseId(courseId);
+		System.out.println(list);
 		return ResponseEntity.ok(list);
 	}
 
@@ -213,12 +214,12 @@ public class CoursesDetailController {
 
 	private Object getCellValue(Cell cell) {
 		switch (cell.getCellType()) {
-		case NUMERIC:
-			return cell.getNumericCellValue();
-		case STRING:
-			return cell.getStringCellValue();
-		default:
-			return null;
+			case NUMERIC:
+				return cell.getNumericCellValue();
+			case STRING:
+				return cell.getStringCellValue();
+			default:
+				return null;
 		}
 	}
 
@@ -247,4 +248,10 @@ public class CoursesDetailController {
 		// Return ResponseEntity with InputStreamResource and headers
 		return new ResponseEntity<>(inputStreamResource, headers, HttpStatus.SC_OK);
 	}
+
+	@GetMapping("/schedule/check/{classId}")
+	public ResponseEntity<Integer> checkCourseDetailsByClassId(@PathVariable("classId") Integer classId) {
+		return ResponseEntity.ok(courseService.countCourseDetailsByClassId(classId));
+	}
+
 }

@@ -1,4 +1,4 @@
-import { Group, LoadingOverlay } from '@mantine/core'
+import { Alert, Group, LoadingOverlay } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import { Edit as EditIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
@@ -16,16 +16,21 @@ import classRoomApi from '../../api/classRoomApi'
 import scheduleApi from '../../api/scheduleApi'
 import { convertArrayToLabel } from '../../utils/Convertor'
 import Notify from '../../utils/Notify'
-import courseApi from 'api/courseApi'
+import courseApi from '../../api/courseApi'
+import courseDetailApi from '../../api/courseDetailApi'
+import { IconRefresh } from '@tabler/icons-react'
 function Schedules() {
     const [listClass, setListClass] = useState([])
     const [classListModal, setClassListModal] = useState(false)
     const [scheduleModal, setScheduleModal] = useState(false)
     const [choiceSessionModal, setChoiceSessionModal] = useState(false)
+    const [alertModal, setAlertModal] = useState(false)
     const [showlistSchedule, setShowlistSchedule] = useState(false)
     const [listSession, setListSession] = useState([])
     const [listSchedule, setListSchedule] = useState([])
     const [listClassroom, setListClassroom] = useState([])
+    const [numberOfContent, setNumberOfContent] = useState(0)
+
     const [listClassroomAndSession, setListClassroomAndSession] = useState([])
     const [classSelected, setClassSelected] = useState({
         classId: 0
@@ -58,6 +63,9 @@ function Schedules() {
                 break
             case 'choiceSessionModal':
                 setChoiceSessionModal((prevState) => !prevState)
+                break
+            case 'alertModal':
+                setAlertModal((prevState) => !prevState)
                 break
             case 'scheduleModal':
                 setScheduleModal((prevState) => !prevState)
@@ -338,13 +346,10 @@ function Schedules() {
     }
     const handleShowModal = (row) => {
         const classDetail = { ...row.original }
-        console.log(
-            '🚀 ~ file: Schedules.js:315 ~ handleShowModal ~ classDetail:',
-            classDetail
-        )
         toggleModal('choiceSessionModal')
         setClassSelected(classDetail)
     }
+
     const handleSetDate = async (val) => {
         setStartDate(val)
         try {
@@ -378,7 +383,16 @@ function Schedules() {
                             ) === i
                         )
                     })
-                setListSession(uniqueSessions)
+
+                console.log(
+                    '🚀 ~ file: Schedules.js:387 ~ handleSetDate ~ uniqueSessions:',
+                    uniqueSessions
+                )
+                setListSession(
+                    uniqueSessions.sort((a, b) =>
+                        a.sessionName.localeCompare(b.sessionName)
+                    )
+                )
                 setListClassroomAndSession(resp.data)
             }
         } catch (error) {
@@ -585,16 +599,15 @@ function Schedules() {
                             positionActionsColumn="last"
                             columns={columnsClasses}
                             data={listClass}
-                            // renderTopToolbarCustomActions={() => (
-                            //     <Button
-                            //         onClick={handleShowAddForm}
-                            //         color="success"
-                            //         variant="contained"
-                            //     >
-                            //         <i className="bx bx-layer-plus"></i>
-                            //         Thêm khóa học
-                            //     </Button>
-                            // )}
+                            renderTopToolbarCustomActions={() => (
+                                <Button
+                                    onClick={fetchAllClass}
+                                    color="success"
+                                    variant="contained"
+                                >
+                                    <IconRefresh />
+                                </Button>
+                            )}
                             enableRowActions
                             renderRowActions={({ row, table }) => (
                                 <Box
@@ -654,6 +667,7 @@ function Schedules() {
                                     style={{ cursor: 'pointer' }}
                                     onClick={() => {
                                         setShowlistSchedule(false)
+                                        fetchAllClass()
                                     }}
                                 >
                                     <i className="fa-solid fa-list"></i>
@@ -882,7 +896,7 @@ function Schedules() {
                                                 'classroomId',
                                                 'classroomName'
                                             )}
-                                            placeholder="Chọn phòng học học"
+                                            placeholder="Chọn phòng học"
                                             onChange={(val) => {
                                                 setClassroomSelected(val)
                                             }}
@@ -905,6 +919,7 @@ function Schedules() {
                         </Row>
                     </div>
                 </Modal>
+
                 <Modal
                     className="modal-dialog-centered"
                     isOpen={scheduleModal}

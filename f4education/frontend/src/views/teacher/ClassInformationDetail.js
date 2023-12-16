@@ -65,6 +65,11 @@ const ClassInformationDetail = () => {
     const [loading, setLoading] = useState(false)
     const [classStudyToday, setClassStudyToday] = useState(false)
 
+    const [examOpenedAgain, handlersAgain] = useDisclosure(false, {
+        onOpen: () => console.log('Opened'),
+        onClose: () => console.log('Closed')
+    })
+
     const [examOpened, handlers] = useDisclosure(false, {
         onOpen: () => console.log('Opened'),
         onClose: () => console.log('Closed')
@@ -196,6 +201,27 @@ const ClassInformationDetail = () => {
         handlers.close()
     }
 
+    const updateExamination = async () => {
+        const classId = classInfor.classId
+        try {
+            const id = toast(Notify.msg.loading, Notify.options.loading())
+
+            const resp = await questionApi.updateExamination(classId)
+            if (resp.status === 200) {
+                toast.update(id, Notify.options.againSuccess())
+            } else {
+                toast.update(id, Notify.options.updateError())
+            }
+        } catch (error) {
+            toast(Notify.options.updateError())
+            console.log(
+                '🚀 ~ file: ClassInformationDetail.js:105 ~ settingQuizz ~ error:',
+                error
+            )
+        }
+        handlersAgain.close()
+    }
+
     const checkActivedExam = async () => {
         const classId = data.classId
 
@@ -220,7 +246,7 @@ const ClassInformationDetail = () => {
     }
 
     const redirectTo = () => {
-        return navigate('/teacher/class-infor')
+        return navigate('/teacher/class-info')
     }
 
     // ********* Action Area
@@ -559,6 +585,14 @@ const ClassInformationDetail = () => {
                                     Tạo quiz
                                 </Button>
                                 <Button
+                                    onClick={handlersAgain.open}
+                                    color="cyan"
+                                    size="md"
+                                    mb="md"
+                                >
+                                   Mở lại bài thi
+                                </Button>
+                                <Button
                                     color="indigo"
                                     size="md"
                                     mb="md"
@@ -702,6 +736,28 @@ const ClassInformationDetail = () => {
                             <Button color="red">Không, để sau</Button>
                             <Button onClick={settingQuizz} color="teal">
                                 Có, tạo ngay
+                            </Button>
+                        </Group>
+                    </Modal.Body>
+                </Modal.Content>
+            </Modal.Root>
+            {/* Modal again */}
+            <Modal.Root opened={examOpenedAgain} onClose={handlersAgain.close} centered>
+                <Modal.Overlay />
+                <Modal.Content>
+                    <Modal.Header>
+                        <Modal.Title>Xác nhận mở lại bài thi</Modal.Title>
+                        <Modal.CloseButton />
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Title order={3} weight={100} align="center">
+                            Bạn có chắc chắn muốn mở lại bài thi cho lớp{' '}
+                            {classInfor.className} không ?{' '}
+                        </Title>
+                        <Group grow mt={'lg'}>
+                            <Button color="red" onClick={handlersAgain.close}>Không, để sau</Button>
+                            <Button onClick={updateExamination} color="teal">
+                                Có, mở lại ngay
                             </Button>
                         </Group>
                     </Modal.Body>

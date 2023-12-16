@@ -3,7 +3,11 @@ import axiosClient from './axiosClient'
 // api/courseApi.js
 const courseApi = {
     getAll: (studentId) => {
-        const url = `/courses/get-all/${studentId}`
+        const url = `/courses/get-all?studentId=${studentId}`
+        return axiosClient.get(url)
+    },
+    getAll: () => {
+        const url = '/courses'
         return axiosClient.get(url)
     },
     getAllCourseHistory: () => {
@@ -30,8 +34,12 @@ const courseApi = {
             headers: { 'Content-Type': 'multipart/form-data' }
         })
     },
-    findCoursesByCheckedSubjects: (checkedSubjects) => {
-        const url = `/courses/topic/${checkedSubjects}`
+    findCoursesByCheckedSubjects: (checkedSubjects, studentId) => {
+        const url = `/courses/topic/${checkedSubjects}?studentId=${studentId}`
+        return axiosClient.get(url)
+    },
+    findCoursesByCheckedRating: (star, studentId) => {
+        const url = `/courses/rating/${star}?studentId=${studentId}`
         return axiosClient.get(url)
     },
     findCoursesByCheckedDurations: (checkedDurations) => {

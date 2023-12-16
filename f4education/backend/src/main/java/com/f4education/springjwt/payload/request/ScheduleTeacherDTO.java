@@ -1,8 +1,8 @@
 package com.f4education.springjwt.payload.request;
 
 import java.sql.Time;
-import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 
 import com.f4education.springjwt.models.Schedule;
 
@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleTeacherDTO {
-    private OffsetDateTime date;
+    private Date date;
     private String classRoomName;
     private Integer classId;
 

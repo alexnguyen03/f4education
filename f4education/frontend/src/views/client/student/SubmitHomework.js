@@ -25,6 +25,7 @@ import { MaterialReactTable } from 'material-react-table'
 import { Delete as DeleteIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
 import { Dropzone } from '@mantine/dropzone'
+import { IconRefresh } from '@tabler/icons-react'
 import {
     IconBookUpload,
     IconUpload,
@@ -259,11 +260,27 @@ const SubmitHomework = () => {
                 <Grid.Col span={3} mx={40}>
                     <Center>
                         <DatePicker
-                            // defaultValue={new Date()}
+                            key={
+                                selectedDate ? selectedDate.toString() : 'null'
+                            }
+                            defaultValue={selectedDate}
                             onChange={(date) => setSelectedDate(date)}
                             size="lg"
                             bg={'#FFFFFF'}
                         />
+                    </Center>
+                    <Center>
+                        <Button
+                            mt={5}
+                            variant="filled"
+                            color="violet"
+                            onClick={() => {
+                                getAllTaskByClassId()
+                                setSelectedDate(null)
+                            }}
+                        >
+                            <IconRefresh />
+                        </Button>
                     </Center>
                 </Grid.Col>
                 <Grid.Col span={8} bg={'#ebebeb'}>

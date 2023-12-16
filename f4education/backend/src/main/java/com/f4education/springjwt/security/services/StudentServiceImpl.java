@@ -6,6 +6,7 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.f4education.springjwt.interfaces.StudentService;
 import com.f4education.springjwt.models.Classes;
@@ -40,6 +41,7 @@ public class StudentServiceImpl implements StudentService {
 	}
 
 	@Override
+	@Transactional
 	public StudentDTO updateStudent(StudentDTO studentDTO) {
 		Student student = studentRepository.findById(studentDTO.getStudentId()).get();
 		Long oldId = student.getUser().getId();

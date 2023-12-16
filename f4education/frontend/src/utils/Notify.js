@@ -103,6 +103,13 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        againSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Mở lại thành công!',
+                ...defaultOptions
+            }
+        },
 
         //! toast ERROR ----------------------------------------------------------------
         createErrorParam: (message) => {

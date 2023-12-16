@@ -12,7 +12,7 @@ import { routesStudent } from '../routes'
 const Student = (props) => {
     const mainContent = useRef(null)
     const location = useLocation()
-    const [showSideBar, setShowSideBar] = useState(true)
+    const [showSideBar, setShowSideBar] = useState(false)
 
     useEffect(() => {}, [])
 
@@ -44,10 +44,15 @@ const Student = (props) => {
             {/* {showSideBar && ( */}
 
             {/* )} */}
-
             {showSideBar && (
-                <TeacherAndStudentSidebar {...props} routes={routesStudent} />
+                <TeacherAndStudentSidebar
+                    // style={{ position: 'fixed' }}
+                    {...props}
+                    isOpen={showSideBar}
+                    routes={routesStudent}
+                />
             )}
+
             <Container
                 className="main-content "
                 style={{ backgroundColor: '#fff', minHeight: '100vh' }}
