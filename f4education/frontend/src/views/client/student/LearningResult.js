@@ -60,10 +60,14 @@ const LearningResult = () => {
 
                     const newClassesData = {
                         ...classes,
-                        averagePoint: pointData.averagePoint,
-                        attendancePoint: pointData.attendancePoint,
-                        exercisePoint: pointData.exercisePoint,
-                        quizzPoint: pointData.quizzPoint
+                        averagePoint:
+                            pointData !== null ? pointData.averagePoint : 0,
+                        attendancePoint:
+                            pointData !== null ? pointData.attendancePoint : 0,
+                        exercisePoint:
+                            pointData !== null ? pointData.exercisePoint : 0,
+                        quizzPoint:
+                            pointData !== null ? pointData.quizzPoint : 0
                     }
 
                     resultClass.push(newClassesData)

@@ -65,7 +65,7 @@ const CourseProgress = () => {
     const [evaluated, setEvaluated] = useState(false)
 
     const params = useParams()
-    const [classIsFinish, setClassIsFinish] = useState(true)
+    const [classIsFinish, setClassIsFinish] = useState(false)
 
     const startQuiz = () => {
         document.documentElement.requestFullscreen().catch((err) => {

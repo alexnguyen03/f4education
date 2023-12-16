@@ -123,7 +123,7 @@ const AdminNavbar = (props) => {
                                 </DropdownItem>
 
                                 <DropdownItem divider />
-                                <DropdownItem href="#pablo" onClick={openModal}>
+                                <DropdownItem onClick={openModal}>
                                     <i className="ni ni-user-run text-danger" />
                                     <span>Đăng xuất</span>
                                 </DropdownItem>

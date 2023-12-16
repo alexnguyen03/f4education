@@ -43,6 +43,7 @@ function Schedules() {
 
     const [startDate, setStartDate] = useState(null)
     const [scheduleSelectedRow, setScheduleSelectedRow] = useState({
+        number: 0,
         scheduleId: '',
         studyDate: '',
         session: '',
@@ -440,21 +441,17 @@ function Schedules() {
         }
     }
     const handleChangeSchedule = (row) => {
+        console.log(
+            '🚀 ~ file: Schedules.js:444 ~ handleChangeSchedule ~ row:',
+            row
+        )
         toggleModal('scheduleModal')
 
         setScheduleSelectedRow({
+            number: parseInt(row.index + 1),
             ...row.original,
             studyDate: row.original.studyDate
         })
-        const studyDateSelected = row.original.studyDate
-        console.log(
-            '🚀 ~ file: Schedules.js:390 ~ handleChangeSchedule ~ studyDateSelected:',
-            studyDateSelected
-        )
-        console.log(
-            '🚀 ~ file: Schedules.js:385 ~ handleChangeSchedule ~ row.original:',
-            moment(row.original.studyDate).add(1, 'day')
-        )
     }
 
     const handleGetScheduleByClassId = async (row) => {
@@ -997,10 +994,7 @@ function Schedules() {
                                     <Badge color={'primary'}>
                                         {' '}
                                         Bạn đang chọn Buổi thứ:{' '}
-                                        {scheduleSelectedRow &&
-                                            scheduleSelectedRow.scheduleId +
-                                                1}{' '}
-                                        -{' '}
+                                        {scheduleSelectedRow.number} -{' '}
                                         {formatDate(
                                             scheduleSelectedRow.studyDate._d
                                         )}
