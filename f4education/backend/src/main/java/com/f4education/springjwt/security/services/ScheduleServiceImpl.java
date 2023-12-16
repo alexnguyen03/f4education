@@ -103,10 +103,10 @@ public class ScheduleServiceImpl implements ScheduleService {
 			String[] mail = mails.toArray(new String[0]);
 			if (isUpdate) {
 				// ! Mail thời khóa biểu mới
-				mailer.mailNewSchedule(mail, null, null, null, classes);
+				mailer.mailUpdateSchedule(mail, null, null, null, classes);
 			} else {
 				// ! Mail thời khóa biểu mới
-				mailer.mailUpdateSchedule(mail, null, null, null, classes);
+				mailer.mailNewSchedule(mail, null, null, null, classes);
 			}
 		}
 	}

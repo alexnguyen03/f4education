@@ -583,129 +583,238 @@ public class MailerServiceImpl implements MailerService {
 	}
 
 	@Override
-	public void mailNewSchedule(String[] to, String subject, String body, Date date, Classes classes) {
+	public void mailUpdateSchedule(String[] to, String subject, String body, Date date, Classes classes) {
 		// ! Mails khi mới bổ sung thời khóa biểu
+		subject = "Thông Báo Thay Đổi Lịch Học";
+
 		Date studyDate = null;
 		try {
 			studyDate = classes.getSchedules().get(0).getStudyDate();
 		} catch (Exception e) {
 		}
-		String htmlBody = "<!DOCTYPE html>\r\n" + //
-				"<html>\r\n" + //
-				"\r\n" + //
-				"<head>\r\n" + //
-				"    <style>\r\n" + //
-				"        a {\r\n" + //
-				"            text-decoration: none;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        body {\r\n" + //
-				"            font-family: Arial, sans-serif;\r\n" + //
-				"            line-height: 1.6;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        .container {\r\n" + //
-				"            max-width: 650px;\r\n" + //
-				"            margin: 0 auto;\r\n" + //
-				"            padding: 20px;\r\n" + //
-				"            border: 1px solid #f5f3f3;\r\n" + //
-				"            border-radius: 5px;\r\n" + //
-				"            background-color: #f9f9f9;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        h1 {\r\n" + //
-				"            color: #333;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        p,\r\n" + //
-				"        .footer {\r\n" + //
-				"            color: #666;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        .button {\r\n" + //
-				"            display: inline-block;\r\n" + //
-				"            padding: 6px 12px;\r\n" + //
-				"            border: none;\r\n" + //
-				"            background-color: #228be6;\r\n" + //
-				"            color: #fff;\r\n" + //
-				"            font-size: 16px;\r\n" + //
-				"            font-weight: 600;\r\n" + //
-				"            text-align: center;\r\n" + //
-				"            text-decoration: none;\r\n" + //
-				"            cursor: pointer;\r\n" + //
-				"            border-radius: 4px;\r\n" + //
-				"            transition: background-color 0.3s ease;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        /* CSS cho bảng */\r\n" + //
-				"        table {\r\n" + //
-				"            width: 100%;\r\n" + //
-				"            margin-bottom: 1rem;\r\n" + //
-				"            color: #212529;\r\n" + //
-				"            border-collapse: collapse;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        th,\r\n" + //
-				"        td {\r\n" + //
-				"            padding: 0.75rem;\r\n" + //
-				"            vertical-align: top;\r\n" + //
-				"            border-top: 1px solid #dee2e6;\r\n" + //
-				"            text-align: center;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        thead {\r\n" + //
-				"            background-color: #e9ecef;\r\n" + //
-				"            border-bottom: 2px solid #dee2e6;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        tbody tr:nth-of-type(even) {\r\n" + //
-				"            background-color: #f8f9fa;\r\n" + //
-				"        }\r\n" + //
-				"\r\n" + //
-				"        tbody tr:hover {\r\n" + //
-				"            background-color: rgba(0, 0, 0, 0.075);\r\n" + //
-				"        }\r\n" + //
-				"    </style>\r\n" + //
-				"</head>\r\n" + //
-				"\r\n" + //
-				"<body>\r\n" + //
-				"    <div class=\"container\">\r\n" + //
-				"        <h2>Thông báo: lớp học " + classes.getClassName() + " đã được bổ sung thời khóa biểu</h2>\r\n"
-				+ //
-				"        <p>Kính gửi các bạn học viên của lớp " + classes.getClassName() + ".</p>\r\n" + //
-				"        <p>Thời khóa biểu của lớp đã được bổ sung trên hệ thống! Buổi học đầu tiên sẽ bắt đầu vào ngày: "
-				+ formatDate(studyDate) + "</p>\r\n" + //
+		String htmlBody = "<!DOCTYPE html>\r\n" +
+				"<html>\r\n" +
+				"\r\n" +
+				"<head>\r\n" +
+				"    <style>\r\n" +
+				"        a {\r\n" +
+				"            text-decoration: none;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        body {\r\n" +
+				"            font-family: Arial, sans-serif;\r\n" +
+				"            line-height: 1.6;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        .container {\r\n" +
+				"            max-width: 650px;\r\n" +
+				"            margin: 0 auto;\r\n" +
+				"            padding: 20px;\r\n" +
+				"            border: 1px solid #f5f3f3;\r\n" +
+				"            border-radius: 5px;\r\n" +
+				"            background-color: #f9f9f9;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        h1 {\r\n" +
+				"            color: #333;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        .button {\r\n" +
+				"            display: inline-block;\r\n" +
+				"            padding: 6px 12px;\r\n" +
+				"            border: none;\r\n" +
+				"            background-color: #228be6;\r\n" +
+				"            color: #fff;\r\n" +
+				"            font-size: 16px;\r\n" +
+				"            font-weight: 600;\r\n" +
+				"            text-align: center;\r\n" +
+				"            text-decoration: none;\r\n" +
+				"            cursor: pointer;\r\n" +
+				"            border-radius: 4px;\r\n" +
+				"            transition: background-color 0.3s ease;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        /* CSS cho bảng */\r\n" +
+				"        table {\r\n" +
+				"            width: 100%;\r\n" +
+				"            margin-bottom: 1rem;\r\n" +
+				"            color: #212529;\r\n" +
+				"            border-collapse: collapse;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        th,\r\n" +
+				"        td {\r\n" +
+				"            padding: 0.75rem;\r\n" +
+				"            vertical-align: top;\r\n" +
+				"            border-top: 1px solid #dee2e6;\r\n" +
+				"            text-align: center;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        thead {\r\n" +
+				"            background-color: #e9ecef;\r\n" +
+				"            border-bottom: 2px solid #dee2e6;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        tbody tr:nth-of-type(even) {\r\n" +
+				"            background-color: #f8f9fa;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        tbody tr:hover {\r\n" +
+				"            background-color: rgba(0, 0, 0, 0.075);\r\n" +
+				"        }\r\n" +
+				"    </style>\r\n" +
+				"</head>\r\n" +
+				"\r\n" +
+				"<body>\r\n" +
+				"    <div class=\"container\">\r\n" +
+				"        <h2>Thông báo: lớp học " + classes.getClassName()
+				+ " đã được chỉnh sửa thời khóa biểu</h2>\r\n"
+				+
+				"        <p>Kính gửi các bạn học viên của lớp " + classes.getClassName() + ".</p>\r\n" +
+				"        <p>Thời khóa biểu của lớp đã được chỉnh sửa bổ sung sung trên hệ thống!" +
 
-				"        <p>Thông tin chi tiết về thời khóa biểu, vui lòng xem thông tin: <a\r\n" + //
-				"                href=\"http://localhost:3000/student/classes?classId=" + classes.getClassId()
+				"        <p>Thông tin chi tiết về thời khóa biểu, vui lòng xem thông tin: <br> <a\r\n" +
+				"                href=\"http:localhost:3000/student/classes?classId=" + classes.getClassId()
 				+ "\" class=\"button\">Xem thông tin thời khóa\r\n"
-				+ //
-				"                biểu</a>.\r\n" + //
-				"        </p>\r\n" + //
+				+
+				"                biểu</a>.\r\n" +
+				"        </p>\r\n" +
 				"        <p>Xin vui lòng kiểm tra lại thông tin chi tiết trên hệ thống và chuẩn bị cho việc học tập.</p>\r\n"
-				+ //
-				"        <p>Chúc các bạn học viên có một khóa học tốt lành!</p>\r\n" + //
-				"        <hr>\r\n" + //
-				"        <p>Trân trọng,</p>\r\n" + //
-				"        <p>Đội ngũ Quản lý Học viên</p>\r\n" + //
-				"        <div class=\"footer\">\r\n" + //
-				"            Trung tâm đào tạo kháo học lập trình ngắn hạn - F4Education.\r\n" + //
-				"        </div>\r\n" + //
-				"        <div style=\"padding: 20px 0;\">\r\n" + //
-				"            <img src=\"https://storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
-				+ //
-				"        </div>\r\n" + //
-				"    </div>\r\n" + //
-				"</body>\r\n" + //
-				"\r\n" + //
+				+
+				"        <p>Chúc các bạn học viên có một khóa học tốt lành!</p>\r\n" +
+				"        <hr>\r\n" +
+				"        <p>Trân trọng,</p>\r\n" +
+				"        <p>Đội ngũ Quản lý Học viên</p>\r\n" +
+				"        <div class=\"footer\">\r\n" +
+				"            Trung tâm đào tạo kháo học lập trình ngắn hạn - F4Education.\r\n" +
+				"        </div>\r\n" +
+				"        <div style=\"padding: 20px 0;\">\r\n" +
+				"            <img src=\"https:storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
+				+
+				"        </div>\r\n" +
+				"    </div>\r\n" +
+				"</body>\r\n" +
+				"\r\n" +
 				"</html>";
 		queue(new MailInfo(to, to, subject, htmlBody));
 		System.out.println("Email đã được gửi thành công!");
 	}
 
 	@Override
-	public void mailUpdateSchedule(String[] to, String subject, String body, Date date, Classes classes) {
-		// ! Mails khi cập nhật thời khóa biểu mới
+	public void mailNewSchedule(String[] to, String subject, String body, Date date, Classes classes) {
+		// ! Mails khi mới bổ sung thời khóa biểu
+		subject = "Thông Báo Bổ Sung Lịch Học";
+		Date studyDate = null;
+		try {
+			studyDate = classes.getSchedules().get(0).getStudyDate();
+		} catch (Exception e) {
+		}
+		String htmlBody = "<!DOCTYPE html>\r\n" +
+				"<html>\r\n" +
+				"\r\n" +
+				"<head>\r\n" +
+				"    <style>\r\n" +
+				"        a {\r\n" +
+				"            text-decoration: none;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        body {\r\n" +
+				"            font-family: Arial, sans-serif;\r\n" +
+				"            line-height: 1.6;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        .container {\r\n" +
+				"            max-width: 650px;\r\n" +
+				"            margin: 0 auto;\r\n" +
+				"            padding: 20px;\r\n" +
+				"            border: 1px solid #f5f3f3;\r\n" +
+				"            border-radius: 5px;\r\n" +
+				"            background-color: #f9f9f9;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        h1 {\r\n" +
+				"            color: #333;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        .button {\r\n" +
+				"            display: inline-block;\r\n" +
+				"            padding: 6px 12px;\r\n" +
+				"            border: none;\r\n" +
+				"            background-color: #228be6;\r\n" +
+				"            color: #fff;\r\n" +
+				"            font-size: 16px;\r\n" +
+				"            font-weight: 600;\r\n" +
+				"            text-align: center;\r\n" +
+				"            text-decoration: none;\r\n" +
+				"            cursor: pointer;\r\n" +
+				"            border-radius: 4px;\r\n" +
+				"            transition: background-color 0.3s ease;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        /* CSS cho bảng */\r\n" +
+				"        table {\r\n" +
+				"            width: 100%;\r\n" +
+				"            margin-bottom: 1rem;\r\n" +
+				"            color: #212529;\r\n" +
+				"            border-collapse: collapse;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        th,\r\n" +
+				"        td {\r\n" +
+				"            padding: 0.75rem;\r\n" +
+				"            vertical-align: top;\r\n" +
+				"            border-top: 1px solid #dee2e6;\r\n" +
+				"            text-align: center;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        thead {\r\n" +
+				"            background-color: #e9ecef;\r\n" +
+				"            border-bottom: 2px solid #dee2e6;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        tbody tr:nth-of-type(even) {\r\n" +
+				"            background-color: #f8f9fa;\r\n" +
+				"        }\r\n" +
+				"\r\n" +
+				"        tbody tr:hover {\r\n" +
+				"            background-color: rgba(0, 0, 0, 0.075);\r\n" +
+				"        }\r\n" +
+				"    </style>\r\n" +
+				"</head>\r\n" +
+				"\r\n" +
+				"<body>\r\n" +
+				"    <div class=\"container\">\r\n" +
+				"        <h2>Thông báo: lớp học " + classes.getClassName() + " đã được bổ sung thời khóa biểu</h2>\r\n"
+				+
+				"        <p>Kính gửi các bạn học viên của lớp " + classes.getClassName() + ".</p>\r\n" +
+				"        <p>Thời khóa biểu của lớp đã được bổ sung trên hệ thống! Buổi học đầu tiên sẽ bắt đầu vào ngày: "
+				+ formatDate(studyDate) + "</p>\r\n" +
+
+				"        <p>Thông tin chi tiết về thời khóa biểu, vui lòng xem thông tin: <br><a\r\n" +
+				"                href=\"http:localhost:3000/student/classes?classId=" + classes.getClassId()
+				+ "\" class=\"button\">Xem thông tin thời khóa\r\n"
+				+
+				"                biểu</a>.\r\n" +
+				"        </p>\r\n" +
+				"        <p>Xin vui lòng kiểm tra lại thông tin chi tiết trên hệ thống và chuẩn bị cho việc học tập.</p>\r\n"
+				+
+				"        <p>Chúc các bạn học viên có một khóa học tốt lành!</p>\r\n" +
+				"        <hr>\r\n" +
+				"        <p>Trân trọng,</p>\r\n" +
+				"        <p>Đội ngũ Quản lý Học viên</p>\r\n" +
+				"        <div class=\"footer\">\r\n" +
+				"            Trung tâm đào tạo kháo học lập trình ngắn hạn - F4Education.\r\n" +
+				"        </div>\r\n" +
+				"        <div style=\"padding: 20px 0;\">\r\n" +
+				"            <img src=\"https:storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
+				+
+				"        </div>\r\n" +
+				"    </div>\r\n" +
+				"</body>\r\n" +
+				"\r\n" +
+				"</html>";
+		queue(new MailInfo(to, to, subject, htmlBody));
+		System.out.println("Email đã được gửi thành công!");
 	}
 
 	// public static void main(String[] args) {
