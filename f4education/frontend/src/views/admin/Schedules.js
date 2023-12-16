@@ -30,6 +30,7 @@ function Schedules() {
     const [listSchedule, setListSchedule] = useState([])
     const [listClassroom, setListClassroom] = useState([])
     const [numberOfContent, setNumberOfContent] = useState(0)
+    const [updateSchedule, setUpdateSchedule] = useState(false)
 
     const [listClassroomAndSession, setListClassroomAndSession] = useState([])
     const [classSelected, setClassSelected] = useState({
@@ -285,7 +286,6 @@ function Schedules() {
         }
     }
     const handleUpdateSchedule = () => {
-        console.log(scheduleSelectedRow.scheduleId)
         const oldSchedule = listSchedule.filter((item) => {
             if (item.scheduleId < scheduleSelectedRow.scheduleId) {
                 return {
@@ -299,10 +299,6 @@ function Schedules() {
                 }
             }
         })
-        console.log(
-            '🚀 ~ file: Schedules.js:299 ~ oldSchedule ~ oldSchedule:',
-            oldSchedule
-        )
         if (oldSchedule.length === 0) {
             toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
             toggleModal('scheduleModal')
@@ -313,10 +309,6 @@ function Schedules() {
         const numberOfLessons =
             classSelected.registerCourses[0].courseDuration / 2 -
             oldSchedule.length
-        console.log(
-            '🚀 ~ file: Schedules.js:306 ~ handleUpdateSchedule ~ numberOfLessons:',
-            numberOfLessons
-        )
 
         const lsScheduleUpdate = generateTimetable(startDate, numberOfLessons)
 
@@ -336,10 +328,7 @@ function Schedules() {
                 content: content
             }
         })
-        console.log(
-            '🚀 ~ file: Schedules.js:327 ~ newSchedule ~ newSchedule:',
-            newSchedule
-        )
+        setUpdateSchedule(true)
         // toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
         toggleModal('scheduleModal')
         setListSchedule([...oldSchedule, ...newSchedule])
@@ -406,7 +395,8 @@ function Schedules() {
                 classroomId: classroomSelected.value,
                 adminId: adminId,
                 sessionId: sessionSelected.value,
-                listSchedule: listSchedule
+                listSchedule: listSchedule,
+                isUpdate: updateSchedule
             }
             console.log(
                 '🚀 ~ file: Schedules.js:364 ~ handleSaveSchedule ~ scheduleRequest:',

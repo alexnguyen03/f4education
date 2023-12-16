@@ -157,7 +157,7 @@ const Notify = {
         usedEmail: () => {
             return {
                 type: toast.TYPE.ERROR,
-                render: 'Email đã được sử dụng!',
+                render: 'Email đã được đăng ký tài khoản!',
                 ...defaultOptions
             }
         },
