@@ -329,29 +329,29 @@ const Points = () => {
                         const item = resp.data[i]
                         certificateIdRef.current = item.certificateId
 
-                        // await Promise.all([
-                        //     updateInstance(
-                        //         <CertificateDownload
-                        //             certificateId={parseInt(
-                        //                 certificateIdRef.current
-                        //             )}
-                        //             awaitComplete={awaitComplete}
-                        //         />
-                        //     )
-                        // ])
+                        await Promise.all([
+                            updateInstance(
+                                <CertificateDownload
+                                    certificateId={parseInt(
+                                        certificateIdRef.current
+                                    )}
+                                    awaitComplete={awaitComplete}
+                                />
+                            )
+                        ])
 
-                        const blob = await pdf(
-                            <CertificateDownload
-                                certificateId={parseInt(
-                                    certificateIdRef.current
-                                )}
-                            />
-                        ).toBlob()
+                        // const blob = await pdf(
+                        //     <CertificateDownload
+                        //         certificateId={parseInt(
+                        //             certificateIdRef.current
+                        //         )}
+                        //     />
+                        // ).toBlob()
 
-                        console.log(blob)
+                        console.log(instance.blob)
 
                         updatedListCertificateDownload.push({
-                            blob: blob,
+                            blob: instance.blob,
                             certificateId: item.certificateId
                         })
                     }
@@ -423,7 +423,7 @@ const Points = () => {
 
             if (resp.status === 200) {
                 console.log('close class')
-                navigate('/teacher/class-infor')
+                navigate('/teacher/class-info')
             }
         } catch (error) {
             console.log(error)

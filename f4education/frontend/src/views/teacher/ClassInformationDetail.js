@@ -350,7 +350,6 @@ const ClassInformationDetail = () => {
                                 { label: 'Có mặt', value: 'present' },
                                 { label: 'Vắng mặt', value: 'absent' }
                             ]}
-                            disabled={classStudyToday === false}
                             onClick={(e) => {
                                 handlCheckAttandance(e, row.studentId)
                             }}
@@ -767,7 +766,8 @@ const ClassInformationDetail = () => {
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
-            {/* Modal again */}
+
+            {/* Modal quiz */}
             <Modal.Root
                 opened={examOpenedAgain}
                 onClose={handlersAgain.close}
@@ -795,6 +795,8 @@ const ClassInformationDetail = () => {
                     </Modal.Body>
                 </Modal.Content>
             </Modal.Root>
+
+            {/* Modal upload data */}
             <Modal size="70%" opened={opened} onClose={close} centered>
                 <Center>
                     <Title order={2} mb={30}>

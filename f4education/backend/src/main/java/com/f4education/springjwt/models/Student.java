@@ -39,34 +39,34 @@ public class Student implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	List<Bill> bills;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	List<Evaluate> evaluates;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	List<Point> points;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	List<RegisterCourse> registerCourses;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	List<QuizResult> quizResults;
 
 	@OneToMany(mappedBy = "student")
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	private List<Attendance> attendances;
 	@JsonIgnore
-	@Access(AccessType.PROPERTY)
+//	@Access(AccessType.PROPERTY)
 	@OneToMany(mappedBy = "student")
 	private List<EvaluationTeacher> evaluationTeachers;
 
@@ -75,61 +75,61 @@ public class Student implements Serializable {
 	@JoinColumn(name = "account_id")
 	User user;
 
-	public List<Attendance> getAttendances() {
-		return new ArrayList<>(attendances);
-	}
-
-	public List<Bill> getBills() {
-		return new ArrayList<>(bills);
-	}
-
-	public void setBills(List<Bill> bills) {
-		this.bills = bills;
-	}
-
-	public List<EvaluationTeacher> getEvaluationTeachers() {
-		return new ArrayList<>(evaluationTeachers);
-	}
-
-	public void setEvaluationTeachers(List<EvaluationTeacher> evaluationTeachers) {
-		this.evaluationTeachers = evaluationTeachers;
-	}
-
-	public List<Evaluate> getEvaluates() {
-		return new ArrayList<>(evaluates);
-	}
-
-	public void setEvaluates(List<Evaluate> evaluates) {
-		this.evaluates = evaluates;
-	}
-
-	public List<Point> getPoints() {
-		return new ArrayList<>(points);
-	}
-
-	public void setPoints(List<Point> points) {
-		this.points = points;
-	}
-
-	public List<RegisterCourse> getRegisterCourses() {
-		return new ArrayList<>(registerCourses);
-	}
-
-	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
-		this.registerCourses = registerCourses;
-	}
-
-	public List<QuizResult> getQuizResults() {
-		return new ArrayList<>(quizResults);
-	}
-
-	public void setQuizResults(List<QuizResult> quizResults) {
-		this.quizResults = quizResults;
-	}
-
-	public void setAttendances(List<Attendance> attendances) {
-		this.attendances = attendances;
-	}
+//	public List<Attendance> getAttendances() {
+//		return new ArrayList<>(attendances);
+//	}
+//
+//	public List<Bill> getBills() {
+//		return new ArrayList<>(bills);
+//	}
+//
+//	public void setBills(List<Bill> bills) {
+//		this.bills = bills;
+//	}
+//
+//	public List<EvaluationTeacher> getEvaluationTeachers() {
+//		return new ArrayList<>(evaluationTeachers);
+//	}
+//
+//	public void setEvaluationTeachers(List<EvaluationTeacher> evaluationTeachers) {
+//		this.evaluationTeachers = evaluationTeachers;
+//	}
+//
+//	public List<Evaluate> getEvaluates() {
+//		return new ArrayList<>(evaluates);
+//	}
+//
+//	public void setEvaluates(List<Evaluate> evaluates) {
+//		this.evaluates = evaluates;
+//	}
+//
+//	public List<Point> getPoints() {
+//		return new ArrayList<>(points);
+//	}
+//
+//	public void setPoints(List<Point> points) {
+//		this.points = points;
+//	}
+//
+//	public List<RegisterCourse> getRegisterCourses() {
+//		return new ArrayList<>(registerCourses);
+//	}
+//
+//	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
+//		this.registerCourses = registerCourses;
+//	}
+//
+//	public List<QuizResult> getQuizResults() {
+//		return new ArrayList<>(quizResults);
+//	}
+//
+//	public void setQuizResults(List<QuizResult> quizResults) {
+//		this.quizResults = quizResults;
+//	}
+//
+//	public void setAttendances(List<Attendance> attendances) {
+//		this.attendances = attendances;
+//	}
 
 	@Override
 	public boolean equals(Object o) {

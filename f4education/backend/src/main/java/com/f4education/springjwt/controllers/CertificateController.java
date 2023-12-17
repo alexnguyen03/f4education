@@ -31,112 +31,112 @@ import com.f4education.springjwt.repository.CertificateRepository;
 @RestController
 @RequestMapping("/api/certificate")
 public class CertificateController {
-	@Autowired
-	CertificateService certificateService;
+    @Autowired
+    CertificateService certificateService;
 
-	@Autowired
-	CertificateRepository certificateRepository;
+    @Autowired
+    CertificateRepository certificateRepository;
 
-	@Autowired
-	MailerService mailService;
+    @Autowired
+    MailerService mailService;
 
-	@GetMapping
-	public ResponseEntity<?> findAll() {
-		List<CertificateResponse> lst = certificateService.getAllCertificate();
-		return ResponseEntity.ok(lst);
-	}
+    @GetMapping
+    public ResponseEntity<?> findAll() {
+        List<CertificateResponse> lst = certificateService.getAllCertificate();
+        return ResponseEntity.ok(lst);
+    }
 
-	@GetMapping("/student/{studentId}")
-	public ResponseEntity<?> findCertificateByStudentID(@PathVariable("studentId") String studentId) {
-		List<CertificateResponse> lst = certificateService.findAllCertificateByStudentId(studentId);
-		return ResponseEntity.ok(lst);
-	}
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<?> findCertificateByStudentID(@PathVariable("studentId") String studentId) {
+        List<CertificateResponse> lst = certificateService.findAllCertificateByStudentId(studentId);
+        return ResponseEntity.ok(lst);
+    }
 
-	@GetMapping("/{certificateId}")
-	public ResponseEntity<?> getCertificatetByCertificateId(@PathVariable("certificateId") Integer certificateId) {
-		CertificateResponse lst = certificateService.getCertificatetByCertificateId(certificateId);
-		return ResponseEntity.ok(lst);
-	}
+    @GetMapping("/{certificateId}")
+    public ResponseEntity<?> getCertificatetByCertificateId(@PathVariable("certificateId") Integer certificateId) {
+        CertificateResponse lst = certificateService.getCertificatetByCertificateId(certificateId);
+        return ResponseEntity.ok(lst);
+    }
 
-	@GetMapping("/pdf")
-	public ResponseEntity<?> findCertificateByRegisterCourseIdAndStudentId(
-			@RequestParam("registerCourseId") Integer registerCourseId, @RequestParam("studentId") String studentId) {
-		CertificateResponse lst = certificateService.findCertificateByRegisterCourseAndStudentId(registerCourseId,
-				studentId);
+    @GetMapping("/pdf")
+    public ResponseEntity<?> findCertificateByRegisterCourseIdAndStudentId(
+            @RequestParam("registerCourseId") Integer registerCourseId, @RequestParam("studentId") String studentId) {
+        CertificateResponse lst = certificateService.findCertificateByRegisterCourseAndStudentId(registerCourseId,
+                studentId);
 
-		System.out.println("List findBy registerCourseID: " + lst);
+        System.out.println("List findBy registerCourseID: " + lst);
 
-		if (lst == null) {
-			return ResponseEntity.noContent().build();
-		}
+        if (lst == null) {
+            return ResponseEntity.noContent().build();
+        }
 
-		return ResponseEntity.ok(lst);
-	}
+        return ResponseEntity.ok(lst);
+    }
 
-	@PostMapping
-	public ResponseEntity<?> createCertificate(@RequestBody List<CertificateDTO> certificateDTO) {
-		if (certificateDTO == null) {
-			return ResponseEntity.badRequest().body("Invalid request data");
-		}
+    @PostMapping
+    public ResponseEntity<?> createCertificate(@RequestBody List<CertificateDTO> certificateDTO) {
+        if (certificateDTO == null) {
+            return ResponseEntity.badRequest().body("Invalid request data");
+        }
 
-		List<CertificateResponse> certificate = new ArrayList<>();
+        List<CertificateResponse> certificate = new ArrayList<>();
 
-		certificateDTO.forEach(item -> {
-			System.out.println(item);
-			certificate.add(certificateService.createCertificatet(item));
-		});
+        certificateDTO.forEach(item -> {
+            System.out.println(item);
+            certificate.add(certificateService.createCertificatet(item));
+        });
 
-		return ResponseEntity.ok(certificate);
-	}
+        return ResponseEntity.ok(certificate);
+    }
 
-	@DeleteMapping("/{certificateId}")
-	public ResponseEntity<?> deleteCertificate(@PathVariable("certificateId") Integer certificateId) {
+    @DeleteMapping("/{certificateId}")
+    public ResponseEntity<?> deleteCertificate(@PathVariable("certificateId") Integer certificateId) {
 
-		if (certificateId == null) {
-			return ResponseEntity.badRequest().build();
-		} else {
+        if (certificateId == null) {
+            return ResponseEntity.badRequest().build();
+        } else {
 
-			certificateService.deleteCertificatet(certificateId);
+            certificateService.deleteCertificatet(certificateId);
 
-			return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Certificate have been delete");
-		}
-	}
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Certificate have been delete");
+        }
+    }
 
-	@PostMapping(value = "/teacher/download", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<String> handleFileUpload(@RequestParam("files") List<MultipartFile> files,
-			@RequestParam List<Integer> certificateIds) {
-		try {
+    @PostMapping(value = "/teacher/download", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<String> handleFileUpload(@RequestParam("files") List<MultipartFile> files,
+                                                   @RequestParam List<Integer> certificateIds) {
+        try {
 
-			for (int i = 0; i < files.size(); i++) {
-				MultipartFile file = files.get(i);
-				Integer certificateId = certificateIds.get(i);
-				System.out.println(file);
-				System.out.println(certificateId);
+            for (int i = 0; i < files.size(); i++) {
+                MultipartFile file = files.get(i);
+                Integer certificateId = certificateIds.get(i);
+                System.out.println(file);
+                System.out.println(certificateId);
 
-				Optional<Certificate> existCt = certificateRepository.findById(certificateId);
+                Optional<Certificate> existCt = certificateRepository.findById(certificateId);
 
-				if (existCt.isPresent()) {
-					// for production
+                if (existCt.isPresent()) {
+                    // for production
 //					String[] listMail = { existCt.get().getRegisterCourse().getStudent().getUser().getEmail() };
 
-					// for testing
-					String[] listMail = { "hienttpc03323@fpt.edu.vn" };
+                    // for testing
+//					namnhpc03517@fpt.edu.vn
+                    String[] listMail = { "hienttpc03323@fpt.edu.vn" , "namnhpc03517@fpt.edu.vn" };
 
-					byte[] fileBytes = file.getBytes();
-					mailService.queueCertificate(listMail, "", "", null,
-							existCt.get().getRegisterCourse().getCourse().getCourseName(),
-							"http://localhost:3000/pdf/certificate/download?certificateId="
-									+ existCt.get().getCertificateId(),
-							fileBytes);
+                    byte[] fileBytes = file.getBytes();
+                    mailService.queueCertificate(listMail, "", "", null,
+                            existCt.get().getRegisterCourse().getCourse().getCourseName(),
+                            "http://localhost:3000/pdf/certificate/download?certificateId="
+                                    + existCt.get().getCertificateId(),
+                            fileBytes);
+                }
+            }
 
-				}
-			}
-
-			return ResponseEntity.ok("File uploaded successfully!");
-		} catch (Exception e) {
-			e.printStackTrace();
-			return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
-		}
-	}
+            return ResponseEntity.ok("File uploaded successfully!");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
+        }
+    }
 
 }

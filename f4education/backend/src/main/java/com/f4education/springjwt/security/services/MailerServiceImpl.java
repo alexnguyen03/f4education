@@ -174,11 +174,10 @@ public class MailerServiceImpl implements MailerService {
 	public void queueAttendance(String[] to, String subject, String body, Integer absentCount, Integer totalCount,
 			String isPassed, Date date) {
 		String link = "http://localhost:3000/student/classes";
-		body = ""
-				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
+		body = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
-				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link// ! Linh website
-				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\n"
+				+ "    <div style=\"border-bottom:1px solid #eee\">\n"
+				+ "<img src=\"https:storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
 				+ "    </div>\n" + " <p>Cảnh báo bạn đã vắng điểm danh vào ngày " + formatDateTime(date) + "</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
 				+ "    Bạn đã vắng " + absentCount + "/" + totalCount + " buổi học</h2>\n"
@@ -195,15 +194,13 @@ public class MailerServiceImpl implements MailerService {
 	@Override
 	public void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link,
 			byte[] pdfFile) {
-		String href = link;
-		body = ""
-				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
+        body = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
-				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link//
-				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION CENTER</a>\n"
-				+ "    </div>\n" + " <p>Nhận chứng chỉ khóa học " + courseName + "</p>\n"
+				+ "    <div style=\"border-bottom:1px solid #eee\">\n"
+				+ "<img src=\"https:storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
+				+ "    </div>\n" + " <p style=\"font-size:1.5em;color: #00466a;font-weight:600\" >Nhận chứng chỉ khóa học " + courseName + "</p>\n"
 				+ "<h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
-				+ "    <a href='" + href
+				+ "    <a href='" + link
 				+ "' style=\"color: #fff;text-decoration: none;\">Nhấn vào đây để nhận chứng chỉ</a></h2>\n"
 				+ "		<p style=\"color:#000;font-size:1em;\">Xin cảm ơn bạn đã đồng hành cùng chúng tôi!</p>"
 				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
@@ -217,14 +214,12 @@ public class MailerServiceImpl implements MailerService {
 
 	private String formatDateTime(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-		String formattedDate = sdf.format(date);
-		return formattedDate;
+        return sdf.format(date);
 	}
 
 	private String formatDate(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-		String formattedDate = sdf.format(date);
-		return formattedDate;
+        return sdf.format(date);
 	}
 
 	@Scheduled(fixedDelay = 5000)
