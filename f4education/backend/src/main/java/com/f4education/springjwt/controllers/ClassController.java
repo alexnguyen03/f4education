@@ -62,6 +62,11 @@ public class ClassController {
 	public ResponseEntity<?> getAllClassActive() {
 		return ResponseEntity.ok(classService.findAllActiveClasses());
 	}
+	
+	@GetMapping("/actived-schedule-exam")
+	public ResponseEntity<?> getAllClassActiveSchedulesExam() {
+		return ResponseEntity.ok(classService.findAllActiveClassesSchedulesExam());
+	}
 
 	@GetMapping("/student/{studentId}")
 	public ResponseEntity<?> getClassByStudentId(@PathVariable("studentId") String studentId) {

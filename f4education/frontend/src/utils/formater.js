@@ -20,3 +20,30 @@ export const formatDate = (date) => {
 }
 
 // export default formatCurrency;
+
+export const CheckUserLogin = (user) => {
+    console.log(user)
+
+    if (user === null || user === undefined) {
+        return false
+    } else {
+        const listRole = user.roles[0]
+        const pathName = window.location.pathname
+
+        if (listRole) {
+            if (pathName.includes('student')) {
+                if (listRole === 'ROLE_USER') {
+                    return true
+                } else return false
+            } else if (pathName.includes('teacher')) {
+                if (listRole === 'ROLE_TEACHER') {
+                    return true
+                } else return false
+            } else if (pathName.includes('admin')) {
+                if (listRole === 'ROLE_ADMIN') {
+                    return true
+                } else return false
+            }
+        }
+    }
+}

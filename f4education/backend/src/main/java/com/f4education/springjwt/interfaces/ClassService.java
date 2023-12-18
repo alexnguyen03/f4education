@@ -17,6 +17,8 @@ public interface ClassService {
 	List<ClassesByTeacherResponse> getAllClassesByTeacherId(String teacherId);
 
 	List<ClassDTO> findAllActiveClasses();
+	
+	List<ClassDTO> findAllActiveClassesSchedulesExam();
 
 	List<Classes> getClassByStudentId(String studentId);
 

@@ -13,8 +13,14 @@ import com.f4education.springjwt.payload.request.ScheduleTeacherDTO;
 
 @Repository
 public interface ScheduleRepository extends JpaRepository<Schedule, Integer> {
-	@Query("SELECT sc FROM Schedule sc WHERE sc.classes.classId = :classId")
+	@Query("SELECT sc FROM Schedule sc WHERE sc.classes.classId = :classId AND isPractice IS NOT NULL")
 	public List<Schedule> findAllScheduleByClassId(Integer classId);
+	
+	@Query("SELECT sc FROM Schedule sc WHERE sc.classes.classId = :classId AND isPractice IS NULL")
+	public List<Schedule> findAllScheduleByClassIdAndIsPractice(Integer classId);
+	
+	@Query("SELECT sc FROM Schedule sc WHERE isPractice IS NULL AND sc.classes IN (SELECT cl FROM Classes cl JOIN cl.registerCourses rg WHERE rg.student.studentId = :studentId)")
+	public List<Schedule> findAllScheduleByStudentId(@Param("studentId") String studentId);
 
 	@Query("SELECT COUNT(sch) FROM Schedule sch WHERE sch.classes.classId = :classId "
 			+ "AND sch.studyDate BETWEEN :startDate AND :endDate")

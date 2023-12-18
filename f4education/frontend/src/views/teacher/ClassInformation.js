@@ -24,6 +24,8 @@ import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 
+import { CheckUserLogin } from '../../utils/formater'
+
 // API
 import classApi from '../../api/classApi'
 
@@ -200,6 +202,15 @@ const ClassInformation = () => {
             )}
         </Grid.Col>
     ))
+
+    useEffect(() => {
+        const checkLogin = CheckUserLogin(user)
+        console.log(checkLogin)
+
+        if (!checkLogin) {
+            return navigate('/auth/login')
+        }
+    }, [])
 
     return (
         <>
