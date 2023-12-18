@@ -17,7 +17,6 @@ public interface QuestionDetailRepository extends JpaRepository<QuestionDetail, 
 			"JOIN qd.question q " +
 			"JOIN q.course c " +
 			"JOIN c.registerCourses rc " +
-			// "JOIN q.examinations e " +
 			"WHERE rc.course.courseId = q.course.courseId " +
 			"AND rc.classes.classId = :classId")
 	public List<QuestionDetail> findQuestionDetailByStudentId(@Param("classId") Integer classId);
