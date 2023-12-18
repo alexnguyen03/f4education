@@ -824,7 +824,7 @@ const CourseProgress = () => {
                                                 startQuiz()
                                             }}
                                         >
-                                            Làm kiểm tra
+                                            Làm bài thi
                                         </Button>
                                         <Tooltip label="Làm mới" withArrow>
                                             <IconRefresh

@@ -6,6 +6,10 @@ const classApi = {
         const url = '/classes/actived'
         return axiosClient.get(url)
     },
+    getAllClassActiveSchedulesExam: () => {
+        const url = '/classes/actived-schedule-exam'
+        return axiosClient.get(url)
+    },
     getAllClass: () => {
         const url = '/classes'
         return axiosClient.get(url)
