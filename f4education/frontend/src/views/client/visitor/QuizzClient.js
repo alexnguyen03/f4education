@@ -242,7 +242,7 @@ function QuizzClient() {
             quizzDate: new Date(),
             courseId: courseId,
             classId: classId,
-            studentId: 'loinvpc04549'
+            studentId: user.username
         }
         console.log(quizzResultRequest)
         try {
