@@ -38,7 +38,8 @@ import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInf
 import { red } from '@mui/material/colors'
 import { useDisclosure } from '@mantine/hooks'
 
-const today = new Date('2023-12-30').toDateString().substring(4, 16).trim()
+const today = new Date()
+// const today = new Date('2023-12-30 7:00:00')
 
 const TeacherSchedule = () => {
     const user = JSON.parse(localStorage.getItem('user') ?? '')
@@ -84,8 +85,10 @@ const TeacherSchedule = () => {
                     '🚀 ~ file: TeacherSchedule.js:83 ~ fetchClassByTeacher ~ data:',
                     data
                 )
-                setSchedules(data)
-                let dataFilter = await filler(data, datepicker)
+                let a = fillerWithTime(data)
+                console.log('🚀 ~ a:', a)
+                setSchedules(a)
+                let dataFilter = filler(a, datepicker)
                 setSchedulesFillter([...dataFilter])
             }
             setLoading(false)
@@ -96,7 +99,7 @@ const TeacherSchedule = () => {
 
     const formatDate = (date) => {
         const formattedDate = moment(date)
-            .locale('vi')
+            // .locale('vi')
             .format('dddd, DD/MM/yyyy')
         return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
     }
@@ -104,22 +107,30 @@ const TeacherSchedule = () => {
     const columnStudent = useMemo(
         () => [
             {
-                accessorKey: 'date',
                 header: 'Ngày học',
                 enableEditing: false,
                 enableSorting: false,
-                accessorFn: (row) => formatDate(row.date),
+                accessorFn: (row) => {
+                    console.log('🚀', new Date(row.date.substring(0, 10)))
+                    return formatDate(new Date(row.date.substring(0, 10)))
+                },
                 size: 100
             },
+            {
+                accessorKey: 'className',
+                header: 'Tên lớp học',
+                size: 50
+            },
+            {
+                accessorKey: 'courseName',
+                header: 'Khóa học',
+                size: 50
+            },
+
             {
                 accessorKey: 'classRoomName',
                 header: 'Phòng',
                 size: 20
-            },
-            {
-                accessorKey: 'classId',
-                header: 'Mã lớp học',
-                size: 30
             },
             {
                 accessorKey: 'sessionName',
@@ -127,13 +138,16 @@ const TeacherSchedule = () => {
                 size: 10
             },
             {
-                accessorKey: 'time',
                 header: 'Thời gian',
+                accessorFn: (row) => row,
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+                    return row.startTime + ' - ' + row.endTime
+                },
                 size: 40
             },
             {
-                accessorKey: 'Nội dung',
-                header: 'Thời gian',
+                header: 'Nội dung',
                 accessorFn: (row) => row,
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
@@ -150,13 +164,23 @@ const TeacherSchedule = () => {
                 accessorFn: (row) => row,
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
-                    const currentDate = new Date('2023-10-30')
-                        .toDateString()
-                        .substring(4, 16)
-                    const rowDate = new Date(row.date)
-                        .toDateString()
-                        .substring(4, 16)
-                    if (rowDate === currentDate) {
+                    const startDate = new Date(row.date)
+
+                    startDate.setHours(
+                        row.startTime.substring(0, 2),
+                        row.startTime.substring(3, 5),
+                        0,
+                        0
+                    )
+                    const endDate = new Date(row.date)
+                    endDate.setHours(
+                        row.endTime.substring(0, 2),
+                        row.endTime.substring(3, 5),
+                        0,
+                        0
+                    )
+
+                    if (startDate < today && endDate > today) {
                         return (
                             <Button
                                 // className="text-danger"
@@ -169,7 +193,19 @@ const TeacherSchedule = () => {
                             </Button>
                         )
                     } else {
-                        return <span className="text-danger">-</span>
+                        if (endDate < today) {
+                            return (
+                                <span className="text-success">
+                                    Đã điểm danh
+                                </span>
+                            )
+                        } else {
+                            return (
+                                <span className="text-danger">
+                                    Chưa điểm danh
+                                </span>
+                            )
+                        }
                     }
                 },
                 size: 40
@@ -179,7 +215,7 @@ const TeacherSchedule = () => {
     )
 
     const redirectTo = (classId) => {
-        return navigate('/teacher/classes-info/' + classId)
+        return navigate('/teacher/class-info/' + classId)
     }
 
     useEffect(() => {
@@ -190,7 +226,7 @@ const TeacherSchedule = () => {
         setSearchTerm(e.target.value)
     }
 
-    const filler = async (list, value) => {
+    const filler = (list, value) => {
         let schedulesInThePast = null
         let check = false
         if (value[0] != null && value[1] != null) {
@@ -211,8 +247,16 @@ const TeacherSchedule = () => {
             }
             default: {
                 schedulesInThePast = list.filter((item) => {
+                    console.log(
+                        '🚀 ~ list:',
+                        new Date(item.date.substring(0, 10)) +
+                            ' - ' +
+                            new Date(today)
+                    )
+
                     return (
-                        new Date(item.date.substring(0, 10)) > new Date(today)
+                        new Date(item.date.substring(0, 10)) >=
+                        new Date(today.toString().substring(0, 10))
                     )
                 })
                 break
@@ -220,6 +264,28 @@ const TeacherSchedule = () => {
         }
 
         return schedulesInThePast
+    }
+
+    const fillerWithTime = (list) => {
+        list.sort((a, b) => {
+            // Sắp xếp theo date
+            const dateA = new Date(a.date).getTime()
+            const dateB = new Date(b.date).getTime()
+            if (dateA !== dateB) {
+                return dateA - dateB
+            }
+
+            // Nếu date giống nhau, sắp xếp theo startTime
+            const startTimeA = convertTimeStringToMinutes(a.startTime)
+            const startTimeB = convertTimeStringToMinutes(b.startTime)
+            return startTimeA - startTimeB
+        })
+        return list
+    }
+
+    function convertTimeStringToMinutes(timeString) {
+        const [hours, minutes] = timeString.split(':')
+        return parseInt(hours, 10) * 60 + parseInt(minutes, 10)
     }
 
     const navigateToClassInformationDetail = (classId) => {

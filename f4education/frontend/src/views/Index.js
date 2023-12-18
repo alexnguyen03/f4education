@@ -1101,6 +1101,7 @@ const Index = () => {
                                                         </h5>
                                                         <div className="d-flex justify-content-start">
                                                             <Button
+                                                                size={'md'}
                                                                 onClick={() => {
                                                                     handleResetFilterCourse()
                                                                 }}
@@ -1109,7 +1110,7 @@ const Index = () => {
                                                                 }}
                                                             >
                                                                 <IconRefresh
-                                                                    size={15}
+                                                                    size={25}
                                                                 />
                                                             </Button>
                                                             <DateInput

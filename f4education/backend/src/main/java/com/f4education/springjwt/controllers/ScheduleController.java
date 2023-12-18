@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,6 +44,12 @@ public class ScheduleController {
 		return ResponseEntity.ok(scheduleResponse);
 	}
 
+	@GetMapping("/is-practice/{classId}")
+	public ResponseEntity<?> findAllScheduleByClassIdAndIsPractice(@PathVariable("classId") Integer classId) {
+		ScheduleResponse scheduleResponse = scheduleService.findAllScheduleByClassIdAndIsPractice(classId);
+		return ResponseEntity.ok(scheduleResponse);
+	}
+
 	@GetMapping("/teacher/{accountId}")
 	public ResponseEntity<?> findAllScheduleTeacherByID(@PathVariable("accountId") Integer accountId) {
 		List<ScheduleTeacherDTO> list = scheduleService.findAllScheduleTeacherByID(accountId);
@@ -70,4 +77,15 @@ public class ScheduleController {
 		return ResponseEntity.ok(scheduleResponse);
 	}
 
+	@DeleteMapping("/delete/{scheduleId}")
+	public void deleteScheduleById(@PathVariable("scheduleId") Integer scheduleId) {
+		scheduleService.deleteScheduleExam(scheduleId);
+	}
+
+	@GetMapping("/student-schdule-exam/{studentId}")
+	public ResponseEntity<?> findAllScheduleByStudentId(@PathVariable("studentId") String studentId) {
+		ScheduleResponse scheduleResponse = scheduleService.findAllScheduleByStudentId(studentId);
+		System.out.println(scheduleResponse);
+		return ResponseEntity.ok(scheduleResponse);
+	}
 }

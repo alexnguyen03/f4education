@@ -1,6 +1,7 @@
 package com.f4education.springjwt.payload.request;
 
 import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -14,25 +15,34 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ScheduleTeacherDTO {
-    private Date date;
+    private String date;
     private String classRoomName;
+    private String className;
     private Integer classId;
 
     private String courseName;
 
     private String sessionName;
-    private String time;
+    private String startTime;
+    private String endTime;
     private Boolean isPractice;
 
     public ScheduleTeacherDTO(Schedule schedule) {
-        this.date = schedule.getStudyDate();
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+            this.date = sdf.format(schedule.getStudyDate());
+
+        } catch (Exception e) {
+        }
         this.isPractice = schedule.getIsPractice();
         try {
             this.classId = schedule.getClasses().getClassId();
             this.classRoomName = schedule.getClassRoom().getClassroomName();
+            this.className = schedule.getClasses().getClassName();
         } catch (Exception e) {
             this.classId = null;
             this.classRoomName = null;
+            this.className = null;
         }
 
         try {
@@ -43,11 +53,12 @@ public class ScheduleTeacherDTO {
 
         try {
             this.sessionName = schedule.getSessions().getSessionName();
-            this.time = timeToString(schedule.getSessions().getStartTime()) + " - "
-                    + timeToString(schedule.getSessions().getEndTime());
+            this.startTime = timeToString(schedule.getSessions().getStartTime());
+            this.endTime = timeToString(schedule.getSessions().getEndTime());
         } catch (Exception e) {
             this.sessionName = null;
-            this.time = null;
+            this.startTime = null;
+            this.endTime = null;
         }
     }
 
