@@ -21,7 +21,6 @@ import com.f4education.springjwt.models.Task;
 import com.f4education.springjwt.repository.ClassRepository;
 
 import jakarta.mail.MessagingException;
-import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 
 @Service
@@ -60,25 +59,6 @@ public class MailerServiceImpl implements MailerService {
 				helper.addAttachment(file.getName(), file);
 			}
 		}
-
-		// if (mail.getPdfFile() != null) {
-		// try {
-		// // Tạo phần nội dung của email và thêm vào email
-		// MimeBodyPart messageBodyPart = new MimeBodyPart();
-		// Multipart multipart = new MimeMultipart();
-		// multipart.addBodyPart(messageBodyPart);
-		//
-		// // Tạo phần đính kèm từ mảng byte và thêm vào email
-		// MimeBodyPart attachmentBodyPart = new MimeBodyPart();
-		// attachmentBodyPart.setContent(mail.getPdfFile(), "application/pdf");
-		// attachmentBodyPart.setFileName("my_pdf.pdf");
-		// multipart.addBodyPart(attachmentBodyPart);
-		//
-		// message.setContent(multipart);
-		// } catch (Exception e) {
-		// e.printStackTrace();
-		// }
-		// }
 
 		// Attach the PDF file
 		if (mail.getPdfFile() != null) {
@@ -130,6 +110,7 @@ public class MailerServiceImpl implements MailerService {
 		queue(new MailInfo(to, subject, body, date));
 	}
 
+	// ! Không sử dụng
 	@Override
 	public void queue(String to, String subject, String body, Date date) {
 		String encodedEmail = Base64.getEncoder().encodeToString(to.getBytes());
@@ -140,33 +121,33 @@ public class MailerServiceImpl implements MailerService {
 				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" + link // ! Linh website
 				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION</a>\n"
 				+ "    </div>\n" + "    <p style=\"font-size:1.1em\">Xin chào,</p>\n"
-				+ "    <p>Cảm ơn bạn đã tin tưởng lựa chọn cửa hàng của chúng tôi</p>\n"
+				+ "    <p>Cảm ơn bạn đã tin tưởng lựa chọn website của chúng tôi. Mã OTP của bạn là:</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">Chào mừng bạn đã đến với thế giới bánh ngọt</h2>\n"
 				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
 				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
-		subject = "Thư chào mừng";
+		subject = "OTP xác nhận email";
 		queue(new MailInfo(to, subject, body, date));
 	}
 
 	@Override
-	public void queue(String to, String subject, String body, Date date, int OTP) {
+	public void sendEmailForRegsiter(String to, String subject, String body, Date date, int OTP) {
 		body = ""
 				+ "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
 				+ "    <div style=\"border-bottom:1px solid #eee\">\n" + "      <a href='" // ! Linh website
 				+ "' style=\"font-size:1.4em;color: #00466a;text-decoration:none;font-weight:600\">F4 EDUCATION</a>\n"
 				+ "    </div>\n" + "    <p style=\"font-size:1.1em\">Xin chào,</p>\n"
-				+ "    <p>Cảm ơn bạn đã tin tưởng lựa chọn cửa hàng của chúng tôi</p>\n"
+				+ "    <p>Cảm ơn bạn đã tin tưởng lựa chọn website của chúng tôi. OTP của bạn là:</p>\n"
 				+ "    <h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
 				+ OTP + "</h2>\n" + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
 				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
-		subject = "Thư chào mừng";
+		subject = "OTP xác nhận tài khoản";
 		queue(new MailInfo(to, subject, body, date));
 	}
 
@@ -194,11 +175,13 @@ public class MailerServiceImpl implements MailerService {
 	@Override
 	public void queueCertificate(String[] to, String subject, String body, Date date, String courseName, String link,
 			byte[] pdfFile) {
-        body = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
+		body = "<div style=\"font-family: Helvetica,Arial,sans-serif;min-width:1000px;overflow:auto;line-height:2\">\n"
 				+ "  <div style=\"margin:50px auto;width:70%;padding:20px 0\">\n"
 				+ "    <div style=\"border-bottom:1px solid #eee\">\n"
 				+ "<img src=\"https:storage.googleapis.com/f4education-p2.appspot.com/avatars/courses/F4EDUCATION.png\" alt=\"\">\r\n"
-				+ "    </div>\n" + " <p style=\"font-size:1.5em;color: #00466a;font-weight:600\" >Nhận chứng chỉ khóa học " + courseName + "</p>\n"
+				+ "    </div>\n"
+				+ " <p style=\"font-size:1.5em;color: #00466a;font-weight:600\" >Nhận chứng chỉ khóa học " + courseName
+				+ "</p>\n"
 				+ "<h2 style=\"background: #00466a;margin: 0 auto;width: max-content;padding: 0 10px;color: #fff;border-radius: 4px;\">"
 				+ "    <a href='" + link
 				+ "' style=\"color: #fff;text-decoration: none;\">Nhấn vào đây để nhận chứng chỉ</a></h2>\n"
@@ -214,12 +197,12 @@ public class MailerServiceImpl implements MailerService {
 
 	private String formatDateTime(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        return sdf.format(date);
+		return sdf.format(date);
 	}
 
 	private String formatDate(Date date) {
 		SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-        return sdf.format(date);
+		return sdf.format(date);
 	}
 
 	@Scheduled(fixedDelay = 5000)

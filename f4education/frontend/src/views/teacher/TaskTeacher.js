@@ -2,14 +2,13 @@ import {
     Box,
     Button,
     Flex,
+    LoadingOverlay,
     Modal,
     Skeleton,
-    NumberInput,
     TextInput,
-    Textarea,
-    LoadingOverlay
+    Textarea
 } from '@mantine/core'
-import { DatePickerInput, DateTimePicker } from '@mantine/dates'
+import { DateTimePicker } from '@mantine/dates'
 import { useForm } from '@mantine/form'
 import { Edit as EditIcon } from '@mui/icons-material'
 import { IconButton } from '@mui/material'
@@ -17,12 +16,10 @@ import { MaterialReactTable } from 'material-react-table'
 import moment from 'moment'
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { Col, Form, FormGroup, Input, Row } from 'reactstrap'
 import { ToastContainer, toast } from 'react-toastify'
 import Notify from '../../utils/Notify'
 
 // API
-import scheduleApi from '../../api/scheduleApi'
 import taskTeacherApi from '../../api/taskTeacherApi'
 
 // scss
@@ -32,68 +29,24 @@ import styles from '../../assets/scss/custom-module-scss/teacher-custom/ClassInf
 const today = new Date('2023-12-30').toDateString().substring(4, 16).trim()
 
 const TaskTeacher = () => {
-    const user = JSON.parse(localStorage.getItem('user') ?? '')
-
-    let navigate = useNavigate()
-
     const [examOpened, handlers] = useDisclosure(false, {
         onOpen: () => console.log('Opened'),
         onClose: () => console.log('Closed')
     })
 
-    const [listClasses, setListClasses] = useState([])
-
-    const [datepicker, setDatepicker] = useState([null, null])
-
     const [loading, setLoading] = useState(false)
-    const [searchTerm, setSearchTerm] = useState('')
-
     const [update, setUpdate] = useState(false)
-
-    //! useState chứa lịch dạy của giảng viên
-    const [schedules, setSchedules] = useState([])
 
     const [tasks, setTasks] = useState([])
 
     const [visible, setVisible] = useState(false)
 
-    const [schedulesFillter, setSchedulesFillter] = useState([])
-
     const { classId } = useParams()
 
-    //! useState chứa 1 buổi dạy của giảng viên
-    const [schedule, setSchedule] = useState({
-        date: '',
-        classRoomName: '',
-        classId: '',
-        courseName: '',
-        sessionName: '',
-        time: '',
-        isPractice: false
-    })
-
-    const [task, setTask] = useState({
-        taskId: '',
-        title: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        classesId: ''
-    })
-
-    const [taskRequest, setTaskRequest] = useState({
-        taskId: '',
-        title: '',
-        description: '',
-        startDate: '',
-        endDate: '',
-        classesId: ''
-    })
-
     const openEdit = (row) => {
+        setUpdate(true)
         const startDate = new Date(row.original.startDate)
         const endDate = new Date(row.original.endDate)
-        setTask({ ...row.original, startDate, endDate })
         form.setValues({
             taskId: row.original.taskId,
             title: row.original.title,
@@ -111,23 +64,12 @@ const TaskTeacher = () => {
             const resp = await taskTeacherApi.getAllTask(classId)
             if (resp.status === 200 && resp.data.length > 0) {
                 let data = resp.data
-                console.log(
-                    '🚀 ~ file: TaskTeacher.js:98 ~ getTasks ~ data:',
-                    data
-                )
                 setTasks(data.reverse())
             }
             setLoading(false)
         } catch (error) {
             console.log(error)
         }
-    }
-
-    const formatDate = (date) => {
-        const formattedDate = moment(date)
-            .locale('vi')
-            .format('dddd, DD/MM/yyyy')
-        return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
     }
 
     const formatDateTime = (date) => {
@@ -171,74 +113,6 @@ const TaskTeacher = () => {
         []
     )
 
-    const redirectTo = (classId) => {
-        return navigate('/teacher/classes-info/' + classId)
-    }
-
-    const filler = async (list, value) => {
-        let schedulesInThePast = null
-        let check = false
-        if (value[0] != null && value[1] != null) {
-            check = true
-        }
-
-        switch (check) {
-            case true: {
-                schedulesInThePast = list.filter((item) => {
-                    return (
-                        new Date(item.date.substring(0, 10)) >
-                            new Date(value[0]) &&
-                        new Date(item.date.substring(0, 10)) <
-                            new Date(value[1])
-                    )
-                })
-                break
-            }
-            default: {
-                schedulesInThePast = list.filter((item) => {
-                    return (
-                        new Date(item.date.substring(0, 10)) > new Date(today)
-                    )
-                })
-                break
-            }
-        }
-
-        return schedulesInThePast
-    }
-
-    const navigateToClassInformationDetail = (classId) => {
-        navigate('/teacher/classes-info/' + classId)
-    }
-
-    const filteredClasses = listClasses.filter((item) => {
-        const className = item.classes.className
-        const startDate = item.classes.startDate
-        const endDate = item.classes.endDate
-        const courseName = item.courseName[0]
-
-        // console.log(className, startDate, endDate, courseName);
-
-        const lowerSearchTerm = searchTerm.toLowerCase()
-
-        return (
-            className.toLowerCase().includes(lowerSearchTerm) ||
-            courseName.toLowerCase().includes(lowerSearchTerm) ||
-            startDate.includes(lowerSearchTerm) ||
-            endDate.includes(lowerSearchTerm)
-        )
-    })
-
-    const onChangeDatePickr = async (value) => {
-        setDatepicker(value)
-        let dataFilter = await filler(schedules, value)
-        setSchedulesFillter([...dataFilter])
-        console.log(
-            '🚀 ~ file: TaskTeacher.js:224 ~ onChangeDatePickr ~ dataFilter:',
-            task
-        )
-    }
-
     const submit = async () => {
         // e.preventDefault()
 
@@ -250,15 +124,32 @@ const TaskTeacher = () => {
             startDate: startDate,
             endDate: endDate
         }
-        // console.log('🚀', taskRequest)
+        setVisible(true)
         const id = toast(Notify.msg.loading, Notify.options.loading())
 
         try {
             const resp = await taskTeacherApi.addTask(taskRequest)
             if (resp.status === 200) {
-                toast.update(id, Notify.options.createSuccess())
-                getTasks()
+                if (update) {
+                    // setTasks([resp.data, ...tasks])
+                    setTasks(
+                        tasks.map((item) => {
+                            if (item.taskId === taskRequest.taskId) {
+                                return resp.data
+                            }
+                            return item
+                        })
+                    )
+                    toast.update(id, Notify.options.updateTaskSuccess())
+                } else {
+                    setTasks([resp.data, ...tasks])
+                    toast.update(id, Notify.options.createTaskSuccess())
+                }
                 resetForm()
+            } else {
+                if (resp.data === 1) {
+                    toast.update(id, Notify.options.existTitleTask())
+                }
             }
         } catch (error) {
             toast.update(id, Notify.options.updateError())
@@ -267,47 +158,28 @@ const TaskTeacher = () => {
                 error
             )
         }
+        setVisible(false)
     }
 
     const resetForm = () => {
-        // hide form
-        // setUpdate(false)
-        form.setValues({
-            taskId: '',
-            title: '',
-            description: '',
-            startDate: '',
-            endDate: '',
-            classesId: 6
-        })
-
+        if (update) {
+            setUpdate(false)
+            form.setValues({
+                taskId: '',
+                title: '',
+                description: '',
+                startDate: '',
+                endDate: '',
+                classesId: classId
+            })
+        }
         handlers.close()
     }
 
     const addTask = () => {
-        console.log('🚀', form)
+        setUpdate(false)
 
         handlers.open()
-    }
-
-    const handelOnChangeInput = (e) => {
-        const { name, value } = e.target
-
-        // Xử lý cho các trường input khác (không phải ngày tháng)
-        setTask((preTask) => ({
-            ...preTask,
-            [name]: value,
-            numberSession: 0
-        }))
-    }
-
-    const handelOnChangeInputDate = (date) => {
-        // Chuyển đổi giá trị ngày tháng sang đối tượng ngày JavaScript
-        setTask((preTask) => ({
-            ...preTask,
-            startDate: date,
-            numberSession: 0
-        }))
     }
 
     const form = useForm({
@@ -381,7 +253,9 @@ const TaskTeacher = () => {
                 <Modal.Content pos="relative">
                     <LoadingOverlay visible={visible} overlayBlur={2} />
                     <Modal.Header>
-                        <Modal.Title>Giao bài tập </Modal.Title>
+                        <Modal.Title>
+                            <b>Giao bài tập</b>
+                        </Modal.Title>
                         <Modal.CloseButton />
                     </Modal.Header>
                     <Modal.Body>
@@ -424,9 +298,15 @@ const TaskTeacher = () => {
                                     placeholder="Mô tả bài tập..."
                                     {...form.getInputProps('description')}
                                 />
-                                <Button type="submit" mt="sm">
-                                    Lưu
-                                </Button>
+                                <div className="modal-footer pr-0">
+                                    <Button
+                                        type="submit"
+                                        mt="sm"
+                                        color="primary"
+                                    >
+                                        {update ? 'Lưu' : 'Thêm'}
+                                    </Button>
+                                </div>
                             </form>
                         </Box>
                     </Modal.Body>
@@ -458,6 +338,7 @@ const TaskTeacher = () => {
                             data={tasks}
                             enableColumnOrdering
                             enableStickyHeader
+                            enableRowActions
                             renderTopToolbarCustomActions={() => (
                                 <div>
                                     <Button onClick={addTask} color="green">
@@ -474,11 +355,14 @@ const TaskTeacher = () => {
                                 </div>
                             )}
                             displayColumnDefOptions={{
+                                'mrt-row-actions': {
+                                    header: 'Thao tác',
+                                    size: 20
+                                },
                                 'mrt-row-numbers': {
                                     size: 5
                                 }
                             }}
-                            enableRowActions
                             positionActionsColumn="last"
                             renderRowActions={({ row, table }) => (
                                 <Box
