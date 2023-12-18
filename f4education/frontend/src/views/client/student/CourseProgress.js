@@ -1159,7 +1159,7 @@ const CourseProgress = () => {
                                                                                         500
                                                                                     }
                                                                                     lineClamp={
-                                                                                        2
+                                                                                        1
                                                                                     }
                                                                                     mt="md"
                                                                                 >

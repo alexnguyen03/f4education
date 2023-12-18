@@ -181,7 +181,7 @@ public class CoursesDetailController {
 			List<CourseDetailDTO> saveList = new ArrayList<>();
 
 			Course course = courseRepository.findById(courseId).get();
-			Integer courseDuration = (Integer) Math.round(course.getCourseDuration() / 4);
+			Integer courseDuration = (Integer) Math.round(course.getCourseDuration() / 2);
 
 			System.out.println(lastRowNum);
 			System.out.println(courseDuration);

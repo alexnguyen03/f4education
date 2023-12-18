@@ -43,7 +43,7 @@ const Register = () => {
         setActive((current) => (current > 0 ? current - 1 : current))
 
     const [OTP, setOTP] = useState({
-        email: 'loinvpc045491@fpt.edu.vn',
+        email: '',
         codeOTP: '',
         date: ''
     })

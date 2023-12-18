@@ -1221,7 +1221,9 @@ const QuestionDetail = () => {
                                     <>
                                         <Button
                                             color="default"
-                                            onClick={() => fetchQuestionDetail()}
+                                            onClick={() =>
+                                                fetchQuestionDetail()
+                                            }
                                             variant="contained"
                                         >
                                             <IconRefresh />

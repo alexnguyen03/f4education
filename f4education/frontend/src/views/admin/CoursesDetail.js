@@ -474,7 +474,7 @@ const CoursesDetail = () => {
                         </h3>
                         <h3 className="text-muted text-left">
                             Số bài học phải là :{' '}
-                            {(currentCourse.courseDuration / 4).toFixed(0)} bài
+                            {(currentCourse.courseDuration / 2).toFixed(0)} bài
                         </h3>
                     </CardHeader>
 

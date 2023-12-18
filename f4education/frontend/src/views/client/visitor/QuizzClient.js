@@ -22,7 +22,7 @@ import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
 
 const user = JSON.parse(localStorage.getItem('user'))
-const totalTime = 1800
+const totalTime = 30
 
 function QuizzClient() {
     const icon = <IconInfoCircle />
@@ -216,7 +216,6 @@ function QuizzClient() {
         const currentTime = Date.now()
         const storedStartTime = localStorage.getItem('countdown_start_time')
         const timeDifference = currentTime - storedStartTime
-
         addQuizzResult(
             Math.round(timeDifference / 1000),
             totalScoreCheckbox + totalScoreRadio
@@ -246,7 +245,7 @@ function QuizzClient() {
             quizzDate: new Date(),
             courseId: courseId,
             classId: classId,
-            studentId: 'loinvpc04549'
+            studentId: user.username
         }
         console.log(quizzResultRequest)
         try {
@@ -287,10 +286,6 @@ function QuizzClient() {
 
     useEffect(() => {
         getQuestionDetailsByClassId()
-    }, [])
-
-    const [notificationCount, setNotificationCount] = useState(0)
-    useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 openModalNotification()
@@ -304,7 +299,23 @@ function QuizzClient() {
         document.addEventListener('visibilitychange', handleVisibilityChange)
         window.addEventListener('beforeunload', handleUnload)
 
+        const timer = setInterval(() => {
+            setSeconds((prevSeconds) => {
+                if (prevSeconds <= 0) {
+                    console.log(
+                        '🚀 ~ file: QuizzClient.js:343 ~ setSeconds ~ prevSeconds:',
+                        prevSeconds
+                    )
+                    return 0
+                } else {
+                    return prevSeconds - 1
+                }
+            })
+        }, 1000)
+
+        // return () => clearInterval(timer)
         return () => {
+            clearInterval(timer)
             document.removeEventListener(
                 'visibilitychange',
                 handleVisibilityChange
@@ -312,6 +323,8 @@ function QuizzClient() {
             window.removeEventListener('beforeunload', handleUnload)
         }
     }, [])
+
+    const [notificationCount, setNotificationCount] = useState(0)
 
     const startQuiz = () => {
         document.documentElement.requestFullscreen().catch((err) => {
@@ -336,28 +349,38 @@ function QuizzClient() {
         localStorage.setItem('countdown_start_time', startTime)
     }, [startTime])
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setSeconds((prevSeconds) => {
-                if (prevSeconds <= 0) {
-                    return 0
-                } else {
-                    return prevSeconds - 1
-                }
-            })
-        }, 1000)
+    // useEffect(() => {
+    //     const timer = setInterval(() => {
+    //         setSeconds((prevSeconds) => {
+    //             if (prevSeconds < 0) {
+    //                 console.log(
+    //                     '🚀 ~ file: QuizzClient.js:343 ~ setSeconds ~ prevSeconds:',
+    //                     prevSeconds
+    //                 )
+    //                 handleFinish()
+    //                 return 0
+    //             } else {
+    //                 return prevSeconds - 1
+    //             }
+    //         })
+    //     }, 1000)
 
-        return () => clearInterval(timer)
-    }, [])
+    //     return () => clearInterval(timer)
+    // }, [])
 
-    useEffect(() => {
-        if (seconds === 0) {
-            handleFinish()
-        }
-    }, [seconds])
+    // useEffect(() => {
+    //     console.log(
+    //         '🚀 ~ file: QuizzClient.js:355 ~ useEffect ~ seconds:',
+    //         seconds
+    //     )
+    //     if (seconds === -1) {
+    //         handleFinish()
+    //     }
+    // }, [seconds])
 
     useEffect(() => {
         if (notificationCount >= 2) {
+            console.log('ldkfjlsdkfjsldkfjsldk')
             handleFinish()
         }
     }, [notificationCount])

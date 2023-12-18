@@ -188,7 +188,20 @@ function Schedules() {
                 accessorKey: 'studyDate',
                 header: 'Ngày học',
 
-                accessorFn: (row) => formatDate(row.studyDate),
+                accessorFn: (row) => (
+                    <>
+                        {formatDate(row.studyDate)}
+                        <div>
+                            <Badge className="font-weight-bold" color="primary">
+                                {row.startTime}
+                            </Badge>
+
+                            <Badge className="font-weight-bold" color="info">
+                                {row.endTime}
+                            </Badge>
+                        </div>
+                    </>
+                ),
                 size: 80
             },
             {
@@ -270,7 +283,7 @@ function Schedules() {
             if (resp.status === 200) {
                 setAllContentByClassId(resp.data)
                 const schedule = ls.map((item, index) => {
-                    var content = 'Chưa có nội dung!!!'
+                    var content = 'Chưa có nội dung'
                     if (resp.data[index]) {
                         content = resp.data[index]
                     }
@@ -279,6 +292,7 @@ function Schedules() {
                         studyDate: item.date._d,
                         session: item.session,
                         classroom: item.classroom,
+
                         isPractice: item.isPractice,
                         teacherName: classSelected.teacher.fullname,
                         content: content
@@ -499,6 +513,8 @@ function Schedules() {
                         studyDate: moment(item.studyDate)._d,
                         session: sessionName,
                         classroom: classroomName,
+                        startTime: item.startTime,
+                        endTime: item.endTime,
                         isPractice: item.isPractice,
                         teacherName: classDetail.teacher.fullname,
                         content: item.content
@@ -845,8 +861,8 @@ function Schedules() {
                                                 }
                                             }
                                         }}
-                                        minDate={new Date()}
-                                        maxDate={new Date(2029, 10, 1)}
+                                        // minDate={new Date()}
+                                        // maxDate={new Date(2029, 10, 1)}
                                     />
                                 </Group>
                             </Col>
@@ -960,12 +976,12 @@ function Schedules() {
                                                 ).getMonth()
                                             )
                                         }
-                                        minDate={
-                                            new Date(
-                                                scheduleSelectedRow.studyDate
-                                            )
-                                        }
-                                        maxDate={new Date(2029, 10, 1)}
+                                        // minDate={
+                                        //     new Date(
+                                        //         scheduleSelectedRow.studyDate
+                                        //     )
+                                        // }
+                                        // maxDate={new Date(2029, 10, 1)}
                                         getDayProps={(date) => {
                                             if (date.getDay() === 0) {
                                                 return { disabled: true }

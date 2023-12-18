@@ -34,7 +34,8 @@ const listOptionView = [
     }
 ]
 const Schedule = () => {
-    const today = new Date('2024-01-04').toDateString().substring(4, 16)
+    const today = new Date().toDateString().substring(4, 16)
+    console.log(today)
     const [showSchedule, setShowSchedule] = useState(false)
     const [searchParams, setSearchParams] = useSearchParams()
     const [classSelected, setClassSelected] = useState()
@@ -42,6 +43,7 @@ const Schedule = () => {
     const [viewValue, setViewValue] = useState(null)
     const [listScheduleInTable, setListScheduleInTable] = useState([])
     const [allSchedules, setAllSchedules] = useState([])
+    const classIdParam = searchParams.get('classId')
     const [loadingSchedule, setLoadingSchedule] = useState(null)
     const formatDate = (date) => {
         const formattedDate = moment(new Date(date))
@@ -49,14 +51,30 @@ const Schedule = () => {
             .format('dddd, DD/MM/yyyy')
         return formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1)
     }
-    
+
     const columnsSchedule = useMemo(
         () => [
             {
                 accessorKey: 'studyDate',
                 header: 'Ngày học',
                 accessorFn: (row) => {
-                    return formatDate(row.studyDate)
+                    return (
+                        <>
+                            {formatDate(row.studyDate)}
+                            <div>
+                                <Badge
+                                    className="font-weight-bold"
+                                    color="indigo.9"
+                                >
+                                    {row.startTime}
+                                </Badge>
+
+                                <Badge className="font-weight-bold">
+                                    {row.endTime}
+                                </Badge>
+                            </div>
+                        </>
+                    )
                     // return row.studyDate
                 },
                 size: 150
@@ -118,14 +136,22 @@ const Schedule = () => {
         console.log(val)
 
         let schedulesInThePast = allSchedules.filter((item) => {
+            console.log(
+                '🚀 ~ file: Schedule.js:123 ~ schedulesInThePast ~ item:',
+                item
+            )
             return (
-                new Date(item.studyDate.substring(0, 10)) < new Date(today) // test
+                new Date(item.studyDate) < new Date(today) // test
             )
         })
+        console.log(
+            '🚀 ~ file: Schedule.js:131 ~ schedulesInThePast ~ allSchedules:',
+            allSchedules
+        )
 
         const presentSchedule = allSchedules.filter((item) => {
             return (
-                new Date(item.studyDate.substring(0, 10)) >= new Date(today) // test
+                new Date(item.studyDate) >= new Date(today) // test
             )
         })
         let newScheduleInThePast = [...schedulesInThePast]
@@ -181,68 +207,79 @@ const Schedule = () => {
     }
     const getScheduleByClassId = async () => {
         try {
-            const classId = searchParams.get('classId')
+            const resp = await scheduleApi.getScheduleByClassId(classIdParam)
             console.log(
-                '🚀 ~ file: Schedule.js:181 ~ getScheduleByClassId ~ classId:',
-                classId
+                '🚀 ~ file: Schedules.js:405 ~ handleGetScheduleByClassId ~ resp:',
+                resp
             )
-            setClassSelected(classId)
-            setLoadingSchedule(true)
 
-            const resp = await scheduleApi.getScheduleByClassId(classId)
-
+            setLoadingSchedule(false)
             if (resp.status === 200) {
                 const { listSchedules, sessionName, classroomName, teacher } = {
                     ...resp.data
                 }
 
+                console.log(
+                    '🚀 ~ file: Schedules.js:416 ~ handleGetScheduleByClassId ~ listSchedules:',
+                    listSchedules
+                )
                 setAllSchedules(
                     listSchedules.map((item) => {
                         return {
                             scheduleId: item.scheduleId,
-                            studyDate: item.studyDate.substring(0, 10),
+                            studyDate: moment(item.studyDate)._d,
                             session: sessionName,
                             classroom: classroomName,
+                            startTime: item.startTime,
+                            endTime: item.endTime,
                             isPractice: item.isPractice,
                             teacherName: teacher.fullname,
                             content: item.content
                         }
                     })
                 )
-                var schedule = listSchedules
+                const schedule = listSchedules
                     .map((item) => {
                         return {
                             scheduleId: item.scheduleId,
-                            studyDate: item.studyDate.substring(0, 10),
+                            studyDate: moment(item.studyDate)._d,
                             session: sessionName,
                             classroom: classroomName,
+                            startTime: item.startTime,
+                            endTime: item.endTime,
                             isPractice: item.isPractice,
                             teacherName: teacher.fullname,
                             content: item.content
                         }
                     })
                     .filter((item) => {
+                        console.log(item.studyDate, new Date(today))
                         return (
-                            new Date(item.studyDate.substring(0, 10)) >=
-                            new Date(today) // test
+                            new Date(item.studyDate) >= new Date(today) // test
                         )
                     })
 
-                setListScheduleInTable([...schedule])
+                setListScheduleInTable(schedule)
                 setLoadingSchedule(false)
             }
         } catch (error) {
             setLoadingSchedule(false)
+
             console.log(
-                '🚀 ~ file: Schedule.js:101 ~ getScheduleByClassId ~ error:',
+                '🚀 ~ file: Schedules.js:406 ~ handleGetScheduleByClassId ~ error:',
                 error
             )
         }
     }
+    // useEffect(() => {
+    //     // getAllClassByStudentId()
+    //     getScheduleByClassId()
+    // }, [])
+
     useEffect(() => {
         // getAllClassByStudentId()
         getScheduleByClassId()
-    }, [])
+    }, [classIdParam])
     return (
         <>
             <Box mt="xl" className="d-inline-block">
@@ -321,17 +358,15 @@ const Schedule = () => {
                         )}
                         {listScheduleInTable.length === 0 &&
                             loadingSchedule && (
-                                <>
-                                    <div className="w-100 text-center mt-6">
-                                        <Loader
-                                            color="rgba(46, 46, 46, 1)"
-                                            size={50}
-                                        />
-                                        <h3 className="text-muted mt-3">
-                                            Vui lòng chờ trong giây lát!
-                                        </h3>
-                                    </div>
-                                </>
+                                <div className="w-100 text-center mt-6">
+                                    <Loader
+                                        color="rgba(46, 46, 46, 1)"
+                                        size={50}
+                                    />
+                                    <h3 className="text-muted mt-3">
+                                        Vui lòng chờ trong giây lát!
+                                    </h3>
+                                </div>
                             )}
                         {listScheduleInTable.length === 0 &&
                             !loadingSchedule && (
