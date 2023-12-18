@@ -224,6 +224,96 @@ public class CourseServiceImpl implements CoursesService {
 		return courseResponses;
 	}
 
+	// xem thống kê doanh thu
+	@Override
+	public List<CourseResponse> findRevenueSoldCourse() {
+		List<Object[]> list = courseRepository.findAllCoursesWithBillDetails(true);
+
+		List<Course> courses = new ArrayList<>();
+		List<Double> totalListRenueve = new ArrayList<>();
+		List<Date> listCreateDate = new ArrayList<>();
+
+		for (Object[] objArray : list) {
+			if (objArray.length >= 1) {
+				Course courseData = new Course();
+				courseData.setAdmin(null);
+				// courseData.setBillDetail(null);
+				courseData.setCourseHistories(null);
+				courseData.setQuestions(null);
+				courseData.setResources(null);
+				courseData.setQuizResults(null);
+
+				Integer courseId = (Integer) objArray[0];
+				courseData.setCourseId(courseId);
+
+				// Get createDate
+				Bill bill = billRepository.findById((Integer) objArray[10]).get();
+				listCreateDate.add(bill.getCreateDate());
+
+				courseData.setCourseName((String) objArray[1]);
+				Object value = objArray[2];
+				Float floatValue = null;
+
+				if (value != null) {
+					String stringValue = value.toString();
+
+					try {
+						floatValue = Float.parseFloat(stringValue);
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+
+				System.out.println(objArray[5]);
+				System.out.println(objArray[6]);
+				System.out.println(objArray[7]);
+
+				courseData.setCoursePrice(floatValue);
+				courseData.setCourseDuration((Integer) objArray[3]);
+				courseData.setCourseDescription((String) objArray[4]);
+				courseData.setImage((String) objArray[5]);
+				Object subjectId = objArray[6];
+
+				Subject subject = null;
+				if (subjectId != null) {
+					Integer subjectIdvalue = Integer.parseInt(subjectId.toString());
+					try {
+						subject = subjectRepository.findById(subjectIdvalue).get();
+					} catch (NumberFormatException e) {
+						e.printStackTrace();
+					}
+				}
+				courseData.setSubject(subject);
+
+				List<RegisterCourse> rg = registerCourseRepository.findByCourseId((Integer) objArray[0]);
+				courseData.setRegisterCourses(rg);
+				courseData.setStatus((Boolean) objArray[8].toString().equals("1") ? true : false);
+
+				// Total sales
+				totalListRenueve.add((Double) objArray[12]);
+
+				courses.add(courseData);
+			}
+		}
+
+		List<CourseResponse> courseResponses = new ArrayList<>();
+
+		for (int i = 0; i < courses.size(); i++) {
+			Course course = courses.get(i);
+
+			Double renueve = totalListRenueve.get(i);
+			Date createDate = listCreateDate.get(i);
+
+			CourseResponse courseResponse = convertToResponseDTO(course, true, null);
+			courseResponse.setTotalRenueve(renueve);
+			courseResponse.setCreateDate(createDate);
+
+			courseResponses.add(courseResponse);
+		}
+
+		return courseResponses;
+	}
+
 	@Override
 	public CourseDTO findById(Integer id) {
 		return convertEntityToDTO(courseRepository.findById(id).get());

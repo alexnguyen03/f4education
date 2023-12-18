@@ -150,8 +150,8 @@ public class CoursesDetailController {
 			// Create a list to store the data from the Excel file
 			List<List<Object>> dataList = new ArrayList<>();
 
-			int lastRowNum = sheet.getLastRowNum();
-			for (int i = 0; i <= lastRowNum; i++) {
+			int lastRowNum = sheet.getPhysicalNumberOfRows();
+			for (int i = 1; i < lastRowNum; i++) { // Thay đổi từ i = 0 thành i = 1
 				Row row = sheet.getRow(i);
 				if (row == null) {
 					continue;
@@ -171,8 +171,6 @@ public class CoursesDetailController {
 
 				if (!isRowEmpty) {
 					dataList.add(rowData);
-				} else {
-					System.out.println("Skipping empty row");
 				}
 			}
 
@@ -189,20 +187,22 @@ public class CoursesDetailController {
 			System.out.println(courseDuration);
 			System.out.println(dataList.size());
 
-			if (dataList.size() < (courseDuration - 1)) {
+			if (dataList.size() != courseDuration) {
 				return ResponseEntity.status(403).body("CourseDuration_ " + courseDuration);
 			} else {
 				for (List<Object> rowData : dataList) {
-					if (rowData.size() > 2) {
+					if (rowData.size() == 2) {
 						CourseDetailDTO courseDetail = new CourseDetailDTO();
 						courseDetail.setLessionTitle((String) rowData.get(0));
 						courseDetail.setLessionContent((String) rowData.get(1));
 						courseDetail.setCourseId(courseId);
 						System.out.println(courseDetail);
-						saveList.add(courseService.createCourseDetail(courseDetail));
+						if (courseDetail.getLessionContent() != null && courseDetail.getLessionTitle() != null) {
+							saveList.add(courseService.createCourseDetail(courseDetail));
+						}
 					} else {
-						// System.out.println("null content");
-						break;
+						System.out.println("null content");
+						continue;
 					}
 				}
 			}

@@ -62,7 +62,7 @@ import evaluateApi from 'api/evaluateApi'
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
-    const [evaluated, setEvaluated] = useState(false)
+    const [evaluated, setEvaluated] = useState(true)
 
     const params = useParams()
     const [classIsFinish, setClassIsFinish] = useState(false)
@@ -139,7 +139,7 @@ const CourseProgress = () => {
 
                 const pointGreaterThanFive = await checkIfCourseProgressIsDone(
                     element.classes.classId,
-                    element.registerCourseId 
+                    element.registerCourseId
                 )
 
                 // Tinh toan progress cua khoa
@@ -406,6 +406,7 @@ const CourseProgress = () => {
                         'Chuyển hướng đến chứng chỉ khóa học'
                     )
                 )
+                console.log(newCertificate)
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
@@ -464,6 +465,14 @@ const CourseProgress = () => {
             checkActivedExamByTodayAndClassId()
             handleCheckIfClassIsClose()
             checkStudentHasEvaluated()
+            console.log(
+                '🚀 ~ file: CourseProgress.js:471 ~ useEffect ~ classIsFinish:',
+                classIsFinish
+            )
+            console.log(
+                '🚀 ~ file: CourseProgress.js:471 ~ useEffect ~ evaluated:',
+                evaluated
+            )
         }
     }, [searchParams])
 
@@ -1902,12 +1911,13 @@ const CourseProgress = () => {
                         )}
                     </Box>
                 </Box>
-                // modal show Evaluation Teacher
                 <Modal.Root
                     opened={classIsFinish && !evaluated}
-                    // onClose={downloadRecourceHandlers.close}
+                    onClose={() => {
+                        setClassIsFinish((prev) => !prev)
+                    }}
                     centered
-                    closeOnClickOutside={false}
+                    closeOnClickOutside={true}
                     closeOnEscape={false}
                 >
                     <Modal.Overlay />

@@ -62,6 +62,10 @@ const courseApi = {
         const url = `/courses/top-selling?studentId=${studentId}`
         return axiosClient.get(url)
     },
+    getRevenueSoldCourse: () => {
+        const url = `/courses/revenue`
+        return axiosClient.get(url)
+    },
     getCourseBySubjectName: (subjectName) => {
         const url = `/courses/${subjectName}`
         return axiosClient.get(url)

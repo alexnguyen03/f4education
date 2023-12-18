@@ -326,7 +326,7 @@ const ClassInformationDetail = () => {
                     const row = cell.getValue()
                     return (
                         <Image
-                            src={`${PUBLIC_IMAGE}/avatars/courses/${row.image}`}
+                            src={`${PUBLIC_IMAGE}/avatars/accounts/${row.image}`}
                             width={40}
                             height={40}
                             radius={50}
@@ -600,7 +600,7 @@ const ClassInformationDetail = () => {
                                     size="md"
                                     mb="md"
                                     disabled={
-                                        activedExam &&
+                                        activedExam ||
                                         classInfor.status === 'kết thúc'
                                     }
                                 >
@@ -611,6 +611,7 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
+                                    disabled={classInfor.status === 'kết thúc'}
                                 >
                                     Mở lại bài thi
                                 </Button>

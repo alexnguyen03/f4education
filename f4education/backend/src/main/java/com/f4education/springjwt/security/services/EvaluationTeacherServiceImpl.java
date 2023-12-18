@@ -80,6 +80,7 @@ public class EvaluationTeacherServiceImpl implements EvaluationTeacherService {
 
 	@Override
 	public Boolean checkStudentHasEvaluated(Integer classId, String studentId) {
+
 		return evaluationTeacherRepository.checkStudentHasEvaluated(classId, studentId) > 0;
 	}
 }

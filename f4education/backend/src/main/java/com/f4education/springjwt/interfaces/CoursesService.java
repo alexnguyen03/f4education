@@ -19,6 +19,8 @@ public interface CoursesService {
 
 	List<CourseResponse> findTop10SoldCourse(String studentId);
 
+	List<CourseResponse> findRevenueSoldCourse();
+
 	CourseDTO findById(Integer id);
 
 	Boolean isCourseNameExist(String courseName);

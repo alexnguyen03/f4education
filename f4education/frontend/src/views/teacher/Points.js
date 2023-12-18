@@ -214,16 +214,7 @@ const Points = () => {
                 header: 'Tên học viên',
                 size: 80
             },
-            {
-                accessorKey: 'quizzPoint',
-                Cell: ({ cell }) => {
-                    const row = cell.getValue()
 
-                    return <span>{row.toFixed(2)}</span>
-                },
-                header: 'Kiểm tra',
-                size: 200
-            },
             {
                 accessorKey: 'attendancePoint',
                 Cell: ({ cell }) => {
@@ -231,7 +222,7 @@ const Points = () => {
 
                     return <span>{row.toFixed(2)}</span>
                 },
-                header: 'Điểm danh',
+                header: 'Điểm danh (10%)',
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
 
@@ -246,8 +237,18 @@ const Points = () => {
 
                     return <span>{row.toFixed(2)}</span>
                 },
-                header: 'Bài tập',
+                header: 'Bài tập (50%)',
                 size: 35
+            },
+            {
+                accessorKey: 'quizzPoint',
+                Cell: ({ cell }) => {
+                    const row = cell.getValue()
+
+                    return <span>{row.toFixed(2)}</span>
+                },
+                header: 'Thi cuối khóa (40%)',
+                size: 200
             },
             {
                 accessorKey: 'averagePoint',
@@ -271,11 +272,19 @@ const Points = () => {
 
             if (resp.status === 200) {
                 const respData = resp.data
-                const today = moment(new Date())
+                const today = moment(new Date('2024-02-14'))
+                console.log(
+                    '🚀 ~ file: Points.js:275 ~ handleCheckIfClassIsClose ~ today:',
+                    today
+                )
                 const lastItem =
                     respData.listSchedules[respData.listSchedules.length - 1]
+                console.log(
+                    '🚀 ~ file: Points.js:276 ~ handleCheckIfClassIsClose ~ lastItem:',
+                    lastItem
+                )
 
-                if (today.isAfter(moment(lastItem.studyDate))) {
+                if (today.isAfter(moment(lastItem.studyDate).add(1, 'day'))) {
                     setClassIsFinish(true)
                     return console.log('class is Done')
                 } else {
@@ -329,17 +338,25 @@ const Points = () => {
                         const item = resp.data[i]
                         certificateIdRef.current = item.certificateId
 
-                        await Promise.all([
-                            updateInstance(
-                                <CertificateDownload
-                                    certificateId={parseInt(
-                                        certificateIdRef.current
-                                    )}
-                                    awaitComplete={awaitComplete}
-                                />
-                            )
-                        ])
+                        // await Promise.all([
+                        //     updateInstance(
+                        //         <CertificateDownload
+                        //             certificateId={parseInt(
+                        //                 certificateIdRef.current
+                        //             )}
+                        //             // awaitComplete={awaitComplete}
+                        //         />
+                        //     )
+                        // ])
 
+                        await updateInstance(
+                            <CertificateDownload
+                                certificateId={parseInt(
+                                    certificateIdRef.current
+                                )}
+                                // awaitComplete={awaitComplete}
+                            />
+                        )
                         // const blob = await pdf(
                         //     <CertificateDownload
                         //         certificateId={parseInt(
@@ -373,6 +390,13 @@ const Points = () => {
                 console.log(error)
             }
         } else {
+            await handleEndClass(params.classId)
+            toast.update(
+                id,
+                Notify.options.createSuccessParam(
+                    'Đã kết thúc lớp học thành công'
+                )
+            )
             console.log('filter null')
         }
     }
@@ -521,7 +545,10 @@ const Points = () => {
                 <Modal.Overlay />
                 <Modal.Content>
                     <Modal.Header>
-                        <Modal.Title>Chi tiết điểm học viên </Modal.Title>
+                        <Modal.Title>
+                            Chi tiết điểm học viên -{' '}
+                            <strong>{editPoint.studentName}</strong>{' '}
+                        </Modal.Title>
                         <Modal.CloseButton />
                     </Modal.Header>
                     <Modal.Body>
@@ -545,9 +572,9 @@ const Points = () => {
                                 <Stack>
                                     <Tooltip
                                         withArrow
-                                        label="Điểm được tự động tính dựa trên bài kiểm tra cuối khóa (chiếm 40% trọng số)"
+                                        label="Điểm được tự động tính dựa trên bài thi cuối khóa (chiếm 40% trọng số)"
                                     >
-                                        <Center>Kiểm tra(Quizz)</Center>
+                                        <Center>Bài thi</Center>
                                     </Tooltip>
                                     <Center>
                                         <Title order={1} color="blue">

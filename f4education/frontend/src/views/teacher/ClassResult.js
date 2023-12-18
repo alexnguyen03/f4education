@@ -2,10 +2,12 @@ import {
     Badge,
     Box,
     Button,
-    Container, Grid,
+    Container,
+    Grid,
     Group,
     Image,
-    Input, Loader,
+    Input,
+    Loader,
     MediaQuery,
     Modal,
     Paper,
@@ -20,7 +22,8 @@ import {
 import { useDisclosure } from '@mantine/hooks'
 import {
     IconAlertCircle,
-    IconFilterSearch, IconMedal2
+    IconFilterSearch,
+    IconMedal2
 } from '@tabler/icons-react'
 import { MaterialReactTable } from 'material-react-table'
 import moment from 'moment/moment'
@@ -220,7 +223,7 @@ const ClassResult = () => {
                 size: 20,
                 Cell: ({ cell }) => (
                     <Image
-                        src={`${PUBLIC_IMAGE}/students/${cell.row.original.studentImage}`}
+                        src={`${PUBLIC_IMAGE}/avatars/accounts/${cell.row.original.studentImage}`}
                         width={30}
                         height={30}
                         radius="50%"

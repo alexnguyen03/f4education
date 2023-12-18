@@ -475,6 +475,30 @@ const Index = () => {
             setLoading(false)
         }
     }
+    const fetchRevenueHeader = async () => {
+        try {
+            setLoading(true)
+
+            const resp = await courseAPI.getRevenueSoldCourse()
+
+            if (resp.status === 200) {
+                console.log(resp.data)
+
+                let totalRevenue = 0
+                resp.data.forEach((revenue) => {
+                    totalRevenue += revenue.totalRenueve
+                })
+
+                console.log(totalRevenue)
+
+                setTotalRevenue(totalRevenue)
+            }
+        } catch (error) {
+            console.log(error)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const filterDataByWeek = (data, week) => {
         return data.filter((item) => moment(item.createDate).isoWeek() === week)
@@ -502,17 +526,18 @@ const Index = () => {
     // Use Effect
     useEffect(() => {
         fetchRevenue()
+        fetchRevenueHeader()
         getAllReportEvaluationTeacher()
         getAllTeachers()
     }, [])
 
-    useEffect(() => {
-        let totalRevenue = 0
-        reportRevenue.forEach((revenue) => {
-            totalRevenue += revenue.totalRenueve
-        })
-        setTotalRevenue(totalRevenue)
-    }, [reportRevenue])
+    // useEffect(() => {
+    //     let totalRevenue = 0
+    //     reportRevenue.forEach((revenue) => {
+    //         totalRevenue += revenue.totalRenueve
+    //     })
+    //     setTotalRevenue(totalRevenue)
+    // }, [reportRevenue])
 
     useEffect(() => {
         setFilteredRevenueData(
