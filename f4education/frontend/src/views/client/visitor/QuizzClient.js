@@ -22,7 +22,7 @@ import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
 
 const user = JSON.parse(localStorage.getItem('user'))
-const totalTime = 30
+const totalTime = 1800
 
 function QuizzClient() {
     const icon = <IconInfoCircle />
@@ -54,6 +54,10 @@ function QuizzClient() {
             const resp = await questionDetailApi.getQuestionDetailsByClassId(
                 searchParams.get('classId'),
                 user.username
+            )
+            console.log(
+                '🚀 ~ file: QuizzClient.js:58 ~ getQuestionDetailsByClassId ~ resp:',
+                resp
             )
             if (resp.status === 200 && resp.data.length > 0) {
                 setQuestionDetail(resp.data)
@@ -608,7 +612,7 @@ function QuizzClient() {
                 </Stack>
             )}
 
-            {isDoing == true && (
+            {isDoing === true && (
                 <Stack mt={250} mx="auto" align="center">
                     <Title order={2} color="dark">
                         Bạn đã làm bài kiểm tra rồi!!!

@@ -1,36 +1,22 @@
-import {
-    Edit as EditIcon,
-    Margin,
-    RemoveCircleOutline as RemoveCircleOutlineIcon
-} from '@mui/icons-material'
-import { Box, IconButton } from '@mui/material'
-import accountApi from '../../../api/accountApi'
-import moment from 'moment'
-import AccountHeader from 'components/Headers/AccountHeader'
-import { MaterialReactTable } from 'material-react-table'
-import { memo, useEffect, useMemo, useState } from 'react'
+import { Group, Stepper } from '@mantine/core'
+import React, { memo, useEffect, useState } from 'react'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { useParams } from 'react-router-dom'
-import Notify from '../../../utils/Notify'
-import { Group, LoadingOverlay, PasswordInput, Stepper } from '@mantine/core'
-import React from 'react'
 import {
     Button,
-    Card,
+    ButtonGroup,
     CardBody,
-    CardHeader,
     Col,
     Container,
     Form,
     FormGroup,
     Input,
     Label,
-    Modal,
-    Row,
-    ButtonGroup
+    Row
 } from 'reactstrap'
-import { create } from 'nouislider'
+import accountApi from '../../../api/accountApi'
+import Notify from '../../../utils/Notify'
 const IMG_URL = '/courses/'
 const Register = () => {
     // const user = JSON.parse(localStorage.getItem('user') ?? '')
@@ -44,6 +30,7 @@ const Register = () => {
     const { email } = useParams()
     const [codeOTP, setCodeOTP] = useState(0)
     const [OTP2, setOTP2] = useState(1)
+    const navigate = useNavigate()
 
     // const emailDaMaHoa = atob(email)
 
@@ -295,6 +282,9 @@ const Register = () => {
                 const resp = await accountApi.addAccount(formData)
                 if (resp.status === 200) {
                     update_success('Tạo tài khoản thành công')
+                    navigate({
+                        pathname: '/auth/login/'
+                    })
                 } else {
                     if (resp.data.message === '1') {
                         update_fail('Email đã được sử dụng')
@@ -410,8 +400,9 @@ const Register = () => {
     return (
         <>
             <ToastContainer />
-            <Container fluid style={{ paddingTop: '72px', width: '60%' }}>
+            <Container fluid style={{ paddingTop: '50px', width: '60%' }}>
                 <CardBody>
+                    <h1 className="text-center mb-2">Đăng ký tài khoản mới</h1>
                     <Stepper
                         active={active}
                         onStepClick={setActive}

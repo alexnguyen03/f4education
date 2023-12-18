@@ -824,7 +824,7 @@ const CoursesDetail = () => {
                             setIsUpdate(false)
                         }}
                     >
-                        {isUpdate ? 'Cập nhật câu hỏi' : 'Thêm câu hỏi'}
+                        {isUpdate ? 'Cập nhật câu hỏi' : 'Thêm đề cương'}
                     </Button>
                 </div>
             </Modal>

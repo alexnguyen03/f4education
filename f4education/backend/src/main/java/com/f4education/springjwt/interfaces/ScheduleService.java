@@ -16,10 +16,16 @@ public interface ScheduleService {
 	List<Schedule> saveSchedule(ScheduleRequest scheduleRequest);
 
 	ScheduleResponse findAllScheduleByClassId(Integer classId);
+	
+	ScheduleResponse findAllScheduleByClassIdAndIsPractice(Integer classId);
 
 	List<ScheduleTeacherDTO> findAllScheduleTeacherByID(Integer id);
+	
+	ScheduleResponse findAllScheduleByStudentId(String studentId);
 
 	Schedule findScheduleByClassAndStudyDate(Integer classId);
+	
+	void deleteScheduleExam(Integer scheduleId);
 
 	List<AttendanceReviewStudent> findAllScheduleByAttendance(Integer classId, String studentId);
 }

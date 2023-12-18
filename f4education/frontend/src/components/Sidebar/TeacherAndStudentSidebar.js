@@ -45,6 +45,7 @@ const TeacherAndStudentSidebar = (props) => {
                 prop.path !== '/task' &&
                 prop.path !== '/classes/recources/:classId' &&
                 prop.path !== '/download-task-student' &&
+                prop.path !== '/resources' &&
                 prop.path !== '/task/:classId' &&
                 prop.path !== '/class-progress/:classId'
             ) {

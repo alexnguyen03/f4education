@@ -590,7 +590,7 @@ const ClassInformationDetail = () => {
                                     onClick={() => {
                                         handleClassProgress(classInfor.classId)
                                     }}
-                                    disabled={classInfor.status === 'kết thúc'}
+                                    disabled={classInfor.status === 'Kết thúc'}
                                 >
                                     Xem điều kiện dự thi
                                 </Button>
@@ -601,7 +601,7 @@ const ClassInformationDetail = () => {
                                     mb="md"
                                     disabled={
                                         activedExam ||
-                                        classInfor.status === 'kết thúc'
+                                        classInfor.status === 'Kết thúc'
                                     }
                                 >
                                     Tạo quiz
@@ -611,7 +611,7 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
-                                    disabled={classInfor.status === 'kết thúc'}
+                                    disabled={classInfor.status === 'Kết thúc'}
                                 >
                                     Mở lại bài thi
                                 </Button>
@@ -625,7 +625,7 @@ const ClassInformationDetail = () => {
                                                 classInfor.classId
                                         )
                                     }}
-                                    disabled={classInfor.status === 'kết thúc'}
+                                    disabled={classInfor.status === 'Kết thúc'}
                                 >
                                     Nhập điểm
                                 </Button>
@@ -633,7 +633,7 @@ const ClassInformationDetail = () => {
                                     color="cyan"
                                     size="md"
                                     mb="md"
-                                    disabled={classInfor.status === 'kết thúc'}
+                                    disabled={classInfor.status === 'Kết thúc'}
                                     onClick={() => {
                                         handleCreateTask(classInfor.classId)
                                     }}
@@ -647,7 +647,7 @@ const ClassInformationDetail = () => {
                                     onClick={() => {
                                         handleShowTask(classInfor.classId)
                                     }}
-                                    disabled={classInfor.status === 'kết thúc'}
+                                    disabled={classInfor.status === 'Kết thúc'}
                                 >
                                     Tải bài tập học viên
                                 </Button>
@@ -658,7 +658,7 @@ const ClassInformationDetail = () => {
                                     onClick={() => {
                                         open()
                                     }}
-                                    disabled={classInfor.status === 'kết thúc'}
+                                    disabled={classInfor.status === 'Kết thúc'}
                                 >
                                     Upload tài liệu
                                 </Button>

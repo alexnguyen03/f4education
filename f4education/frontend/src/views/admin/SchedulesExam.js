@@ -2,7 +2,7 @@ import { Alert, Group, LoadingOverlay } from '@mantine/core'
 import { DatePicker } from '@mantine/dates'
 import { Edit as EditIcon } from '@mui/icons-material'
 import { Box, IconButton } from '@mui/material'
-import SchedulesHeader from 'components/Headers/SchedulesHeader'
+import SchedulesExamHeader from 'components/Headers/SchedulesExamHeader'
 import MaterialReactTable from 'material-react-table'
 import moment from 'moment'
 import 'moment/locale/vi'
@@ -19,18 +19,20 @@ import Notify from '../../utils/Notify'
 import courseApi from '../../api/courseApi'
 import courseDetailApi from '../../api/courseDetailApi'
 import { IconRefresh } from '@tabler/icons-react'
-function Schedules() {
+function SchedulesExam() {
     const [listClass, setListClass] = useState([])
-    const [classListModal, setClassListModal] = useState(false)
-    const [scheduleModal, setScheduleModal] = useState(false)
-    const [choiceSessionModal, setChoiceSessionModal] = useState(false)
-    const [alertModal, setAlertModal] = useState(false)
+    const [classListModalScheduleExam, setClassListModalScheduleExam] =
+        useState(false)
+    const [scheduleModalScheduleExam, setScheduleModalScheduleExam] =
+        useState(false)
+    const [choiceSessionModalScheduleExam, setChoiceSessionModalScheduleExam] =
+        useState(false)
+    const [alertModalScheduleExam, setAlertModalScheduleExam] = useState(false)
     const [showlistSchedule, setShowlistSchedule] = useState(false)
     const [listSession, setListSession] = useState([])
     const [listSchedule, setListSchedule] = useState([])
     const [listClassroom, setListClassroom] = useState([])
     const [numberOfContent, setNumberOfContent] = useState(0)
-    const [updateSchedule, setUpdateSchedule] = useState(false)
 
     const [listClassroomAndSession, setListClassroomAndSession] = useState([])
     const [classSelected, setClassSelected] = useState({
@@ -44,7 +46,6 @@ function Schedules() {
 
     const [startDate, setStartDate] = useState(null)
     const [scheduleSelectedRow, setScheduleSelectedRow] = useState({
-        number: 0,
         scheduleId: '',
         studyDate: '',
         session: '',
@@ -58,19 +59,19 @@ function Schedules() {
         label: ''
     })
 
-    const toggleModal = (state) => {
+    const toggleModalScheduleExam = (state) => {
         switch (state) {
-            case 'classListModal':
-                setClassListModal((prevState) => !prevState)
+            case 'classListModalScheduleExam':
+                setClassListModalScheduleExam((prevState) => !prevState)
                 break
-            case 'choiceSessionModal':
-                setChoiceSessionModal((prevState) => !prevState)
+            case 'choiceSessionModalScheduleExam':
+                setChoiceSessionModalScheduleExam((prevState) => !prevState)
                 break
-            case 'alertModal':
-                setAlertModal((prevState) => !prevState)
+            case 'alertModalScheduleExam':
+                setAlertModalScheduleExam((prevState) => !prevState)
                 break
-            case 'scheduleModal':
-                setScheduleModal((prevState) => !prevState)
+            case 'scheduleModalScheduleExam':
+                setScheduleModalScheduleExam((prevState) => !prevState)
                 break
             default:
                 break
@@ -185,8 +186,13 @@ function Schedules() {
     const columnsSchedule = useMemo(
         () => [
             {
+                accessorKey: 'scheduleId',
+                header: 'Id',
+                size: 100
+            },
+            {
                 accessorKey: 'studyDate',
-                header: 'Ngày học',
+                header: 'Ngày thi',
 
                 accessorFn: (row) => formatDate(row.studyDate),
                 size: 80
@@ -198,7 +204,7 @@ function Schedules() {
             },
             {
                 accessorKey: 'isPractice',
-                header: 'Thực hành/Lý thuyết',
+                header: 'Thi',
                 // accessorFn: (row) => row,
                 Cell: ({ cell }) => {
                     const row = cell.getValue()
@@ -241,96 +247,56 @@ function Schedules() {
         []
     )
 
-    //!  HANDLE FUNCTIONS
-    const handleSetupSchedule = async () => {
-        toggleModal('choiceSessionModal')
+    const handleSetupScheduleExam = async () => {
+        toggleModalScheduleExam('choiceSessionModalScheduleExam')
 
         setShowlistSchedule(true)
-        const numberOfLessons =
-            classSelected.registerCourses[0].courseDuration / 2
-        console.log(
-            '🚀 ~ file: Schedules.js:232 ~ handleSetupSchedule ~ numberOfLessons:',
-            numberOfLessons
-        )
 
-        const ls = generateTimetable(startDate, numberOfLessons)
-        console.log(
-            '🚀 ~ file: Schedules.js:277 ~ handleSetupSchedule ~ ls:',
-            ls
-        )
+        const daysOfWeek = [
+            'Monday',
+            'Tuesday',
+            'Wednesday',
+            'Thursday',
+            'Friday',
+            'Saturday'
+        ]
+        const timetable = []
+        let currentDate = moment(startDate)
+        const dayOfWeek = daysOfWeek[currentDate.day() - 1]
 
-        try {
-            const resp = await courseApi.getAllCourseContentByClassId(
-                classSelected.classId
-            )
-            console.log(
-                '🚀 ~ file: Schedules.js:241 ~ handleSetupSchedule ~ resp:',
-                resp
-            )
-            if (resp.status === 200) {
-                setAllContentByClassId(resp.data)
-                const schedule = ls.map((item, index) => {
-                    var content = 'Chưa có nội dung!!!'
-                    if (resp.data[index]) {
-                        content = resp.data[index]
-                    }
-                    return {
-                        scheduleId: index,
-                        studyDate: item.date._d,
-                        session: item.session,
-                        classroom: item.classroom,
-                        isPractice: item.isPractice,
-                        teacherName: classSelected.teacher.fullname,
-                        content: content
-                    }
-                })
+        if (dayOfWeek !== undefined) {
+            let isPractice = null
 
-                setListSchedule(schedule)
-            }
-        } catch (error) {
-            console.log(
-                '🚀 ~ file: Schedules.js:239 ~ handleSetupSchedule ~ error:',
-                error
-            )
-        }
-    }
-
-    const handleUpdateSchedule = () => {
-        const oldSchedule = listSchedule.filter((item) => {
-            if (item.scheduleId < scheduleSelectedRow.scheduleId) {
-                return {
-                    scheduleId: item.scheduleId,
-                    studyDate: moment(new Date(item.studyDate))._d,
+            if (isPublicHoliday(currentDate)) {
+                const nextValidDay = getNextValidDay(currentDate)
+                timetable.push({
+                    date: moment(nextValidDay),
                     session: sessionSelected.label,
                     classroom: classroomSelected.label,
-                    isPractice: item.isPractice,
-                    teacherName: classSelected.teacher.fullname,
-                    content: item.content
-                }
+                    isPractice: isPractice
+                })
+                currentDate = nextValidDay
+            } else {
+                timetable.push({
+                    date: moment(currentDate),
+                    session: sessionSelected.label,
+                    classroom: classroomSelected.label,
+                    isPractice: isPractice
+                })
             }
-        })
-        if (oldSchedule.length === 0) {
-            toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
-            toggleModal('scheduleModal')
-            return
         }
-        const lastItemIndex = oldSchedule[oldSchedule.length - 1].scheduleId
+        currentDate = currentDate.add(1, 'day')
 
-        const numberOfLessons =
-            classSelected.registerCourses[0].courseDuration / 2 -
-            oldSchedule.length
+        console.log(
+            '🚀 ~ file: Schedules.js:277 ~ handleSetupSchedule ~ timetable:',
+            timetable
+        )
 
-        const lsScheduleUpdate = generateTimetable(startDate, numberOfLessons)
-
-        const newSchedule = lsScheduleUpdate.map((item, index) => {
-            index = index + lastItemIndex + 1
-            var content = 'Chưa có nội dung!!!'
-            if (allContentByClassId[index]) {
-                content = allContentByClassId[index]
-            }
+        const schedule = timetable.map((item, index) => {
+            var content = 'Thi trắc nghiệm cuối khóa học'
             return {
                 scheduleId: index,
-                studyDate: item.date,
+                studyDate: item.date._d,
                 session: item.session,
                 classroom: item.classroom,
                 isPractice: item.isPractice,
@@ -338,14 +304,13 @@ function Schedules() {
                 content: content
             }
         })
-        setUpdateSchedule(true)
-        // toast(Notify.msg.updateSuccess, Notify.options.updateSuccess())
-        toggleModal('scheduleModal')
-        setListSchedule([...oldSchedule, ...newSchedule])
+
+        setListSchedule(schedule)
     }
-    const handleShowModal = (row) => {
+
+    const handleShowModalScheduleExam = (row) => {
         const classDetail = { ...row.original }
-        toggleModal('choiceSessionModal')
+        toggleModalScheduleExam('choiceSessionModalScheduleExam')
         setClassSelected(classDetail)
     }
 
@@ -414,8 +379,7 @@ function Schedules() {
                 classroomId: classroomSelected.value,
                 adminId: adminId,
                 sessionId: sessionSelected.value,
-                listSchedule: listSchedule,
-                isUpdate: updateSchedule
+                listSchedule: listSchedule
             }
             console.log(
                 '🚀 ~ file: Schedules.js:364 ~ handleSaveSchedule ~ scheduleRequest:',
@@ -439,18 +403,23 @@ function Schedules() {
             )
         }
     }
-    const handleChangeSchedule = (row) => {
-        console.log(
-            '🚀 ~ file: Schedules.js:444 ~ handleChangeSchedule ~ row:',
-            row
-        )
-        toggleModal('scheduleModal')
 
-        setScheduleSelectedRow({
-            number: parseInt(row.index + 1),
-            ...row.original,
-            studyDate: row.original.studyDate
-        })
+    const handleDeleteSchedule = async (row) => {
+        const id = toast(Notify.msg.loading, Notify.options.loading())
+
+        try {
+            const resp = await scheduleApi.deleteScheduleById(
+                row.original.scheduleId
+            )
+            toast.update(id, Notify.options.deleteSuccess())
+            setShowlistSchedule(false)
+            fetchAllClass()
+        } catch (error) {
+            console.log(
+                '🚀 ~ file: Schedules.js:382 ~ handleSaveSchedule ~ error:',
+                error
+            )
+        }
     }
 
     const handleGetScheduleByClassId = async (row) => {
@@ -462,12 +431,13 @@ function Schedules() {
         setLoadingSchedule(true)
         setClassSelected(classDetail)
         try {
-            const resp = await scheduleApi.getScheduleByClassId(
-                classDetail.classId
-            )
+            const resp =
+                await scheduleApi.findAllScheduleByClassIdAndIsPractice(
+                    classDetail.classId
+                )
             console.log(
                 '🚀 ~ file: Schedules.js:405 ~ handleGetScheduleByClassId ~ resp:',
-                resp
+                resp.data
             )
 
             setLoadingSchedule(false)
@@ -528,7 +498,7 @@ function Schedules() {
     const fetchAllClass = async () => {
         setLoadingClass(true)
         try {
-            const resp = await classApi.getAllClassActive()
+            const resp = await classApi.getAllClassActiveSchedulesExam()
             console.log(
                 '🚀 ~ file: Schedules.js:413 ~ fetchAllClass ~ resp:',
                 resp
@@ -536,6 +506,10 @@ function Schedules() {
 
             if (resp.status === 200) {
                 setListClass(resp.data)
+                console.log(
+                    '🚀 ~ file: Schedules.js:45 ~ setListClass ~ error:',
+                    resp.data
+                )
             }
             setLoadingClass(false)
         } catch (error) {
@@ -554,7 +528,7 @@ function Schedules() {
         <>
             <ToastContainer />
 
-            <SchedulesHeader />
+            <SchedulesExamHeader />
             <Container className="mt--7" fluid>
                 {!showlistSchedule && (
                     <Card className="card-profile shadow position-relative ">
@@ -613,37 +587,26 @@ function Schedules() {
                                         gap: '8px'
                                     }}
                                 >
-                                    {!row.original.hasSchedule && (
+                                    {row.original.hasSchedule === false && (
                                         <IconButton
                                             color="secondary"
                                             onClick={() => {
-                                                handleShowModal(row)
+                                                handleShowModalScheduleExam(row)
                                             }}
                                         >
                                             <EditIcon />
                                         </IconButton>
                                     )}
-                                    {row.original.hasSchedule && (
+                                    {row.original.hasSchedule === true && (
                                         <IconButton
                                             color="secondary"
                                             onClick={() => {
-                                                // handleShowModal(row)
                                                 handleGetScheduleByClassId(row)
                                             }}
                                         >
                                             <i className="fa-sharp fa-solid fa-eye"></i>
                                         </IconButton>
                                     )}
-                                    {/* <IconButton
-                                    color="info"
-                                    onClick={() => {
-                                        handelShowHistory(
-                                            row.original.courseId
-                                        )
-                                    }}
-                                >
-                                    <IconEyeSearch />
-                                </IconButton> */}
                                 </Box>
                             )}
                             muiTablePaginationProps={{
@@ -666,7 +629,7 @@ function Schedules() {
                                         fetchAllClass()
                                     }}
                                 >
-                                    <i className="fa-solid fa-list"></i>
+                                    <i className="fa-solid fa-arrow-left"></i>
                                 </div>{' '}
                                 <div className="shadow px-3 py-2 rounded-sm">
                                     Tên lớp học:{' '}
@@ -748,13 +711,16 @@ function Schedules() {
                                     <IconButton
                                         color="secondary"
                                         onClick={() =>
-                                            handleChangeSchedule(row)
+                                            handleDeleteSchedule(row)
                                         }
                                     >
-                                        <i className="fa-solid fa-arrows-left-right-to-line"></i>{' '}
+                                        <i class="fa-solid fa-trash"></i>
                                     </IconButton>
                                 </Box>
                             )}
+                            initialState={{
+                                columnVisibility: { scheduleId: false }
+                            }}
                             muiTableHeadCellProps={{
                                 align: 'center'
                             }}
@@ -771,12 +737,16 @@ function Schedules() {
                 ) : (
                     ''
                 )}
-                {/* //! modals */}
-                {/* Modal */}
+
+                {/* ModalScheduleExam */}
                 <Modal
                     className="modal-dialog-centered modal-lg"
-                    isOpen={choiceSessionModal}
-                    toggle={() => toggleModal('choiceSessionModal')}
+                    isOpen={choiceSessionModalScheduleExam}
+                    toggle={() =>
+                        toggleModalScheduleExam(
+                            'choiceSessionModalScheduleExam'
+                        )
+                    }
                     backdrop
                 >
                     <div className="modal-header">
@@ -788,7 +758,11 @@ function Schedules() {
                             className="close"
                             data-dismiss="modal"
                             type="button"
-                            onClick={() => toggleModal('choiceSessionModal')}
+                            onClick={() =>
+                                toggleModalScheduleExam(
+                                    'choiceSessionModalScheduleExam'
+                                )
+                            }
                         >
                             <span aria-hidden={true}>×</span>
                         </button>
@@ -800,7 +774,7 @@ function Schedules() {
                                     className="form-control-label text-center w-100"
                                     htmlFor="input-datepicker"
                                 >
-                                    Chọn ngày bắt đầu
+                                    Chọn ngày thi
                                 </label>
                                 <Group position="center" pb={'lg'}>
                                     <DatePicker
@@ -860,7 +834,7 @@ function Schedules() {
                                         className="form-control-label"
                                         htmlFor="input-email"
                                     >
-                                        Chọn ca học
+                                        Chọn ca thi
                                     </label>
                                     <Select
                                         options={convertArrayToLabel(
@@ -868,7 +842,7 @@ function Schedules() {
                                             'sessionId',
                                             'sessionName'
                                         )}
-                                        placeholder="Chọn ca học"
+                                        placeholder="Chọn ca thi"
                                         onChange={(val) => {
                                             getClassroomBySession(val)
                                         }}
@@ -883,7 +857,7 @@ function Schedules() {
                                         className="form-control-label"
                                         htmlFor="input-email"
                                     >
-                                        Chọn phòng học
+                                        Chọn phòng thi
                                     </label>
                                     <div>
                                         <Select
@@ -892,7 +866,7 @@ function Schedules() {
                                                 'classroomId',
                                                 'classroomName'
                                             )}
-                                            placeholder="Chọn phòng học"
+                                            placeholder="Chọn phòng thi"
                                             onChange={(val) => {
                                                 setClassroomSelected(val)
                                             }}
@@ -906,115 +880,19 @@ function Schedules() {
                                     <Button
                                         color="primary"
                                         type="button"
-                                        onClick={handleSetupSchedule}
+                                        onClick={() => {
+                                            handleSetupScheduleExam()
+                                        }}
                                     >
-                                        Xếp thời khóa biểu
+                                        Xếp lịch thi
                                     </Button>
                                 </div>
                             </Col>
                         </Row>
                     </div>
                 </Modal>
-
-                <Modal
-                    className="modal-dialog-centered"
-                    isOpen={scheduleModal}
-                    toggle={() => toggleModal('scheduleModal')}
-                    backdrop
-                    onClosed={() => {
-                        setStartDate(new Date())
-                    }}
-                >
-                    <div className="modal-header">
-                        <h5 className="modal-title" id="classListModalLabel">
-                            CHỌN NGÀY THAY THẾ
-                        </h5>
-                        <button
-                            aria-label="Close"
-                            className="close"
-                            data-dismiss="modal"
-                            type="button"
-                            onClick={() => toggleModal('scheduleModal')}
-                        >
-                            <span aria-hidden={true}>×</span>
-                        </button>
-                    </div>
-                    <div className="modal-body py-0">
-                        <div className="d-flex flex-column justify-content-betweent mb-4">
-                            <div>
-                                <Group
-                                    position="center"
-                                    pb={'lg'}
-                                    className="shadow mb-4 rounded pt-3"
-                                >
-                                    <DatePicker
-                                        value={startDate}
-                                        onChange={setStartDate}
-                                        defaultDate={
-                                            new Date(
-                                                new Date(
-                                                    scheduleSelectedRow.studyDate
-                                                ).getFullYear(),
-                                                new Date(
-                                                    scheduleSelectedRow.studyDate
-                                                ).getMonth()
-                                            )
-                                        }
-                                        minDate={
-                                            new Date(
-                                                scheduleSelectedRow.studyDate
-                                            )
-                                        }
-                                        maxDate={new Date(2029, 10, 1)}
-                                        getDayProps={(date) => {
-                                            if (date.getDay() === 0) {
-                                                return { disabled: true }
-                                            }
-                                            // if (
-                                            //     date.getDate() === minDateUpdate
-                                            // ) {
-                                            //     return {
-                                            //         sx: (theme) => ({
-                                            //             backgroundColor:
-                                            //                 theme.colors.red[
-                                            //                     theme.fn.primaryShade()
-                                            //                 ],
-                                            //             color: theme.white,
-                                            //             ...theme.fn.hover({
-                                            //                 backgroundColor:
-                                            //                     theme.colors
-                                            //                         .red[7]
-                                            //             })
-                                            //         })
-                                            //     }
-                                            // }
-                                        }}
-                                    />
-                                    <Badge color={'primary'}>
-                                        {' '}
-                                        Bạn đang chọn Buổi thứ:{' '}
-                                        {scheduleSelectedRow.number} -{' '}
-                                        {formatDate(
-                                            scheduleSelectedRow.studyDate._d
-                                        )}
-                                    </Badge>
-                                </Group>
-                            </div>
-
-                            <div className="d-flex justify-content-center">
-                                <Button
-                                    color="primary"
-                                    type="button"
-                                    onClick={handleUpdateSchedule}
-                                >
-                                    Xếp thời khóa biểu
-                                </Button>
-                            </div>
-                        </div>
-                    </div>
-                </Modal>
             </Container>
         </>
     )
 }
-export default Schedules
+export default SchedulesExam

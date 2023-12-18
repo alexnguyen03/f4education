@@ -81,8 +81,12 @@ import { IconAlertCircle } from '@tabler/icons-react'
 import Select from 'react-select'
 import teacherApi from 'api/teacherApi'
 
+import { CheckUserLogin } from '../utils/formater'
+import { useNavigate } from 'react-router-dom'
+
 const Index = () => {
     const user = JSON.parse(localStorage.getItem('user'))
+    let navigate = useNavigate()
 
     const [dataForEvaluatioTeacherChart, setDataForEvaluatioTeacherChart] =
         useState([])
@@ -745,6 +749,15 @@ const Index = () => {
         }
     }, [data, startDateCourse, endDateCourse])
 
+    useEffect(() => {
+        const checkLogin = CheckUserLogin(user)
+        console.log(checkLogin)
+
+        if (!checkLogin) {
+            return navigate('/auth/login')
+        }
+    }, [])
+
     return (
         <>
             {/* Header */}
@@ -1113,6 +1126,7 @@ const Index = () => {
                                                         </h5>
                                                         <div className="d-flex justify-content-start">
                                                             <Button
+                                                                size={'md'}
                                                                 onClick={() => {
                                                                     handleResetFilterCourse()
                                                                 }}
@@ -1121,7 +1135,7 @@ const Index = () => {
                                                                 }}
                                                             >
                                                                 <IconRefresh
-                                                                    size={15}
+                                                                    size={25}
                                                                 />
                                                             </Button>
                                                             <DateInput

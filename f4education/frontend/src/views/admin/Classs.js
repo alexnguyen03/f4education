@@ -195,7 +195,7 @@ const Classs = () => {
             console.log('🚀 ~ file: Classs.js:195 ~ getDataClass ~ resp:', resp)
             if (resp.status === 200) {
                 setLoading(false)
-                setClassses(resp.data)
+                setClassses(resp.data.reverse())
             }
         } catch (error) {
             setLoading(false)
@@ -216,7 +216,8 @@ const Classs = () => {
                 if (resp.status === 200) {
                     toast.update(id, Notify.options.createSuccess())
                     handleResetForm()
-                    getDataClass()
+                    setClassses([resp.data, ...classses])
+                    // getDataClass()
                 } else {
                     toast.update(id, Notify.options.createError())
                 }
@@ -251,7 +252,14 @@ const Classs = () => {
                 if (resp.status === 200) {
                     toast.update(id, Notify.options.updateSuccess())
                     handleResetForm()
-                    getDataClass()
+                    setClassses(
+                        classses.map((item) => {
+                            if (item.classId === classs.classId) {
+                                return resp.data
+                            }
+                            return item
+                        })
+                    )
                 }
             } catch (error) {
                 console.log('Cập nhật thất bại', error)

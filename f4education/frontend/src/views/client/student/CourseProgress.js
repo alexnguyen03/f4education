@@ -58,11 +58,15 @@ import Notify from '../../../utils/Notify'
 import scheduleApi from 'api/scheduleApi'
 import evaluateApi from 'api/evaluateApi'
 
+import { CheckUserLogin } from '../../../utils/formater'
+
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
-    const [evaluated, setEvaluated] = useState(true)
+    const user = JSON.parse(localStorage.getItem('user'))
+
+    const [evaluated, setEvaluated] = useState(false)
 
     const params = useParams()
     const [classIsFinish, setClassIsFinish] = useState(false)
@@ -78,7 +82,6 @@ const CourseProgress = () => {
         onOpen: () => console.log('Opened'),
         onClose: () => console.log('Closed')
     })
-    const user = JSON.parse(localStorage.getItem('user'))
 
     //  ***********Route
     let navigate = useNavigate()
@@ -502,6 +505,15 @@ const CourseProgress = () => {
         setDetailCourseProgress(totalCountCourseProgress)
     }, [totalCountCourseProgress])
 
+    useEffect(() => {
+        const checkLogin = CheckUserLogin(user)
+        console.log(checkLogin)
+
+        if (!checkLogin) {
+            return navigate('/auth/login')
+        }
+    }, [])
+
     return (
         <>
             <ToastContainer />
@@ -833,7 +845,7 @@ const CourseProgress = () => {
                                                 startQuiz()
                                             }}
                                         >
-                                            Làm kiểm tra
+                                            Làm bài thi
                                         </Button>
                                         <Tooltip label="Làm mới" withArrow>
                                             <IconRefresh
