@@ -58,10 +58,14 @@ import Notify from '../../../utils/Notify'
 import scheduleApi from 'api/scheduleApi'
 import evaluateApi from 'api/evaluateApi'
 
+import { CheckUserLogin } from '../../../utils/formater'
+
 // IMAGE PATH
 const PUBLIC_IMAGE = process.env.REACT_APP_IMAGE_URL
 
 const CourseProgress = () => {
+    const user = JSON.parse(localStorage.getItem('user'))
+
     const [evaluated, setEvaluated] = useState(false)
 
     const params = useParams()
@@ -78,7 +82,6 @@ const CourseProgress = () => {
         onOpen: () => console.log('Opened'),
         onClose: () => console.log('Closed')
     })
-    const user = JSON.parse(localStorage.getItem('user'))
 
     //  ***********Route
     let navigate = useNavigate()
@@ -492,6 +495,15 @@ const CourseProgress = () => {
     useEffect(() => {
         setDetailCourseProgress(totalCountCourseProgress)
     }, [totalCountCourseProgress])
+
+    useEffect(() => {
+        const checkLogin = CheckUserLogin(user)
+        console.log(checkLogin)
+
+        if (!checkLogin) {
+            return navigate('/auth/login')
+        }
+    }, [])
 
     return (
         <>

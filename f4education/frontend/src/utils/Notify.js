@@ -60,6 +60,20 @@ const Notify = {
                 ...defaultOptions
             }
         },
+        createTaskSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Giao bài tập thành công!',
+                ...defaultOptions
+            }
+        },
+        updateTaskSuccess: () => {
+            return {
+                type: toast.TYPE.SUCCESS,
+                render: 'Đã cập nhật lại bài tập!',
+                ...defaultOptions
+            }
+        },
 
         deleteSuccess: () => {
             return {
@@ -112,6 +126,13 @@ const Notify = {
         },
 
         //! toast ERROR ----------------------------------------------------------------
+        existTitleTask: () => {
+            return {
+                type: toast.TYPE.ERROR,
+                render: 'Lớp đã giao bài tập này rồi!',
+                ...defaultOptions
+            }
+        },
         createErrorParam: (message) => {
             return {
                 type: toast.TYPE.ERROR,

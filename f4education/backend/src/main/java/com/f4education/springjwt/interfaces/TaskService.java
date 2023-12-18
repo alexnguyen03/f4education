@@ -2,7 +2,7 @@ package com.f4education.springjwt.interfaces;
 
 import java.util.List;
 
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.f4education.springjwt.models.Task;
@@ -18,8 +18,9 @@ public interface TaskService {
 	List<TaskFileStudentDTO> getAllFilesInFolderTaskStudent(String className, String taskName, String studentName)
 			throws Exception;
 
-	@Query("SELECT o.tasks FROM Classes o WHERE o.classId = :id")
 	List<Task> getAll(Integer id);
 
 	Task save(Task task);
+
+	Task exitTaskByTaskTitleAndClassId(Integer classId, String taskTile);
 }

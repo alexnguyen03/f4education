@@ -14,4 +14,7 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
 
 	@Query("SELECT o FROM Task o where o.classes.classId = :classId")
 	List<Task> getAll(@Param("classId") Integer id);
+
+	@Query("SELECT o FROM Task o where o.classes.classId = :classId AND o.title = :taskTile")
+	Task exitTaskByTaskTitleAndClassId(@Param("classId") Integer classId, @Param("taskTile") String taskTile);
 }

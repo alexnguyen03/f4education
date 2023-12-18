@@ -1,5 +1,5 @@
-import { Group, LoadingOverlay, PasswordInput, Stepper } from '@mantine/core'
-import { hasLength, useForm } from '@mantine/form'
+import { Group, PasswordInput, Stepper } from '@mantine/core'
+import { useForm } from '@mantine/form'
 import { Box } from '@mui/material'
 import React, { memo, useEffect, useState } from 'react'
 import { ToastContainer, toast } from 'react-toastify'
@@ -9,7 +9,6 @@ import accountApi from '../../../api/accountApi'
 import Notify from '../../../utils/Notify'
 const IMG_URL = '/courses/'
 const ForgotPassword = () => {
-    const user = JSON.parse(localStorage.getItem('user') ?? '')
     const [OTP2, setOTP2] = useState(1)
     const [emailStatus, setEmailStatus] = useState(0)
     const [codeOTP, setCodeOTP] = useState(0)
@@ -179,8 +178,10 @@ const ForgotPassword = () => {
         <>
             <ToastContainer />
 
-            <Container fluid style={{ paddingTop: '72px', width: '45%' }}>
+            <Container fluid style={{ paddingTop: '50px', width: '45%' }}>
                 <CardBody>
+                    <h1 className="text-center"> Khôi phục tài khoản</h1>
+                    <br></br>
                     <Stepper
                         active={active}
                         onStepClick={setActive}
@@ -370,13 +371,6 @@ const ForgotPassword = () => {
                             </h3>
                         </Stepper.Completed>
                     </Stepper>
-
-                    <Group position="center" mt="xl">
-                        <Button variant="default" onClick={prevStep}>
-                            Back
-                        </Button>
-                        <Button onClick={nextStep}>Next step</Button>
-                    </Group>
                 </CardBody>
             </Container>
         </>

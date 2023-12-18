@@ -97,7 +97,7 @@ public class AccountController {
     }
 
     @PostMapping(value = "/checkEmailForPassWord") // ! Kiểm tra mail đúng chưa và gửi OTP
-    public ResponseEntity<?> checkMailForPassWord(@RequestBody OTP otp) {
+    public ResponseEntity<?> checkEmailForPassWord(@RequestBody OTP otp) {
 
         // ! kiểm tra xem email đó có tồn tại hay không?
         Boolean checkEmailExit = accountService.existsByEmail(otp.getEmail().trim());
@@ -119,7 +119,7 @@ public class AccountController {
 
         // ! Gửi mail cho người dùng
         String mail = otpUpdate.getEmail().toString();
-        mailer.queue(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
+        mailer.sendEmailForRegsiter(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
         return ResponseEntity.ok().body(otpUpdate);
     }
 
@@ -172,7 +172,7 @@ public class AccountController {
 
         // ! Gửi mail cho người dùng
         String mail = otpUpdate.getEmail().toString();
-        mailer.queue(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
+        mailer.sendEmailForRegsiter(mail, "", "", null, otpUpdate.getCodeOTP()); // ! Gửi mail có OTP
         return ResponseEntity.ok().body(otpUpdate);
     }
 
@@ -224,20 +224,6 @@ public class AccountController {
         }
         AccountDTO accountDTO = changeImg(teacherRequestString, file, true);
         return ResponseEntity.ok(accountService.createAccount(accountDTO));
-    }
-
-    // ! Kiểm tra mail có tồn tại hay chưa
-    @PostMapping(value = "/checkEmail")
-    public ResponseEntity<?> checkMail(@RequestBody AccountDTO accountDTO) {
-        Boolean checkEmailExit = accountService.existsByEmail(accountDTO.getEmail().trim());
-        if (checkEmailExit) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("1"));
-        }
-        String mail = accountDTO.getEmail().toString();
-        mailer.queue(mail, "", "", null);
-        return ResponseEntity.ok().body(new MessageResponse("2"));
     }
 
     // ! Chuyển đổi json sang DTO và set img vào DTO nếu có file có tồn tại
@@ -315,8 +301,8 @@ public class AccountController {
         }
         return accountDTO;
     }
-    
+
     public static void main(String[] args) {
-		System.out.println("hêllo");
-	}
+        System.out.println("hêllo");
+    }
 }

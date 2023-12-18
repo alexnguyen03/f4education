@@ -72,8 +72,13 @@ public class TaskController {
 	@PostMapping
 	// @PreAuthorize("hasRole('TEACHER')")
 	public ResponseEntity<?> save(@RequestBody Task task) {
+		Task taskCheck = taskService.exitTaskByTaskTitleAndClassId(task.getClassesId(), task.getTitle());
+		if (taskCheck != null && task.getTaskId() == null) {
+			return ResponseEntity.badRequest().body("1");// ! Lỗi tên task đã tồn tại trong lớp đó
+		} else {
+			Task taskSave = taskService.save(task);
+			return ResponseEntity.ok(taskSave);
+		}
 
-		Task taskSave = taskService.save(task);
-		return ResponseEntity.ok(null);
 	}
 }

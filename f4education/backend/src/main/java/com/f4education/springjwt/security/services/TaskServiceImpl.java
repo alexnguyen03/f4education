@@ -187,4 +187,9 @@ public class TaskServiceImpl implements TaskService {
         }
         return taskRepository.save(task);
     }
+
+    @Override
+    public Task exitTaskByTaskTitleAndClassId(Integer classId, String taskTile) {
+        return taskRepository.exitTaskByTaskTitleAndClassId(classId, taskTile);
+    }
 }
