@@ -16,6 +16,7 @@ import com.f4education.springjwt.models.Admin;
 import com.f4education.springjwt.models.ClassHistory;
 import com.f4education.springjwt.models.Classes;
 import com.f4education.springjwt.models.RegisterCourse;
+import com.f4education.springjwt.models.Schedule;
 import com.f4education.springjwt.models.Student;
 import com.f4education.springjwt.models.Task;
 import com.f4education.springjwt.payload.request.AdminDTO;
@@ -117,10 +118,51 @@ public class ClassServiceImpl implements ClassService {
 		if (classes.getSchedules() != null) {
 			System.out.println(classes.getSchedules().size());
 			// Kiểm tra xem danh sách schedules có phần tử không
-			if (!classes.getSchedules().isEmpty()) {
-				classDTO.setHasSchedule(true);
+			if(!classes.getSchedules().isEmpty()) {
+				for (Schedule schedule : classes.getSchedules()) {
+					if(schedule.getIsPractice() != null) {
+						classDTO.setHasSchedule(true);
+					}
+				}
 			}
 		}
+
+		if (classes.getRegisterCourses() != null) {
+			if (classes.getRegisterCourses().size() > 0) {
+				List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
+						.collect(Collectors.toList());
+				classDTO.setStudents(lStudents);
+				classDTO.setCourseName(classes.getRegisterCourses().get(0).getCourse().getCourseName());
+				classDTO.setCourseId(classes.getRegisterCourses().get(0).getCourse().getCourseId());
+			}
+		}
+		return classDTO;
+	}
+
+	private ClassDTO convertToDtoSchedulesExam(Classes classes) {
+		ClassDTO classDTO = new ClassDTO();
+		BeanUtils.copyProperties(classes, classDTO);
+		Admin admin = adminRepository.findById(classes.getAdmin().getAdminId()).get();
+		AdminDTO adminDTO = new AdminDTO();
+		BeanUtils.copyProperties(admin, adminDTO);
+		classDTO.setAdmin(adminDTO);
+		classDTO.setRegisterCourses(classes.getRegisterCourses());
+		classDTO.setTeacher(classes.getTeacher());
+		classDTO.setHasSchedule(true);
+		if (classes.getSchedules().isEmpty()) {
+			classDTO.setHasSchedule(false);
+		}
+		
+		if(!classes.getSchedules().isEmpty()) {
+			for (Schedule schedule : classes.getSchedules()) {
+				if(schedule.getIsPractice() == null) {
+					classDTO.setHasSchedule(true);
+				}else {
+					classDTO.setHasSchedule(false);
+				}
+			}
+		}
+		
 		if (classes.getRegisterCourses() != null) {
 			if (classes.getRegisterCourses().size() > 0) {
 				List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
@@ -258,5 +300,19 @@ public class ClassServiceImpl implements ClassService {
 		}
 
 		return null;
+	}
+
+	@Override
+	public List<ClassDTO> findAllActiveClassesSchedulesExam() {
+		List<Classes> list = classRepository.findAll();
+		List<Classes> filteredList = list.stream().filter(obj -> {
+			if (obj instanceof Classes) {
+				Classes item = obj;
+				return item.getTeacher() != null;
+			}
+
+			return false;
+		}).collect(Collectors.toList());
+		return filteredList.stream().map(this::convertToDtoSchedulesExam).collect(Collectors.toList());
 	}
 }

@@ -573,26 +573,6 @@ const ClassInformationDetail = () => {
                                         Trở về
                                     </Button> */}
                                 <Button
-                                    onClick={handlers.open}
-                                    color="cyan"
-                                    size="md"
-                                    mb="md"
-                                    disabled={
-                                        activedExam &&
-                                        classInfor.status === 'kết thúc'
-                                    }
-                                >
-                                    Tạo quiz
-                                </Button>
-                                <Button
-                                    onClick={handlersAgain.open}
-                                    color="cyan"
-                                    size="md"
-                                    mb="md"
-                                >
-                                   Mở lại bài thi
-                                </Button>
-                                <Button
                                     color="indigo"
                                     size="md"
                                     mb="md"
@@ -742,7 +722,11 @@ const ClassInformationDetail = () => {
                 </Modal.Content>
             </Modal.Root>
             {/* Modal again */}
-            <Modal.Root opened={examOpenedAgain} onClose={handlersAgain.close} centered>
+            <Modal.Root
+                opened={examOpenedAgain}
+                onClose={handlersAgain.close}
+                centered
+            >
                 <Modal.Overlay />
                 <Modal.Content>
                     <Modal.Header>
@@ -755,7 +739,9 @@ const ClassInformationDetail = () => {
                             {classInfor.className} không ?{' '}
                         </Title>
                         <Group grow mt={'lg'}>
-                            <Button color="red" onClick={handlersAgain.close}>Không, để sau</Button>
+                            <Button color="red" onClick={handlersAgain.close}>
+                                Không, để sau
+                            </Button>
                             <Button onClick={updateExamination} color="teal">
                                 Có, mở lại ngay
                             </Button>

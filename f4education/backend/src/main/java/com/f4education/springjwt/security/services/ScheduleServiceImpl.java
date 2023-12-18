@@ -256,4 +256,22 @@ public class ScheduleServiceImpl implements ScheduleService {
 		return schedulesResponse;
 	}
 
+	@Override
+	public ScheduleResponse findAllScheduleByClassIdAndIsPractice(Integer classId) {
+		List<Schedule> schedules = scheduleRepository.findAllScheduleByClassIdAndIsPractice(classId);
+		ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
+		return scheduleResponse;
+	}
+
+	@Override
+	public void deleteScheduleExam(Integer scheduleId) {
+		scheduleRepository.deleteById(scheduleId);
+	}
+
+	@Override
+	public ScheduleResponse findAllScheduleByStudentId(String studentId) {
+		List<Schedule> schedules = scheduleRepository.findAllScheduleByStudentId(studentId);
+		ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
+		return scheduleResponse;
+	}
 }

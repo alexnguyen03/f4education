@@ -29,6 +29,7 @@ import QuizzClient from './views/client/visitor/QuizzClient'
 
 import Accounts from './views/admin/Accounts'
 import Schedules from './views/admin/Schedules'
+import SchedulesExam from 'views/admin/SchedulesExam.js'
 
 import Icons from './views/examples/Icons'
 import ClassInformation from './views/teacher/ClassInformation'
@@ -46,6 +47,7 @@ import EvaluateTeacherCompleted from './views/client/student/EvaluateTeacherComp
 import EvaluateTeacher from './views/client/student/EvaluateTeacher'
 import EvaluateTeacherViewByTeacher from './views/client/student/EvaluateTeacherViewByTeacher.js'
 import PaymentHistory from 'views/client/student/PaymentHistory'
+import SchdulesExam from 'views/client/student/SchdulesExam.js'
 import ClassResult from 'views/teacher/ClassResult'
 import ClassProgress from 'views/teacher/ClassProgress'
 import TeacherSchedule from 'views/teacher/TeacherSchedule'
@@ -136,7 +138,6 @@ export var routes = [
         component: <Schedules />,
         layout: '/admin'
     },
-
     {
         path: '/question-detail/:questionId',
         component: <QuestionDetail />,
@@ -148,6 +149,13 @@ export var routes = [
         name: 'Tài nguyên',
         icon: 'fa-solid fa-folder-open text-success',
         component: <Resources />,
+        layout: '/admin'
+    },
+    {
+        path: '/schedule-exam',
+        name: 'Xếp lịch thi',
+        icon: 'ni ni-ui-04 text-primary',
+        component: <SchedulesExam />,
         layout: '/admin'
     },
     {
@@ -376,7 +384,14 @@ export const routesStudent = [
         icon: 'fa-regular fa-clock text-danger',
         component: <Attendance />,
         layout: '/student'
-    }
+    },
+    {
+        path: '/schdule-exam',
+        name: 'Xem lịch thi',
+        icon: 'fa-solid fa-file-invoice text-primary',
+        component: <SchdulesExam />,
+        layout: '/student'
+    },
 ]
 
 export const routesPDF = [
