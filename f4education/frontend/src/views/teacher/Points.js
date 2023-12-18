@@ -212,6 +212,14 @@ const Points = () => {
             {
                 accessorKey: 'studentName',
                 header: 'Tên học viên',
+                accessorFn: (row) => {
+                    return (
+                        <>
+                            {row.studentName} {' - '} {row.studentId}
+                        </>
+                    )
+                    // return row.studyDate
+                },
                 size: 80
             },
 

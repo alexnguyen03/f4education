@@ -276,7 +276,7 @@ const DownloadTaskStudent = () => {
                                         color="success"
                                     />
                                     <Title order={2}>
-                                        {tasks[0].className}- Task
+                                        Bài tập của lớp: {tasks[0].className}
                                     </Title>
                                 </Group>
 

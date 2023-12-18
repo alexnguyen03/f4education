@@ -104,7 +104,7 @@ public class CertificateController {
 
     @PostMapping(value = "/teacher/download", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> handleFileUpload(@RequestParam("files") List<MultipartFile> files,
-                                                   @RequestParam List<Integer> certificateIds) {
+            @RequestParam List<Integer> certificateIds) {
         try {
 
             for (int i = 0; i < files.size(); i++) {
@@ -117,11 +117,12 @@ public class CertificateController {
 
                 if (existCt.isPresent()) {
                     // for production
-//					String[] listMail = { existCt.get().getRegisterCourse().getStudent().getUser().getEmail() };
+                    String[] listMail = { existCt.get().getRegisterCourse().getStudent().getUser().getEmail() };
 
                     // for testing
-//					namnhpc03517@fpt.edu.vn
-                    String[] listMail = { "hienttpc03323@fpt.edu.vn" , "namnhpc03517@fpt.edu.vn" };
+                    // namnhpc03517@fpt.edu.vn
+                    // String[] listMail = { "hienttpc03323@fpt.edu.vn" , "namnhpc03517@fpt.edu.vn"
+                    // };
 
                     byte[] fileBytes = file.getBytes();
                     mailService.queueCertificate(listMail, "", "", null,

@@ -614,11 +614,6 @@ const CourseProgress = () => {
                                             selectedCourse.course
                                                 .courseDescription
                                         }
-                                        , Lorem ipsum dolor sit amet
-                                        consectetur, adipisicing elit.
-                                        Reprehenderit quo pariatur rerum
-                                        blanditiis provident dolores itaque,
-                                        illo porro. Totam, libero!
                                     </strong>
                                 </Text>
                                 <Group position="apart">
