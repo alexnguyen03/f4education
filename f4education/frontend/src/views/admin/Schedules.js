@@ -861,8 +861,8 @@ function Schedules() {
                                                 }
                                             }
                                         }}
-                                        // minDate={new Date()}
-                                        // maxDate={new Date(2029, 10, 1)}
+                                        minDate={new Date()}
+                                        maxDate={new Date(2029, 10, 1)}
                                     />
                                 </Group>
                             </Col>
@@ -976,12 +976,12 @@ function Schedules() {
                                                 ).getMonth()
                                             )
                                         }
-                                        // minDate={
-                                        //     new Date(
-                                        //         scheduleSelectedRow.studyDate
-                                        //     )
-                                        // }
-                                        // maxDate={new Date(2029, 10, 1)}
+                                        minDate={
+                                            new Date(
+                                                scheduleSelectedRow.studyDate
+                                            )
+                                        }
+                                        maxDate={new Date(2029, 10, 1)}
                                         getDayProps={(date) => {
                                             if (date.getDay() === 0) {
                                                 return { disabled: true }

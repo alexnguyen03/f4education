@@ -595,7 +595,7 @@ const ClassInformationDetail = () => {
                                     Xem điều kiện dự thi
                                 </Button>
 
-                                <Button
+                                {/* <Button
                                     onClick={handlersAgain.open}
                                     color="cyan"
                                     size="md"
@@ -603,7 +603,7 @@ const ClassInformationDetail = () => {
                                     disabled={classInfor.status === 'Kết thúc'}
                                 >
                                     Mở lại bài thi
-                                </Button>
+                                </Button> */}
                                 <Button
                                     color="indigo"
                                     size="md"

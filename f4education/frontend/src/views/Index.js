@@ -83,11 +83,17 @@ import teacherApi from 'api/teacherApi'
 
 import { CheckUserLogin } from '../utils/formater'
 import { useNavigate } from 'react-router-dom'
+import accountApi from 'api/accountApi'
+import registerCourseApi from 'api/registerCourseApi'
+import certificateApi from 'api/certificateApi'
 
 const Index = () => {
     const user = JSON.parse(localStorage.getItem('user'))
     let navigate = useNavigate()
 
+    const [totalStudent, setTotalStudent] = useState(0)
+    const [totalCertificate, setTotalCertificate] = useState(0)
+    const [totalRegister, setTotalRegister] = useState(0)
     const [dataForEvaluatioTeacherChart, setDataForEvaluatioTeacherChart] =
         useState([])
 
@@ -198,6 +204,42 @@ const Index = () => {
             ]
         }
     ])
+
+    const getAllRegisterCourse = async () => {
+        try {
+            const resp = await registerCourseApi.getAllRegisterCourse()
+            console.log(
+                '🚀 ~ file: ClassDetail.js:171 ~ getAllStudentInCourse ~ resp:',
+                resp
+            )
+
+            if (resp.status === 200) {
+                setTotalRegister(resp.data.data.length)
+            }
+        } catch (error) {
+            console.log(
+                '🚀 ~ file: ClassDetail.js:74 ~ getRegisterCourse ~ error:',
+                error
+            )
+        }
+    }
+    const getAllCertificate = async () => {
+        try {
+            setLoading(true)
+
+            const resp = await certificateApi.getAllCertificate()
+            console.log(
+                '🚀 ~ file: Index.js:230 ~ getAllCertificate ~ resp:',
+                resp
+            )
+
+            if (resp.status === 200) {
+                setTotalCertificate(resp.data.length)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    }
     const getAllTeachers = async () => {
         try {
             const resp = await teacherApi.getAllTeachers()
@@ -527,12 +569,30 @@ const Index = () => {
         setEndDateCourse(null)
     }
 
+    const getAllStudent = async () => {
+        try {
+            const resp = await accountApi.getAllAccountsByRole(1)
+            console.log(
+                '🚀 ~ file: Accounts.js:1226 ~ getAllStudent ~ resp:',
+                resp
+            )
+            if (resp.status === 200) {
+                setTotalStudent(resp.data.length)
+            }
+        } catch (error) {
+            console.log('failed to load data', error)
+        }
+    }
+
     // Use Effect
     useEffect(() => {
         fetchRevenue()
         fetchRevenueHeader()
         getAllReportEvaluationTeacher()
         getAllTeachers()
+        getAllStudent()
+        getAllRegisterCourse()
+        getAllCertificate()
     }, [])
 
     // useEffect(() => {
@@ -761,7 +821,12 @@ const Index = () => {
     return (
         <>
             {/* Header */}
-            <Header totalRevenue={totalRevenue} />
+            <Header
+                totalRevenue={totalRevenue}
+                totalStudent={totalStudent}
+                totalRegister={totalRegister}
+                totalCertificate={totalCertificate}
+            />
             {/* Header End*/}
 
             {/* Page content */}

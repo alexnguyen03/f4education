@@ -117,12 +117,12 @@ public class CertificateController {
 
                 if (existCt.isPresent()) {
                     // for production
-                    String[] listMail = { existCt.get().getRegisterCourse().getStudent().getUser().getEmail() };
+                    String[] listMail = {
+                            existCt.get().getRegisterCourse().getStudent().getUser().getEmail() };
 
                     // for testing
                     // namnhpc03517@fpt.edu.vn
-                    // String[] listMail = { "hienttpc03323@fpt.edu.vn" , "namnhpc03517@fpt.edu.vn"
-                    // };
+                    // String[] listMail = { "hienttpc03323@fpt.edu.vn", "" };
 
                     byte[] fileBytes = file.getBytes();
                     mailService.queueCertificate(listMail, "", "", null,
@@ -134,7 +134,9 @@ public class CertificateController {
             }
 
             return ResponseEntity.ok("File uploaded successfully!");
-        } catch (Exception e) {
+        } catch (
+
+        Exception e) {
             e.printStackTrace();
             return ResponseEntity.status(500).body("Error uploading file: " + e.getMessage());
         }

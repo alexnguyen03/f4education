@@ -22,7 +22,7 @@ import questionDetailApi from 'api/questionDetailApi'
 import quizzResultApi from 'api/quizzResultApi'
 
 const user = JSON.parse(localStorage.getItem('user'))
-const totalTime = 30
+const totalTime = 1800
 
 function QuizzClient() {
     const icon = <IconInfoCircle />

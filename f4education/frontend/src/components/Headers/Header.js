@@ -21,7 +21,12 @@ import { Card, CardBody, CardTitle, Container, Row, Col } from 'reactstrap'
 
 import { formatCurrency } from 'utils/formater'
 
-const Header = ({ totalRevenue }) => {
+const Header = ({
+    totalRevenue,
+    totalStudent,
+    totalRegister,
+    totalCertificate
+}) => {
     return (
         <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
             <Container fluid>
@@ -73,7 +78,7 @@ const Header = ({ totalRevenue }) => {
                                                 Tổng học viên
                                             </CardTitle>
                                             <span className="h2 font-weight-bold mb-0">
-                                                2,356
+                                                {totalStudent}
                                             </span>
                                         </div>
                                         <Col className="col-auto">
@@ -94,10 +99,34 @@ const Header = ({ totalRevenue }) => {
                                                 tag="h5"
                                                 className="text-uppercase text-muted mb-0"
                                             >
-                                                Số khóa học bán được
+                                                Số khóa học đã được đăng ký
                                             </CardTitle>
                                             <span className="h2 font-weight-bold mb-0">
-                                                924
+                                                {totalRegister}
+                                            </span>
+                                        </div>
+                                        <Col className="col-auto">
+                                            <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
+                                                <i className="fas fa-users" />
+                                            </div>
+                                        </Col>
+                                    </Row>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                        <Col lg="6" xl="3" className="gap-3">
+                            <Card className="card-stats mb-4 mb-xl-0 ">
+                                <CardBody>
+                                    <Row>
+                                        <div className="col">
+                                            <CardTitle
+                                                tag="h5"
+                                                className="text-uppercase text-muted mb-0"
+                                            >
+                                                Số học viên nhận chứng nhận
+                                            </CardTitle>
+                                            <span className="h2 font-weight-bold mb-0">
+                                                {totalCertificate}
                                             </span>
                                         </div>
                                         <Col className="col-auto">
