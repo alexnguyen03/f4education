@@ -104,7 +104,7 @@ public class MailerServiceImpl implements MailerService {
 				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
-				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
+				+ "      <p>Team Bộ tứ siêu đẳng</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
 		subject = "Thư chào mừng";
 		queue(new MailInfo(to, subject, body, date));
@@ -126,7 +126,7 @@ public class MailerServiceImpl implements MailerService {
 				+ "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
-				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
+				+ "      <p>Team Bộ tứ siêu đẳng</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
 		subject = "OTP xác nhận email";
 		queue(new MailInfo(to, subject, body, date));
@@ -145,7 +145,7 @@ public class MailerServiceImpl implements MailerService {
 				+ OTP + "</h2>\n" + "    <p style=\"font-size:0.9em;\">Trân trọng,<br />F4 EDUCATION</p>\n"
 				+ "    <hr style=\"border:none;border-top:1px solid #eee\" />\n"
 				+ "    <div style=\"float:right;padding:8px 0;color:#aaa;font-size:0.8em;line-height:1;font-weight:300\">\n"
-				+ "      <p>Team 6</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
+				+ "      <p>Team Bộ tứ siêu đẳng</p>\n" + "      <p>123, Đường Nguyễn Văn Linh, TP.Cần Thơ</p>\n"
 				+ "      <p>Việt Nam</p>\n" + "    </div>\n" + "  </div>\n" + "</div>";
 		subject = "OTP xác nhận tài khoản";
 		queue(new MailInfo(to, subject, body, date));
