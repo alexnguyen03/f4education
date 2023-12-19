@@ -193,7 +193,7 @@ const Resource = () => {
             if (tabs === 1) {
                 formData.append('type', 'BÀI HỌC')
             } else if (tabs === 2) {
-                formData.append('type', 'TÀI NGUYÊN')
+                formData.append('type', 'TÀI LIỆU')
             }
             console.log([...formData])
             try {

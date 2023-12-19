@@ -513,7 +513,7 @@ const Home = () => {
                         </Group>
                         <Group>
                             <Avatar
-                                src={`${PUBLIC_IMAGE}/avatars/accounts/${evaluate.studentImage}`}
+                                src={`{PUBLIC_IMAGE}/avatars/students/${evaluate.studentImage}`}
                                 alt={evaluate.studentName}
                                 radius="xl"
                             />

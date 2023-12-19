@@ -134,10 +134,11 @@ const LearningResult = () => {
     // POINT CONTENT
     const tableTheadContent = (
         <tr>
-            <th>Điểm chuyên cần / (10%)</th>
-            <th>Điểm cuối kỳ / (50%)</th>
-            <th>Điểm quiz / (40%)</th>
+            <th>Điểm chuyên cần(10%)</th>
+            <th>Điểm bài tập(50%)</th>
+            <th>Điểm thi(40%)</th>
             <th>Điểm trung bình</th>
+            <th>Xếp loại</th>
         </tr>
     )
 
@@ -153,6 +154,11 @@ const LearningResult = () => {
                 <td>{exercisePoint}</td>
                 <td>{quizzPoint}</td>
                 <td>{averagePoint}</td>
+                <td>
+                    <Badge color={`${averagePoint > 5 ? 'green' : 'red'}`}>
+                        {averagePoint > 5 ? 'Đạt' : 'Chưa đạt'}
+                    </Badge>
+                </td>
             </tr>
         )
     }
@@ -188,149 +194,137 @@ const LearningResult = () => {
                     <Skeleton width="100%" height={200} mb={30} />
                 </>
             ) : (
-                <>
-                    <Box>
-                        {/* Search tearn */}
-                        <Box mb={20}>
-                            <Group position="left">
-                                <Input
-                                    id="search-input"
-                                    icon={<IconFilterSearch />}
-                                    size="md"
-                                    w={350}
-                                    placeholder="Tìm lớp học"
-                                    onChange={(e) => handleChangeSearchClass(e)}
-                                />
-                                <Button color="violet" size="md" ml={20}>
-                                    Tìm kiếm
-                                </Button>
-                            </Group>
-                        </Box>
-                        {listClasses.length === 0 ? (
-                            <>
-                                <Center w="100%">
-                                    <Title
-                                        order={1}
-                                        maw={600}
-                                        color="dark"
-                                        fw={500}
-                                        mt={200}
-                                    >
-                                        Không có lớp học nào khả dụng !
-                                    </Title>
-                                </Center>
-                            </>
-                        ) : (
-                            <Box>
-                                {/* List Class */}
-                                {filteredClasses.map((classes) => (
-                                    <Box
-                                        w="100%"
-                                        className={resultStyle.box}
-                                        p={rem('1rem')}
-                                        mb={50}
-                                        key={classes.classId}
-                                    >
-                                        <Stack>
-                                            <Text color="dimmed" size="md">
-                                                Tổng {classes.courseDuration}{' '}
-                                                giờ -{' '}
-                                                {classes.courseDuration / 2}{' '}
-                                                buổi học
-                                            </Text>
+                <Box>
+                    {/* Search tearn */}
+                    <Box mb={20}>
+                        <Group position="left">
+                            <Input
+                                id="search-input"
+                                icon={<IconFilterSearch />}
+                                size="md"
+                                w={350}
+                                placeholder="Tìm lớp học"
+                                onChange={(e) => handleChangeSearchClass(e)}
+                            />
+                            <Button color="violet" size="md" ml={20}>
+                                Tìm kiếm
+                            </Button>
+                        </Group>
+                    </Box>
+                    {listClasses.length === 0 ? (
+                        <Center w="100%">
+                            <Title
+                                order={1}
+                                maw={600}
+                                color="dark"
+                                fw={500}
+                                mt={200}
+                            >
+                                Không có lớp học nào khả dụng !
+                            </Title>
+                        </Center>
+                    ) : (
+                        <Box>
+                            {/* List Class */}
+                            {filteredClasses.map((classes) => (
+                                <Box
+                                    w="100%"
+                                    className={resultStyle.box}
+                                    p={rem('1rem')}
+                                    mb={50}
+                                    key={classes.classId}
+                                >
+                                    <Stack>
+                                        <Text color="dimmed" size="md">
+                                            Tổng {classes.courseDuration} giờ -{' '}
+                                            {classes.courseDuration / 2} buổi
+                                            học
+                                        </Text>
+                                        <Title
+                                            order={4}
+                                            fw={500}
+                                            color="dark"
+                                            mb={10}
+                                        >
+                                            Lớp {classes.className}
+                                            {' - '}Thời gian học từ{' '}
+                                            {moment(classes.startDate).format(
+                                                'DD-MM-yyyy'
+                                            )}{' '}
+                                            đến{' '}
+                                            {moment(classes.endDate).format(
+                                                'DD-MM-yyyy'
+                                            ) !== 'Invalid date'
+                                                ? moment(
+                                                      classes.endDate
+                                                  ).format('DD-MM-yyyy')
+                                                : '"chưa có ngày khả dụng"'}
+                                        </Title>
+                                        <Box>
                                             <Title
-                                                order={4}
+                                                order={2}
                                                 fw={500}
                                                 color="dark"
-                                                mb={10}
+                                                mb={5}
+                                                // style={{
+                                                //     textDecoration:
+                                                //         'underline'
+                                                // }}
                                             >
-                                                Lớp {classes.className}
-                                                {' - '}Thời gian học từ{' '}
-                                                {moment(
-                                                    classes.startDate
-                                                ).format('DD-MM-yyyy')}{' '}
-                                                đến{' '}
-                                                {moment(classes.endDate).format(
-                                                    'DD-MM-yyyy'
-                                                ) !== 'Invalid date'
-                                                    ? moment(
-                                                          classes.endDate
-                                                      ).format('DD-MM-yyyy')
-                                                    : '"chưa có ngày khả dụng"'}
+                                                Kết quả khóa học -{' '}
+                                                {classes.courseName}
                                             </Title>
-                                            <Box>
-                                                <Title
-                                                    order={2}
-                                                    fw={500}
-                                                    color="dark"
-                                                    mb={5}
-                                                    // style={{
-                                                    //     textDecoration:
-                                                    //         'underline'
-                                                    // }}
-                                                >
-                                                    Kết quả khóa học -{' '}
-                                                    {classes.courseName}
-                                                </Title>
-                                                <Table
-                                                    width="100%"
-                                                    highlightOnHover
-                                                    withBorder
-                                                    withColumnBorders
-                                                    striped
-                                                >
-                                                    <caption>
-                                                        Kết quả học tập
-                                                    </caption>
-                                                    <thead>
-                                                        {tableTheadContent}
-                                                    </thead>
-                                                    <tbody>
-                                                        {tableTbodyContent(
-                                                            classes.attendancePoint,
-                                                            classes.exercisePoint,
-                                                            classes.quizzPoint,
-                                                            classes.averagePoint
-                                                        )}
-                                                    </tbody>
-                                                </Table>
-                                            </Box>
+                                            <Table
+                                                width="100%"
+                                                highlightOnHover
+                                                withBorder
+                                                withColumnBorders
+                                                striped
+                                            >
+                                                <thead>
+                                                    {tableTheadContent}
+                                                </thead>
+                                                <tbody>
+                                                    {tableTbodyContent(
+                                                        classes.attendancePoint,
+                                                        classes.exercisePoint,
+                                                        classes.quizzPoint,
+                                                        classes.averagePoint
+                                                    )}
+                                                </tbody>
+                                            </Table>
+                                        </Box>
+                                        <Group position="left">
+                                            <Text color="dark" size="lg">
+                                                Trạng thái lớp học:{' '}
+                                            </Text>
+                                            <Badge color="violet" size="md">
+                                                {classes.status}
+                                            </Badge>
+                                        </Group>
+                                        <Group position="left">
+                                            <Avatar
+                                                src={`${PUBLIC_IMAGE}/avatars/teachers/${classes.teacherImage}`}
+                                                alt={''}
+                                                radius="xl"
+                                            />
                                             <Group position="left">
                                                 <Text color="dark" size="lg">
-                                                    Trạng thái lớp học:{' '}
+                                                    Giáo viên hướng dẫn:{' '}
                                                 </Text>
-                                                <Badge color="violet" size="md">
-                                                    {classes.status}
-                                                </Badge>
+                                                <Text color="dimmed" size="lg">
+                                                    {classes.teacherName}
+                                                    {' - '}{' '}
+                                                    {classes.teacherImage}
+                                                </Text>
                                             </Group>
-                                            <Group position="left">
-                                                <Avatar
-                                                    src={`${PUBLIC_IMAGE}/teachers/${classes.teacherImage}`}
-                                                    alt={''}
-                                                    radius="xl"
-                                                />
-                                                <Group position="left">
-                                                    <Text
-                                                        color="dark"
-                                                        size="lg"
-                                                    >
-                                                        Giáo viên hướng dẫn:{' '}
-                                                    </Text>
-                                                    <Text
-                                                        color="dimmed"
-                                                        size="lg"
-                                                    >
-                                                        {classes.teacherName}
-                                                    </Text>
-                                                </Group>
-                                            </Group>
-                                        </Stack>
-                                    </Box>
-                                ))}
-                            </Box>
-                        )}
-                    </Box>
-                </>
+                                        </Group>
+                                    </Stack>
+                                </Box>
+                            ))}
+                        </Box>
+                    )}
+                </Box>
             )}
         </Box>
     )

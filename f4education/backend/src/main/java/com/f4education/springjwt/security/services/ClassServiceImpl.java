@@ -120,9 +120,9 @@ public class ClassServiceImpl implements ClassService {
 		if (classes.getSchedules() != null) {
 			System.out.println(classes.getSchedules().size());
 			// Kiểm tra xem danh sách schedules có phần tử không
-			if(!classes.getSchedules().isEmpty()) {
+			if (!classes.getSchedules().isEmpty()) {
 				for (Schedule schedule : classes.getSchedules()) {
-					if(schedule.getIsPractice() != null) {
+					if (schedule.getIsPractice() != null) {
 						classDTO.setHasSchedule(true);
 					}
 				}
@@ -154,17 +154,17 @@ public class ClassServiceImpl implements ClassService {
 		if (classes.getSchedules().isEmpty()) {
 			classDTO.setHasSchedule(false);
 		}
-		
-		if(!classes.getSchedules().isEmpty()) {
+
+		if (!classes.getSchedules().isEmpty()) {
 			for (Schedule schedule : classes.getSchedules()) {
-				if(schedule.getIsPractice() == null) {
+				if (schedule.getIsPractice() == null) {
 					classDTO.setHasSchedule(true);
-				}else {
+				} else {
 					classDTO.setHasSchedule(false);
 				}
 			}
 		}
-		
+
 		if (classes.getRegisterCourses() != null) {
 			if (classes.getRegisterCourses().size() > 0) {
 				List<Student> lStudents = classes.getRegisterCourses().stream().map(RegisterCourse::getStudent)
@@ -295,7 +295,7 @@ public class ClassServiceImpl implements ClassService {
 		Optional<Classes> classes = classRepository.findById(classId);
 
 		if (classes.isPresent()) {
-			classes.get().setStatus("kết thúc");
+			classes.get().setStatus("Kết thúc");
 
 			System.out.println(classes.get());
 			Classes newClasses = classRepository.save(classes.get());

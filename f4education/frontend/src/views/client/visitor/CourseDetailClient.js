@@ -393,7 +393,6 @@ function CourseDetailClient() {
     }
 
     const handleCheckOut = async (course) => {
-        
         if (user === null) {
             // toast.update(
             //     id,
@@ -404,9 +403,9 @@ function CourseDetailClient() {
             setModalLogin(true)
             return
         }
-        
+
         const id = toast(Notify.msg.loading, Notify.options.loading())
-        
+
         try {
             const selectedCart = await handleAddCart(course)
 
@@ -481,7 +480,7 @@ function CourseDetailClient() {
         <>
             <ToastContainer />
 
-           {/* Modal login */}
+            {/* Modal login */}
             <ClientModal
                 isOpen={modalLogin}
                 handleCloseModal={handleCloseModal}
@@ -1439,7 +1438,7 @@ function CourseDetailClient() {
                                                                 <Divider />
                                                                 <Group>
                                                                     <Avatar
-                                                                        src={`${PUBLIC_IMAGE}/students/${evaluate.studentImage}`}
+                                                                        src={`${PUBLIC_IMAGE}/avatars/students/${evaluate.studentImage}`}
                                                                         alt={
                                                                             evaluate.studentName
                                                                         }

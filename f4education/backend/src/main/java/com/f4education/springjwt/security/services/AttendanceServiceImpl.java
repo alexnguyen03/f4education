@@ -95,10 +95,11 @@ public class AttendanceServiceImpl implements AttendanceService {
 
 		Optional<Student> student = studentReposotory.findById(attendanceDTO.getStudentId());
 		// For production
-		// String[] listMail = { student.get().getUser().getEmail() };
+		String[] listMail = { student.get().getUser().getEmail() };
 
 		// For testing
-		String[] listMail = { "hienttpc03323@fpt.edu.vn", "namnhpc03517@fpt.edu.vn" };
+		// String[] listMail = { "hienttpc03323@fpt.edu.vn", "namnhpc03517@fpt.edu.vn"
+		// };
 
 		attendance.setAttendanceDate(new Date());
 		Attendance newAttendance = attendanceReposotory.save(attendance);

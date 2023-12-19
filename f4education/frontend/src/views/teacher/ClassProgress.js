@@ -37,7 +37,7 @@ const ClassProgress = () => {
                     const row = cell.getValue()
                     return (
                         <Image
-                            src={`${PUBLIC_IMAGE}/courses/${row.student.image}`}
+                            src={`${PUBLIC_IMAGE}/avatars/accounts/${row.student.image}`}
                             width={40}
                             height={40}
                             radius={50}

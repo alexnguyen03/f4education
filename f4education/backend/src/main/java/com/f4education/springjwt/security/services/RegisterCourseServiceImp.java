@@ -296,13 +296,14 @@ public class RegisterCourseServiceImp implements RegisterCourseService {
 				registerCourseRepository.save(registerCourse);
 			});
 		}
-		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<RegisterCourse>();
+		List<RegisterCourse> filteredRegisterCoursesToDelete = new ArrayList<>();
 		if (!listRegisterCourseIdToDelete.isEmpty()) {
-			filteredRegisterCoursesToDelete = listRegisterCourse.stream().filter(
-					registerCourse -> listRegisterCourseIdToDelete.contains(registerCourse.getCourse().getCourseId()))
+			filteredRegisterCoursesToDelete = listRegisterCourse.stream()
+					.filter(registerCourse -> listRegisterCourseIdToDelete
+							.contains(registerCourse.getRegisterCourseId()))
 					.collect(Collectors.toList());
 			filteredRegisterCoursesToDelete.forEach(registerCourse -> {
-				registerCourse.setClasses(new Classes());
+				registerCourse.setClasses(null);
 			});
 		}
 		try {

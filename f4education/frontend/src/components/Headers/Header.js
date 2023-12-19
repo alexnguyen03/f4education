@@ -23,36 +23,33 @@ import { formatCurrency } from 'utils/formater'
 
 const Header = ({ totalRevenue }) => {
     return (
-        <>
-            <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
-                <Container fluid>
-                    <div className="header-body">
-                        {/* Card stats */}
-                        <Row>
-                            <Col lg="6" xl="3" className="gap-3">
-                                <Card className="card-stats mb-4 mb-xl-0 ">
-                                    <CardBody>
-                                        <Row>
-                                            <div className="col">
-                                                <CardTitle
-                                                    tag="h5"
-                                                    className="text-uppercase text-muted mb-0"
-                                                >
-                                                    Tổng doanh thu
-                                                </CardTitle>
-                                                <span className="h2 font-weight-bold mb-0">
-                                                    {formatCurrency(
-                                                        totalRevenue
-                                                    )}
-                                                </span>
+        <div className="header bg-gradient-info pb-8 pt-5 pt-md-8">
+            <Container fluid>
+                <div className="header-body">
+                    {/* Card stats */}
+                    <Row>
+                        <Col lg="6" xl="3" className="gap-3">
+                            <Card className="card-stats mb-4 mb-xl-0 ">
+                                <CardBody>
+                                    <Row>
+                                        <div className="col">
+                                            <CardTitle
+                                                tag="h5"
+                                                className="text-uppercase text-muted mb-0"
+                                            >
+                                                Tổng doanh thu
+                                            </CardTitle>
+                                            <span className="h2 font-weight-bold mb-0">
+                                                {formatCurrency(totalRevenue)}
+                                            </span>
+                                        </div>
+                                        <Col className="col-auto">
+                                            <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
+                                                <i className="fas fa-chart-bar" />
                                             </div>
-                                            <Col className="col-auto">
-                                                <div className="icon icon-shape bg-danger text-white rounded-circle shadow">
-                                                    <i className="fas fa-chart-bar" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                        {/* <p className="mt-3 mb-0 text-muted text-sm">
+                                        </Col>
+                                    </Row>
+                                    {/* <p className="mt-3 mb-0 text-muted text-sm">
                                             <span className="text-success mr-2">
                                                 <i className="fa fa-arrow-up" />{' '}
                                                 3.48%
@@ -61,62 +58,61 @@ const Header = ({ totalRevenue }) => {
                                                 so với tháng trước
                                             </span>
                                         </p> */}
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                            <Col lg="6" xl="3" className="gap-3">
-                                <Card className="card-stats mb-4 mb-xl-0 ">
-                                    <CardBody>
-                                        <Row>
-                                            <div className="col">
-                                                <CardTitle
-                                                    tag="h5"
-                                                    className="text-uppercase text-muted mb-0"
-                                                >
-                                                    Tổng học viên
-                                                </CardTitle>
-                                                <span className="h2 font-weight-bold mb-0">
-                                                    2,356
-                                                </span>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                        <Col lg="6" xl="3" className="gap-3">
+                            <Card className="card-stats mb-4 mb-xl-0 ">
+                                <CardBody>
+                                    <Row>
+                                        <div className="col">
+                                            <CardTitle
+                                                tag="h5"
+                                                className="text-uppercase text-muted mb-0"
+                                            >
+                                                Tổng học viên
+                                            </CardTitle>
+                                            <span className="h2 font-weight-bold mb-0">
+                                                2,356
+                                            </span>
+                                        </div>
+                                        <Col className="col-auto">
+                                            <div className="icon icon-shape bg-warning text-white rounded-circle shadow">
+                                                <i className="fas fa-chart-pie" />
                                             </div>
-                                            <Col className="col-auto">
-                                                <div className="icon icon-shape bg-warning text-white rounded-circle shadow">
-                                                    <i className="fas fa-chart-pie" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                            <Col lg="6" xl="3" className="gap-3">
-                                <Card className="card-stats mb-4 mb-xl-0 ">
-                                    <CardBody>
-                                        <Row>
-                                            <div className="col">
-                                                <CardTitle
-                                                    tag="h5"
-                                                    className="text-uppercase text-muted mb-0"
-                                                >
-                                                    Số khóa học bán được
-                                                </CardTitle>
-                                                <span className="h2 font-weight-bold mb-0">
-                                                    924
-                                                </span>
+                                        </Col>
+                                    </Row>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                        <Col lg="6" xl="3" className="gap-3">
+                            <Card className="card-stats mb-4 mb-xl-0 ">
+                                <CardBody>
+                                    <Row>
+                                        <div className="col">
+                                            <CardTitle
+                                                tag="h5"
+                                                className="text-uppercase text-muted mb-0"
+                                            >
+                                                Số khóa học bán được
+                                            </CardTitle>
+                                            <span className="h2 font-weight-bold mb-0">
+                                                924
+                                            </span>
+                                        </div>
+                                        <Col className="col-auto">
+                                            <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
+                                                <i className="fas fa-users" />
                                             </div>
-                                            <Col className="col-auto">
-                                                <div className="icon icon-shape bg-yellow text-white rounded-circle shadow">
-                                                    <i className="fas fa-users" />
-                                                </div>
-                                            </Col>
-                                        </Row>
-                                    </CardBody>
-                                </Card>
-                            </Col>
-                        </Row>
-                    </div>
-                </Container>
-            </div>
-        </>
+                                        </Col>
+                                    </Row>
+                                </CardBody>
+                            </Card>
+                        </Col>
+                    </Row>
+                </div>
+            </Container>
+        </div>
     )
 }
 

@@ -85,6 +85,12 @@ public class CoursesController {
 		return ResponseEntity.ok(list);
 	}
 
+	@GetMapping("/revenue")
+	public ResponseEntity<?> getRevenueSoldCourse() {
+		List<CourseResponse> list = courseService.findRevenueSoldCourse();
+		return ResponseEntity.ok(list);
+	}
+
 	@PostMapping(value = "", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
 	@ResponseBody
 	@PreAuthorize("hasRole('ADMIN')")

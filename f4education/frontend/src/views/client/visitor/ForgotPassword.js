@@ -24,7 +24,7 @@ const ForgotPassword = () => {
 
     //Nhận data vai trò học viên gửi lên từ server
     const [OTP, setOTP] = useState({
-        email: 'loinvpc04549@fpt.edu.vn',
+        email: '',
         codeOTP: '',
         date: ''
     })

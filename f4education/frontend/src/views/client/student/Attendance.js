@@ -1,6 +1,7 @@
 import {
     Badge,
     Card,
+    Center,
     Container,
     Divider,
     Grid,
@@ -33,6 +34,10 @@ const Attendance = () => {
     const fetchAllClasses = async () => {
         try {
             const resp = await classAPI.getAllClassByStudentId(user.username)
+            console.log(
+                '🚀 ~ file: Attendance.js:36 ~ fetchAllClasses ~ resp:',
+                resp
+            )
 
             if (resp.status === 200) {
                 const newData = resp.data
@@ -88,6 +93,10 @@ const Attendance = () => {
                             // Check courseName
                             let courseName
                             for (const item of attendanceData) {
+                                console.log(
+                                    '🚀 ~ file: Attendance.js:91 ~ newData.map ~ item:',
+                                    item
+                                )
                                 if (item.courseName !== null) {
                                     courseName = item.courseName
                                     break
@@ -195,12 +204,12 @@ const Attendance = () => {
                 },
                 header: 'Trạng thái',
                 size: 85
-            },
-            {
-                accessorKey: 'notes',
-                header: 'Ghi chú',
-                size: 85
             }
+            // {
+            //     accessorKey: 'notes',
+            //     header: 'Ghi chú',
+            //     size: 85
+            // }
         ],
         []
     )
@@ -217,9 +226,11 @@ const Attendance = () => {
 
     return (
         <Container fluid>
-            <Title order={1} color="dark" fw={500} mb={20}>
-                ĐIỂM DANH
-            </Title>
+            <Center>
+                <Title order={1} color="dark" fw={500} mb={20}>
+                    LỊCH SỬ ĐIỂM DANH
+                </Title>
+            </Center>
             <Grid mt={30}>
                 {loading ? (
                     <>
@@ -263,9 +274,7 @@ const Attendance = () => {
                                                         color="dark"
                                                         fw={700}
                                                     >
-                                                        Khóa học{' '}
-                                                        {attendance.courseName}{' '}
-                                                        - Lớp{' '}
+                                                        Lớp{' '}
                                                         {attendance.className}
                                                     </Title>
                                                 </Group>

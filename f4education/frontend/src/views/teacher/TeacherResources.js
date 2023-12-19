@@ -227,7 +227,7 @@ const TeacherResources = () => {
             if (rSelected === 1) {
                 formData.append('type', 'BÀI HỌC')
             } else if (rSelected === 2) {
-                formData.append('type', 'TÀI NGUYÊN')
+                formData.append('type', 'TÀI LIỆU')
             }
             console.log([...formData])
             try {

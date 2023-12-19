@@ -1,5 +1,6 @@
 package com.f4education.springjwt.payload.response;
 
+import java.sql.Time;
 import java.util.List;
 
 import com.f4education.springjwt.payload.request.ScheduleDTO;
@@ -18,6 +19,7 @@ public class ScheduleResponse {
     private Integer classroomId;
     private String className;
     private TeacherDTO teacher;
+
     private List<ScheduleDTO> listSchedules;
     private String sessionName;
     private String classroomName;

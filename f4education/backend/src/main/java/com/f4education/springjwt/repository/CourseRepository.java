@@ -52,6 +52,12 @@ public interface CourseRepository extends JpaRepository<Course, Integer> {
 			+ "WHERE c.status = :status ORDER BY bd.total_sales DESC", nativeQuery = true)
 	List<Object[]> findTop10CoursesWithBillDetails(Boolean status);
 
+	@Query(value = "SELECT c.*, bd.* FROM Course c "
+			+ "JOIN (SELECT b.course_id, b.bill_id ,b.create_date, SUM(b.total_price) AS total_sales "
+			+ "FROM Bill b GROUP BY b.course_id, b.bill_id, b.create_date) bd ON c.course_id = bd.course_id "
+			+ "WHERE c.status = :status ORDER BY bd.total_sales DESC", nativeQuery = true)
+	List<Object[]> findAllCoursesWithBillDetails(Boolean status);
+
 	@Query("SELECT c FROM Course c JOIN c.subject s WHERE s.subjectName =:subjectName")
 	List<Course> getCourseBySubjectName(@Param("subjectName") String subjectName);
 

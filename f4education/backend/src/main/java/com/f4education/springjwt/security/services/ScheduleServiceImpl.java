@@ -146,6 +146,8 @@ public class ScheduleServiceImpl implements ScheduleService {
         scheduleDTO.setStudyDate(schedule.getStudyDate());
         scheduleDTO.setContent(schedule.getContents());
         scheduleDTO.setIsPractice(schedule.getIsPractice());
+        scheduleDTO.setStartTime(schedule.getSessions().getStartTime());
+        scheduleDTO.setEndTime(schedule.getSessions().getEndTime());
 
         return scheduleDTO;
     }
@@ -193,7 +195,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         OffsetDateTime studyDate = OffsetDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        //         Format the OffsetDateTime and parse it back to OffsetDateTime
+        // Format the OffsetDateTime and parse it back to OffsetDateTime
         String formattedDate = studyDate.format(formatter);
         OffsetDateTime formattedOffsetDateTime = OffsetDateTime.parse(formattedDate + "T00:00:00+00:00");
 
@@ -207,24 +209,29 @@ public class ScheduleServiceImpl implements ScheduleService {
             LocalTime startTime = schedule.getSessions().getStartTime().toLocalTime();
 
             // Get current date time
-//            OffsetDateTime studyDateTime = OffsetDateTime.now().withYear(formattedOffsetDateTime.getYear())
-//                    .withMonth(formattedOffsetDateTime.getMonthValue())
-//                    .withDayOfMonth(formattedOffsetDateTime.getDayOfMonth()).withHour(LocalTime.now().getHour())
-//                    .withMinute(LocalTime.now().getMinute()).withSecond(LocalTime.now().getSecond());
-//
-//            // Check if studyDateTime is after 15 minutes from startTime
-//            LocalDate currentDate = formattedOffsetDateTime.toLocalDate();
-//            OffsetDateTime startDateTime = OffsetDateTime.of(currentDate, startTime, ZoneOffset.UTC);
-//            OffsetDateTime startTimePlus15Minutes = startDateTime.plusMinutes(15);
+            // OffsetDateTime studyDateTime =
+            // OffsetDateTime.now().withYear(formattedOffsetDateTime.getYear())
+            // .withMonth(formattedOffsetDateTime.getMonthValue())
+            // .withDayOfMonth(formattedOffsetDateTime.getDayOfMonth()).withHour(LocalTime.now().getHour())
+            // .withMinute(LocalTime.now().getMinute()).withSecond(LocalTime.now().getSecond());
+            //
+            // // Check if studyDateTime is after 15 minutes from startTime
+            // LocalDate currentDate = formattedOffsetDateTime.toLocalDate();
+            // OffsetDateTime startDateTime = OffsetDateTime.of(currentDate, startTime,
+            // ZoneOffset.UTC);
+            // OffsetDateTime startTimePlus15Minutes = startDateTime.plusMinutes(15);
 
             LocalTime studyTime = LocalTime.now();
 
-//            System.out.println(startTimePlus15Minutes);
+            // System.out.println(startTimePlus15Minutes);
             System.out.println(studyTime);
             System.out.println(startTime);
 
-            /*studyDateTime.getHour() == startTime.getHour() && studyDateTime.getMinute() >= startTime.getMinute()
-                    && studyDateTime.getMinute() <= startTimePlus15Minutes.getMinute()*/
+            /*
+             * studyDateTime.getHour() == startTime.getHour() && studyDateTime.getMinute()
+             * >= startTime.getMinute()
+             * && studyDateTime.getMinute() <= startTimePlus15Minutes.getMinute()
+             */
             if (studyTime.isAfter(startTime) && studyTime.isBefore(startTime.plusMinutes(25))) {
                 System.out.println("Class is study");
                 return schedule;
@@ -292,22 +299,22 @@ public class ScheduleServiceImpl implements ScheduleService {
         return schedulesResponse;
     }
 
-	@Override
-	public ScheduleResponse findAllScheduleByClassIdAndIsPractice(Integer classId) {
-		List<Schedule> schedules = scheduleRepository.findAllScheduleByClassIdAndIsPractice(classId);
-		ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
-		return scheduleResponse;
-	}
+    @Override
+    public ScheduleResponse findAllScheduleByClassIdAndIsPractice(Integer classId) {
+        List<Schedule> schedules = scheduleRepository.findAllScheduleByClassIdAndIsPractice(classId);
+        ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
+        return scheduleResponse;
+    }
 
-	@Override
-	public void deleteScheduleExam(Integer scheduleId) {
-		scheduleRepository.deleteById(scheduleId);
-	}
+    @Override
+    public void deleteScheduleExam(Integer scheduleId) {
+        scheduleRepository.deleteById(scheduleId);
+    }
 
-	@Override
-	public ScheduleResponse findAllScheduleByStudentId(String studentId) {
-		List<Schedule> schedules = scheduleRepository.findAllScheduleByStudentId(studentId);
-		ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
-		return scheduleResponse;
-	}
+    @Override
+    public ScheduleResponse findAllScheduleByStudentId(String studentId) {
+        List<Schedule> schedules = scheduleRepository.findAllScheduleByStudentId(studentId);
+        ScheduleResponse scheduleResponse = this.convertListEntityToResponses(schedules);
+        return scheduleResponse;
+    }
 }

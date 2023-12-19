@@ -1,5 +1,6 @@
 package com.f4education.springjwt.payload.request;
 
+import java.sql.Time;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -18,6 +19,11 @@ public class ScheduleDTO {
 	@JsonProperty("studyDate")
 	private Date studyDate;
 
+	@JsonProperty("startTime")
+	private Time startTime;
+
+	@JsonProperty("endTime")
+	private Time endTime;
 	@JsonProperty("content")
 	private String content;
 

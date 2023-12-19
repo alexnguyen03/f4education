@@ -200,11 +200,23 @@ const SubmitHomework = () => {
 
     const isCurrentDateInRange = (startDateTime, endDateTime) => {
         const currentDateTime = moment(new Date()).format('DD-MM-yyyy h:mm:ss')
+        console.log(
+            '🚀 ~ file: SubmitHomework.js:203 ~ isCurrentDateInRange ~ currentDateTime:',
+            currentDateTime
+        )
         const startDate = moment(new Date(startDateTime)).format(
             'DD-MM-yyyy h:mm:ss'
         )
+        console.log(
+            '🚀 ~ file: SubmitHomework.js:206 ~ isCurrentDateInRange ~ startDate:',
+            startDate
+        )
         const endDate = moment(new Date(endDateTime)).format(
             'DD-MM-yyyy h:mm:ss'
+        )
+        console.log(
+            '🚀 ~ file: SubmitHomework.js:210 ~ isCurrentDateInRange ~ endDate:',
+            endDate
         )
         return moment(currentDateTime, 'DD-MM-yyyy h:mm:ss').isBetween(
             moment(startDate, 'DD-MM-yyyy h:mm:ss'),

@@ -63,7 +63,7 @@ const Questions = () => {
             const resp = await questionApi.getAllQuestion()
 
             if (resp.status === 200 && resp.data.length > 0) {
-                setQuestions(resp.data)
+                setQuestions(resp.data.reverse())
                 console.log(resp.data)
             }
             setQuestionLoading(false)
@@ -105,6 +105,7 @@ const Questions = () => {
                 setQuestionLoading(true)
                 const resp = await questionApi.createQuestion(question)
                 if (resp.status === 200) {
+                    setQuestions([resp.data, ...questions])
                     toast.update(id, Notify.options.createSuccess())
                 }
             } catch (error) {
@@ -113,7 +114,7 @@ const Questions = () => {
             } finally {
                 setQuestionLoading(false)
                 setShowModal(false)
-                fetchQuestions()
+                // fetchQuestions()
                 handleClearForm()
             }
         } else {

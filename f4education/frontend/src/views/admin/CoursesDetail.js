@@ -24,7 +24,8 @@ import { Dropzone, MIME_TYPES } from '@mantine/dropzone'
 import {
     IconBookDownload,
     IconBookUpload,
-    IconFile3d, IconRefresh,
+    IconFile3d,
+    IconRefresh,
     IconUpload,
     IconX
 } from '@tabler/icons-react'
@@ -97,7 +98,7 @@ const CoursesDetail = () => {
         } catch (error) {
             console.error('Failed to upload file.', error)
         }
-    } 
+    }
 
     // ACTION AREA
     const handleExcelFileUpload = async () => {
@@ -436,7 +437,7 @@ const CoursesDetail = () => {
                 </FormGroup>
             </Col>
         ))
-    } 
+    }
 
     // USE EFECT AREA
     useEffect(() => {
@@ -470,6 +471,10 @@ const CoursesDetail = () => {
                             {'  -  '}
                             Tổng số bài học:{' '}
                             {courseDetail.length > 0 ? courseDetail.length : 0}
+                        </h3>
+                        <h3 className="text-muted text-left">
+                            Số bài học phải là :{' '}
+                            {(currentCourse.courseDuration / 2).toFixed(0)} bài
                         </h3>
                     </CardHeader>
 
@@ -819,7 +824,7 @@ const CoursesDetail = () => {
                             setIsUpdate(false)
                         }}
                     >
-                        {isUpdate ? 'Cập nhật câu hỏi' : 'Thêm câu hỏi'}
+                        {isUpdate ? 'Cập nhật câu hỏi' : 'Thêm đề cương'}
                     </Button>
                 </div>
             </Modal>

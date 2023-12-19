@@ -142,7 +142,7 @@ const CourseProgress = () => {
 
                 const pointGreaterThanFive = await checkIfCourseProgressIsDone(
                     element.classes.classId,
-                    element.registerCourseId 
+                    element.registerCourseId
                 )
 
                 // Tinh toan progress cua khoa
@@ -409,6 +409,7 @@ const CourseProgress = () => {
                         'Chuyển hướng đến chứng chỉ khóa học'
                     )
                 )
+                console.log(newCertificate)
                 navigate({
                     pathname: '/pdf/certificate/download',
                     search: `?${createSearchParams({
@@ -467,6 +468,14 @@ const CourseProgress = () => {
             checkActivedExamByTodayAndClassId()
             handleCheckIfClassIsClose()
             checkStudentHasEvaluated()
+            console.log(
+                '🚀 ~ file: CourseProgress.js:471 ~ useEffect ~ classIsFinish:',
+                classIsFinish
+            )
+            console.log(
+                '🚀 ~ file: CourseProgress.js:471 ~ useEffect ~ evaluated:',
+                evaluated
+            )
         }
     }, [searchParams])
 
@@ -605,11 +614,6 @@ const CourseProgress = () => {
                                             selectedCourse.course
                                                 .courseDescription
                                         }
-                                        , Lorem ipsum dolor sit amet
-                                        consectetur, adipisicing elit.
-                                        Reprehenderit quo pariatur rerum
-                                        blanditiis provident dolores itaque,
-                                        illo porro. Totam, libero!
                                     </strong>
                                 </Text>
                                 <Group position="apart">
@@ -1150,7 +1154,7 @@ const CourseProgress = () => {
                                                                                         500
                                                                                     }
                                                                                     lineClamp={
-                                                                                        2
+                                                                                        1
                                                                                     }
                                                                                     mt="md"
                                                                                 >
@@ -1914,12 +1918,13 @@ const CourseProgress = () => {
                         )}
                     </Box>
                 </Box>
-                // modal show Evaluation Teacher
                 <Modal.Root
                     opened={classIsFinish && !evaluated}
-                    // onClose={downloadRecourceHandlers.close}
+                    onClose={() => {
+                        setClassIsFinish((prev) => !prev)
+                    }}
                     centered
-                    closeOnClickOutside={false}
+                    closeOnClickOutside={true}
                     closeOnEscape={false}
                 >
                     <Modal.Overlay />

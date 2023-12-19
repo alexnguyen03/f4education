@@ -39,34 +39,34 @@ public class Student implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	List<Bill> bills;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	List<Evaluate> evaluates;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	List<Point> points;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	List<RegisterCourse> registerCourses;
 
 	@JsonIgnore
 	@OneToMany(mappedBy = "student")
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	List<QuizResult> quizResults;
 
 	@OneToMany(mappedBy = "student")
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	private List<Attendance> attendances;
 	@JsonIgnore
-	// @Access(AccessType.PROPERTY)
+	@Access(AccessType.PROPERTY)
 	@OneToMany(mappedBy = "student")
 	private List<EvaluationTeacher> evaluationTeachers;
 
@@ -76,11 +76,11 @@ public class Student implements Serializable {
 	User user;
 
 	public List<Attendance> getAttendances() {
-		return this.attendances;
+		return new ArrayList<>(this.attendances);
 	}
 
 	public List<Bill> getBills() {
-		return this.bills;
+		return new ArrayList<>(this.bills);
 	}
 
 	public void setBills(List<Bill> bills) {
@@ -88,7 +88,7 @@ public class Student implements Serializable {
 	}
 
 	public List<EvaluationTeacher> getEvaluationTeachers() {
-		return this.evaluationTeachers;
+		return new ArrayList<>(this.evaluationTeachers);
 	}
 
 	public void setEvaluationTeachers(List<EvaluationTeacher> evaluationTeachers) {
@@ -96,7 +96,7 @@ public class Student implements Serializable {
 	}
 
 	public List<Evaluate> getEvaluates() {
-		return this.evaluates;
+		return new ArrayList<>(this.evaluates);
 	}
 
 	public void setEvaluates(List<Evaluate> evaluates) {
@@ -104,7 +104,7 @@ public class Student implements Serializable {
 	}
 
 	public List<Point> getPoints() {
-		return this.points;
+		return new ArrayList<>(this.points);
 	}
 
 	public void setPoints(List<Point> points) {
@@ -112,7 +112,7 @@ public class Student implements Serializable {
 	}
 
 	public List<RegisterCourse> getRegisterCourses() {
-		return this.registerCourses;
+		return new ArrayList<>(this.registerCourses);
 	}
 
 	public void setRegisterCourses(List<RegisterCourse> registerCourses) {
@@ -120,7 +120,7 @@ public class Student implements Serializable {
 	}
 
 	public List<QuizResult> getQuizResults() {
-		return this.quizResults;
+		return new ArrayList<>(this.quizResults);
 	}
 
 	public void setQuizResults(List<QuizResult> quizResults) {

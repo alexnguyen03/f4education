@@ -89,6 +89,10 @@ const TeacherSchedule = () => {
                 console.log('🚀 ~ a:', a)
                 setSchedules(a)
                 let dataFilter = filler(a, datepicker)
+                console.log(
+                    '🚀 ~ file: TeacherSchedule.js:92 ~ fetchClassByTeacher ~ dataFilter:',
+                    dataFilter
+                )
                 setSchedulesFillter([...dataFilter])
             }
             setLoading(false)
@@ -253,10 +257,10 @@ const TeacherSchedule = () => {
                             ' - ' +
                             new Date(today)
                     )
-
+                    console.log(new Date(item.date.substring(0, 10)))
+                    console.log(today.toDateString().substring(0, 10))
                     return (
-                        new Date(item.date.substring(0, 10)) >=
-                        new Date(today.toString().substring(0, 10))
+                        new Date(item.date.substring(0, 10)) >= new Date(today)
                     )
                 })
                 break
